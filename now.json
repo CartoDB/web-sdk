@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "name": "web-sdk",
+  "builds": [
+    { "src": "examples/**/*", "use": "@now/static" },
+    {
+      "src": "package.json",
+      "use": "@now/static-build",
+      "config": { "distDir": "/dist" }
+    },
+    { "src": "/dist/umd/**/*", "use": "@now/static" }
+  ],
+  "routes": [{ "src": "/dist/umd/(.*)", "dest": "/umd/" }]
+}
