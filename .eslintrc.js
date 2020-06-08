@@ -46,6 +46,7 @@ module.exports = {
 
     // Maybe we can enable this later
     "@typescript-eslint/explicit-function-return-type": "off",
+    "@typescript-eslint/explicit-module-boundary-types": "off",
     "import/prefer-default-export": "off",
   },
 };
