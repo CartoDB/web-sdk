@@ -1,6 +1,7 @@
-const BundleAnalyzerPlugin = require("webpack-bundle-analyzer")
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer')
   .BundleAnalyzerPlugin;
-const mode = process.env.NODE_ENV || "development";
+const mode = process.env.NODE_ENV || 'development';
+const path = require('path');
 
 // This is main configuration object.
 // Here you write different options and tell Webpack what to do
@@ -10,53 +11,60 @@ module.exports = {
   // on final bundle.
   mode,
 
-  devtool: "source-map",
+  devtool: 'source-map',
 
-  entry: "./src/index.ts",
+  entry: './src/index.ts',
+
+  output: {
+    path: path.resolve(__dirname, 'dist/umd'),
+    filename: 'index.min.js',
+    library: 'carto',
+    libraryTarget: 'umd'
+  },
 
   externals: {
-    "@luma.gl/core": {
-      amd: "@luma.gl/core",
-      root: "luma",
-      commonjs: "@luma.gl/core",
-      commonjs2: "@luma.gl/core",
+    '@luma.gl/core': {
+      amd: '@luma.gl/core',
+      root: 'luma',
+      commonjs: '@luma.gl/core',
+      commonjs2: '@luma.gl/core'
     },
-    "@deck.gl/core": {
-      amd: "@deck.gl/core",
-      root: "deck",
-      commonjs: "@deck.gl/core",
-      commonjs2: "@deck.gl/core",
-    },
+    '@deck.gl/core': {
+      amd: '@deck.gl/core',
+      root: 'deck',
+      commonjs: '@deck.gl/core',
+      commonjs2: '@deck.gl/core'
+    }
   },
 
   module: {
     rules: [
       {
         test: /\.tsx?$/,
-        use: "ts-loader",
-        exclude: /node_modules/,
+        use: 'ts-loader',
+        exclude: /node_modules/
       },
 
       {
         test: /\.mjs$/,
         include: /node_modules/,
-        type: "javascript/auto",
+        type: 'javascript/auto'
       },
 
       {
         test: /\.js$/,
-        use: "source-map-loader",
-        enforce: "pre",
-      },
-    ],
+        use: 'source-map-loader',
+        enforce: 'pre'
+      }
+    ]
   },
 
   resolve: {
-    extensions: [".ts", ".mjs", ".js"],
+    extensions: ['.ts', '.mjs', '.js']
   },
 
   plugins: [
     // Uncomment for bundle analysis
     // new BundleAnalyzerPlugin()
-  ],
+  ]
 };
