@@ -1,0 +1,7 @@
+.cache/
+.vscode
+coverage/
+dist/
+docs/
+node_modules/
+secrets.json
