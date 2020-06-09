@@ -8,7 +8,7 @@ module.exports = {
   excludeNotExported: true,
   excludePrivate: true,
   excludeProtected: true,
-  ignoreCompilerErrors: true,
+  ignoreCompilerErrors: false,
   inputFiles: './src/index.ts',
   listInvalidSymbolLinks: true,
   mode: 'file',
