@@ -23,7 +23,7 @@
     "build:umd": "webpack --config webpack.config.js",
     "build:watch": "webpack --config webpack.config.js --watch ",
     "prewatch": "rimraf dist/",
-    "test": "jest --config jest.config.js ./src",
+    "test": "jest --config jest.config.js ./src --coverage",
     "test:watch": "jest --watch ./src"
   },
   "devDependencies": {
