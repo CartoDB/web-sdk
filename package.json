@@ -3,6 +3,10 @@
   "version": "0.0.1",
   "description": "CARTO Web SDK",
   "keywords": [],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CartoDB/web-sdk.git"
+  },
   "author": "",
   "license": "BSD-3-Clause",
   "main": "dist/cjs/index.js",
@@ -22,6 +26,8 @@
     "build:cjs": "BABEL_ENV=COMMONJS npx babel --source-maps --config-file ./babel.config.js --out-dir dist/cjs --extensions '.ts' ./src",
     "build:umd": "webpack --config webpack.config.js",
     "build:watch": "webpack --config webpack.config.js --watch ",
+    "build:docs": "npm run docs:reference",
+    "docs:reference": "rimraf docs/api && npx typedoc --options typedoc.js",
     "prewatch": "rimraf dist/",
     "test": "jest --config jest.config.js",
     "test:watch": "jest --watch"
@@ -66,6 +72,9 @@
     "ts-loader": "^7.0.5",
     "tslint": "^5.20.0",
     "typescript": "3.8.3",
+    "typedoc": "next",
+    "typedoc-plugin-external-module-name": "^4.0.3",
+    "typedoc-plugin-markdown": "^2.3.1",
     "webpack": "^4.42.0",
     "webpack-bundle-analyzer": "^3.7.0",
     "webpack-cli": "^3.3.11"
