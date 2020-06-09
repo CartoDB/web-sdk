@@ -1,6 +1,7 @@
 import mitt from 'mitt';
 import { CartoError } from '../errors/CartoError';
 
+console.log(mitt);
 export abstract class WithEvents {
   protected emitter = mitt();
   protected availableEvents = ['*'];

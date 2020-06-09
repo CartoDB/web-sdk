@@ -1,5 +1,8 @@
 module.exports = {
   preset: 'ts-jest',
   modulePathIgnorePatterns: ['__tests__/.*/cases/'],
-  rootDir: './src'
+  rootDir: './',
+  moduleNameMapper: {
+    "^@/(.*)$": "<rootDir>/src/lib/$1"
+  }
 };
