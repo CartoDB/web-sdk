@@ -9,7 +9,7 @@ module.exports = {
   excludePrivate: true,
   excludeProtected: true,
   ignoreCompilerErrors: true,
-  inputFiles: './packages',
+  inputFiles: './src/index.ts',
   listInvalidSymbolLinks: true,
   mode: 'file',
   module: 'es2015',
