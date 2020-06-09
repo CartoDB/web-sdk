@@ -3,13 +3,13 @@
  */
 module.exports = {
   // excludeNotDocumented: true,
+  entryPoint: './src/index.ts',
   exclude: ['**/node_modules/**/*.ts', '**/__tests__/**/*', '**/*.types.ts'],
   excludeExternals: true,
   excludeNotExported: true,
   excludePrivate: true,
   excludeProtected: true,
   ignoreCompilerErrors: false,
-  inputFiles: './src/index.ts',
   listInvalidSymbolLinks: true,
   mode: 'file',
   module: 'es2015',
