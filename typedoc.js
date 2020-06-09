@@ -3,18 +3,21 @@
  */
 module.exports = {
   // excludeNotDocumented: true,
-  entryPoint: './src/index.ts',
   exclude: ['**/node_modules/**/*.ts', '**/__tests__/**/*', '**/*.types.ts'],
   excludeExternals: true,
   excludeNotExported: true,
   excludePrivate: true,
   excludeProtected: true,
+  inputFiles:
   ignoreCompilerErrors: false,
   listInvalidSymbolLinks: true,
-  mode: 'file',
+  mode: 'library',
+  // mode: 'file',
   module: 'es2015',
   name: '@carto/web-sdk',
-  out: './docs/api',
+  // out: './docs/api', // default
+  out: './docs/api-lib', // libraty
+  // out: './docs/api-file', // file
   plugin: 'none',
   target: 'es6',
   theme: 'default',
