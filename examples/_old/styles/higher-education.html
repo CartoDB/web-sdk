@@ -33,7 +33,7 @@
     <script src="https://unpkg.com/deck.gl@8.2.0-alpha.2/dist.min.js"></script>
 
     <!-- CARTO Web SDK -->
-    <script src="/packages/toolkit/dist/umd/index.min.js"></script>
+    <script src="/dist/umd/index.min.js"></script>
 
     <script>
       async function initialize() {
@@ -51,16 +51,13 @@
           }
         });
 
-        const percentageStyleWithCARTOColors = carto.viz.colorBinsStyle(
-          'pct_higher_ed',
-          {
-            // colors accepts an array of HEX color strings,
-            // or a string pointing to a CARTOColors palette
-            palette: 'pinkyl',
+        const percentageStyleWithCARTOColors = carto.viz.colorBinsStyle('pct_higher_ed', {
+          // colors accepts an array of HEX color strings,
+          // or a string pointing to a CARTOColors palette
+          palette: 'pinkyl',
 
-            othersColor: '#FFF'
-          }
-        );
+          othersColor: '#FFF'
+        });
 
         const airbnbLayer = new carto.viz.Layer(
           'higher_edu_by_county',

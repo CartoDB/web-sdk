@@ -106,7 +106,7 @@
     <script src="https://libs.cartocdn.com/airship-components/v2.3/airship.js"></script>
 
     <!-- CARTO Deck.gl's Tile Layer -->
-    <script src="/packages/toolkit/dist/umd/index.min.js"></script>
+    <script src="/dist/umd/index.min.js"></script>
 
     <script>
       let points, lines, polygons;
@@ -144,8 +144,7 @@
 
       function setOnHover(enable = true) {
         let layer;
-        const selectedLayer = document.querySelector('as-dropdown')
-          .selectedOption;
+        const selectedLayer = document.querySelector('as-dropdown').selectedOption;
         eval(`layer = ${selectedLayer}`);
         if (enable) {
           layer.setPopupHover([{ attr: 'type', title: 'Layer' }]);
@@ -156,8 +155,7 @@
 
       function setOnClick(enable = true) {
         let layer;
-        const selectedLayer = document.querySelector('as-dropdown')
-          .selectedOption;
+        const selectedLayer = document.querySelector('as-dropdown').selectedOption;
         eval(`layer = ${selectedLayer}`);
         if (enable) {
           layer.setPopupClick([{ attr: 'type', title: 'Layer' }]);

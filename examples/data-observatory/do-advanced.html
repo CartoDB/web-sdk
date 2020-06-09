@@ -43,7 +43,7 @@
     <script src="https://unpkg.com/deck.gl@8.2.0-alpha.2/dist.min.js"></script>
 
     <!-- CARTO Deck.gl's Tile Layer -->
-    <script src="/packages/toolkit/dist/umd/index.min.js"></script>
+    <script src="/dist/umd/index.min.js"></script>
 
     <script>
       let initCenter = [-73.989582, 40.741587]; // [-87.623177, 41.881832],
@@ -112,8 +112,7 @@
 
       function getURLTemplates(suffix) {
         const domains = ['a', 'b', 'c', 'd'];
-        const urlTemplate =
-          'https://do-gusc-{domain}.cartocdn.com/USER/api/v4/data/observatory/';
+        const urlTemplate = 'https://do-gusc-{domain}.cartocdn.com/USER/api/v4/data/observatory/';
 
         return domains.map(d => urlTemplate.replace('{domain}', d) + suffix);
       }

@@ -59,7 +59,7 @@
     <script src="https://unpkg.com/deck.gl@8.2.0-alpha.2/dist.min.js"></script>
 
     <!-- CARTO Deck.gl's Tile Layer -->
-    <script src="/packages/toolkit/dist/umd/index.min.js"></script>
+    <script src="/dist/umd/index.min.js"></script>
 
     <script>
       async function initialize() {
@@ -80,22 +80,18 @@
         const sizeBinStyle = new carto.viz.sizeBinsStyle('pop_2015', {
           sizeRange: [1, 50]
         });
-        const populationLayer = new carto.viz.Layer(
-          'world_population_2015',
-          sizeBinStyle,
-          {
-            hoverStyle: {
-              getFillColor: [255, 0, 165, 200],
-              getLineColor: [214, 0, 138, 200],
-              getLineWidth: 4
-            },
-            clickStyle: {
-              getFillColor: [0, 78, 255, 200],
-              getLineColor: [0, 50, 160, 200],
-              getLineWidth: 7
-            }
+        const populationLayer = new carto.viz.Layer('world_population_2015', sizeBinStyle, {
+          hoverStyle: {
+            getFillColor: [255, 0, 165, 200],
+            getLineColor: [214, 0, 138, 200],
+            getLineWidth: 4
+          },
+          clickStyle: {
+            getFillColor: [0, 78, 255, 200],
+            getLineColor: [0, 50, 160, 200],
+            getLineWidth: 7
           }
-        );
+        });
         populationLayer.addTo(deckMap);
       }
       initialize();

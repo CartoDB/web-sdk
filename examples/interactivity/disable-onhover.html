@@ -52,16 +52,10 @@
             <section id="map"></section>
             <div class="as-map-panels">
               <div class="as-panel as-panel--top as-panel--left">
-                <button
-                  class="as-btn"
-                  onclick="window.layer.setPopupHover(['cartodb_id']);"
-                >
+                <button class="as-btn" onclick="window.layer.setPopupHover(['cartodb_id']);">
                   enable
                 </button>
-                <button
-                  class="as-btn"
-                  onclick="window.layer.setPopupHover(null);"
-                >
+                <button class="as-btn" onclick="window.layer.setPopupHover(null);">
                   disable
                 </button>
               </div>
@@ -87,7 +81,7 @@
     <script src="https://libs.cartocdn.com/airship-components/v2.3/airship.js"></script>
 
     <!-- CARTO Deck.gl's Tile Layer -->
-    <script src="/packages/toolkit/dist/umd/index.min.js"></script>
+    <script src="/dist/umd/index.min.js"></script>
 
     <script>
       async function initialize() {
@@ -108,14 +102,8 @@
         const sizeBinStyle = new carto.viz.sizeBinsStyle('pop_2015', {
           sizeRange: [1, 50]
         });
-        const populationLayer = new carto.viz.Layer(
-          'world_population_2015',
-          sizeBinStyle
-        );
-        populationLayer.setPopupClick([
-          'cartodb_id',
-          { attr: 'pop_2015', title: 'Population' }
-        ]);
+        const populationLayer = new carto.viz.Layer('world_population_2015', sizeBinStyle);
+        populationLayer.setPopupClick(['cartodb_id', { attr: 'pop_2015', title: 'Population' }]);
         await populationLayer.addTo(deckMap);
         window.layer = populationLayer;
       }

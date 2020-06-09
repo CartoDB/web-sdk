@@ -33,7 +33,7 @@
     <script src="https://unpkg.com/deck.gl@8.2.0-alpha.2/dist.min.js"></script>
 
     <!-- CARTO Web SDK -->
-    <script src="/packages/toolkit/dist/umd/index.min.js"></script>
+    <script src="/dist/umd/index.min.js"></script>
 
     <script>
       async function initialize() {
@@ -51,26 +51,13 @@
           }
         });
 
-        const categoryStyleWithCARTOColors = carto.viz.colorCategoriesStyle(
-          'category',
-          {
-            categories: [
-              'Moda y calzado',
-              'Salud',
-              'Alimentación',
-              'Bares y restaurantes'
-            ],
-            palette: 'vivid'
-          }
-        );
+        const categoryStyleWithCARTOColors = carto.viz.colorCategoriesStyle('category', {
+          categories: ['Moda y calzado', 'Salud', 'Alimentación', 'Bares y restaurantes'],
+          palette: 'vivid'
+        });
 
         const categoryStyle = carto.viz.colorCategoriesStyle('category', {
-          categories: [
-            'Moda y calzado',
-            'Salud',
-            'Alimentación',
-            'Bares y restaurantes'
-          ],
+          categories: ['Moda y calzado', 'Salud', 'Alimentación', 'Bares y restaurantes'],
 
           // colors accepts an array of HEX color strings,
           // or a string pointing to a CARTOColors palette
@@ -84,10 +71,7 @@
           nullColor: '#00000010'
         });
 
-        const airbnbLayer = new carto.viz.Layer(
-          'spend_data',
-          categoryStyleWithCARTOColors
-        );
+        const airbnbLayer = new carto.viz.Layer('spend_data', categoryStyleWithCARTOColors);
         airbnbLayer.addTo(deckMap);
 
         window.deckMap = deckMap;

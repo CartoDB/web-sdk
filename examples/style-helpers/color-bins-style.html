@@ -32,7 +32,7 @@
     <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.js"></script>
     <script src="https://unpkg.com/deck.gl@8.2.0-alpha.2/dist.min.js"></script>
 
-    <script src="/packages/toolkit/dist/umd/index.min.js"></script>
+    <script src="/dist/umd/index.min.js"></script>
 
     <script>
       function initialize() {
@@ -48,10 +48,7 @@
         });
 
         const availabilityStyle = carto.viz.colorBinsStyle('availability_365');
-        const airbnbLayer = new carto.viz.Layer(
-          'listings_madrid',
-          availabilityStyle
-        );
+        const airbnbLayer = new carto.viz.Layer('listings_madrid', availabilityStyle);
         airbnbLayer.addTo(deckMap);
       }
 

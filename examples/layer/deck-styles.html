@@ -10,10 +10,7 @@
       type="text/css"
       href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.css"
     />
-    <link
-      rel="stylesheet"
-      href="https://libs.cartocdn.com/airship-style/v2.3/airship.css"
-    />
+    <link rel="stylesheet" href="https://libs.cartocdn.com/airship-style/v2.3/airship.css" />
 
     <style>
       body {
@@ -48,7 +45,7 @@
     <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.js"></script>
     <script src="https://unpkg.com/deck.gl@8.2.0-alpha.2/dist.min.js"></script>
 
-    <script src="/packages/toolkit/dist/umd/index.min.js"></script>
+    <script src="/dist/umd/index.min.js"></script>
 
     <script>
       async function initialize() {
@@ -62,10 +59,7 @@
           getLineColor: [255, 255, 255, 127]
         };
 
-        const countriesLayer = new carto.viz.Layer(
-          'ne_50m_admin_1_states_1',
-          styles
-        );
+        const countriesLayer = new carto.viz.Layer('ne_50m_admin_1_states_1', styles);
         countriesLayer.addTo(deckMap);
       }
 

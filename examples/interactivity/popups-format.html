@@ -46,8 +46,7 @@
                     </p>
                     <p class="as-body">
                       The attribute format accepts a string as D3 format (see
-                      https://github.com/d3/d3-format) or a function as custom
-                      format.
+                      https://github.com/d3/d3-format) or a function as custom format.
                     </p>
                   </section>
                 </div>
@@ -65,7 +64,7 @@
     <script src="https://libs.cartocdn.com/airship-components/v2.3/airship.js"></script>
 
     <!-- CARTO Deck.gl's Tile Layer -->
-    <script src="/packages/toolkit/dist/umd/index.min.js"></script>
+    <script src="/dist/umd/index.min.js"></script>
 
     <script>
       async function initialize() {
@@ -86,10 +85,7 @@
         const sizeBinStyle = new carto.viz.sizeBinsStyle('pop_2015', {
           sizeRange: [1, 50]
         });
-        const populationLayer = new carto.viz.Layer(
-          'world_population_2015',
-          sizeBinStyle
-        );
+        const populationLayer = new carto.viz.Layer('world_population_2015', sizeBinStyle);
         populationLayer.setPopupHover([
           {
             attr: 'cartodb_id',
