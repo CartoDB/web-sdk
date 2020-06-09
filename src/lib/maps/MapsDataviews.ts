@@ -1,18 +1,16 @@
 import { Credentials } from '../core/Credentials';
-import { Maps } from './Maps';
+import { Client } from './Client';
 
 export class MapsDataviews {
   private _source: string;
-  private _mapClient: Maps;
+  private _mapClient: Client;
 
   constructor(source: string, credentials: Credentials) {
     this._source = source;
-    this._mapClient = new Maps(credentials);
+    this._mapClient = new Client(credentials);
   }
 
-  public async aggregation(
-    params: AggregationParameters
-  ): Promise<AggregationResponse> {
+  public async aggregation(params: AggregationParameters): Promise<AggregationResponse> {
     const { column, aggregation, operationColumn, limit } = params;
 
     const dataviewName = `${this._source}_${Date.now()}`;
@@ -38,7 +36,7 @@ export class MapsDataviews {
     aggregation: AggregationType,
     operationColumn?: string
   ) {
-    const sourceMapConfig = Maps.generateMapConfigFromSource(this._source);
+    const sourceMapConfig = Client.generateMapConfigFromSource(this._source);
     const sourceId = sourceMapConfig.analyses[0].id;
     const mapConfig = {
       ...sourceMapConfig,
@@ -70,6 +68,7 @@ export interface AggregationResponse {
   aggregation: AggregationType;
   categoriesCount: number;
   categories: AggregationCategory[];
+  // eslint-disable-next-line camelcase
   errors_with_context?: { type: string; message: string }[];
   errors?: string[];
 }

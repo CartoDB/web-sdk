@@ -6,7 +6,7 @@ const REQUEST_GET_MAX_URL_LENGTH = 2048;
 const VECTOR_EXTENT = 2048;
 const VECTOR_SIMPLIFY_EXTENT = 2048;
 
-export class Maps {
+export class Client {
   private _credentials: Credentials;
 
   constructor(credentials: Credentials) {
@@ -41,10 +41,8 @@ export class Maps {
           type: 'mapnik',
           options: {
             sql: sql || `select * from ${dataset}`,
-            /* eslint-disable @typescript-eslint/camelcase */
             vector_extent: vectorExtent,
             vector_simplify_extent: vectorSimplifyExtent,
-            /* eslint-enable @typescript-eslint/camelcase */
             metadata,
             aggregation
           }
@@ -80,11 +78,7 @@ export class Maps {
    * @param layergroup
    * @param options
    */
-  public async aggregationDataview(
-    layergroup: any,
-    dataview: string,
-    categories?: number
-  ) {
+  public async aggregationDataview(layergroup: any, dataview: string, categories?: number) {
     const {
       metadata: {
         dataviews: {
@@ -96,10 +90,7 @@ export class Maps {
     const parameters = [encodeParameter('api_key', this._credentials.apiKey)];
 
     if (categories) {
-      const encodedCategories = encodeParameter(
-        'categories',
-        categories.toString()
-      );
+      const encodedCategories = encodeParameter('categories', categories.toString());
       parameters.push(encodedCategories);
     }
 
@@ -167,7 +158,9 @@ export class Maps {
 }
 
 export interface AggregationColumn {
+  // eslint-disable-next-line camelcase
   aggregate_function: string;
+  // eslint-disable-next-line camelcase
   aggregated_column: string;
 }
 
@@ -177,7 +170,9 @@ export interface StatsColumn {
 }
 
 export interface Sample {
+  // eslint-disable-next-line camelcase
   num_rows: number;
+  // eslint-disable-next-line camelcase
   include_columns: string[];
 }
 
@@ -210,6 +205,7 @@ interface BufferSizeOptions {
 
 export interface MapInstance {
   layergroupid: string;
+  // eslint-disable-next-line camelcase
   last_updated: string;
   metadata: {
     layers: [
@@ -250,6 +246,7 @@ export interface MapInstance {
         subdomains: string[];
       };
     };
+    // eslint-disable-next-line camelcase
     cdn_url: {
       http: string;
       https: string;

@@ -1,5 +1,5 @@
-import { Credentials } from '@carto/toolkit-core';
-import { MapOptions, Maps as Client } from '../src/Client';
+import { Credentials } from '../../core/Credentials';
+import { MapOptions, Client } from '../Client';
 
 describe('maps', () => {
   it('can be easily created', () => {
