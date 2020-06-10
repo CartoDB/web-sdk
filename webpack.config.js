@@ -1,5 +1,7 @@
-const BundleAnalyzerPlugin = require('webpack-bundle-analyzer')
-  .BundleAnalyzerPlugin;
+/* eslint-disable @typescript-eslint/no-var-requires */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
+
 const mode = process.env.NODE_ENV || 'development';
 const path = require('path');
 
@@ -60,7 +62,10 @@ module.exports = {
   },
 
   resolve: {
-    extensions: ['.ts', '.mjs', '.js']
+    extensions: ['.ts', '.mjs', '.js'],
+    alias: {
+      '@': path.resolve(__dirname, 'src/lib/')
+    }
   },
 
   plugins: [

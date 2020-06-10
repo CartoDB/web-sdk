@@ -1,6 +1,6 @@
 const COMMON_CONFIG = {
   comments: false,
-  ignore: ["./declarations"],
+  ignore: ["./declarations"]
 };
 
 const ESM_CONFIG = {
@@ -11,14 +11,14 @@ const ESM_CONFIG = {
       {
         forceAllTransforms: true,
         modules: false,
-        targets: { esmodules: true },
-      },
-    ],
+        targets: { esmodules: true }
+      }
+    ]
   ],
   plugins: [
     ["@babel/plugin-proposal-class-properties"],
-    ["@babel/transform-runtime", { useESModules: true }],
-  ],
+    ["@babel/transform-runtime", { useESModules: true }]
+  ]
 };
 
 const COMMONJS_CONFIG = {
@@ -28,22 +28,23 @@ const COMMONJS_CONFIG = {
       "@babel/env",
       {
         forceAllTransforms: true,
-        modules: "commonjs",
-      },
-    ],
+        modules: "commonjs"
+      }
+    ]
   ],
   plugins: [
     ["@babel/plugin-proposal-class-properties"],
-    ["@babel/transform-runtime"],
-  ],
+    ["@babel/transform-runtime"]
+  ]
 };
 
 const CONFIGURATIONS = {
   ESM: ESM_CONFIG,
-  COMMONJS: COMMONJS_CONFIG,
+  COMMONJS: COMMONJS_CONFIG
 };
 
 module.exports = (babelApi) => {
+  // eslint-disable-next-line no-console
   console.log("Bundling", babelApi.env());
 
   // Cache Babel config by environment
@@ -52,6 +53,6 @@ module.exports = (babelApi) => {
 
   return {
     ...COMMON_CONFIG,
-    ...CONFIGURATIONS[babelApi.env()],
+    ...CONFIGURATIONS[babelApi.env()]
   };
 };
