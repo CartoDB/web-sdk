@@ -3,6 +3,10 @@ import { Layer } from '../../../viz/layer/Layer';
 import { FormulaDataView } from './formula';
 import { AggregationType } from '../../operations/aggregation/aggregation';
 
+jest.mock('mitt', () => ({
+  default: jest.fn()
+}));
+
 describe('FormulaDataView', () => {
   describe('Instance Creation', () => {
     it('should create new DataView instance', () => {
