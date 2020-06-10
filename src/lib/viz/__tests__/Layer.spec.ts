@@ -35,7 +35,11 @@ const instantiateMapFrom = jest
   .mockImplementation(() => Promise.resolve(instantiationMapResult));
 
 jest.mock('@/maps/Client', () => ({
-  Maps: jest.fn().mockImplementation(() => ({ instantiateMapFrom }))
+  Client: jest.fn().mockImplementation(() => ({ instantiateMapFrom }))
+}));
+
+jest.mock('mitt', () => ({
+  default: jest.fn()
 }));
 
 describe('Layer', () => {

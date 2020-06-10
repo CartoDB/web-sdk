@@ -1,7 +1,7 @@
 import { calculateSizeBins } from './utils';
 import { Style, getStyleValue, BasicOptionsStyle, getStyles } from '..';
 import { CartoStylingError, stylingErrorTypes } from '../../errors/styling-error';
-import { StyledLayer, pixel2meters } from '../layer-style';
+import { StyledLayer } from '../layer-style';
 import { CategoryFieldStats, Category, GeometryType } from '../../sources/Source';
 import { sizeRangeValidation } from '../validators';
 
@@ -63,7 +63,7 @@ export function sizeCategoriesStyle(
     // Apply top
     categories = categories.slice(0, opts.top);
 
-    return calculateWithCategories(featureProperty, layer, categories, meta.geometryType, opts);
+    return calculateWithCategories(featureProperty, categories, meta.geometryType, opts);
   };
 
   return new Style(evalFN, featureProperty);
@@ -71,7 +71,6 @@ export function sizeCategoriesStyle(
 
 function calculateWithCategories(
   featureProperty: string,
-  layer: StyledLayer,
   categories: string[],
   geometryType: GeometryType,
   options: SizeCategoriesOptionsStyle
@@ -88,6 +87,7 @@ function calculateWithCategories(
    * @param feature - feature used to calculate the size.
    * @returns size.
    */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const getSizeValue = (feature: Record<string, any>) => {
     const featureValue: string = feature.properties[featureProperty];
 
@@ -99,30 +99,6 @@ function calculateWithCategories(
     return sizes[featureValueIndex];
   };
 
-  /**
-   * @public
-   * Calculates the radius size for the feature provided
-   * by parameter according to the categories and sizes.
-   *
-   * @param feature - feature used to calculate the radius size.
-   * @returns radio size.
-   */
-  const getRadius = (feature: Record<string, any>) => {
-    return pixel2meters(getSizeValue(feature), layer);
-  };
-
-  /**
-   * @public
-   * Calculates the line width for the feature provided
-   * by parameter according to the categories and sizes.
-   *
-   * @param feature - feature used to calculate the line width.
-   * @returns radio size.
-   */
-  const getLineWidth = (feature: Record<string, any>) => {
-    return getSizeValue(feature);
-  };
-
   // gets the min and max size
   const minSize = Math.min(...sizes);
   const maxSize = Math.max(...sizes);
@@ -130,14 +106,14 @@ function calculateWithCategories(
 
   if (geometryType === 'Point') {
     obj = {
-      getRadius,
+      getRadius: getSizeValue,
       pointRadiusMinPixels: minSize,
       pointRadiusMaxPixels: maxSize,
       radiusUnits: 'pixels'
     };
   } else {
     obj = {
-      getLineWidth,
+      getLineWidth: getSizeValue,
       lineWidthMinPixels: minSize,
       lineWidthMaxPixels: maxSize,
       radiusUnits: 'pixels'
@@ -147,7 +123,7 @@ function calculateWithCategories(
   return {
     ...styles,
     ...obj,
-    updateTriggers: { getRadius, getLineWidth }
+    updateTriggers: { getRadius: getSizeValue, getLineWidth: getSizeValue }
   };
 }
 
