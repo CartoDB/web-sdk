@@ -1,7 +1,8 @@
-import { CartoError } from '../../../core/errors/CartoError';
-import { Layer } from '../../../viz/layer/Layer';
-import { CARTOSource } from '../../../viz/sources/CARTOSource';
-import { DataView } from '../dataview';
+import { CartoError } from '@/core/errors/CartoError';
+import { Layer } from '@/viz/layer/Layer';
+import { CARTOSource } from '@/viz/sources/CARTOSource';
+import { castToNumberOrUndefined } from '@/core/utils/number';
+import { DataView, DataViewData } from '../dataview';
 import { AggregationType, aggregate } from '../../operations/aggregation/aggregation';
 import { groupValuesByAnotherColumn } from '../../operations/grouping';
 
@@ -21,7 +22,7 @@ export class CategoryDataView extends DataView {
     this.limit = limit;
   }
 
-  async getData() {
+  async getData(): Promise<Partial<DataViewData>> {
     const { categories, nullCount } = await this.groupBy();
     const categoryValues = categories.map(category => category.value);
 
@@ -90,15 +91,4 @@ interface CategoryDataViewOptions {
   limit?: number;
   operation: AggregationType;
   operationColumn: string;
-}
-
-function castToNumberOrUndefined(number: string | number) {
-  const castedNumber = Number(number);
-
-  if (!Number.isFinite(castedNumber)) {
-    return;
-  }
-
-  // eslint-disable-next-line consistent-return
-  return castedNumber;
 }

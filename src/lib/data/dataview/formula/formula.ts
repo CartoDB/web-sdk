@@ -1,7 +1,7 @@
 import { CartoError } from '../../../core/errors/CartoError';
 import { Layer } from '../../../viz/layer/Layer';
 import { CARTOSource } from '../../../viz/sources/CARTOSource';
-import { DataView } from '../dataview';
+import { DataView, DataViewData } from '../dataview';
 import { AggregationType, aggregate } from '../../operations/aggregation/aggregation';
 
 export class FormulaDataView extends DataView {
@@ -16,7 +16,7 @@ export class FormulaDataView extends DataView {
     this.operation = operation;
   }
 
-  async getData() {
+  async getData(): Promise<Partial<DataViewData>> {
     const features = await this.getSourceData([this.column]);
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
