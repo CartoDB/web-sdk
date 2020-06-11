@@ -4,6 +4,7 @@ import { WithEvents } from '@/core/mixins/WithEvents';
 import { GeoJsonLayer } from '@deck.gl/layers';
 import { MVTLayer } from '@deck.gl/geo-layers';
 import mitt from 'mitt';
+import { GeoJSON } from 'geojson';
 import { Source, StatFields } from '../sources/Source';
 import { CARTOSource, DOSource, GeoJsonSource } from '../sources';
 import { DOLayer } from '../deck/DOLayer';
@@ -14,6 +15,7 @@ import { StyledLayer } from '../style/layer-style';
 import { CartoLayerError, layerErrorTypes } from '../errors/layer-error';
 import { LayerInteractivity, InteractivityEventType } from './LayerInteractivity';
 import { LayerOptions } from './LayerOptions';
+import { basicStyle } from '../style/helpers/basic-style';
 
 const DEFAULT_ID_PROPERTY = 'cartodb_id';
 
@@ -42,7 +44,7 @@ export class Layer extends WithEvents implements StyledLayer {
 
   constructor(
     source: string | Source,
-    style: Style | StyleProperties = {},
+    style: Style | StyleProperties = basicStyle(),
     options?: Partial<LayerOptions>
   ) {
     super();
@@ -427,8 +429,20 @@ export class Layer extends WithEvents implements StyledLayer {
  * Internal function to auto convert string to CARTO source
  * @param source source object to be converted
  */
-function buildSource(source: string | Source) {
-  return typeof source === 'string' ? new CARTOSource(source) : source;
+function buildSource(source: string | Source | GeoJSON): Source {
+  if (source instanceof Source) {
+    return source;
+  }
+
+  if (typeof source === 'string') {
+    return new CARTOSource(source);
+  }
+
+  if (typeof source === 'object') {
+    return new GeoJsonSource(source);
+  }
+
+  throw new CartoLayerError('Unsupported source type', layerErrorTypes.UNKNOWN_SOURCE);
 }
 
 function buildStyle(style: Style | StyleProperties) {
