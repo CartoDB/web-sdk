@@ -38,27 +38,44 @@
 
   <script>
     async function initialize() {
-      // const data = await fetch('https://cartoframes.carto.com/api/v2/sql?api_key=default_public&q=select%20*%20from%20clev_sales&format=geojson')
-      //   .then(response => response.json())
-
-      const data = await fetch('./cartodb-query.geojson')
-        .then(response => response.json())
+      const data = await fetch('https://public.carto.com/api/v2/sql?api_key=default_public&q=select* from world_ports&format=geojson').then(response => response.json())
+      // const data = await fetch('./cartodb-query.geojson').then(response => response.json())
 
       console.log(data)
+      console.log({
+        data,
+        filled: true,
+        getFillColor: [238, 77, 90, 255],
+        pointRadiusMinPixels: 0,
+        pointRadiusMaxPixels: 30000000,
+        pointRadiusUnits: "pixels",
+        pointRadiusScale: 0.5,
+        getRadius: 10,
+        id: "geojson-771137a8-7b1e-4a16-8bb0-eeacdaf5f2ce-1591892085495",
+        stroked: true,
+        getLineColor: [34, 0, 34, 34],
+        getLineWidth: 0.5,
+        lineWidthUnits: 'pixels',
+        opacity: 1,
+        type: "GeoJsonLayer"
+      })
 
       const layer = new window.deck.GeoJsonLayer({
         data,
         filled: true,
         getFillColor: [238, 77, 90, 255],
-        pointRadiusMinPixels: 5,
-        pointRadiusMaxPixels: 30,
+        pointRadiusMinPixels: 0,
+        pointRadiusMaxPixels: 30000000,
         pointRadiusUnits: "pixels",
         pointRadiusScale: 0.5,
-        getRadius: 30,
+        getRadius: 10,
+        id: "geojson-771137a8-7b1e-4a16-8bb0-eeacdaf5f2ce-1591892085495",
         stroked: true,
         getLineColor: [34, 0, 34, 34],
-        getLineWidth: 1,
+        getLineWidth: 0.5,
         lineWidthUnits: 'pixels',
+        opacity: 1,
+        type: "GeoJsonLayer"
       });
 
       const deckInstance = new window.deck.DeckGL({
@@ -67,9 +84,9 @@
         mapStyle:
           'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
         initialViewState: {
-          longitude: -81.6830062866211,
-          latitude: 41.49057783237735,
-          zoom: 11
+          longitude: 0,
+          latitude: 0,
+          zoom: 1
         },
         controller: true,
         layers: [layer]
