@@ -1,10 +1,11 @@
 import { Deck } from '@deck.gl/core';
 import { CartoError } from '@/core/errors/CartoError';
 import { WithEvents } from '@/core/mixins/WithEvents';
+import { GeoJsonLayer } from '@deck.gl/layers';
 import { MVTLayer } from '@deck.gl/geo-layers';
 import mitt from 'mitt';
 import { Source, StatFields } from '../sources/Source';
-import { CARTOSource, DOSource } from '../sources';
+import { CARTOSource, DOSource, GeoJsonSource } from '../sources';
 import { DOLayer } from '../deck/DOLayer';
 import { getStyles, StyleProperties, Style } from '../style';
 import { ViewportFeaturesGenerator } from '../interactivity/viewport-features/ViewportFeaturesGenerator';
@@ -232,6 +233,8 @@ export class Layer extends WithEvents implements StyledLayer {
     // Create the Deck.gl instance
     if (this._source instanceof CARTOSource) {
       this._deckLayer = new MVTLayer(layerProperties);
+    } else if (this._source instanceof GeoJsonSource) {
+      this._deckLayer = new GeoJsonLayer(layerProperties);
     } else if (this._source instanceof DOSource) {
       this._deckLayer = new DOLayer(layerProperties);
     } else {
