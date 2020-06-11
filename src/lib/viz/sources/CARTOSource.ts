@@ -6,7 +6,7 @@ import {
   SourceMetadata,
   NumericFieldStats,
   CategoryFieldStats,
-  Field
+  StatFields
 } from './Source';
 import { parseGeometryType } from '../style/helpers/utils';
 import { sourceErrorTypes, SourceError } from '../errors/source-error';
@@ -122,7 +122,7 @@ export class CARTOSource extends Source {
     return this._metadata;
   }
 
-  private _initConfigForStats(fields: Field[]) {
+  private _initConfigForStats(fields: StatFields) {
     if (this._mapConfig.metadata === undefined) {
       throw new SourceError('Map Config has not metadata field');
     }
@@ -136,14 +136,12 @@ export class CARTOSource extends Source {
 
     this._mapConfig.metadata.sample = {
       num_rows: 1000,
-      include_columns: fields.filter(f => f.sample).map(f => f.column)
+      include_columns: [...fields.sample]
     };
 
     const dimensions: Record<string, { column: string }> = {};
-    fields.forEach(field => {
-      if (field.aggregation) {
-        dimensions[field.column] = { column: field.column };
-      }
+    fields.aggregation.forEach(field => {
+      dimensions[field] = { column: field };
     });
 
     this._mapConfig.aggregation = {
@@ -155,7 +153,7 @@ export class CARTOSource extends Source {
     };
   }
 
-  public async init(fields?: Field[]): Promise<boolean> {
+  public async init(fields: StatFields): Promise<boolean> {
     if (this.isInitialized) {
       // Maybe this is too hard, but I'd like to keep to check it's not a performance issue. We could move it to just a warning
       throw new SourceError('Try to reinstantiate map multiple times');
@@ -163,7 +161,7 @@ export class CARTOSource extends Source {
 
     const mapsClient = new Client(this._credentials);
 
-    if (fields) {
+    if (fields.sample.size || fields.aggregation.size) {
       this._initConfigForStats(fields);
     }
 
@@ -173,31 +171,30 @@ export class CARTOSource extends Source {
     const urlTemplate = urlData.subdomains.map((subdomain: string) =>
       urlData.urlTemplate.replace('{s}', subdomain)
     );
-
-    const { stats } = mapInstance.metadata.layers[0].meta;
-
-    const geometryType = parseGeometryType(stats.geometryType);
-
     this._props = { type: 'TileLayer', data: urlTemplate };
 
+    const { stats } = mapInstance.metadata.layers[0].meta;
+    const geometryType = parseGeometryType(stats.geometryType);
+    const columns = new Set([...fields.sample, ...fields.aggregation]);
     const fieldStats: (NumericFieldStats | CategoryFieldStats)[] = [];
 
-    if (fields) {
-      fields.forEach(field => {
-        const columnStats = stats.columns[field.column];
+    if (columns) {
+      columns.forEach(column => {
+        const columnStats = stats.columns[column];
 
         switch (columnStats.type) {
           case 'string':
             fieldStats.push({
-              name: field.column,
+              name: column,
               categories: columnStats.categories
             });
             break;
           case 'number':
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             fieldStats.push({
-              name: field.column,
-              ...stats.columns[field.column],
-              sample: stats.sample.map((x: any) => x[field.column])
+              name: column,
+              ...stats.columns[column],
+              sample: stats.sample.map((x: any) => x[column])
             });
             break;
           default:

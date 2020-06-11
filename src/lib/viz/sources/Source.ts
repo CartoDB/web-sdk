@@ -3,9 +3,17 @@
  * Base Source definition. We should keep here the code shared between different sources
  */
 
-import { Stats } from '../utils/Classifier';
-
 export type GeometryType = 'Point' | 'Line' | 'Polygon';
+
+export interface Stats {
+  min: number;
+  max: number;
+  avg?: number;
+  sum?: number;
+  sample?: number[];
+  stdev?: number;
+  range?: number;
+}
 
 export interface NumericFieldStats extends Stats {
   name: string;
@@ -27,13 +35,12 @@ export interface SourceMetadata {
 }
 
 export interface SourceProps {
-  type: 'TileLayer';
+  type: 'TileLayer' | 'GeoJsonLayer';
 }
 
-export interface Field {
-  column: string;
-  sample: boolean;
-  aggregation: boolean;
+export interface StatFields {
+  sample: Set<string>;
+  aggregation: Set<string>;
 }
 
 export abstract class Source {
@@ -47,7 +54,7 @@ export abstract class Source {
     this.isInitialized = false;
   }
 
-  abstract async init(fields?: Field[]): Promise<boolean>;
+  abstract async init(fields?: StatFields): Promise<boolean>;
 
   abstract getProps(): SourceProps;
 
