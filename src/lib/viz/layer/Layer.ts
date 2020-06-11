@@ -2,6 +2,7 @@ import { Deck } from '@deck.gl/core';
 import { CartoError } from '@/core/errors/CartoError';
 import { WithEvents } from '@/core/mixins/WithEvents';
 import { MVTLayer } from '@deck.gl/geo-layers';
+import { DataFilterExtension } from '@deck.gl/extensions';
 import mitt from 'mitt';
 import { Source, Field } from '../sources/Source';
 import { CARTOSource, DOSource } from '../sources';
@@ -13,6 +14,9 @@ import { StyledLayer } from '../style/layer-style';
 import { CartoLayerError, layerErrorTypes } from '../errors/layer-error';
 import { LayerInteractivity, InteractivityEventType } from './LayerInteractivity';
 import { LayerOptions } from './LayerOptions';
+import { FiltersCollection } from '../filters/FiltersCollection';
+import { FunctionFilterApplicator } from '../filters/FunctionFilterApplicator';
+import { ColumnFilters } from '../filters/types';
 
 export class Layer extends WithEvents implements StyledLayer {
   private _source: Source;
@@ -36,6 +40,8 @@ export class Layer extends WithEvents implements StyledLayer {
   // pickable events count
   private _pickableEventsCount = 0;
   private _fields: Field[];
+
+  private filtersCollection = new FiltersCollection(FunctionFilterApplicator);
 
   constructor(
     source: string | Source,
@@ -255,6 +261,9 @@ export class Layer extends WithEvents implements StyledLayer {
     const props = this._source.getProps();
     const styleProps = this.getStyle().getLayerProps(this);
 
+    const applicatorInstance = this.filtersCollection.getApplicatorInstance();
+    const shouldShowFeature = applicatorInstance.getApplicator();
+
     const events = {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       onViewportLoad: (...args: any) => {
@@ -276,8 +285,21 @@ export class Layer extends WithEvents implements StyledLayer {
       ...this._options,
       ...props,
       ...styleProps,
-      ...events
+      ...events,
+      ...{
+        getFilterValue: (f: GeoJSON.Feature) => shouldShowFeature(f.properties || {}),
+        filterRange: [1, 1],
+        extensions: [new DataFilterExtension({ filterSize: 1 })]
+      }
     };
+
+    if (layerProps.updateTriggers) {
+      layerProps.updateTriggers.getFilterValue = [this.filtersCollection.getUniqueID()];
+    } else {
+      layerProps.updateTriggers = {
+        getFilterValue: [this.filtersCollection.getUniqueID()]
+      };
+    }
 
     return ensureProperPropStyles(layerProps);
   }
@@ -386,6 +408,26 @@ export class Layer extends WithEvents implements StyledLayer {
       hoverStyle,
       clickStyle
     });
+  }
+
+  addFilter(widgetId: string, filter: ColumnFilters) {
+    this.filtersCollection.addFilter(widgetId, filter);
+
+    if (this._deckLayer) {
+      return this.replaceDeckGLLayer();
+    }
+
+    return Promise.resolve();
+  }
+
+  removeFilter(widgetId: string) {
+    this.filtersCollection.removeFilter(widgetId);
+
+    if (this._deckLayer) {
+      return this.replaceDeckGLLayer();
+    }
+
+    return Promise.resolve();
   }
 
   // eslint-disable-next-line consistent-return
