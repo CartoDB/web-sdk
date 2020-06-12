@@ -122,6 +122,10 @@ export class CARTOSource extends Source {
     return this._metadata;
   }
 
+  /**
+   * Set the internal mapConfig properly: columnStats, dimensions, sample and aggregation
+   * @param fields
+   */
   private _initConfigForStats(fields: Field[]) {
     if (this._mapConfig.metadata === undefined) {
       throw new SourceError('Map Config has not metadata field');
@@ -132,6 +136,7 @@ export class CARTOSource extends Source {
       topCategories: 32768,
       includeNulls: true
     };
+
     this._mapConfig.metadata.dimensions = true;
 
     this._mapConfig.metadata.sample = {
@@ -155,69 +160,85 @@ export class CARTOSource extends Source {
     };
   }
 
+  /**
+   * Instantiate the map, getting proper stats for input fields
+   * @param fields
+   */
   public async init(fields?: Field[]): Promise<boolean> {
     if (this.isInitialized) {
       // Maybe this is too hard, but I'd like to keep to check it's not a performance issue. We could move it to just a warning
       throw new SourceError('Try to reinstantiate map multiple times');
     }
 
-    const mapsClient = new Client(this._credentials);
-
     if (fields) {
       this._initConfigForStats(fields);
     }
 
+    const mapsClient = new Client(this._credentials);
     const mapInstance: MapInstance = await mapsClient.instantiateMapFrom(this._mapConfig);
 
-    const urlData = mapInstance.metadata.url.vector;
-
-    let urlTemplate = [urlData.urlTemplate];
-
-    // if subdomains exist, then a collection of urls will be used for better performance
-    if (urlData.subdomains.length) {
-      urlTemplate = urlData.subdomains.map((subdomain: string) =>
-        urlData.urlTemplate.replace('{s}', subdomain)
-      );
-    }
-
-    const { stats } = mapInstance.metadata.layers[0].meta;
-
-    const geometryType = parseGeometryType(stats.geometryType);
-
-    this._props = { type: 'TileLayer', data: urlTemplate };
-
-    const fieldStats: (NumericFieldStats | CategoryFieldStats)[] = [];
-
-    if (fields) {
-      fields.forEach(field => {
-        const columnStats = stats.columns[field.column];
-
-        switch (columnStats.type) {
-          case 'string':
-            fieldStats.push({
-              name: field.column,
-              categories: columnStats.categories
-            });
-            break;
-          case 'number':
-            fieldStats.push({
-              name: field.column,
-              ...stats.columns[field.column],
-              sample: stats.sample.map((x: any) => x[field.column])
-            });
-            break;
-          default:
-            throw new SourceError(
-              'Unsupported type for stats',
-              sourceErrorTypes.UNSUPPORTED_STATS_TYPE
-            );
-        }
-      });
-    }
-
-    this._metadata = { geometryType, stats: fieldStats };
+    const urlTemplate = getUrlsFrom(mapInstance);
+    this._props = { type: 'TileLayer', data: urlTemplate }; // TODO refactor / include in metadata ?
+    this._metadata = extractMetadataFrom(mapInstance, fields);
 
     this.isInitialized = true;
     return this.isInitialized;
   }
+}
+
+function getUrlsFrom(mapInstance: MapInstance): string | string[] {
+  const urlData = mapInstance.metadata.url.vector;
+  let urlTemplate = [urlData.urlTemplate];
+
+  // if subdomains exist, then a collection of urls will be used for better performance
+  if (urlData.subdomains.length) {
+    urlTemplate = urlData.subdomains.map((subdomain: string) =>
+      urlData.urlTemplate.replace('{s}', subdomain)
+    );
+  }
+
+  return urlTemplate;
+}
+
+function extractMetadataFrom(mapInstance: MapInstance, fields?: Field[]) {
+  const { stats } = mapInstance.metadata.layers[0].meta;
+  const geometryType = parseGeometryType(stats.geometryType);
+  const fieldStats = getCompleteFieldStats(stats, fields);
+
+  const metadata = { geometryType, stats: fieldStats };
+
+  return metadata;
+}
+
+function getCompleteFieldStats(stats: any, fields?: Field[]) {
+  const fieldStats: (NumericFieldStats | CategoryFieldStats)[] = [];
+
+  if (fields) {
+    fields.forEach(field => {
+      const columnStats = stats.columns[field.column];
+
+      switch (columnStats.type) {
+        case 'string':
+          fieldStats.push({
+            name: field.column,
+            categories: columnStats.categories
+          });
+          break;
+        case 'number':
+          fieldStats.push({
+            name: field.column,
+            ...stats.columns[field.column],
+            sample: stats.sample.map((x: any) => x[field.column])
+          });
+          break;
+        default:
+          throw new SourceError(
+            'Unsupported type for stats',
+            sourceErrorTypes.UNSUPPORTED_STATS_TYPE
+          );
+      }
+    });
+  }
+
+  return fieldStats;
 }
