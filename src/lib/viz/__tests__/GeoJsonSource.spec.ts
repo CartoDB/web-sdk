@@ -160,7 +160,8 @@ describe('SourceMetadata', () => {
           min: 10,
           max: 70,
           avg: 100 / 3,
-          sum: 100
+          sum: 100,
+          sample: [10, 20, 70]
         },
         {
           name: 'cat',
