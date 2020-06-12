@@ -170,9 +170,15 @@ export class CARTOSource extends Source {
     const mapInstance: MapInstance = await mapsClient.instantiateMapFrom(this._mapConfig);
 
     const urlData = mapInstance.metadata.url.vector;
-    const urlTemplate = urlData.subdomains.map((subdomain: string) =>
-      urlData.urlTemplate.replace('{s}', subdomain)
-    );
+
+    let urlTemplate = [urlData.urlTemplate];
+
+    // if subdomains exist, then a collection of urls will be used for better performance
+    if (urlData.subdomains.length) {
+      urlTemplate = urlData.subdomains.map((subdomain: string) =>
+        urlData.urlTemplate.replace('{s}', subdomain)
+      );
+    }
 
     const { stats } = mapInstance.metadata.layers[0].meta;
 
