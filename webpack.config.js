@@ -15,7 +15,7 @@ module.exports = {
 
   devtool: 'source-map',
 
-  entry: './src/index.ts',
+  entry: './src/lib/index.ts',
 
   output: {
     path: path.resolve(__dirname, 'dist/umd'),
