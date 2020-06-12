@@ -2,8 +2,8 @@ import { Deck } from '@deck.gl/core';
 import { CartoError } from '@/core/errors/CartoError';
 import { WithEvents } from '@/core/mixins/WithEvents';
 import { MVTLayer } from '@deck.gl/geo-layers';
-import { DataFilterExtension } from '@deck.gl/extensions';
 import mitt from 'mitt';
+import deepmerge from 'deepmerge';
 import { Source, Field } from '../sources/Source';
 import { CARTOSource, DOSource } from '../sources';
 import { DOLayer } from '../deck/DOLayer';
@@ -261,8 +261,7 @@ export class Layer extends WithEvents implements StyledLayer {
     const props = this._source.getProps();
     const styleProps = this.getStyle().getLayerProps(this);
 
-    const applicatorInstance = this.filtersCollection.getApplicatorInstance();
-    const shouldShowFeature = applicatorInstance.getApplicator();
+    const filters = this.filtersCollection.getApplicatorInstance();
 
     const events = {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -286,20 +285,16 @@ export class Layer extends WithEvents implements StyledLayer {
       ...props,
       ...styleProps,
       ...events,
-      ...{
-        getFilterValue: (f: GeoJSON.Feature) => shouldShowFeature(f.properties || {}),
-        filterRange: [1, 1],
-        extensions: [new DataFilterExtension({ filterSize: 1 })]
-      }
+      ...filters.getOptions()
     };
 
-    if (layerProps.updateTriggers) {
-      layerProps.updateTriggers.getFilterValue = [this.filtersCollection.getUniqueID()];
-    } else {
-      layerProps.updateTriggers = {
-        getFilterValue: [this.filtersCollection.getUniqueID()]
-      };
-    }
+    // Merge Update Triggers to avoid overriding
+    // TODO: We should split regular properties from
+    // updateTriggers
+    layerProps.updateTriggers = deepmerge.all([
+      layerProps.updateTriggers || {},
+      this.filtersCollection.getUpdateTriggers()
+    ]);
 
     return ensureProperPropStyles(layerProps);
   }

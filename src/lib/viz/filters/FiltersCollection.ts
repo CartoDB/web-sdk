@@ -23,12 +23,17 @@ export class FiltersCollection {
     return new this.FilterApplicator(filters);
   }
 
-  private _mergeFilters(): ColumnFilters {
-    return deepmerge.all(Array.from(this.collection.values())) as ColumnFilters;
+  getUpdateTriggers() {
+    return {
+      getFilterValue: [this._getUniqueID()]
+    };
   }
 
-  getUniqueID() {
-    // TODO: Improve This
+  private _getUniqueID() {
     return JSON.stringify(Array.from(this.collection.values()));
+  }
+
+  private _mergeFilters(): ColumnFilters {
+    return deepmerge.all(Array.from(this.collection.values())) as ColumnFilters;
   }
 }

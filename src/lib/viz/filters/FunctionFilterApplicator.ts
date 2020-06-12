@@ -1,3 +1,4 @@
+import { DataFilterExtension } from '@deck.gl/extensions';
 import { GeoJsonProperties } from 'geojson';
 import { CartoError } from '@/core/errors/CartoError';
 import { ColumnFilters, FilterTypes } from './types';
@@ -10,12 +11,15 @@ export class FunctionFilterApplicator {
   private filters: ColumnFilters;
 
   constructor(filters: ColumnFilters) {
-    // TODO: Deep clone?
-    this.filters = filters;
+    this.filters = { ...filters };
   }
 
-  getApplicator() {
-    return this.applicator.bind(this);
+  getOptions() {
+    return {
+      getFilterValue: (f: GeoJSON.Feature) => this.applicator(f.properties || {}),
+      filterRange: [1, 1],
+      extensions: [new DataFilterExtension({ filterSize: 1 })]
+    };
   }
 
   applicator(feature: GeoJsonProperties) {
