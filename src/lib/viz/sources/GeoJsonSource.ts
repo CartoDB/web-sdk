@@ -1,4 +1,4 @@
-import { GeoJSON, GeoJsonGeometryTypes, Feature, GeoJsonProperties } from 'geojson';
+import { GeoJSON, GeoJsonGeometryTypes, Feature } from 'geojson';
 import { uuidv4 } from '@/core/utils';
 import { aggregate, AggregationType } from '@/data/operations/aggregation/aggregation';
 
@@ -27,7 +27,6 @@ export class GeoJsonSource extends Source {
   private _props?: GeoJsonSourceProps;
   private _numericFieldValues: Record<string, number[]>;
   private _categoryFieldValues: Record<string, string[]>;
-  private _sample: Array<GeoJsonProperties>;
 
   constructor(geojson: GeoJSON) {
     const id = `geojson-${uuidv4()}`;
@@ -36,7 +35,6 @@ export class GeoJsonSource extends Source {
     this._geojson = geojson;
     this._numericFieldValues = {};
     this._categoryFieldValues = {};
-    this._sample = [];
   }
 
   public getProps(): GeoJsonSourceProps {
@@ -99,11 +97,6 @@ export class GeoJsonSource extends Source {
           this._saveFeatureValue(propName, properties[propName]);
         });
       }
-
-      // sample
-      if (features.length < MAX_SAMPLE_SIZE || Math.random() < MAX_SAMPLE_SIZE / features.length) {
-        this._sample.push(properties);
-      }
     });
   }
 
@@ -159,13 +152,15 @@ export class GeoJsonSource extends Source {
       const max = aggregate(values, AggregationType.MAX);
       const avg = aggregate(values, AggregationType.AVG);
       const sum = aggregate(values, AggregationType.SUM);
+      const sample = createSample(values);
 
       numericStats.push({
         name: propName,
         min,
         max,
         avg,
-        sum
+        sum,
+        sample
       });
     }
 
@@ -239,4 +234,13 @@ export function getFeatures(geojson: GeoJSON): Feature[] {
   }
 
   return [];
+}
+
+function createSample(values: number[]) {
+  if (values.length < MAX_SAMPLE_SIZE) {
+    return values;
+  }
+
+  const shuffled = values.sort(() => 0.5 - Math.random());
+  return shuffled.slice(0, MAX_SAMPLE_SIZE);
 }
