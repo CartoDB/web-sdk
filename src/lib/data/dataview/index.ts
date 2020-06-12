@@ -1,3 +1,2 @@
-export { CategoryDataView } from './category/category';
+export { CategoryDataView } from './category/CategoryDataView';
 export { FormulaDataView } from './formula/formula';
-export { CategorySourceDataView } from './category/CategorySourceDataView';

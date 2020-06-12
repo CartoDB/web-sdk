@@ -1,5 +1,5 @@
 import { Layer } from '../../../viz/layer/Layer';
-import { CategoryDataView } from './category';
+import { CategoryDataView } from './CategoryDataView';
 import { AggregationType } from '../../operations/aggregation/aggregation';
 import { CartoDataViewError, dataViewErrorTypes } from '../DataViewError';
 

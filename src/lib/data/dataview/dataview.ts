@@ -1,22 +1,18 @@
 import { CartoError } from '@/core/errors/CartoError';
 import { WithEvents } from '@/core/mixins/WithEvents';
-import { CARTOSource, Layer } from '@/viz';
 import { AggregationType } from '../operations/aggregation/aggregation';
 import { CartoDataViewError, dataViewErrorTypes } from './DataViewError';
 import { Filter } from './types';
 
-export class DataView extends WithEvents {
-  private dataSource: CARTOSource | Layer;
-  protected column: string;
+export abstract class DataView<T> extends WithEvents {
+  protected dataSource: T;
+  protected _column: string;
 
-  constructor(dataSource: CARTOSource | Layer, column: string) {
+  constructor(dataSource: T, column: string) {
     super();
-    validateParameters(dataSource, column);
 
     this.dataSource = dataSource;
-    this.column = column;
-
-    this.bindEvents();
+    this._column = column;
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -35,38 +31,30 @@ export class DataView extends WithEvents {
     this.dataSource.removeFilter(filterId);
   }
 
-  private bindEvents() {
-    this.registerAvailableEvents(['dataUpdate']);
+  public get column() {
+    return this._column;
+  }
 
-    if (this.dataSource instanceof Layer) {
-      this.dataSource.on('viewportLoad', () => {
-        this.onDataUpdate();
-      });
+  public set column(newColumn: string) {
+    this.validateParameters(this.dataSource, newColumn);
+    this._column = newColumn;
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  protected validateParameters(source: T, column: string) {
+    if (!source) {
+      throw new CartoDataViewError(
+        'Source was not provided while creating dataview',
+        dataViewErrorTypes.PROPERTY_MISSING
+      );
     }
-  }
 
-  private onDataUpdate() {
-    this.emitter.emit('dataUpdate');
-  }
-
-  protected getSourceData(columns: string[]) {
-    return (this.dataSource as Layer).getViewportFeatures(columns);
-  }
-}
-
-function validateParameters(source: CARTOSource | Layer, column: string) {
-  if (!source) {
-    throw new CartoDataViewError(
-      'Source was not provided while creating dataview',
-      dataViewErrorTypes.PROPERTY_MISSING
-    );
-  }
-
-  if (!column) {
-    throw new CartoDataViewError(
-      'Column name was not provided while creating dataview',
-      dataViewErrorTypes.PROPERTY_MISSING
-    );
+    if (!column) {
+      throw new CartoDataViewError(
+        'Column name was not provided while creating dataview',
+        dataViewErrorTypes.PROPERTY_MISSING
+      );
+    }
   }
 }
 
