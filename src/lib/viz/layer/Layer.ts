@@ -227,7 +227,6 @@ export class Layer extends WithEvents implements StyledLayer {
     }
 
     const layerProperties = await this._getLayerProperties();
-    console.log(layerProperties);
 
     // Create the Deck.gl instance
     if (this._source instanceof CARTOSource) {
