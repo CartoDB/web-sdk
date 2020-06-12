@@ -5,7 +5,6 @@ import { castToNumberOrUndefined } from '@/core/utils/number';
 import { DataView, DataViewData } from '../dataview';
 import { AggregationType, aggregate } from '../../operations/aggregation/aggregation';
 import { groupValuesByAnotherColumn } from '../../operations/grouping';
-import { Filter } from '../types';
 
 export class CategoryDataView extends DataView {
   private operation: AggregationType;
@@ -37,15 +36,6 @@ export class CategoryDataView extends DataView {
       min: aggregate(categoryValues, AggregationType.MIN),
       nullCount
     };
-  }
-
-  // TODO: Espero que se puedan quitar
-  addFilter(widgetId: string, filter: Filter) {
-    super.addFilter(widgetId, filter);
-  }
-
-  removeFilter(widgetId: string) {
-    super.removeFilter(widgetId);
   }
 
   private async groupBy() {
