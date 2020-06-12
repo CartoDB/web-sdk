@@ -38,10 +38,6 @@ jest.mock('@/maps/Client', () => ({
   Client: jest.fn().mockImplementation(() => ({ instantiateMapFrom }))
 }));
 
-jest.mock('mitt', () => ({
-  default: jest.fn()
-}));
-
 describe('Layer', () => {
   describe('Layer creation', () => {
     it('should create a new Layer instance properly', () => {

@@ -3,10 +3,6 @@ import { Layer } from '../../../viz/layer/Layer';
 import { CategoryDataView } from './category';
 import { AggregationType } from '../../operations/aggregation/aggregation';
 
-jest.mock('mitt', () => ({
-  default: jest.fn()
-}));
-
 describe('DataView', () => {
   describe('Instance Creation', () => {
     it('should create new DataView instance', () => {
