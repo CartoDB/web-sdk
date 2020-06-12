@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Set a new Source to a CARTO Layer</title>
+    <title>Change the source of a Layer</title>
 
     <link
       rel="stylesheet"
@@ -40,10 +40,10 @@
           <!-- panel -->
           <div class="as-panel as-panel--top as-panel--right as-bg--ui-01">
             <div class="as-panel__element as-p--16 as-body">
-              <h1 class="as-title">Change the source</h1>
-              <p class="as-body as-mb--12">
-                Set a new Source to a CARTO Layer, using a SQL query
-              </p>           
+              <h1 class="as-title">Set source</h1>
+              <h4 class="as-subheader as-mb--12">
+                Set a new source to a CARTO Layer, using a SQL query
+              </h4>           
               <div>
                 <button class="as-btn as-btn--primary" onclick="updateSource()">Update Source</button>
               </div>
@@ -56,23 +56,21 @@
     <script src="https://unpkg.com/deck.gl@8.2.0-alpha.2/dist.min.js"></script>
     <script src="/dist/umd/index.min.js"></script>
 
-    
-
     <script>
-      let countriesLayer;
+      let countries;
 
       async function initialize() {
         carto.setDefaultCredentials({ username: 'public' });
         const deckMap = carto.viz.createMap();
-        countriesLayer = new carto.viz.Layer('ne_50m_admin_0_countries');
-        countriesLayer.addTo(deckMap);
+        countries = new carto.viz.Layer('ne_50m_admin_0_countries');
+        countries.addTo(deckMap);
       }
 
       initialize();
 
       function updateSource() {
         // See the dataset at https://public.carto.com/tables/ne_50m_admin_0_countries/
-        countriesLayer.setSource(`SELECT * FROM ne_50m_admin_0_countries WHERE continent='North America'`);
+        countries.setSource(`SELECT * FROM ne_50m_admin_0_countries WHERE continent='North America'`);
       }
     </script>
   </body>
