@@ -23,7 +23,8 @@
     "build:umd": "webpack --config webpack.config.js",
     "build:watch": "webpack --config webpack.config.js --watch ",
     "prewatch": "rimraf dist/",
-    "test": "jest --config jest.config.js ./src",
+    "serve": "live-server --port=6001 --watch=dist/umd",
+    "test": "jest --config jest.config.js ./src --coverage",
     "test:watch": "jest --watch ./src"
   },
   "devDependencies": {
@@ -86,6 +87,7 @@
     "cartocolor": "^4.0.2",
     "chroma-js": "^2.1.0",
     "d3-format": "^1.4.4",
+    "live-server": "^1.2.1",
     "mitt": "^1.2.0",
     "pbf": "3.2.1",
     "deepmerge": "^4.2.2"
