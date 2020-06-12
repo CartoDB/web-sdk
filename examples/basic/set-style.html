@@ -3,12 +3,18 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Change style to existing layer</title>
+    <title>Change the style of a layer</title>
 
     <link
       rel="stylesheet"
       type="text/css"
       href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.css"
+    />
+
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://libs.cartocdn.com/airship-style/v2.3/airship.css"
     />
 
     <style>
@@ -21,61 +27,51 @@
         width: 100vw;
         height: 100vh;
       }
-
-      .action {
-        position: absolute;
-        top: 10px;
-        left: 10px;
-      }
     </style>
   </head>
 
-  <body>
-    <section id="map"></section>
-    <button class="action" onclick="updateStyle()">Update Style</button>
+  <body class="as-app-body as-app">
+    <div class="as-content">
+      <main class="as-main">
+        <div class="as-map-area">
+          <!-- map -->
+          <div id="map"></div>
 
-    <!-- Map libraries-->
+          <!-- panel -->
+          <div class="as-panel as-panel--top as-panel--right as-bg--ui-01">
+            <div class="as-panel__element as-p--16 as-body">
+              <h1 class="as-title">Set style</h1>
+              <h4 class="as-subheader as-mb--12">
+                Set a new style to a Layer
+              </h4>           
+              <div>
+                <button class="as-btn as-btn--primary" onclick="updateStyle()">Update Style</button>
+              </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
     <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.js"></script>
     <script src="https://unpkg.com/deck.gl@8.2.0-alpha.2/dist.min.js"></script>
-
     <script src="/dist/umd/index.min.js"></script>
 
     <script>
-      let layer;
+      let countries;
 
       async function initialize() {
         carto.setDefaultCredentials({ username: 'public' });
-
-        const deckMap = carto.viz.createMap({
-          basemap: 'voyager',
-          view: {
-            longitude: -3.7003859,
-            latitude: 40.4153265,
-            zoom: 17
-          }
-        });
-
-        const layerStyle = carto.viz.colorCategoriesStyle('room_type', {
-          categories: ['Entire home/apt', 'Private room', 'Shared room'],
-
-          // palette accepts an array of HEX color strings,
-          // or a string pointing to a CARTOColors palette
-          palette: ['#88ccee', '#cc6677', '#ddcc77']
-        });
-
-        layer = new carto.viz.Layer('listings_madrid', layerStyle);
-        layer.addTo(deckMap);
-      }
-
-      function updateStyle() {
-        const newStyle = carto.viz.colorCategoriesStyle('room_type', {
-          categories: ['Entire home/apt', 'Private room', 'Shared room'],
-          palette: 'prism' // https://carto.com/carto-colors/
-        });
-        layer.setStyle(newStyle);
+        const deckMap = carto.viz.createMap();
+        countries = new carto.viz.Layer('ne_50m_admin_0_countries');
+        countries.addTo(deckMap);
       }
 
       initialize();
+
+      function updateStyle() {
+        const newStyle = carto.viz.colorCategoriesStyle('continent');
+        countries.setStyle(newStyle);
+      }
     </script>
   </body>
 </html>
