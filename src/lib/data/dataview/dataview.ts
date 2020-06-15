@@ -3,6 +3,7 @@ import { WithEvents } from '@/core/mixins/WithEvents';
 import { CARTOSource, Layer } from '@/viz';
 import { AggregationType } from '../operations/aggregation/aggregation';
 import { CartoDataViewError, dataViewErrorTypes } from './DataViewError';
+import { Filter } from './types';
 
 export class DataView extends WithEvents {
   private dataSource: CARTOSource | Layer;
@@ -24,6 +25,14 @@ export class DataView extends WithEvents {
       type: `[DataView]`,
       message: 'Method getData is not implemented'
     });
+  }
+
+  addFilter(filterId: string, filter: Filter) {
+    this.dataSource.addFilter(filterId, { [this.column]: filter });
+  }
+
+  removeFilter(filterId: string) {
+    this.dataSource.removeFilter(filterId);
   }
 
   private bindEvents() {

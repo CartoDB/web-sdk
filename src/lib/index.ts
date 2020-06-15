@@ -7,6 +7,9 @@ import { DOSource, CARTOSource } from './viz/sources';
 // Basemaps
 import { createMap, createGoogleMap } from './viz/basemap';
 
+// Widgets
+import { CategoryWidget } from './viz/widgets';
+
 // Basics
 import { Layer } from './viz/layer';
 import { Popup } from './viz/popups/Popup';
@@ -36,6 +39,7 @@ export { Credentials, setDefaultCredentials };
 // carto.viz
 const sources = { DOSource, CARTOSource };
 const basemaps = { createMap, createGoogleMap };
+const widgets = { CategoryWidget };
 const basics = { Layer, Popup };
 const styles = {
   basicStyle,
@@ -50,6 +54,7 @@ const styles = {
 export const viz = {
   ...sources,
   ...basemaps,
+  ...widgets,
   ...styles,
   ...basics
 };

@@ -3,6 +3,7 @@ import { CartoError } from '@/core/errors/CartoError';
 import { WithEvents } from '@/core/mixins/WithEvents';
 import { MVTLayer } from '@deck.gl/geo-layers';
 import mitt from 'mitt';
+import deepmerge from 'deepmerge';
 import { Source, Field } from '../sources/Source';
 import { CARTOSource, DOSource } from '../sources';
 import { DOLayer } from '../deck/DOLayer';
@@ -13,6 +14,9 @@ import { StyledLayer } from '../style/layer-style';
 import { CartoLayerError, layerErrorTypes } from '../errors/layer-error';
 import { LayerInteractivity, InteractivityEventType } from './LayerInteractivity';
 import { LayerOptions } from './LayerOptions';
+import { FiltersCollection } from '../filters/FiltersCollection';
+import { FunctionFilterApplicator } from '../filters/FunctionFilterApplicator';
+import { ColumnFilters } from '../filters/types';
 import { basicStyle } from '../style/helpers/basic-style';
 
 export class Layer extends WithEvents implements StyledLayer {
@@ -37,6 +41,8 @@ export class Layer extends WithEvents implements StyledLayer {
   // pickable events count
   private _pickableEventsCount = 0;
   private _fields: Field[];
+
+  private filtersCollection = new FiltersCollection(FunctionFilterApplicator);
 
   constructor(
     source: string | Source,
@@ -256,6 +262,8 @@ export class Layer extends WithEvents implements StyledLayer {
     const props = this._source.getProps();
     const styleProps = this.getStyle().getLayerProps(this);
 
+    const filters = this.filtersCollection.getApplicatorInstance();
+
     const events = {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       onViewportLoad: (...args: any) => {
@@ -277,8 +285,17 @@ export class Layer extends WithEvents implements StyledLayer {
       ...this._options,
       ...props,
       ...styleProps,
-      ...events
+      ...events,
+      ...filters.getOptions()
     };
+
+    // Merge Update Triggers to avoid overriding
+    // TODO: We should split regular properties from
+    // updateTriggers
+    layerProps.updateTriggers = deepmerge.all([
+      layerProps.updateTriggers || {},
+      this.filtersCollection.getUpdateTriggers()
+    ]);
 
     return ensureProperPropStyles(layerProps);
   }
@@ -387,6 +404,26 @@ export class Layer extends WithEvents implements StyledLayer {
       hoverStyle,
       clickStyle
     });
+  }
+
+  addFilter(filterId: string, filter: ColumnFilters) {
+    this.filtersCollection.addFilter(filterId, filter);
+
+    if (this._deckLayer) {
+      return this.replaceDeckGLLayer();
+    }
+
+    return Promise.resolve();
+  }
+
+  removeFilter(filterId: string) {
+    this.filtersCollection.removeFilter(filterId);
+
+    if (this._deckLayer) {
+      return this.replaceDeckGLLayer();
+    }
+
+    return Promise.resolve();
   }
 
   // eslint-disable-next-line consistent-return

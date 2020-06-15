@@ -55,7 +55,7 @@
     "http-server": "^0.12.3",
     "husky": "^4.2.5",
     "install": "^0.13.0",
-    "jest": "^24.9.0",
+    "jest": "^26.0.1",
     "jest-environment-jsdom-fifteen": "^1.0.0",
     "jest-fetch-mock": "^2.1.2",
     "lint-staged": "^10.1.7",
@@ -64,7 +64,7 @@
     "prettier": "2.0.5",
     "rimraf": "^3.0.0",
     "source-map-loader": "^0.2.4",
-    "ts-jest": "^24.1.0",
+    "ts-jest": "^26.0.1",
     "ts-loader": "^7.0.5",
     "tslint": "^5.20.0",
     "typescript": "3.8.3",
@@ -74,6 +74,7 @@
   },
   "dependencies": {
     "@deck.gl/core": "8.2.0-alpha.2",
+    "@deck.gl/extensions": "8.2.0-alpha.2",
     "@deck.gl/geo-layers": "8.2.0-alpha.2",
     "@deck.gl/google-maps": "8.2.0-alpha.2",
     "@deck.gl/layers": "8.2.0-alpha.2",
@@ -88,7 +89,8 @@
     "d3-format": "^1.4.4",
     "live-server": "^1.2.1",
     "mitt": "^1.2.0",
-    "pbf": "3.2.1"
+    "pbf": "3.2.1",
+    "deepmerge": "^4.2.2"
   },
   "publishConfig": {
     "access": "public"

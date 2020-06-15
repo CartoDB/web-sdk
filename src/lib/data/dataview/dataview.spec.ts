@@ -2,10 +2,6 @@ import { Layer } from '../../viz/layer/Layer';
 import { DataView } from './dataview';
 import { CartoDataViewError, dataViewErrorTypes } from './DataViewError';
 
-jest.mock('mitt', () => ({
-  default: jest.fn()
-}));
-
 describe('DataView', () => {
   describe('Instance Creation', () => {
     it('should create new DataView instance', () => {

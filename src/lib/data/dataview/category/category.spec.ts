@@ -3,10 +3,6 @@ import { CategoryDataView } from './category';
 import { AggregationType } from '../../operations/aggregation/aggregation';
 import { CartoDataViewError, dataViewErrorTypes } from '../DataViewError';
 
-jest.mock('mitt', () => ({
-  default: jest.fn()
-}));
-
 describe('DataView', () => {
   describe('Instance Creation', () => {
     it('should create new DataView instance', () => {
