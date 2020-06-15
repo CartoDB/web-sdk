@@ -25,6 +25,7 @@ function defaultOptions(
 ): ColorContinuousOptionsStyle {
   return {
     strokeWidth: 0,
+    size: 6,
     palette: DEFAULT_PALETTE,
     nullColor: getStyleValue('nullColor', geometryType, options),
     ...options
