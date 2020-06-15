@@ -1,11 +1,7 @@
-import { CartoError } from '../../../core/errors/CartoError';
 import { Layer } from '../../../viz/layer/Layer';
 import { CategoryDataView } from './category';
 import { AggregationType } from '../../operations/aggregation/aggregation';
-
-jest.mock('mitt', () => ({
-  default: jest.fn()
-}));
+import { CartoDataViewError, dataViewErrorTypes } from '../DataViewError';
 
 describe('DataView', () => {
   describe('Instance Creation', () => {
@@ -27,11 +23,10 @@ describe('DataView', () => {
             operationColumn: 'fake_operation_column'
           })
       ).toThrow(
-        new CartoError({
-          type: '[DataView]',
-          message:
-            'Operation property not provided while creating dataview. Please check documentation.'
-        })
+        new CartoDataViewError(
+          'Operation property not provided while creating dataview. Please check documentation.',
+          dataViewErrorTypes.PROPERTY_MISSING
+        )
       );
     });
 
@@ -43,11 +38,10 @@ describe('DataView', () => {
             operationColumn: undefined as never
           })
       ).toThrow(
-        new CartoError({
-          type: '[DataView]',
-          message:
-            'Operation column property not provided while creating dataview. Please check documentation.'
-        })
+        new CartoDataViewError(
+          'Operation column property not provided while creating dataview. Please check documentation.',
+          dataViewErrorTypes.PROPERTY_MISSING
+        )
       );
     });
   });

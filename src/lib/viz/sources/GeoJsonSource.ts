@@ -1,5 +1,5 @@
 import { GeoJSON, GeoJsonGeometryTypes, Feature } from 'geojson';
-import { uuidv4 } from '@/core/utils';
+import { uuidv4 } from '@/core/utils/uuid';
 import { aggregate, AggregationType } from '@/data/operations/aggregation/aggregation';
 
 import {
