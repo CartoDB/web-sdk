@@ -406,8 +406,8 @@ export class Layer extends WithEvents implements StyledLayer {
     });
   }
 
-  addFilter(widgetId: string, filter: ColumnFilters) {
-    this.filtersCollection.addFilter(widgetId, filter);
+  addFilter(filterId: string, filter: ColumnFilters) {
+    this.filtersCollection.addFilter(filterId, filter);
 
     if (this._deckLayer) {
       return this.replaceDeckGLLayer();
@@ -416,8 +416,8 @@ export class Layer extends WithEvents implements StyledLayer {
     return Promise.resolve();
   }
 
-  removeFilter(widgetId: string) {
-    this.filtersCollection.removeFilter(widgetId);
+  removeFilter(filterId: string) {
+    this.filtersCollection.removeFilter(filterId);
 
     if (this._deckLayer) {
       return this.replaceDeckGLLayer();

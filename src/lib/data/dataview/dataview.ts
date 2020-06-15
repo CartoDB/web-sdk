@@ -27,12 +27,12 @@ export class DataView extends WithEvents {
     });
   }
 
-  addFilter(widgetId: string, filter: Filter) {
-    this.dataSource.addFilter(widgetId, { [this.column]: filter });
+  addFilter(filterId: string, filter: Filter) {
+    this.dataSource.addFilter(filterId, { [this.column]: filter });
   }
 
-  removeFilter(widgetId: string) {
-    this.dataSource.removeFilter(widgetId);
+  removeFilter(filterId: string) {
+    this.dataSource.removeFilter(filterId);
   }
 
   private bindEvents() {

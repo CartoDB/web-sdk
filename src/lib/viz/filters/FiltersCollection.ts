@@ -10,12 +10,12 @@ export class FiltersCollection {
     this.FilterApplicator = FilterApplicator;
   }
 
-  addFilter(widgetId: string, filterDefinition: ColumnFilters) {
-    this.collection.set(widgetId, filterDefinition);
+  addFilter(filterId: string, filterDefinition: ColumnFilters) {
+    this.collection.set(filterId, filterDefinition);
   }
 
-  removeFilter(widgetId: string) {
-    this.collection.delete(widgetId);
+  removeFilter(filterId: string) {
+    this.collection.delete(filterId);
   }
 
   getApplicatorInstance() {
