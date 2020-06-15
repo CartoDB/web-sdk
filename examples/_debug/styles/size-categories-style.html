@@ -36,7 +36,7 @@
 
     <script>
       function initializePoints() {
-        carto.setDefaultCredentials({ username: 'cartoframes' });
+        carto.setDefaultCredentials({ username: 'josemacarto' });
 
         const deckMap = carto.viz.createMap({
           basemap: 'voyager',
@@ -47,8 +47,8 @@
           }
         });
 
-        const style = carto.viz.sizeCategoriesStyle('category');
-        const layer = new carto.viz.Layer('sf_nbhd_crime', style);
+        const style = carto.viz.sizeCategoriesStyle('incident_day_of_week');
+        const layer = new carto.viz.Layer('sf_incidents', style);
         layer.addTo(deckMap);
       }
 
@@ -77,8 +77,8 @@
         layer.addTo(deckMap);
       }
 
-      // initializePoints();
-      initializeLines();
+      initializePoints();
+      // initializeLines();
     </script>
   </body>
 </html>

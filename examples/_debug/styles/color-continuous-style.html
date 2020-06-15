@@ -52,7 +52,25 @@
         tempLayer.addTo(deckMap);
       }
 
-      initialize();
+      async function initializePolygons() {
+        carto.setDefaultCredentials({ username: 'josemacarto' });
+
+        const deckMap = carto.viz.createMap({
+          basemap: 'voyager',
+          view: {
+            longitude: -122.45292663574217,
+            latitude: 37.760944207425965,
+            zoom: 11
+          }
+        });
+
+        const style = carto.viz.colorContinuousStyle('businesses', {});
+        const tempLayer = new carto.viz.Layer('sf_businesses_neighborhoods', style);
+        tempLayer.addTo(deckMap);
+      }
+
+      // initialize();
+      initializePolygons();
     </script>
   </body>
 </html>
