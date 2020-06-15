@@ -2,7 +2,7 @@ import { DataView } from '@/data/dataview/dataview';
 import { CartoError } from '@/core/errors/CartoError';
 import { queryDOMElement } from '../utils/dom';
 
-export class Widget {
+export abstract class Widget {
   protected element: HTMLElement;
   protected dataView: DataView;
 
