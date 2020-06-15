@@ -1,4 +1,3 @@
-import { CartoError } from '@/core/errors/CartoError';
 import { Layer } from '@/viz/layer/Layer';
 import { CARTOSource } from '@/viz/sources/CARTOSource';
 import { castToNumberOrUndefined } from '@/core/utils/number';

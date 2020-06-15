@@ -1,6 +1,5 @@
-import { CartoError } from '../../core/errors/CartoError';
+import { CartoError } from '@/core/errors/CartoError';
 import { WithEvents } from '@/core/mixins/WithEvents';
-import { Layer } from '../../viz/layer/Layer';
 import { CARTOSource, Layer } from '@/viz';
 import { AggregationType } from '../operations/aggregation/aggregation';
 import { CartoDataViewError, dataViewErrorTypes } from './DataViewError';
