@@ -3,13 +3,18 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>GeoJSON Layer with CARTO Tiles Example</title>
+    <title>Add several CARTO Layers</title>
 
-    <!-- Custom CSS -->
     <link
       rel="stylesheet"
       type="text/css"
       href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.css"
+    />
+
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://libs.cartocdn.com/airship-style/v2.3/airship.css"
     />
 
     <style>
@@ -25,13 +30,27 @@
     </style>
   </head>
 
-  <body>
-    <section id="map"></section>
+  <body class="as-app-body as-app">
+    <div class="as-content">
+      <main class="as-main">
+        <div class="as-map-area">
+          <!-- map -->
+          <div id="map"></div>
 
-    <!-- Map libraries-->
+          <!-- panel -->
+          <div class="as-panel as-panel--top as-panel--right as-bg--ui-01">
+            <div class="as-panel__element as-p--16 as-body">
+              <h1 class="as-title">Add several layers</h1>
+              <h4 class="as-subheader as-mb--12">
+                Add several CARTO layers to your map
+              </h4>             
+          </div>
+        </div>
+      </main>
+    </div>
+
     <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.js"></script>
     <script src="https://unpkg.com/deck.gl@8.2.0-alpha.2/dist.min.js"></script>
-
     <script src="/dist/umd/index.min.js"></script>
 
     <script>
@@ -47,19 +66,19 @@
         });
 
         /*
-        if order of the layers is relevant, add await to the `addTo` sentences and the next
-        layer will be added on top of the previous. For example, here we ensure states are
-        at the bottom, but we don't care abour boundaries or ports relative ordering
-      */
+          if order of the layers is relevant, add `await` to the `addTo` sentences and the next
+          layer will be added on top of the previous. For example, here we ensure states are
+          at the bottom, but we don't care about boundaries or ports relative ordering
+        */
 
-        const countriesLayer = new carto.viz.Layer('ne_50m_admin_1_states_1');
-        await countriesLayer.addTo(deckMap);
+        const states = new carto.viz.Layer('ne_50m_admin_1_states_1');
+        await states.addTo(deckMap);
 
-        const worldRivers = new carto.viz.Layer('ne_50m_admin_0_boundary_lines_land');
-        worldRivers.addTo(deckMap);
+        const boundaries = new carto.viz.Layer('ne_50m_admin_0_boundary_lines_land');
+        boundaries.addTo(deckMap);
 
-        const worldPortsLayer = new carto.viz.Layer('world_ports');
-        worldPortsLayer.addTo(deckMap);
+        const ports = new carto.viz.Layer('world_ports');
+        ports.addTo(deckMap);
       }
 
       initialize();
