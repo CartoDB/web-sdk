@@ -63,6 +63,7 @@ export class CARTOSource extends Source {
 
     // call to super class
     super(id);
+    this.sourceType = 'CARTOSource';
 
     // Set object properties
     this._type = getSourceType(source);

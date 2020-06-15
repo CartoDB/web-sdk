@@ -31,6 +31,7 @@ export class GeoJsonSource extends Source {
   constructor(geojson: GeoJSON) {
     const id = `geojson-${uuidv4()}`;
     super(id);
+    this.sourceType = 'GeoJsonSource';
 
     this._geojson = geojson;
     this._numericFieldValues = {};

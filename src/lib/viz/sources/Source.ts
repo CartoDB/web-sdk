@@ -8,6 +8,8 @@ import { ColumnFilters } from '../filters/types';
 
 export type GeometryType = 'Point' | 'Line' | 'Polygon';
 
+export type SourceType = 'CARTOSource' | 'DOSource' | 'GeoJsonSource';
+
 export interface Stats {
   min: number;
   max: number;
@@ -51,6 +53,8 @@ export abstract class Source extends WithEvents {
   public id: string;
 
   public isInitialized: boolean;
+
+  public sourceType: SourceType | unknown;
 
   constructor(id: string) {
     super();

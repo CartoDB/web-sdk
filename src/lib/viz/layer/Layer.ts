@@ -8,7 +8,7 @@ import { GeoJSON } from 'geojson';
 import { uuidv4 } from '@/core/utils/uuid';
 import { WithEvents } from '@/core/mixins/WithEvents';
 import { Source, StatFields } from '../sources/Source';
-import { CARTOSource, DOSource, GeoJsonSource } from '../sources';
+import { CARTOSource, GeoJsonSource } from '../sources';
 import { DOLayer } from '../deck/DOLayer';
 import { getStyles, StyleProperties, Style } from '../style';
 import { ViewportFeaturesGenerator } from '../interactivity/viewport-features/ViewportFeaturesGenerator';
@@ -215,11 +215,11 @@ export class Layer extends WithEvents implements StyledLayer {
     const layerProperties = await this._getLayerProperties();
 
     // Create the Deck.gl instance
-    if (this._source instanceof CARTOSource) {
+    if (this._source.sourceType === 'CARTOSource') {
       this._deckLayer = new MVTLayer(layerProperties);
-    } else if (this._source instanceof GeoJsonSource) {
+    } else if (this._source.sourceType === 'GeoJsonSource') {
       this._deckLayer = new GeoJsonLayer(layerProperties);
-    } else if (this._source instanceof DOSource) {
+    } else if (this._source.sourceType === 'DOSource') {
       this._deckLayer = new DOLayer(layerProperties);
     } else {
       throw new CartoLayerError('Unsupported source instance', layerErrorTypes.UNKNOWN_SOURCE);
