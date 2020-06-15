@@ -13,6 +13,7 @@ import { StyledLayer } from '../style/layer-style';
 import { CartoLayerError, layerErrorTypes } from '../errors/layer-error';
 import { LayerInteractivity, InteractivityEventType } from './LayerInteractivity';
 import { LayerOptions } from './LayerOptions';
+import { basicStyle } from '../style/helpers/basic-style';
 
 export class Layer extends WithEvents implements StyledLayer {
   private _source: Source;
@@ -39,7 +40,7 @@ export class Layer extends WithEvents implements StyledLayer {
 
   constructor(
     source: string | Source,
-    style: Style | StyleProperties = {},
+    style: Style | StyleProperties = basicStyle(),
     options?: Partial<LayerOptions>
   ) {
     super();
