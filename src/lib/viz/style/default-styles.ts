@@ -9,7 +9,7 @@ export const defaultStyles: any = {
     color: '#EE4D5A',
     size: 8,
     opacity: 1,
-    strokeColor: STROKE_COLOR,
+    strokeColor: '#FFF',
     strokeWidth: STROKE_WIDTH,
     nullColor: NULL_COLOR,
     othersColor: OTHERS_COLOR,
