@@ -1,8 +1,8 @@
-import { CartoError } from '../../core/errors/CartoError';
-import { WithEvents } from '../../core/mixins/WithEvents';
-import { Layer } from '../../viz/layer/Layer';
-import { CARTOSource } from '../../viz/sources/CARTOSource';
+import { CartoError } from '@/core/errors/CartoError';
+import { WithEvents } from '@/core/mixins/WithEvents';
+import { CARTOSource, Layer } from '@/viz';
 import { AggregationType } from '../operations/aggregation/aggregation';
+import { CartoDataViewError, dataViewErrorTypes } from './DataViewError';
 import { Filter } from './types';
 
 export class DataView extends WithEvents {
@@ -56,17 +56,17 @@ export class DataView extends WithEvents {
 
 function validateParameters(source: CARTOSource | Layer, column: string) {
   if (!source) {
-    throw new CartoError({
-      type: '[DataView]',
-      message: 'Source was not provided while creating dataview'
-    });
+    throw new CartoDataViewError(
+      'Source was not provided while creating dataview',
+      dataViewErrorTypes.PROPERTY_MISSING
+    );
   }
 
   if (!column) {
-    throw new CartoError({
-      type: '[DataView]',
-      message: 'Column name was not provided while creating dataview'
-    });
+    throw new CartoDataViewError(
+      'Column name was not provided while creating dataview',
+      dataViewErrorTypes.PROPERTY_MISSING
+    );
   }
 }
 

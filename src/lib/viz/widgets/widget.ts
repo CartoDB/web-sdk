@@ -3,7 +3,7 @@ import { CartoError } from '@/core/errors/CartoError';
 import { uuidv4 } from '@/core/utils/uuid';
 import { queryDOMElement } from '../utils/dom';
 
-export class Widget {
+export abstract class Widget {
   protected element: HTMLElement;
   protected dataView: DataView;
   protected widgetUUID: string = uuidv4();

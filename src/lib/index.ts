@@ -26,7 +26,7 @@ import {
 } from './viz/style';
 
 // Dataviews
-import { CategoryDataView, FormulaDataView } from './data/dataview';
+import { CategoryDataView, FormulaDataView, CategorySourceDataView } from './data/dataview';
 
 /*
  * --- Public API ---
@@ -60,7 +60,7 @@ export const viz = {
 };
 
 // carto.data
-const dataviews = { CategoryDataView, FormulaDataView };
+const dataviews = { CategoryDataView, FormulaDataView, CategorySourceDataView };
 
 export const data = {
   ...dataviews

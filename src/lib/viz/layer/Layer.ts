@@ -17,6 +17,7 @@ import { LayerOptions } from './LayerOptions';
 import { FiltersCollection } from '../filters/FiltersCollection';
 import { FunctionFilterApplicator } from '../filters/FunctionFilterApplicator';
 import { ColumnFilters } from '../filters/types';
+import { basicStyle } from '../style/helpers/basic-style';
 
 export class Layer extends WithEvents implements StyledLayer {
   private _source: Source;
@@ -45,7 +46,7 @@ export class Layer extends WithEvents implements StyledLayer {
 
   constructor(
     source: string | Source,
-    style: Style | StyleProperties = {},
+    style: Style | StyleProperties = basicStyle(),
     options?: Partial<LayerOptions>
   ) {
     super();
