@@ -1,4 +1,4 @@
-import { uuidv4 } from './utils';
+import { uuidv4 } from './utils/uuid';
 
 // Custom CARTO headers, for metrics at API level
 // Double check they are valid for the API (eg. allowed for CORS requests)

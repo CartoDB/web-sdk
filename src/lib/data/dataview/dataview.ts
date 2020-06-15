@@ -1,5 +1,7 @@
+import { CartoError } from '@/core/errors/CartoError';
 import { WithEvents } from '@/core/mixins/WithEvents';
 import { CARTOSource, Layer } from '@/viz';
+import { AggregationType } from '../operations/aggregation/aggregation';
 import { CartoDataViewError, dataViewErrorTypes } from './DataViewError';
 
 export class DataView extends WithEvents {
@@ -14,6 +16,14 @@ export class DataView extends WithEvents {
     this.column = column;
 
     this.bindEvents();
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  async getData(): Promise<Partial<DataViewData>> {
+    throw new CartoError({
+      type: `[DataView]`,
+      message: 'Method getData is not implemented'
+    });
   }
 
   private bindEvents() {
@@ -49,4 +59,17 @@ function validateParameters(source: CARTOSource | Layer, column: string) {
       dataViewErrorTypes.PROPERTY_MISSING
     );
   }
+}
+
+export interface DataViewData {
+  result: number;
+  categories: {
+    name: string;
+    value: number;
+  }[];
+  count: number;
+  operation: AggregationType;
+  max: number;
+  min: number;
+  nullCount: number;
 }
