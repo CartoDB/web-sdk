@@ -2,7 +2,7 @@
 import { Credentials, setDefaultCredentials } from './core/Credentials';
 
 // Sources
-import { DOSource, CARTOSource } from './viz/sources';
+import { DOSource, CARTOSource, GeoJsonSource } from './viz/sources';
 
 // Basemaps
 import { createMap, createGoogleMap } from './viz/basemap';
@@ -37,7 +37,7 @@ import { CategoryDataView, FormulaDataView, CategorySourceDataView } from './dat
 export { Credentials, setDefaultCredentials };
 
 // carto.viz
-const sources = { DOSource, CARTOSource };
+const sources = { DOSource, CARTOSource, GeoJsonSource };
 const basemaps = { createMap, createGoogleMap };
 const widgets = { CategoryWidget };
 const basics = { Layer, Popup };
