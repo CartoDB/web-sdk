@@ -124,31 +124,6 @@ export class Layer extends WithEvents implements StyledLayer {
     const metadata = this._source.getMetadata();
     const defaultStyleProps = getStyles(metadata.geometryType);
 
-    /* eslint-disable @typescript-eslint/ban-ts-comment */
-    if (
-      metadata.geometryType === 'Point' &&
-      // @ts-ignore
-      defaultStyleProps.pointRadiusScale
-    ) {
-      // @ts-ignore
-      defaultStyleProps.pointRadiusMaxPixels *=
-        // @ts-ignore
-        defaultStyleProps.pointRadiusScale;
-      // @ts-ignore
-      defaultStyleProps.pointRadiusMinPixels *=
-        // @ts-ignore
-        defaultStyleProps.pointRadiusScale;
-    }
-    /* eslint-disable @typescript-eslint/ban-ts-comment */
-
-    if (
-      ['Point', 'Polygon'].includes(metadata.geometryType) &&
-      defaultStyleProps.getLineWidth === 0
-    ) {
-      // @ts-ignore
-      defaultStyleProps.stroked = false;
-    }
-
     return new Style({
       ...defaultStyleProps,
       ...styleProps
@@ -303,7 +278,7 @@ export class Layer extends WithEvents implements StyledLayer {
       this.filtersCollection.getUpdateTriggers()
     ]);
 
-    return ensureProperPropStyles(layerProps);
+    return ensureRelatedStyleProps(layerProps);
   }
 
   /**
@@ -487,7 +462,7 @@ function buildStyle(style: Style | StyleProperties) {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function ensureProperPropStyles(layerProps: any) {
+function ensureRelatedStyleProps(layerProps: any) {
   const layerPropsValidated = layerProps;
 
   if (layerPropsValidated.pointRadiusScale) {
