@@ -1,19 +1,23 @@
 import { MapsDataviews as DataviewsApi } from '@/maps/MapsDataviews';
 import { defaultCredentials } from '@/core/Credentials';
-import { DataView } from './dataview';
+import { Source, CARTOSource } from '@/viz';
+import { DataViewMode } from './DataViewMode';
 import { AggregationType } from '../operations/aggregation/aggregation';
 import { CartoDataViewError, dataViewErrorTypes } from './DataViewError';
 
-export class Source extends DataView<string> {
+export class DataViewRemote extends DataViewMode<Source> {
   protected dataviewsApi: DataviewsApi;
 
-  protected _dataSource: string;
+  protected _dataSource: Source;
 
-  constructor(dataSource: string, column: string, credentials = defaultCredentials) {
+  constructor(dataSource: Source, column: string, credentials = defaultCredentials) {
     super(dataSource, column);
 
     this._dataSource = dataSource;
-    this.dataviewsApi = new DataviewsApi(dataSource, credentials);
+
+    // TODO what about the other sources?
+    const dataset = (dataSource as CARTOSource).value;
+    this.dataviewsApi = new DataviewsApi(dataset, credentials);
 
     this.registerAvailableEvents(['dataChanged', 'optionChanged', 'error']);
   }
@@ -22,7 +26,7 @@ export class Source extends DataView<string> {
     return this._dataSource;
   }
 
-  public set dataSource(newSource: string) {
+  public set dataSource(newSource: Source) {
     this.validateParameters(newSource, this.column);
 
     this._dataSource = newSource;
@@ -43,7 +47,7 @@ export class Source extends DataView<string> {
   public async aggregation(aggregationParams: {
     aggregation: AggregationType;
     operationColumn: string;
-    limit: number;
+    limit?: number;
   }) {
     const { aggregation, limit, operationColumn } = aggregationParams;
 

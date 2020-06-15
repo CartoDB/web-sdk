@@ -1,6 +1,6 @@
 import { CartoError } from '../../../core/errors/CartoError';
 import { Layer } from '../../../viz/layer/Layer';
-import { FormulaDataView } from './formula';
+import { FormulaDataView } from './FormulaDataView';
 import { AggregationType } from '../../operations/aggregation/aggregation';
 
 describe('FormulaDataView', () => {

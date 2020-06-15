@@ -1,14 +1,15 @@
-import { DataView } from '@/data/dataview/dataview';
+import { DataViewMode } from '@/data/dataview/DataViewMode';
 import { CartoError } from '@/core/errors/CartoError';
 import { uuidv4 } from '@/core/utils/uuid';
 import { queryDOMElement } from '../utils/dom';
+import { Filterable } from '../filters/Filterable';
 
-export abstract class Widget {
+export abstract class Widget<T extends Filterable> {
   protected element: HTMLElement;
-  protected dataView: DataView;
+  protected dataView: DataViewMode<T>;
   protected widgetUUID: string = uuidv4();
 
-  constructor(element: string | HTMLElement, dataView: DataView) {
+  constructor(element: string | HTMLElement, dataView: DataView<T>) {
     const domElement = queryDOMElement(element);
     validateParameters(domElement, dataView);
 
@@ -29,7 +30,7 @@ export abstract class Widget {
   }
 }
 
-function validateParameters(element: HTMLElement | null, dataView: DataView) {
+function validateParameters(element: HTMLElement | null, dataView: DataView<any>) {
   if (!element) {
     throw new CartoError({
       type: '[Widget]',

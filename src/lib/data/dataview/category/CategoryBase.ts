@@ -1,44 +1,23 @@
 import { WithEvents } from '@/core/mixins/WithEvents';
-import { Layer } from '@/viz';
+import { Layer, Source } from '@/viz';
 import { AggregationType } from '../../operations/aggregation/aggregation';
-import { DataView } from '../dataview';
+import { DataViewMode } from '../DataViewMode';
 import { CartoDataViewError, dataViewErrorTypes } from '../DataViewError';
+import { DataViewBase } from '../DataViewBase';
 
-export abstract class CategoryBase<T extends DataView<Layer | string>> extends WithEvents {
-  protected dataView: T;
-  protected _operation: AggregationType;
+export abstract class CategoryBase<T extends DataViewMode<Layer | Source>> extends DataViewBase<T> {
   protected _operationColumn: string;
   protected _limit?: number;
-  protected events: string[];
 
   constructor(dataView: T, options: CategoryOptions, events: string[] = ['optionChanged']) {
-    super();
+    super(dataView, options, events);
 
-    this.dataView = dataView;
+    const { operationColumn, limit } = options || {};
 
-    const { operation, operationColumn, limit } = options || {};
+    validateParameters(this._operation, operationColumn);
 
-    validateParameters(operation, operationColumn);
-
-    this._operation = operation;
     this._operationColumn = operationColumn;
     this._limit = limit;
-
-    this.events = [...events];
-
-    if (!events.includes('optionChanged')) {
-      events.push('optionChanged');
-    }
-
-    this.registerAvailableEvents(this.events);
-  }
-
-  public get operation() {
-    return this._operation;
-  }
-  public set operation(operation: AggregationType) {
-    this._operation = operation;
-    this.emit('optionChanged');
   }
 
   public get operationColumn() {
@@ -52,31 +31,9 @@ export abstract class CategoryBase<T extends DataView<Layer | string>> extends W
   public get limit() {
     return this._limit;
   }
-  public set limit(limit: number) {
+  public set limit(limit: number | undefined) {
     this._limit = limit;
     this.emit('optionChanged');
-  }
-
-  public getEvents(): string[] {
-    return this.events;
-  }
-
-  public abstract async getData(): Promise<CategoryData>;
-}
-
-function validateParameters(operation: AggregationType, operationColumn: string) {
-  if (!operation) {
-    throw new CartoDataViewError(
-      'Operation property not provided while creating dataview. Please check documentation.',
-      dataViewErrorTypes.PROPERTY_MISSING
-    );
-  }
-
-  if (!operationColumn) {
-    throw new CartoDataViewError(
-      'Operation column property not provided while creating dataview. Please check documentation.',
-      dataViewErrorTypes.PROPERTY_MISSING
-    );
   }
 }
 
@@ -94,10 +51,4 @@ export interface CategoryData {
   min: number;
   nullCount: number;
   operation: AggregationType;
-}
-
-export enum DataViewMode {
-  SOURCE = 'source',
-  VIEWPORT = 'viewport',
-  MIXED = 'mixed'
 }

@@ -4,6 +4,8 @@
  */
 
 import { Stats } from '../utils/Classifier';
+import { Filterable } from '../filters/Filterable';
+import { ColumnFilters } from '../filters/types';
 
 export type GeometryType = 'Point' | 'Line' | 'Polygon';
 
@@ -36,13 +38,15 @@ export interface Field {
   aggregation: boolean;
 }
 
-export abstract class Source {
+export abstract class Source extends Filterable {
   // ID of the source. It's mandatory for the source but not for the user.
   public id: string;
 
   public isInitialized: boolean;
 
   constructor(id: string) {
+    super();
+
     this.id = id;
     this.isInitialized = false;
   }
@@ -52,4 +56,14 @@ export abstract class Source {
   abstract getProps(): SourceProps;
 
   abstract getMetadata(): SourceMetadata;
+
+  // eslint-disable-next-line class-methods-use-this
+  async addFilter(filterId: string, filter: ColumnFilters) {
+    throw new Error(`Method not implemented`);
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  async removeFilter(filterId: string) {
+    throw new Error(`Method not implemented`);
+  }
 }

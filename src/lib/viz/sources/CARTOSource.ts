@@ -122,16 +122,6 @@ export class CARTOSource extends Source {
     return this._metadata;
   }
 
-  // eslint-disable-next-line class-methods-use-this
-  addFilter() {
-    throw new Error(`Method not implemented`);
-  }
-
-  // eslint-disable-next-line class-methods-use-this
-  removeFilter() {
-    throw new Error(`Method not implemented`);
-  }
-
   /**
    * Set the internal mapConfig properly: columnStats, dimensions, sample and aggregation
    * @param fields

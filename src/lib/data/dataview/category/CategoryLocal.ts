@@ -1,10 +1,10 @@
 import { AggregationType, aggregate } from '../../operations/aggregation/aggregation';
 import { groupValuesByAnotherColumn } from '../../operations/grouping';
 import { CategoryBase, CategoryOptions, CategoryData } from './CategoryBase';
-import { Viewport } from '../Viewport';
+import { DataViewLocal } from '../DataViewLocal';
 
-export class CategoryViewport extends CategoryBase<Viewport> {
-  constructor(origin: Viewport, options: CategoryOptions) {
+export class CategoryLocal extends CategoryBase<DataViewLocal> {
+  constructor(origin: DataViewLocal, options: CategoryOptions) {
     const events = ['dataUpdate'];
     super(origin, options, events);
   }

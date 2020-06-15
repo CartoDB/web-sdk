@@ -1,6 +1,5 @@
 import { Deck } from '@deck.gl/core';
 import { CartoError } from '@/core/errors/CartoError';
-import { WithEvents } from '@/core/mixins/WithEvents';
 import { MVTLayer } from '@deck.gl/geo-layers';
 import mitt from 'mitt';
 import deepmerge from 'deepmerge';
@@ -18,8 +17,9 @@ import { FiltersCollection } from '../filters/FiltersCollection';
 import { FunctionFilterApplicator } from '../filters/FunctionFilterApplicator';
 import { ColumnFilters } from '../filters/types';
 import { basicStyle } from '../style/helpers/basic-style';
+import { Filterable } from '../filters/Filterable';
 
-export class Layer extends WithEvents implements StyledLayer {
+export class Layer extends Filterable implements StyledLayer {
   private _source: Source;
   private _style: Style;
   private _options: LayerOptions;

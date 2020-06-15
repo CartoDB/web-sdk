@@ -1,12 +1,20 @@
-import { CartoError } from '@/core/errors/CartoError';
 import { WithEvents } from '@/core/mixins/WithEvents';
-import { AggregationType } from '../operations/aggregation/aggregation';
+import { Filterable } from '@/viz/filters/Filterable';
 import { CartoDataViewError, dataViewErrorTypes } from './DataViewError';
 import { Filter } from './types';
+import { AggregationType } from '../operations/aggregation/aggregation';
 
-export abstract class DataView<T> extends WithEvents {
+enum Modes {
+  GLOBAL = 'global',
+  VIEWPORT = 'viewport',
+  NON_PRECISE = 'non-precise'
+}
+
+export abstract class DataViewMode<T extends Filterable> extends WithEvents {
   protected dataSource: T;
   protected _column: string;
+
+  public static Type = Modes;
 
   constructor(dataSource: T, column: string) {
     super();
@@ -15,12 +23,13 @@ export abstract class DataView<T> extends WithEvents {
     this._column = column;
   }
 
-  // eslint-disable-next-line class-methods-use-this
-  async getData(): Promise<Partial<DataViewData>> {
-    throw new CartoError({
-      type: `[DataView]`,
-      message: 'Method getData is not implemented'
-    });
+  public get column() {
+    return this._column;
+  }
+
+  public set column(newColumn: string) {
+    this.validateParameters(this.dataSource, newColumn);
+    this._column = newColumn;
   }
 
   addFilter(filterId: string, filter: Filter) {
@@ -31,13 +40,9 @@ export abstract class DataView<T> extends WithEvents {
     this.dataSource.removeFilter(filterId);
   }
 
-  public get column() {
-    return this._column;
-  }
-
-  public set column(newColumn: string) {
-    this.validateParameters(this.dataSource, newColumn);
-    this._column = newColumn;
+  // eslint-disable-next-line class-methods-use-this
+  async getData(): Promise<Partial<DataViewData>> {
+    throw new CartoDataViewError('Method getData is not implemented');
   }
 
   // eslint-disable-next-line class-methods-use-this

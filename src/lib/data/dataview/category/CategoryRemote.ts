@@ -1,16 +1,16 @@
 import { CategoryBase, CategoryOptions } from './CategoryBase';
-import { Source } from '../Source';
+import { DataViewRemote } from '../DataViewRemote';
 
 const OPTION_CHANGED_DELAY = 250;
 
-export class CategorySource extends CategoryBase<Source> {
+export class CategoryRemote extends CategoryBase<DataViewRemote> {
   /**
    * optionChanged timeout to prevent multiple
    * calls when user sets several options in a row
    */
   private optionChangedTimeoutId?: number;
 
-  constructor(origin: Source, options: CategoryOptions) {
+  constructor(origin: DataViewRemote, options: CategoryOptions) {
     const events = ['dataChanged', 'optionChanged', 'error'];
     super(origin, options, events);
 
@@ -43,22 +43,6 @@ export class CategorySource extends CategoryBase<Source> {
       throw error;
     }
 
-    const { aggregation, categories, count, max, min, nulls } = aggregationResponse;
-
-    const adaptedCategories = categories.map(({ category, value }) => {
-      return {
-        name: category,
-        value
-      };
-    });
-
-    return {
-      categories: adaptedCategories,
-      count,
-      max,
-      min,
-      nullCount: nulls,
-      operation: aggregation
-    };
+    return aggregationResponse;
   }
 }

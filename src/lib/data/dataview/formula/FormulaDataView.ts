@@ -1,7 +1,7 @@
 import { CartoError } from '../../../core/errors/CartoError';
 import { Layer } from '../../../viz/layer/Layer';
 import { CARTOSource } from '../../../viz/sources/CARTOSource';
-import { DataView, DataViewData } from '../dataview';
+import { DataView, DataViewData } from '../DataViewMode';
 import { AggregationType, aggregate } from '../../operations/aggregation/aggregation';
 
 export class FormulaDataView extends DataView {

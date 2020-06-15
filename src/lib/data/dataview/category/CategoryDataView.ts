@@ -1,22 +1,19 @@
 import { WithEvents } from '@/core/mixins/WithEvents';
-import { Layer } from '@/viz/layer/Layer';
-import { CARTOSource } from '@/viz/sources/CARTOSource';
-import { DataView } from '../dataview';
-import { CartoDataViewError, dataViewErrorTypes } from '../DataViewError';
+import { Layer, Source } from '@/viz';
+import { DataView } from '../DataViewMode';
 import { CategoryBase, DataViewMode, CategoryOptions } from './CategoryBase';
-import { Source } from '../Source';
-import { Viewport } from '../Viewport';
-import { CategorySource } from './CategorySource';
-import { CategoryViewport } from './CategoryViewport';
-import { CategoryMixed } from './CategoryMixed';
+import { DataViewLocal } from '../DataViewLocal';
+import { DataViewRemote } from '../DataViewRemote';
+import { CategoryLocal } from './CategoryLocal';
+import { CategoryRemote } from './CategoryRemote';
 
 export class CategoryDataView extends WithEvents {
-  private categoryWrappee: CategoryBase<DataView<Layer | string>>;
+  private categoryWrappee: CategoryBase<DataView<Layer | Source>>;
 
-  constructor(dataSource: Layer | string, column: string, options: CategoryOptions) {
+  constructor(dataSource: Layer | Source, column: string, options: CategoryOptions) {
     super();
 
-    const mode = options.mode || DataViewMode.MIXED;
+    const mode = options.mode || DataViewMode.VIEWPORT;
     this.categoryWrappee = buildCategoryWrappee(dataSource, column, options, mode);
 
     // bind events with the mode
@@ -35,7 +32,7 @@ export class CategoryDataView extends WithEvents {
 }
 
 function buildCategoryWrappee(
-  dataSource: Layer | string,
+  dataSource: Layer | Source,
   column: string,
   options: CategoryOptions,
   mode: DataViewMode
@@ -43,48 +40,21 @@ function buildCategoryWrappee(
   let categoryWrappee;
 
   switch (mode) {
-    case DataViewMode.SOURCE: {
-      let sourceName;
-
-      if (typeof dataSource === 'string') {
-        sourceName = dataSource;
-      } else {
-        const layerSource = (dataSource as Layer).source;
-        sourceName = (layerSource as CARTOSource).value;
-      }
-
-      const source = new Source(sourceName, column);
-      categoryWrappee = new CategorySource(source, options);
+    case DataViewMode.NON_PRECISE: {
+      const dataViewLocal = new DataViewLocal(dataSource as Layer, column);
+      categoryWrappee = new CategoryLocal(dataViewLocal, options);
       break;
     }
 
     case DataViewMode.VIEWPORT: {
-      if (typeof dataSource === 'string') {
-        throw new CartoDataViewError(
-          `The provided source has to be an instance of Layer when the ${DataViewMode.VIEWPORT} mode is used.`,
-          dataViewErrorTypes.PROPERTY_INVALID
-        );
-      }
-
-      const viewport = new Viewport(dataSource, column);
-      categoryWrappee = new CategoryViewport(viewport, options);
+      const dataViewRemote = new DataViewRemote(dataSource as Source, column);
+      categoryWrappee = new CategoryRemote(dataViewRemote, options);
       break;
     }
 
     default: {
-      if (typeof dataSource === 'string') {
-        throw new CartoDataViewError(
-          'The provided source has to be an instance of Layer or CARTOSource',
-          dataViewErrorTypes.PROPERTY_INVALID
-        );
-      }
-
-      const layerSource = (dataSource as Layer).source;
-      const sourceName = (layerSource as CARTOSource).value;
-
-      const source = new Source(sourceName, column);
-      const viewport = new Viewport(dataSource, column);
-      categoryWrappee = new CategoryMixed(source, viewport, options);
+      const dataViewRemote = new DataViewRemote(dataSource as Source, column);
+      categoryWrappee = new CategoryRemote(dataViewRemote, options);
       break;
     }
   }
