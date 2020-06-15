@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Add a CARTO Layer</title>
+    <title>Add a GeoJSON Layer</title>
 
     <link
       rel="stylesheet"
@@ -40,9 +40,9 @@
           <!-- panel -->
           <div class="as-panel as-panel--top as-panel--right as-bg--ui-01">
             <div class="as-panel__element as-p--16 as-body">
-              <h1 class="as-title">Add layer</h1>
+              <h1 class="as-title">GeoJSON</h1>
               <h4 class="as-subheader as-mb--12">
-                Add one CARTO layer to your map
+                Add one GeoJSON layer to your map                              
               </h4>             
           </div>
         </div>
@@ -54,13 +54,27 @@
     <script src="/dist/umd/index.min.js"></script>
 
     <script>
-      function initialize() {
-        carto.setDefaultCredentials({ username: 'public' });
+      async function initialize() {
+        // here we use CARTO sql endpoint, but you can use any other GeoJSON source
+        const url = 'https://public.carto.com/api/v2/sql?api_key=default_public&q=select* from world_ports&format=geojson';
+        const geojsonData = await fetch(url).then(response => response.json());
+
         const deckMap = carto.viz.createMap();
-        const countriesLayer = new carto.viz.Layer('ne_50m_admin_0_countries');
-        countriesLayer.addTo(deckMap);
+
+        const basicStyle = carto.viz.basicStyle({
+          color: '#0000FF',
+          size: 14,
+          strokeColor: '#0000FF44',
+          strokeWidth: 6
+        });
+
+        const layer = new carto.viz.Layer(geojsonData, basicStyle);
+        // equivalent to...
+        // const layer = new carto.viz.Layer(new carto.viz.GeoJsonSource(geojsonData), basicStyle);
+        
+        layer.addTo(deckMap);
       }
-      
+
       initialize();
     </script>
   </body>
