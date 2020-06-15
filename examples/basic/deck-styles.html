@@ -3,14 +3,19 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Pure deck.gl styles on a CARTO layer</title>
+    <title>deck.gl styles on a CARTO layer</title>
 
     <link
       rel="stylesheet"
       type="text/css"
       href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.css"
     />
-    <link rel="stylesheet" href="https://libs.cartocdn.com/airship-style/v2.3/airship.css" />
+
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://libs.cartocdn.com/airship-style/v2.3/airship.css"
+    />
 
     <style>
       body {
@@ -25,26 +30,27 @@
     </style>
   </head>
 
-  <body>
-    <section id="map"></section>
+  <body class="as-app-body as-app">
+    <div class="as-content">
+      <main class="as-main">
+        <div class="as-map-area">
+          <!-- map -->
+          <div id="map"></div>
 
-    <div class="as-map-panels">
-      <div class="as-panel as-panel--top as-panel--right as-panel--vertical">
-        <div class="as-panel__element">
-          <section class="as-box">
-            <p class="as-title">deck.gl styles</p>
-            <p class="as-body">
-              Pure deck.gl styles on a CARTO Layer
-            </p>
-          </section>
+          <!-- panel -->
+          <div class="as-panel as-panel--top as-panel--right as-bg--ui-01">
+            <div class="as-panel__element as-p--16 as-body">
+              <h1 class="as-title">deck.gl styles</h1>
+              <h4 class="as-subheader as-mb--12">
+                CARTOLayer is a deck.gl layer, so you can use common deck.gl styles for it
+              </h4>             
+          </div>
         </div>
-      </div>
+      </main>
     </div>
 
-    <!-- Map libraries-->
     <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.js"></script>
     <script src="https://unpkg.com/deck.gl@8.2.0-alpha.2/dist.min.js"></script>
-
     <script src="/dist/umd/index.min.js"></script>
 
     <script>
@@ -59,7 +65,7 @@
           getLineColor: [255, 255, 255, 127]
         };
 
-        const countriesLayer = new carto.viz.Layer('ne_50m_admin_1_states_1', styles);
+        const countriesLayer = new carto.viz.Layer('ne_50m_admin_0_countries', styles);
         countriesLayer.addTo(deckMap);
       }
 
