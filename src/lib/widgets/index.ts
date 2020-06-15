@@ -1,1 +1,1 @@
-export { CategoryWidget } from './category/category';
+export { Category } from './category/category';
