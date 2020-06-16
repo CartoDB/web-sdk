@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>deck.gl mix layers</title>
+
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.css"
+    />
+
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://libs.cartocdn.com/airship-style/v2.3/airship.css"
+    />
+
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+      }
+
+      #map {
+        width: 100vw;
+        height: 100vh;
+      }
+    </style>
+  </head>
+
+  <body class="as-app-body as-app">
+    <div class="as-content">
+      <main class="as-main">
+        <div class="as-map-area">
+          <!-- map -->
+          <div id="map"></div>
+
+          <!-- panel -->
+          <div class="as-panel as-panel--top as-panel--right as-bg--ui-01">
+            <div class="as-panel__element as-p--16 as-body">
+              <h1 class="as-title">deck.gl layers mix</h1>
+              <h4 class="as-subheader as-mb--12">
+                Using a deckgl map, you can add any decklayer, whether it is a CARTO layer or not
+              </h4>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.js"></script>
+    <script src="https://unpkg.com/deck.gl@8.2.0-alpha.2/dist.min.js"></script>
+    <script src="/dist/umd/index.min.js"></script>
+
+    <script>
+      async function initialize() {
+        carto.setDefaultCredentials({ username: 'public' });
+
+        // standard deckgl map, using scripting API
+        // see: https://deck.gl/#/documentation/getting-started/using-standalone?section=using-the-scripting-api
+        const deckMap = new window.deck.DeckGL({
+            container: 'map',
+            mapStyle: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
+            initialViewState: {
+                longitude: -122.45,
+                latitude: 37.8,
+                zoom: 8
+            },
+            controller: true,
+            layers: [
+                // standard deckgl layer, replace with anyone you like
+                new deck.ScatterplotLayer({
+                data: [
+                    {position: [-122.45, 37.8], color: [0, 255, 0, 100], radius: 10000}
+                ],
+                getColor: d => d.color,
+                getRadius: d => d.radius
+                })
+            ]
+            });
+
+        // A CARTO Layer is a simple deckgl layer, built over MVTLayer, so you can just add it to the map 
+        const countries = new carto.viz.Layer('world_ports');
+        countries.addTo(deckMap);
+      }
+
+      initialize();
+    </script>
+  </body>
+</html>
