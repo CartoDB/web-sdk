@@ -35,50 +35,25 @@
     <script src="/dist/umd/index.min.js"></script>
 
     <script>
-      function initializePoints() {
-        carto.setDefaultCredentials({ username: 'josemacarto' });
+      async function initializeLines() {
+        carto.setDefaultCredentials({ username: 'public' });
+        const data = await fetch('https://public.carto.com/api/v2/sql?api_key=default_public&q=select* from lineas_metro&format=geojson').then(response => response.json())
 
         const deckMap = carto.viz.createMap({
           basemap: 'voyager',
           view: {
-            longitude: -122.45292663574217,
-            latitude: 37.760944207425965,
+            longitude: -3.6968994140625,
+            latitude: 40.444856858961764,
             zoom: 11
           }
         });
 
-        const style = carto.viz.sizeCategoriesStyle('incident_day_of_week');
-        const layer = new carto.viz.Layer('sf_incidents', style);
+        const style = carto.viz.colorCategoriesStyle('name');
+        const layer = new carto.viz.Layer(data, style);
         layer.addTo(deckMap);
       }
 
-      function initializeLines() {
-        carto.setDefaultCredentials({ username: 'cartoframes' });
-
-        const deckMap = carto.viz.createMap({
-          basemap: 'voyager',
-          view: {
-            longitude: 135.7,
-            latitude: -25.48,
-            zoom: 3
-          }
-        });
-
-        const style = carto.viz.sizeCategoriesStyle('type');
-
-        const source = new carto.viz.CARTOSource('roads', {
-          mapOptions: {
-            bufferSize: {
-              mvt: 30
-            }
-          }
-        });
-        const layer = new carto.viz.Layer(source, style);
-        layer.addTo(deckMap);
-      }
-
-      initializePoints();
-      // initializeLines();
+      initializeLines();
     </script>
   </body>
 </html>

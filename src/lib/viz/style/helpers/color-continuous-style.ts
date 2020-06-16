@@ -24,7 +24,8 @@ function defaultOptions(
   options: Partial<ColorContinuousOptionsStyle>
 ): ColorContinuousOptionsStyle {
   return {
-    strokeWidth: 0,
+    strokeWidth: getDefaultStrokeWidth(geometryType, options),
+    size: 6,
     palette: DEFAULT_PALETTE,
     nullColor: getStyleValue('nullColor', geometryType, options),
     ...options
@@ -120,4 +121,15 @@ function validateParameters(options: ColorContinuousOptionsStyle) {
       stylingErrorTypes.PROPERTY_MISMATCH
     );
   }
+}
+
+function getDefaultStrokeWidth(
+  geometryType: GeometryType,
+  options: Partial<ColorContinuousOptionsStyle>
+) {
+  if (geometryType === 'Point') {
+    return options.strokeWidth || 0;
+  }
+
+  return getStyleValue('strokeWidth', geometryType, options);
 }

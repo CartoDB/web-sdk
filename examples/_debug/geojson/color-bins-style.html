@@ -35,41 +35,24 @@
     <script src="/dist/umd/index.min.js"></script>
 
     <script>
-      async function initialize() {
-        carto.setDefaultCredentials({ username: 'cartoframes' });
-
-        const deckMap = carto.viz.createMap({
-          basemap: 'voyager',
-          view: {
-            longitude: -116.846099,
-            latitude: 50.2672297,
-            zoom: 2.5
-          }
-        });
-
-        const style = carto.viz.colorContinuousStyle('value', {});
-        const tempLayer = new carto.viz.Layer('temps', style);
-        tempLayer.addTo(deckMap);
-      }
-
       async function initializePolygons() {
-        carto.setDefaultCredentials({ username: 'josemacarto' });
+        carto.setDefaultCredentials({ username: 'public' });
+        const data = await fetch('https://public.carto.com/api/v2/sql?api_key=default_public&q=select* from ne_50m_admin_0_countries&format=geojson').then(response => response.json())
 
         const deckMap = carto.viz.createMap({
           basemap: 'voyager',
           view: {
-            longitude: -122.45292663574217,
-            latitude: 37.760944207425965,
-            zoom: 11
+            longitude: 0,
+            latitude: 0,
+            zoom: 0
           }
         });
 
-        const style = carto.viz.colorContinuousStyle('businesses', {});
-        const tempLayer = new carto.viz.Layer('sf_businesses_neighborhoods', style);
-        tempLayer.addTo(deckMap);
+        const style = carto.viz.colorBinsStyle('gdp_md_est');
+        const layer = new carto.viz.Layer(data, style);
+        layer.addTo(deckMap);
       }
 
-      // initialize();
       initializePolygons();
     </script>
   </body>
