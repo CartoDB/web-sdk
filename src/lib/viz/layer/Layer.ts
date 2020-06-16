@@ -327,11 +327,19 @@ export class Layer extends WithEvents implements StyledLayer {
   public async setPopupClick(elements: PopupElement[] | string[] | null = []) {
     this._interactivity.setPopupClick(elements);
     this._addPopupFields(elements);
+
+    if (this._source.isInitialized) {
+      await this._source.init(this._fields);
+    }
   }
 
   public async setPopupHover(elements: PopupElement[] | string[] | null = []) {
     this._interactivity.setPopupHover(elements);
     this._addPopupFields(elements);
+
+    if (this._source.isInitialized) {
+      await this._source.init(this._fields);
+    }
   }
 
   public remove() {
