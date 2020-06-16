@@ -1,7 +1,7 @@
 import { DataView } from '@/data/dataview/dataview';
 import { CartoError } from '@/core/errors/CartoError';
 import { uuidv4 } from '@/core/utils/uuid';
-import { queryDOMElement } from '../utils/dom';
+import { queryDOMElement } from '@/core/utils/dom';
 
 export abstract class Widget {
   protected element: HTMLElement;

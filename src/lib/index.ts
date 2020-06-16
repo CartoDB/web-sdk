@@ -7,9 +7,6 @@ import { DOSource, CARTOSource, GeoJsonSource } from './viz/sources';
 // Basemaps
 import { createMap, createGoogleMap } from './viz/basemap';
 
-// Widgets
-import { CategoryWidget } from './viz/widgets';
-
 // Basics
 import { Layer } from './viz/layer';
 import { Popup } from './viz/popups/Popup';
@@ -28,6 +25,9 @@ import {
 // Dataviews
 import { CategoryDataView, FormulaDataView, CategorySourceDataView } from './data/dataview';
 
+// Widgets
+import { Category } from './widgets';
+
 /*
  * --- Public API ---
  */
@@ -39,7 +39,6 @@ export { Credentials, setDefaultCredentials };
 // carto.viz
 const sources = { DOSource, CARTOSource, GeoJsonSource };
 const basemaps = { createMap, createGoogleMap };
-const widgets = { CategoryWidget };
 const basics = { Layer, Popup };
 const styles = {
   basicStyle,
@@ -54,7 +53,6 @@ const styles = {
 export const viz = {
   ...sources,
   ...basemaps,
-  ...widgets,
   ...styles,
   ...basics
 };
@@ -64,4 +62,9 @@ const dataviews = { CategoryDataView, FormulaDataView, CategorySourceDataView };
 
 export const data = {
   ...dataviews
+};
+
+// carto.widgets
+export const widgets = {
+  Category
 };
