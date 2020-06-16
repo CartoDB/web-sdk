@@ -1,8 +1,8 @@
-import { CartoError } from '../../../core/errors/CartoError';
 import { DataViewData } from '../DataViewMode';
 import { aggregate } from '../../operations/aggregation/aggregation';
 import { DataViewLocal } from '../DataViewLocal';
 import { FormulaBase, FormulaDataViewOptions } from './FormulaBase';
+import { CartoDataViewError, dataViewErrorTypes } from '../DataViewError';
 
 export class FormulaLocal extends FormulaBase<DataViewLocal> {
   constructor(dataView: DataViewLocal, options: FormulaDataViewOptions) {
@@ -39,10 +39,10 @@ function validateNumbersOrNullIn(values: any[]) {
     const isAcceptedNull = value === null || value === undefined; // TODO should we just support null?
 
     if (!isAcceptedNull && typeof value !== 'number') {
-      throw new CartoError({
-        type: '[DataView]',
-        message: `Column property for Formula can just contain numbers (or nulls) and a ${typeof value} with ${value} value was found. Please check documentation.`
-      });
+      throw new CartoDataViewError(
+        `Column property for Formula can just contain numbers (or nulls) and a ${typeof value} with ${value} value was found. Please check documentation.`,
+        dataViewErrorTypes.PROPERTY_INVALID
+      );
     }
   });
 }

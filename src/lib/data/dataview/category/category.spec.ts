@@ -2,6 +2,7 @@ import { Layer } from '../../../viz/layer/Layer';
 import { CategoryDataView } from './CategoryDataView';
 import { AggregationType } from '../../operations/aggregation/aggregation';
 import { CartoDataViewError, dataViewErrorTypes } from '../DataViewError';
+import { DataViewModeAlias } from '../DataViewMode';
 
 describe('DataView', () => {
   describe('Instance Creation', () => {
@@ -33,9 +34,10 @@ describe('DataView', () => {
     it('should throw an exception when operationColumn is not provided', () => {
       expect(
         () =>
-          new CategoryDataView(undefined as never, 'fake_column', {
+          new CategoryDataView(new Layer('fake_source'), 'fake_column', {
             operation: AggregationType.AVG,
-            operationColumn: undefined as never
+            operationColumn: undefined as never,
+            mode: DataViewModeAlias.NON_PRECISE
           })
       ).toThrow(
         new CartoDataViewError(
@@ -61,7 +63,8 @@ describe('DataView', () => {
 
       const dataView = new CategoryDataView(layer, 'country', {
         operation: AggregationType.AVG,
-        operationColumn: 'popEst'
+        operationColumn: 'popEst',
+        mode: DataViewModeAlias.NON_PRECISE
       });
 
       expect(await dataView.getData()).toMatchObject({

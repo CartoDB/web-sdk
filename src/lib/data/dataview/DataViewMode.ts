@@ -31,7 +31,8 @@ export abstract class DataViewMode<T extends Filterable> extends WithEvents {
   }
 }
 
-function validateParameters(source: T, column: string) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function validateParameters(source: any, column: string) {
   if (!source) {
     throw new CartoDataViewError(
       'Source was not provided while creating dataview',

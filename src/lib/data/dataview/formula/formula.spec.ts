@@ -2,6 +2,7 @@ import { Layer } from '../../../viz/layer/Layer';
 import { FormulaDataView } from './FormulaDataView';
 import { AggregationType } from '../../operations/aggregation/aggregation';
 import { CartoDataViewError, dataViewErrorTypes } from '../DataViewError';
+import { DataViewModeAlias } from '../DataViewMode';
 
 describe('FormulaDataView', () => {
   describe('Instance Creation', () => {
@@ -47,7 +48,8 @@ describe('FormulaDataView', () => {
       spyOn(layer, 'getViewportFeatures').and.returnValue(Promise.resolve(sourceData));
 
       const dataView = new FormulaDataView(layer, 'pop', {
-        operation: AggregationType.AVG
+        operation: AggregationType.AVG,
+        mode: DataViewModeAlias.NON_PRECISE
       });
 
       expect(await dataView.getData()).toMatchObject({
@@ -71,7 +73,8 @@ describe('FormulaDataView', () => {
       spyOn(layer, 'getViewportFeatures').and.returnValue(Promise.resolve(sourceData));
 
       const dataView = new FormulaDataView(layer, 'pop', {
-        operation: AggregationType.SUM
+        operation: AggregationType.SUM,
+        mode: DataViewModeAlias.NON_PRECISE
       });
 
       try {
