@@ -35,8 +35,8 @@
     <script src="/dist/umd/index.min.js"></script>
 
     <script>
-      function initializePoints() {
-        carto.setDefaultCredentials({ username: 'josemacarto' });
+      function initialize() {
+        carto.setDefaultCredentials({ username: 'cartoframes' });
 
         const deckMap = carto.viz.createMap({
           basemap: 'voyager',
@@ -47,38 +47,11 @@
           }
         });
 
-        const style = carto.viz.sizeCategoriesStyle('incident_day_of_week');
-        const layer = new carto.viz.Layer('sf_incidents', style);
+        const layer = new carto.viz.Layer('global_power_plants');
         layer.addTo(deckMap);
       }
 
-      function initializeLines() {
-        carto.setDefaultCredentials({ username: 'cartoframes' });
-
-        const deckMap = carto.viz.createMap({
-          basemap: 'voyager',
-          view: {
-            longitude: 135.7,
-            latitude: -25.48,
-            zoom: 3
-          }
-        });
-
-        const style = carto.viz.sizeCategoriesStyle('type');
-
-        const source = new carto.viz.CARTOSource('roads', {
-          mapOptions: {
-            bufferSize: {
-              mvt: 30
-            }
-          }
-        });
-        const layer = new carto.viz.Layer(source, style);
-        layer.addTo(deckMap);
-      }
-
-      initializePoints();
-      // initializeLines();
+      initialize();
     </script>
   </body>
 </html>
