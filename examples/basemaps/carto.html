@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Helper for simple carto basemap using Mapbox GL JS</title>
+
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.css"
+    />
+
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://libs.cartocdn.com/airship-style/v2.3/airship.css"
+    />
+
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+      }
+
+      #map {
+        width: 100vw;
+        height: 100vh;
+      }
+    </style>
+  </head>
+
+  <body class="as-app-body as-app">
+    <div class="as-content">
+      <main class="as-main">
+        <div class="as-map-area">
+          <!-- map -->
+          <div id="map"></div>
+
+          <!-- panel -->
+          <div class="as-panel as-panel--top as-panel--right as-bg--ui-01">
+            <div class="as-panel__element as-p--16 as-body">
+              <h1 class="as-title">CARTO basemap</h1>
+              <h4 class="as-subheader as-mb--12">
+                An easy way to create a CARTO basemap, using DeckGL and Mapbox GL under the hood
+              </h4>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.js"></script>
+    <script src="https://unpkg.com/deck.gl@8.2.0-alpha.2/dist.min.js"></script>
+    <!-- <script src="https://libs.cartocdn.com/airship-components/v2.3/airship.js"></script> -->
+    <script src="/dist/umd/index.min.js"></script>
+
+    <script>
+      function initialize() {
+        carto.setDefaultCredentials({ username: 'public' });
+
+        const deckMap = carto.viz.createMap();
+        // All these variations are also allowed:
+        //   const deckMap = carto.viz.createMap({ basemap: 'positron'});
+        //   const deckMap = carto.viz.createMap({ basemap: 'darkmatter', view: { zoom: 4 } });
+        //   const deckMap = carto.viz.createMap({ basemap: 'positron', view: { zoom: 4, longitude: 3, latitude: 40, pitch: 45, bearing: 30 }, container: 'map' });
+
+        const ports = new carto.viz.Layer('world_ports');
+        ports.addTo(deckMap);
+      }
+
+      initialize();
+    </script>
+  </body>
+</html>
