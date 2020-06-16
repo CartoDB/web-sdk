@@ -1,4 +1,7 @@
 import { log, Deck } from '@deck.gl/core';
+import { CARTOSource } from '@/viz/sources';
+import { colorBinsStyle } from '@/viz/style/helpers/color-bins-style';
+import { NumericFieldStats } from '@/viz/sources/Source';
 import { Layer } from '../layer/Layer';
 import { getStyles } from '../style';
 
@@ -121,6 +124,78 @@ describe('Layer', () => {
 
       const deckGLLayer = await layer.getDeckGLLayer();
       expect(deckGLLayer.props).toMatchObject(layerProperties);
+    });
+  });
+
+  describe('Source init calls (instantiation in CARTOSource)', () => {
+    const mockSourceInit = jest.fn().mockImplementation();
+    const mockSourceGetProps = jest.fn().mockImplementation();
+    const mockSourceGetMetadata = jest.fn().mockImplementation(() => {
+      return {
+        geometryType: 'Polygon',
+        stats: [{} as NumericFieldStats]
+      };
+    });
+
+    let deckInstanceMock: Deck;
+
+    beforeAll(() => {
+      const deck = {
+        props: {
+          layers: []
+        },
+        setProps: null as unknown
+      };
+      deck.setProps = jest.fn().mockImplementation(props => {
+        deck.props = { ...props };
+      });
+
+      deckInstanceMock = (deck as unknown) as Deck;
+
+      CARTOSource.prototype.init = mockSourceInit;
+      CARTOSource.prototype.getProps = mockSourceGetProps;
+      CARTOSource.prototype.getMetadata = mockSourceGetMetadata;
+    });
+
+    afterEach(() => {
+      mockSourceInit.mockClear();
+      mockSourceGetProps.mockClear();
+      mockSourceGetMetadata.mockClear();
+    });
+
+    it('should trigger a first Source init when adding the layer', async () => {
+      const source = new CARTOSource(DEFAULT_DATASET);
+      const layer = new Layer(source);
+      await layer.addTo(deckInstanceMock);
+      expect(mockSourceInit).toHaveBeenCalledTimes(1);
+    });
+
+    it('should trigger a second Source init when modifying styles requires it', async () => {
+      const source = new CARTOSource(DEFAULT_DATASET);
+      const layer = new Layer(source);
+      await layer.addTo(deckInstanceMock);
+      expect(mockSourceInit).toHaveBeenCalledTimes(1);
+
+      const styleWithNewColumn = colorBinsStyle('attributeName');
+      layer.setStyle(styleWithNewColumn);
+      expect(mockSourceInit).toHaveBeenCalledTimes(2);
+    });
+
+    it('should trigger a second Source init when modifying popups requires it', async () => {
+      const source = new CARTOSource(DEFAULT_DATASET);
+      const layer = new Layer(source);
+      await layer.addTo(deckInstanceMock);
+      expect(mockSourceInit).toHaveBeenCalledTimes(1);
+
+      source.isInitialized = true;
+
+      layer.setPopupClick(['fake_column']);
+      expect(mockSourceInit).toHaveBeenCalledTimes(2);
+
+      source.isInitialized = true;
+
+      layer.setPopupHover(['another_fake_column']);
+      expect(mockSourceInit).toHaveBeenCalledTimes(3);
     });
   });
 });
