@@ -1,4 +1,5 @@
 import { Layer, Source } from '@/viz';
+import { spatialFilter } from '@/viz/filters/spatial-filters';
 import { DataViewLocal } from '../DataViewLocal';
 import { DataViewRemote } from '../DataViewRemote';
 import { CategoryLocal } from './CategoryLocal';
@@ -23,6 +24,7 @@ export class CategoryDataView extends DataViewWrapper {
 
       case DataViewModeAlias.VIEWPORT: {
         const dataViewRemote = new DataViewRemote(dataSource as Source, column);
+        dataViewRemote.addFilter(column, spatialFilter.VIEWPORT);
         this.dataviewWrappee = new CategoryRemote(dataViewRemote, options);
         break;
       }

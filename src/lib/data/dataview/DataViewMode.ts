@@ -1,6 +1,7 @@
 import { WithEvents } from '@/core/mixins/WithEvents';
 import { Filterable } from '@/viz/filters/Filterable';
 import { Filter } from '@/viz/filters/types';
+import { spatialFilter } from '@/viz/filters/spatial-filters';
 import { CartoDataViewError, dataViewErrorTypes } from './DataViewError';
 import { AggregationType } from '../operations/aggregation/aggregation';
 
@@ -17,8 +18,12 @@ export abstract class DataViewMode<T extends Filterable> extends WithEvents {
     this.dataSource = dataSource;
   }
 
-  public addFilter(filterId: string, filter: Filter) {
-    this.dataSource.addFilter(filterId, { [this.column]: filter });
+  public addFilter(filterId: string, filter: Filter | spatialFilter) {
+    if (filter === spatialFilter.VIEWPORT) {
+      this.dataSource.addFilter(filterId, filter);
+    } else {
+      this.dataSource.addFilter(filterId, { [this.column]: filter });
+    }
   }
 
   public removeFilter(filterId: string) {
