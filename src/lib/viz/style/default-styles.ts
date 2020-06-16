@@ -2,14 +2,14 @@ const NULL_COLOR = '#ccc';
 const OTHERS_COLOR = '#777';
 const NULL_SIZE = 0;
 const STROKE_WIDTH = 0.5;
-const STROKE_COLOR = '#22222288';
+const STROKE_COLOR = '#FFFFFF';
 
 export const defaultStyles: any = {
   Point: {
     color: '#EE4D5A',
-    size: 10,
+    size: 8,
     opacity: 1,
-    strokeColor: STROKE_COLOR,
+    strokeColor: '#FFF',
     strokeWidth: STROKE_WIDTH,
     nullColor: NULL_COLOR,
     othersColor: OTHERS_COLOR,

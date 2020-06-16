@@ -23,6 +23,8 @@ function defaultOptions(
   return {
     top: 11,
     categories: [],
+    opacity: 0.7,
+    color: getDefaultColor(geometryType, options),
     sizeRange: getDefaultSizeRange(geometryType, options),
     nullSize: getStyleValue('nullSize', geometryType, options),
     ...options
@@ -166,4 +168,12 @@ export function getDefaultSizeRange(
   }
 
   return getStyleValue('sizeRange', geometryType, options);
+}
+
+function getDefaultColor(geometryType: GeometryType, options: Partial<SizeCategoriesOptionsStyle>) {
+  if (geometryType === 'Point') {
+    return options.color || '#F46D43';
+  }
+
+  return getStyleValue('color', geometryType, options);
 }

@@ -1,10 +1,12 @@
 import { Deck } from '@deck.gl/core';
 import { CartoError } from '@/core/errors/CartoError';
+import { GeoJsonLayer } from '@deck.gl/layers';
 import { MVTLayer } from '@deck.gl/geo-layers';
 import mitt from 'mitt';
 import deepmerge from 'deepmerge';
-import { Source, Field } from '../sources/Source';
-import { CARTOSource, DOSource } from '../sources';
+import { GeoJSON } from 'geojson';
+import { Source, StatFields } from '../sources/Source';
+import { CARTOSource, DOSource, GeoJsonSource } from '../sources';
 import { DOLayer } from '../deck/DOLayer';
 import { getStyles, StyleProperties, Style } from '../style';
 import { ViewportFeaturesGenerator } from '../interactivity/viewport-features/ViewportFeaturesGenerator';
@@ -18,6 +20,8 @@ import { FunctionFilterApplicator } from '../filters/FunctionFilterApplicator';
 import { ColumnFilters } from '../filters/types';
 import { basicStyle } from '../style/helpers/basic-style';
 import { Filterable } from '../filters/Filterable';
+
+const DEFAULT_ID_PROPERTY = 'cartodb_id';
 
 export class Layer extends Filterable implements StyledLayer {
   private _source: Source;
@@ -40,7 +44,7 @@ export class Layer extends Filterable implements StyledLayer {
 
   // pickable events count
   private _pickableEventsCount = 0;
-  private _fields: Field[];
+  private _fields: StatFields;
 
   private filtersCollection = new FiltersCollection(FunctionFilterApplicator);
 
@@ -66,7 +70,7 @@ export class Layer extends Filterable implements StyledLayer {
     };
 
     this._interactivity = this._buildInteractivity(options);
-    this._fields = this._getStyleField() || [];
+    this._fields = this._buildFields();
   }
 
   getMapInstance(): Deck {
@@ -100,7 +104,7 @@ export class Layer extends Filterable implements StyledLayer {
    */
   public async setStyle(style: Style) {
     this._style = buildStyle(style);
-    this._fields = this._getStyleField() || [];
+    this._fields = this._buildFields();
 
     if (this._deckLayer) {
       await this.replaceDeckGLLayer();
@@ -119,31 +123,6 @@ export class Layer extends Filterable implements StyledLayer {
 
     const metadata = this._source.getMetadata();
     const defaultStyleProps = getStyles(metadata.geometryType);
-
-    /* eslint-disable @typescript-eslint/ban-ts-comment */
-    if (
-      metadata.geometryType === 'Point' &&
-      // @ts-ignore
-      defaultStyleProps.pointRadiusScale
-    ) {
-      // @ts-ignore
-      defaultStyleProps.pointRadiusMaxPixels *=
-        // @ts-ignore
-        defaultStyleProps.pointRadiusScale;
-      // @ts-ignore
-      defaultStyleProps.pointRadiusMinPixels *=
-        // @ts-ignore
-        defaultStyleProps.pointRadiusScale;
-    }
-    /* eslint-disable @typescript-eslint/ban-ts-comment */
-
-    if (
-      ['Point', 'Polygon'].includes(metadata.geometryType) &&
-      defaultStyleProps.getLineWidth === 0
-    ) {
-      // @ts-ignore
-      defaultStyleProps.stroked = false;
-    }
 
     return new Style({
       ...defaultStyleProps,
@@ -237,6 +216,8 @@ export class Layer extends Filterable implements StyledLayer {
     // Create the Deck.gl instance
     if (this._source instanceof CARTOSource) {
       this._deckLayer = new MVTLayer(layerProperties);
+    } else if (this._source instanceof GeoJsonSource) {
+      this._deckLayer = new GeoJsonLayer(layerProperties);
     } else if (this._source instanceof DOSource) {
       this._deckLayer = new DOLayer(layerProperties);
     } else {
@@ -297,7 +278,7 @@ export class Layer extends Filterable implements StyledLayer {
       this.filtersCollection.getUpdateTriggers()
     ]);
 
-    return ensureProperPropStyles(layerProps);
+    return ensureRelatedStyleProps(layerProps);
   }
 
   /**
@@ -406,6 +387,23 @@ export class Layer extends Filterable implements StyledLayer {
     });
   }
 
+  private _buildFields(): StatFields {
+    const sample: Set<string> = new Set();
+    const aggregation: Set<string> = new Set();
+    const fields = { sample, aggregation };
+
+    if (this._style && this._style.field) {
+      const { field } = this._style;
+      fields.sample.add(field);
+
+      if (field !== DEFAULT_ID_PROPERTY) {
+        fields.aggregation.add(field);
+      }
+    }
+
+    return fields;
+  }
+
   addFilter(filterId: string, filter: ColumnFilters) {
     this.filtersCollection.addFilter(filterId, filter);
 
@@ -426,29 +424,14 @@ export class Layer extends Filterable implements StyledLayer {
     return Promise.resolve();
   }
 
-  // eslint-disable-next-line consistent-return
-  private _getStyleField() {
-    if (this._style && this._style.field) {
-      return [
-        {
-          column: this._style.field,
-          sample: true,
-          aggregation: true
-        }
-      ];
-    }
-  }
-
   private _addPopupFields(elements: PopupElement[] | string[] | null = []) {
     if (elements) {
       elements.forEach((e: PopupElement | string) => {
         const column = typeof e === 'string' ? e : e.attr;
-        const field = {
-          column,
-          sample: false,
-          aggregation: true
-        };
-        this._fields.push(field);
+
+        if (column !== DEFAULT_ID_PROPERTY) {
+          this._fields.aggregation.add(column);
+        }
       });
     }
   }
@@ -458,8 +441,20 @@ export class Layer extends Filterable implements StyledLayer {
  * Internal function to auto convert string to CARTO source
  * @param source source object to be converted
  */
-function buildSource(source: string | Source) {
-  return typeof source === 'string' ? new CARTOSource(source) : source;
+function buildSource(source: string | Source | GeoJSON): Source {
+  if (source instanceof Source) {
+    return source;
+  }
+
+  if (typeof source === 'string') {
+    return new CARTOSource(source);
+  }
+
+  if (typeof source === 'object') {
+    return new GeoJsonSource(source);
+  }
+
+  throw new CartoLayerError('Unsupported source type', layerErrorTypes.UNKNOWN_SOURCE);
 }
 
 function buildStyle(style: Style | StyleProperties) {
@@ -467,7 +462,7 @@ function buildStyle(style: Style | StyleProperties) {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function ensureProperPropStyles(layerProps: any) {
+function ensureRelatedStyleProps(layerProps: any) {
   const layerPropsValidated = layerProps;
 
   if (layerPropsValidated.pointRadiusScale) {

@@ -6,7 +6,7 @@ import {
   SourceMetadata,
   NumericFieldStats,
   CategoryFieldStats,
-  Field
+  StatFields
 } from './Source';
 import { parseGeometryType } from '../style/helpers/utils';
 import { sourceErrorTypes, SourceError } from '../errors/source-error';
@@ -122,11 +122,7 @@ export class CARTOSource extends Source {
     return this._metadata;
   }
 
-  /**
-   * Set the internal mapConfig properly: columnStats, dimensions, sample and aggregation
-   * @param fields
-   */
-  private _initConfigForStats(fields: Field[]) {
+  private _initConfigForStats(fields: StatFields) {
     if (this._mapConfig.metadata === undefined) {
       throw new SourceError('Map Config has not metadata field');
     }
@@ -141,14 +137,12 @@ export class CARTOSource extends Source {
 
     this._mapConfig.metadata.sample = {
       num_rows: 1000,
-      include_columns: fields.filter(f => f.sample).map(f => f.column)
+      include_columns: [...fields.sample]
     };
 
     const dimensions: Record<string, { column: string }> = {};
-    fields.forEach(field => {
-      if (field.aggregation) {
-        dimensions[field.column] = { column: field.column };
-      }
+    fields.aggregation.forEach(field => {
+      dimensions[field] = { column: field };
     });
 
     this._mapConfig.aggregation = {
@@ -164,13 +158,13 @@ export class CARTOSource extends Source {
    * Instantiate the map, getting proper stats for input fields
    * @param fields
    */
-  public async init(fields?: Field[]): Promise<boolean> {
+  public async init(fields: StatFields): Promise<boolean> {
     if (this.isInitialized) {
       // Maybe this is too hard, but I'd like to keep to check it's not a performance issue. We could move it to just a warning
       throw new SourceError('Try to reinstantiate map multiple times');
     }
 
-    if (fields) {
+    if (fields.sample.size || fields.aggregation.size) {
       this._initConfigForStats(fields);
     }
 
@@ -200,7 +194,7 @@ function getUrlsFrom(mapInstance: MapInstance): string | string[] {
   return urlTemplate;
 }
 
-function extractMetadataFrom(mapInstance: MapInstance, fields?: Field[]) {
+function extractMetadataFrom(mapInstance: MapInstance, fields?: StatFields) {
   const { stats } = mapInstance.metadata.layers[0].meta;
   const geometryType = parseGeometryType(stats.geometryType);
   const fieldStats = getCompleteFieldStats(stats, fields);
@@ -210,25 +204,28 @@ function extractMetadataFrom(mapInstance: MapInstance, fields?: Field[]) {
   return metadata;
 }
 
-function getCompleteFieldStats(stats: any, fields?: Field[]) {
-  const fieldStats: (NumericFieldStats | CategoryFieldStats)[] = [];
+function getCompleteFieldStats(stats: any, fields?: StatFields) {
+  if (!fields) return [];
 
-  if (fields) {
-    fields.forEach(field => {
-      const columnStats = stats.columns[field.column];
+  const fieldStats: (NumericFieldStats | CategoryFieldStats)[] = [];
+  const columns = new Set([...fields.sample, ...fields.aggregation]);
+
+  if (columns) {
+    columns.forEach(column => {
+      const columnStats = stats.columns[column];
 
       switch (columnStats.type) {
         case 'string':
           fieldStats.push({
-            name: field.column,
+            name: column,
             categories: columnStats.categories
           });
           break;
         case 'number':
           fieldStats.push({
-            name: field.column,
-            ...stats.columns[field.column],
-            sample: stats.sample.map((x: any) => x[field.column])
+            name: column,
+            ...stats.columns[column],
+            sample: stats.sample.map((x: any) => x[column])
           });
           break;
         default:
