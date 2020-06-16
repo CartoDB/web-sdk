@@ -139,7 +139,7 @@ describe('Layer', () => {
 
     let deckInstanceMock: Deck;
 
-    beforeAll(() => {
+    beforeEach(() => {
       const deck = {
         props: {
           layers: []
@@ -181,6 +181,23 @@ describe('Layer', () => {
       expect(mockSourceInit).toHaveBeenCalledTimes(2);
     });
 
+    it('should trigger Source init just once when setting a layer and source is not added to the map yet', async () => {
+      const source = new CARTOSource(DEFAULT_DATASET);
+      const layer = new Layer(source);
+
+      const styleWithNewColumn = colorBinsStyle('attributeName');
+      layer.setStyle(styleWithNewColumn);
+      expect(mockSourceInit).toHaveBeenCalledTimes(0);
+
+      await layer.addTo(deckInstanceMock).catch(err => {
+        // catching this error is better than mocking everything
+        if (err.message !== "Cannot read property 'sample' of undefined") {
+          throw err;
+        }
+      });
+      expect(mockSourceInit).toHaveBeenCalledTimes(1);
+    });
+
     it('should trigger a second Source init when modifying popups requires it', async () => {
       const source = new CARTOSource(DEFAULT_DATASET);
       const layer = new Layer(source);
@@ -196,6 +213,17 @@ describe('Layer', () => {
 
       layer.setPopupHover(['another_fake_column']);
       expect(mockSourceInit).toHaveBeenCalledTimes(3);
+    });
+
+    it('should trigger Source init just once when setting a popup and source is not added to the map yet', async () => {
+      const source = new CARTOSource(DEFAULT_DATASET);
+      const layer = new Layer(source);
+
+      layer.setPopupClick(['fake_column']);
+      expect(mockSourceInit).toHaveBeenCalledTimes(0);
+
+      await layer.addTo(deckInstanceMock);
+      expect(mockSourceInit).toHaveBeenCalledTimes(1);
     });
   });
 });
