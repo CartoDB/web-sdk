@@ -1,7 +1,7 @@
-import { CartoError } from '../../../core/errors/CartoError';
 import { Layer } from '../../../viz/layer/Layer';
 import { FormulaDataView } from './FormulaDataView';
 import { AggregationType } from '../../operations/aggregation/aggregation';
+import { CartoDataViewError, dataViewErrorTypes } from '../DataViewError';
 
 describe('FormulaDataView', () => {
   describe('Instance Creation', () => {
@@ -21,11 +21,10 @@ describe('FormulaDataView', () => {
             operation: undefined as never
           })
       ).toThrow(
-        new CartoError({
-          type: '[DataView]',
-          message:
-            'Operation property not provided while creating dataview. Please check documentation.'
-        })
+        new CartoDataViewError(
+          'Operation property not provided while creating dataview. Please check documentation.',
+          dataViewErrorTypes.PROPERTY_MISSING
+        )
       );
     });
   });
@@ -79,10 +78,10 @@ describe('FormulaDataView', () => {
         await dataView.getData();
       } catch (error) {
         expect(error).toMatchObject(
-          new CartoError({
-            type: '[DataView]',
-            message: `Column property for Formula can just contain numbers (or nulls) and a string with 30 value was found. Please check documentation.`
-          })
+          new CartoDataViewError(
+            `Column property for Formula can just contain numbers (or nulls) and a string with 30 value was found. Please check documentation.`,
+            dataViewErrorTypes.PROPERTY_INVALID
+          )
         );
       }
     });

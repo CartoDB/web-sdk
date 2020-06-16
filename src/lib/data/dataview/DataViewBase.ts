@@ -1,13 +1,14 @@
 import { WithEvents } from '@/core/mixins/WithEvents';
 import { Layer, Source } from '@/viz';
+import { Filter } from '@/viz/filters/types';
 import { DataViewMode, DataViewData } from './DataViewMode';
 import { AggregationType } from '../operations/aggregation/aggregation';
 import { CartoDataViewError, dataViewErrorTypes } from './DataViewError';
 
 export abstract class DataViewBase<T extends DataViewMode<Layer | Source>> extends WithEvents {
   protected dataView: T;
-  protected _operation: AggregationType;
-  protected events: string[];
+
+  public operation: AggregationType;
 
   constructor(
     dataView: T,
@@ -22,27 +23,30 @@ export abstract class DataViewBase<T extends DataViewMode<Layer | Source>> exten
 
     validateParameters(operation, this.dataView.column);
 
-    this._operation = operation;
+    this.operation = operation;
 
-    this.events = [...events];
-
-    if (!events.includes('optionChanged')) {
-      events.push('optionChanged');
-    }
-
-    this.registerAvailableEvents(this.events);
+    this.bindEvents(events);
   }
 
-  public get operation() {
-    return this._operation;
-  }
-  public set operation(operation: AggregationType) {
-    this._operation = operation;
-    this.emit('optionChanged');
+  public get column() {
+    return this.dataView.column;
   }
 
-  public getEvents(): string[] {
-    return this.events;
+  public set column(newColumn: string) {
+    this.dataView.column = newColumn;
+  }
+
+  public addFilter(filterId: string, filter: Filter) {
+    this.dataView.addFilter(filterId, filter);
+  }
+
+  public removeFilter(filterId: string) {
+    this.dataView.removeFilter(filterId);
+  }
+
+  private bindEvents(events: string[]) {
+    this.registerAvailableEvents(events);
+    events.forEach((e: string) => this.dataView.on(e, (args: any[]) => this.emit(e, args)));
   }
 
   public abstract async getData(): Promise<Partial<DataViewData>>;

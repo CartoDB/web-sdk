@@ -8,40 +8,14 @@ import { CartoDataViewError, dataViewErrorTypes } from './DataViewError';
 export class DataViewRemote extends DataViewMode<Source> {
   protected dataviewsApi: DataviewsApi;
 
-  protected _dataSource: Source;
-
   constructor(dataSource: Source, column: string, credentials = defaultCredentials) {
     super(dataSource, column);
-
-    this._dataSource = dataSource;
 
     // TODO what about the other sources?
     const dataset = (dataSource as CARTOSource).value;
     this.dataviewsApi = new DataviewsApi(dataset, credentials);
 
-    this.registerAvailableEvents(['dataChanged', 'optionChanged', 'error']);
-  }
-
-  public get dataSource() {
-    return this._dataSource;
-  }
-
-  public set dataSource(newSource: Source) {
-    this.validateParameters(newSource, this.column);
-
-    this._dataSource = newSource;
-    this.emit('optionChanged');
-  }
-
-  public get column() {
-    return this._column;
-  }
-
-  public set column(newColumn: string) {
-    this.validateParameters(this._dataSource, newColumn);
-
-    this._column = newColumn;
-    this.emit('optionChanged');
+    this.registerAvailableEvents(['error']);
   }
 
   public async aggregation(aggregationParams: {
@@ -83,6 +57,21 @@ export class DataViewRemote extends DataViewMode<Source> {
       min,
       nullCount: nulls,
       operation: aggregation
+    };
+  }
+
+  public async formula(operation: AggregationType) {
+    const formulaResponse = await this.dataviewsApi.formula({
+      column: this.column,
+      operation
+    });
+
+    const { result, nulls } = formulaResponse;
+
+    return {
+      result,
+      operation,
+      nullCount: nulls
     };
   }
 }

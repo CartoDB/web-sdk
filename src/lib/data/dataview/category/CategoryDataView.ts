@@ -1,63 +1,58 @@
-import { WithEvents } from '@/core/mixins/WithEvents';
 import { Layer, Source } from '@/viz';
-import { DataView } from '../DataViewMode';
-import { CategoryBase, DataViewMode, CategoryOptions } from './CategoryBase';
 import { DataViewLocal } from '../DataViewLocal';
 import { DataViewRemote } from '../DataViewRemote';
 import { CategoryLocal } from './CategoryLocal';
 import { CategoryRemote } from './CategoryRemote';
+import { DataViewModeAlias } from '../DataViewMode';
+import { DataViewWrapper } from '../DataViewWrapper';
+import { CategoryOptions, CategoryBase } from './CategoryBase';
 
-export class CategoryDataView extends WithEvents {
-  private categoryWrappee: CategoryBase<DataView<Layer | Source>>;
+export class CategoryDataView extends DataViewWrapper {
+  protected buildWrappee(
+    dataSource: Layer | Source,
+    column: string,
+    options: CategoryOptions,
+    mode: DataViewModeAlias
+  ) {
+    switch (mode) {
+      case DataViewModeAlias.NON_PRECISE: {
+        const dataViewLocal = new DataViewLocal(dataSource as Layer, column);
+        this.dataviewWrappee = new CategoryLocal(dataViewLocal, options);
+        break;
+      }
 
-  constructor(dataSource: Layer | Source, column: string, options: CategoryOptions) {
-    super();
+      case DataViewModeAlias.VIEWPORT: {
+        const dataViewRemote = new DataViewRemote(dataSource as Source, column);
+        this.dataviewWrappee = new CategoryRemote(dataViewRemote, options);
+        break;
+      }
 
-    const mode = options.mode || DataViewMode.VIEWPORT;
-    this.categoryWrappee = buildCategoryWrappee(dataSource, column, options, mode);
-
-    // bind events with the mode
-    this.bindEvents();
-  }
-
-  public getData() {
-    return this.categoryWrappee.getData();
-  }
-
-  private bindEvents() {
-    const events = this.categoryWrappee.getEvents();
-    this.registerAvailableEvents(events);
-    events.forEach((e: string) => this.categoryWrappee.on(e, (args: any[]) => this.emit(e, args)));
-  }
-}
-
-function buildCategoryWrappee(
-  dataSource: Layer | Source,
-  column: string,
-  options: CategoryOptions,
-  mode: DataViewMode
-) {
-  let categoryWrappee;
-
-  switch (mode) {
-    case DataViewMode.NON_PRECISE: {
-      const dataViewLocal = new DataViewLocal(dataSource as Layer, column);
-      categoryWrappee = new CategoryLocal(dataViewLocal, options);
-      break;
-    }
-
-    case DataViewMode.VIEWPORT: {
-      const dataViewRemote = new DataViewRemote(dataSource as Source, column);
-      categoryWrappee = new CategoryRemote(dataViewRemote, options);
-      break;
-    }
-
-    default: {
-      const dataViewRemote = new DataViewRemote(dataSource as Source, column);
-      categoryWrappee = new CategoryRemote(dataViewRemote, options);
-      break;
+      default: {
+        const dataViewRemote = new DataViewRemote(dataSource as Source, column);
+        this.dataviewWrappee = new CategoryRemote(dataViewRemote, options);
+        break;
+      }
     }
   }
 
-  return categoryWrappee;
+  public get operationColumn() {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return (this.dataviewWrappee as CategoryBase<any>).operationColumn;
+  }
+  public set operationColumn(operationColumn: string) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (this.dataviewWrappee as CategoryBase<any>).operationColumn = operationColumn;
+    this.emit('optionChanged');
+  }
+
+  public get limit() {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return (this.dataviewWrappee as CategoryBase<any>).limit;
+  }
+
+  public set limit(limit: number | undefined) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (this.dataviewWrappee as CategoryBase<any>).limit = limit;
+    this.emit('optionChanged');
+  }
 }

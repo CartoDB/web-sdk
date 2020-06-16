@@ -8,7 +8,7 @@ export class DataViewLocal extends DataViewMode<Layer> {
     this.bindEvents();
   }
 
-  public getSourceData(columns: string[]) {
+  public getSourceData(columns: string[] = []) {
     return this.dataSource.getViewportFeatures([this.column, ...columns]);
   }
 
@@ -23,6 +23,6 @@ export class DataViewLocal extends DataViewMode<Layer> {
   }
 
   private onDataUpdate() {
-    this.emitter.emit('dataUpdate');
+    this.emit('dataUpdate');
   }
 }

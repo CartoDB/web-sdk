@@ -14,8 +14,8 @@ export class CategoryLocal extends CategoryBase<DataViewLocal> {
     const categoryValues = categories.map(category => category.value);
 
     return {
-      categories: Number.isInteger(this._limit as number)
-        ? categories.splice(0, this._limit)
+      categories: Number.isInteger(this.limit as number)
+        ? categories.splice(0, this.limit)
         : categories,
       count: categories.length,
       operation: this.operation,

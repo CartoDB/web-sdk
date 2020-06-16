@@ -1,15 +1,14 @@
-import { DataViewMode } from '@/data/dataview/DataViewMode';
 import { CartoError } from '@/core/errors/CartoError';
 import { uuidv4 } from '@/core/utils/uuid';
+import { DataViewWrapper } from '@/data/dataview/DataViewWrapper';
 import { queryDOMElement } from '../utils/dom';
-import { Filterable } from '../filters/Filterable';
 
-export abstract class Widget<T extends Filterable> {
+export abstract class Widget {
   protected element: HTMLElement;
-  protected dataView: DataViewMode<T>;
+  protected dataView: DataViewWrapper;
   protected widgetUUID: string = uuidv4();
 
-  constructor(element: string | HTMLElement, dataView: DataView<T>) {
+  constructor(element: string | HTMLElement, dataView: DataViewWrapper) {
     const domElement = queryDOMElement(element);
     validateParameters(domElement, dataView);
 
@@ -30,7 +29,8 @@ export abstract class Widget<T extends Filterable> {
   }
 }
 
-function validateParameters(element: HTMLElement | null, dataView: DataView<any>) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function validateParameters(element: HTMLElement | null, dataView: DataViewWrapper) {
   if (!element) {
     throw new CartoError({
       type: '[Widget]',

@@ -57,13 +57,13 @@ export abstract class Source extends Filterable {
 
   abstract getMetadata(): SourceMetadata;
 
-  // eslint-disable-next-line class-methods-use-this
-  async addFilter(filterId: string, filter: ColumnFilters) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars, class-methods-use-this
+  async addFilter(_filterId: string, _filter: ColumnFilters) {
     throw new Error(`Method not implemented`);
   }
 
-  // eslint-disable-next-line class-methods-use-this
-  async removeFilter(filterId: string) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars, class-methods-use-this
+  async removeFilter(_filterId: string) {
     throw new Error(`Method not implemented`);
   }
 }
