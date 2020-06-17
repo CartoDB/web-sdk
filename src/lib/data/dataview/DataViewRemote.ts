@@ -65,6 +65,11 @@ export class DataViewRemote extends DataViewMode<Source> {
       operation
     });
 
+    if (formulaResponse.errors_with_context && formulaResponse.errors_with_context.length > 0) {
+      const { message, type } = formulaResponse.errors_with_context[0];
+      throw new CartoDataViewError(`${type}: ${message}`, dataViewErrorTypes.MAPS_API);
+    }
+
     const { result, nulls } = formulaResponse;
 
     return {

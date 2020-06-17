@@ -82,6 +82,9 @@ export interface FormulaResponse {
   result: number;
   nulls: number;
   type: string;
+  // eslint-disable-next-line camelcase
+  errors_with_context?: { type: string; message: string }[];
+  errors?: string[];
 }
 
 export interface AggregationCategory {
