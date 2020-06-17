@@ -107,46 +107,90 @@ describe('getFeatures', () => {
 });
 
 describe('SourceMetadata', () => {
-  it('should build props and metadata properly with basic example', async () => {
-    const geojson: FeatureCollection = {
-      type: 'FeatureCollection',
-      features: [
-        {
-          type: 'Feature',
-          id: 1,
-          geometry,
-          properties: {
-            number: 10,
-            cat: 'cat1'
-          }
-        },
-        {
-          type: 'Feature',
-          id: 1,
-          geometry,
-          properties: {
-            number: 20,
-            cat: 'cat1'
-          }
-        },
-        {
-          type: 'Feature',
-          id: 1,
-          geometry,
-          properties: {
-            number: 70,
-            cat: 'cat2'
-          }
+  const geojson: FeatureCollection = {
+    type: 'FeatureCollection',
+    features: [
+      {
+        type: 'Feature',
+        id: 1,
+        geometry,
+        properties: {
+          number: 10,
+          cat: 'cat1'
         }
-      ]
-    };
+      },
+      {
+        type: 'Feature',
+        id: 1,
+        geometry,
+        properties: {
+          number: 20,
+          cat: 'cat1'
+        }
+      },
+      {
+        type: 'Feature',
+        id: 1,
+        geometry,
+        properties: {
+          number: 70,
+          cat: 'cat2'
+        }
+      }
+    ]
+  };
 
+  it('should build props and metadata properly with basic example', async () => {
     const fields = {
       sample: new Set(['number', 'cat']),
       aggregation: new Set(['number'])
     };
+
     const source = new GeoJsonSource(geojson);
     await source.init(fields);
+
+    const props = source.getProps();
+    expect(props).toEqual({ type: 'GeoJsonLayer', data: geojson });
+
+    const metadata = source.getMetadata();
+    expect(metadata).toEqual({
+      geometryType: GEOM_TYPE,
+      stats: [
+        {
+          name: 'number',
+          min: 10,
+          max: 70,
+          avg: 100 / 3,
+          sum: 100,
+          sample: [10, 20, 70]
+        },
+        {
+          name: 'cat',
+          categories: [
+            { category: 'cat1', frequency: 2 },
+            { category: 'cat2', frequency: 1 }
+          ]
+        }
+      ]
+    });
+  });
+
+  it('should rebuild props and metadata properly after calling init again with different fields', async () => {
+    const source = new GeoJsonSource(geojson);
+
+    const fields1 = {
+      sample: new Set(['number']),
+      aggregation: new Set(['number'])
+    };
+
+    await source.init(fields1);
+
+    const fields2 = {
+      sample: new Set(['number', 'cat']),
+      aggregation: new Set(['number'])
+    };
+
+    await source.init(fields2);
 
     const props = source.getProps();
     expect(props).toEqual({ type: 'GeoJsonLayer', data: geojson });
