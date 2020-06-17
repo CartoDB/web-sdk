@@ -1,4 +1,4 @@
-import { DataViewRemote } from '../DataViewRemote';
+import { DataViewRemote } from '../mode/DataViewRemote';
 import { FormulaBase, FormulaDataViewOptions } from './FormulaBase';
 
 export class FormulaRemote extends FormulaBase<DataViewRemote> {

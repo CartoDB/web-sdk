@@ -1,6 +1,6 @@
-import { DataViewData } from '../DataViewMode';
-import { aggregate } from '../../operations/aggregation/aggregation';
-import { DataViewLocal } from '../DataViewLocal';
+import { DataViewData } from '../mode/DataViewModeBase';
+import { aggregate } from '../../data/operations/aggregation/aggregation';
+import { DataViewLocal } from '../mode/DataViewLocal';
 import { FormulaBase, FormulaDataViewOptions } from './FormulaBase';
 import { CartoDataViewError, dataViewErrorTypes } from '../DataViewError';
 

@@ -1,7 +1,7 @@
-import { AggregationType, aggregate } from '../../operations/aggregation/aggregation';
-import { groupValuesByAnotherColumn } from '../../operations/grouping';
+import { AggregationType, aggregate } from '../../data/operations/aggregation/aggregation';
+import { groupValuesByAnotherColumn } from '../../data/operations/grouping';
 import { CategoryBase, CategoryOptions, CategoryData } from './CategoryBase';
-import { DataViewLocal } from '../DataViewLocal';
+import { DataViewLocal } from '../mode/DataViewLocal';
 
 export class CategoryLocal extends CategoryBase<DataViewLocal> {
   constructor(origin: DataViewLocal, options: CategoryOptions) {

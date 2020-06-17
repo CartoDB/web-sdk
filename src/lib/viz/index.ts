@@ -24,4 +24,4 @@ export {
 export { createGoogleMap, createMap } from './basemap';
 
 // Widgets
-export { CategoryWidget } from './widgets';
+export { Category } from '../widget';

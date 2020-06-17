@@ -1,10 +1,10 @@
 import { WithEvents } from '@/core/mixins/WithEvents';
 import { Filterable } from '@/viz/filters/Filterable';
 import { Filter } from '@/viz/filters/types';
-import { CartoDataViewError, dataViewErrorTypes } from './DataViewError';
-import { AggregationType } from '../operations/aggregation/aggregation';
+import { AggregationType } from '@/data/operations/aggregation/aggregation';
+import { CartoDataViewError, dataViewErrorTypes } from '../DataViewError';
 
-export abstract class DataViewMode<T extends Filterable> extends WithEvents {
+export abstract class DataViewModeBase<T extends Filterable> extends WithEvents {
   protected dataSource: T;
   public column: string;
 

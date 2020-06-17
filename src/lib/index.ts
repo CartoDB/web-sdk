@@ -8,7 +8,7 @@ import { DOSource, CARTOSource, GeoJsonSource } from './viz/sources';
 import { createMap, createGoogleMap } from './viz/basemap';
 
 // Widgets
-import { CategoryWidget } from './viz/widgets';
+import { Category as CategoryWidget } from './widget';
 
 // Basics
 import { Layer } from './viz/layer';
@@ -26,7 +26,7 @@ import {
 } from './viz/style';
 
 // Dataviews
-import { CategoryDataView, FormulaDataView } from './data/dataview';
+import { Category, Formula } from './dataview';
 
 /*
  * --- Public API ---
@@ -59,9 +59,13 @@ export const viz = {
   ...basics
 };
 
-// carto.data
-const dataviews = { CategoryDataView, FormulaDataView };
+// carto.dataview
+export const dataview = {
+  Category,
+  Formula
+};
 
-export const data = {
-  ...dataviews
+// carto.widget
+export const widget = {
+  CategoryWidget
 };

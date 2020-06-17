@@ -1,15 +1,15 @@
-import { Layer } from '../../../viz/layer/Layer';
-import { FormulaDataView } from './FormulaDataView';
-import { AggregationType } from '../../operations/aggregation/aggregation';
+import { Layer } from '../../viz/layer/Layer';
+import { Formula } from './Formula';
+import { AggregationType } from '../../data/operations/aggregation/aggregation';
 import { CartoDataViewError, dataViewErrorTypes } from '../DataViewError';
-import { DataViewModeAlias } from '../DataViewMode';
+import { DataViewModeAlias } from '../mode/DataViewModeBase';
 
-describe('FormulaDataView', () => {
+describe('Formula', () => {
   describe('Instance Creation', () => {
     it('should create new DataView instance', () => {
       expect(
         () =>
-          new FormulaDataView(new Layer('fake_source'), 'fake_column', {
+          new Formula(new Layer('fake_source'), 'fake_column', {
             operation: AggregationType.AVG
           })
       ).not.toThrow();
@@ -18,7 +18,7 @@ describe('FormulaDataView', () => {
     it('should throw an exception when operation is not provided', () => {
       expect(
         () =>
-          new FormulaDataView(new Layer('fake_source'), 'fake_column', {
+          new Formula(new Layer('fake_source'), 'fake_column', {
             operation: undefined as never
           })
       ).toThrow(
@@ -47,7 +47,7 @@ describe('FormulaDataView', () => {
 
       spyOn(layer, 'getViewportFeatures').and.returnValue(Promise.resolve(sourceData));
 
-      const dataView = new FormulaDataView(layer, 'pop', {
+      const dataView = new Formula(layer, 'pop', {
         operation: AggregationType.AVG,
         mode: DataViewModeAlias.NON_PRECISE
       });
@@ -72,7 +72,7 @@ describe('FormulaDataView', () => {
 
       spyOn(layer, 'getViewportFeatures').and.returnValue(Promise.resolve(sourceData));
 
-      const dataView = new FormulaDataView(layer, 'pop', {
+      const dataView = new Formula(layer, 'pop', {
         operation: AggregationType.SUM,
         mode: DataViewModeAlias.NON_PRECISE
       });

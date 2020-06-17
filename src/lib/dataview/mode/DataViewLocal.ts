@@ -1,7 +1,7 @@
 import { Layer } from '@/viz';
-import { DataViewMode } from './DataViewMode';
+import { DataViewModeBase } from './DataViewModeBase';
 
-export class DataViewLocal extends DataViewMode<Layer> {
+export class DataViewLocal extends DataViewModeBase<Layer> {
   constructor(dataSource: Layer, column: string) {
     super(dataSource, column);
 

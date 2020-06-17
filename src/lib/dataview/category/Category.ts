@@ -1,13 +1,13 @@
 import { Layer, Source } from '@/viz';
-import { DataViewLocal } from '../DataViewLocal';
-import { DataViewRemote } from '../DataViewRemote';
+import { DataViewLocal } from '../mode/DataViewLocal';
+import { DataViewRemote } from '../mode/DataViewRemote';
 import { CategoryLocal } from './CategoryLocal';
 import { CategoryRemote } from './CategoryRemote';
-import { DataViewModeAlias } from '../DataViewMode';
-import { DataViewWrapper } from '../DataViewWrapper';
+import { DataViewModeAlias } from '../mode/DataViewModeBase';
+import { DataViewWrapperBase } from '../DataViewWrapperBase';
 import { CategoryOptions, CategoryBase } from './CategoryBase';
 
-export class CategoryDataView extends DataViewWrapper {
+export class Category extends DataViewWrapperBase {
   protected buildWrappee(
     dataSource: Layer | Source,
     column: string,

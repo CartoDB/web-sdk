@@ -1,13 +1,13 @@
 import { Layer, Source } from '@/viz';
-import { DataViewModeAlias } from '../DataViewMode';
-import { AggregationType } from '../../operations/aggregation/aggregation';
-import { DataViewLocal } from '../DataViewLocal';
-import { DataViewRemote } from '../DataViewRemote';
+import { DataViewModeAlias } from '../mode/DataViewModeBase';
+import { AggregationType } from '../../data/operations/aggregation/aggregation';
+import { DataViewLocal } from '../mode/DataViewLocal';
+import { DataViewRemote } from '../mode/DataViewRemote';
 import { FormulaLocal } from './FormulaLocal';
 import { FormulaRemote } from './FormulaRemote';
-import { DataViewWrapper } from '../DataViewWrapper';
+import { DataViewWrapperBase } from '../DataViewWrapperBase';
 
-export class FormulaDataView extends DataViewWrapper {
+export class Formula extends DataViewWrapperBase {
   protected buildWrappee(
     dataSource: Layer | Source,
     column: string,

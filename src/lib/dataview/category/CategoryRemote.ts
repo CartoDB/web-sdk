@@ -1,5 +1,5 @@
 import { CategoryBase, CategoryOptions } from './CategoryBase';
-import { DataViewRemote } from '../DataViewRemote';
+import { DataViewRemote } from '../mode/DataViewRemote';
 
 export class CategoryRemote extends CategoryBase<DataViewRemote> {
   constructor(origin: DataViewRemote, options: CategoryOptions) {

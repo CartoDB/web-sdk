@@ -1,9 +1,11 @@
 import { Layer, Source } from '@/viz';
-import { AggregationType } from '../../operations/aggregation/aggregation';
-import { DataViewData, DataViewMode } from '../DataViewMode';
+import { AggregationType } from '../../data/operations/aggregation/aggregation';
+import { DataViewData, DataViewModeBase } from '../mode/DataViewModeBase';
 import { DataViewBase } from '../DataViewBase';
 
-export abstract class FormulaBase<T extends DataViewMode<Layer | Source>> extends DataViewBase<T> {
+export abstract class FormulaBase<T extends DataViewModeBase<Layer | Source>> extends DataViewBase<
+  T
+> {
   constructor(dataView: T, options: FormulaDataViewOptions, events: string[] = ['optionChanged']) {
     super(dataView, options, events);
   }

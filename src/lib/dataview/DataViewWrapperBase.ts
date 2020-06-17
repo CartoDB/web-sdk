@@ -3,12 +3,12 @@ import { Layer, Source } from '@/viz';
 import { Filter } from '@/viz/filters/types';
 import { AggregationType } from '@/maps/MapsDataviews';
 import { DataViewBase } from './DataViewBase';
-import { DataViewMode, DataViewModeAlias } from './DataViewMode';
+import { DataViewModeBase, DataViewModeAlias } from './mode/DataViewModeBase';
 
 const OPTION_CHANGED_DELAY = 100;
 
-export abstract class DataViewWrapper extends WithEvents {
-  protected dataviewWrappee!: DataViewBase<DataViewMode<Layer | Source>>;
+export abstract class DataViewWrapperBase extends WithEvents {
+  protected dataviewWrappee!: DataViewBase<DataViewModeBase<Layer | Source>>;
 
   /**
    * optionChanged timeout to prevent multiple
