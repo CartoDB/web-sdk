@@ -1,13 +1,10 @@
 import { WithEvents } from '@/core/mixins/WithEvents';
-import { Layer, Source } from '@/viz';
 import { Filter } from '@/viz/filters/types';
 import { DataViewModeBase, DataViewData } from './mode/DataViewModeBase';
 import { AggregationType } from '../data/operations/aggregation/aggregation';
 import { CartoDataViewError, dataViewErrorTypes } from './DataViewError';
 
-export abstract class DataViewImplBase<
-  T extends DataViewModeBase<Layer | Source>
-> extends WithEvents {
+export abstract class DataViewImplBase<T extends DataViewModeBase> extends WithEvents {
   protected dataView: T;
 
   public operation: AggregationType;

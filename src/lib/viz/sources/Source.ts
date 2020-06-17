@@ -3,7 +3,7 @@
  * Base Source definition. We should keep here the code shared between different sources
  */
 
-import { Filterable } from '../filters/Filterable';
+import { WithEvents } from '@/core/mixins/WithEvents';
 import { ColumnFilters } from '../filters/types';
 
 export type GeometryType = 'Point' | 'Line' | 'Polygon';
@@ -46,7 +46,7 @@ export interface StatFields {
   aggregation: Set<string>;
 }
 
-export abstract class Source extends Filterable {
+export abstract class Source extends WithEvents {
   // ID of the source. It's mandatory for the source but not for the user.
   public id: string;
 

@@ -8,7 +8,7 @@ import { DataViewModeBase, DataViewModeAlias } from './mode/DataViewModeBase';
 const OPTION_CHANGED_DELAY = 100;
 
 export abstract class DataViewWrapperBase extends WithEvents {
-  protected dataviewImpl!: DataViewImplBase<DataViewModeBase<Layer | Source>>;
+  protected dataviewImpl!: DataViewImplBase<DataViewModeBase>;
 
   /**
    * optionChanged timeout to prevent multiple
@@ -21,7 +21,7 @@ export abstract class DataViewWrapperBase extends WithEvents {
     super();
 
     const mode = options.mode || DataViewModeAlias.VIEWPORT;
-    this.buildWrappee(dataSource, column, options, mode);
+    this.buildImpl(dataSource, column, options, mode);
 
     // bind events with the mode
     this.bindEvents();
