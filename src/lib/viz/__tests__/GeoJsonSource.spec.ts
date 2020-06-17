@@ -1,5 +1,11 @@
 import { Feature, FeatureCollection, Geometry, GeometryCollection } from 'geojson';
-import { GeoJsonSource, getGeomType, getFeatures, DEFAULT_GEOM } from '../sources/GeoJsonSource';
+import {
+  GeoJsonSource,
+  getGeomType,
+  getFeatures,
+  DEFAULT_GEOM,
+  shouldInitialize
+} from '../sources/GeoJsonSource';
 
 const GEOJSON_GEOM_TYPE = 'LineString';
 const GEOM_TYPE = 'Line';
@@ -35,22 +41,22 @@ const featureCollection: FeatureCollection = {
 describe('getGeomType', () => {
   it('should get geom type from FeatureCollection', () => {
     const geomType = getGeomType(featureCollection);
-    expect(geomType).toBe(GEOM_TYPE);
+    expect(geomType).toEqual(GEOM_TYPE);
   });
 
   it('should get geom type from GeometryCollection', () => {
     const geomType = getGeomType(geometryCollection);
-    expect(geomType).toBe(GEOM_TYPE);
+    expect(geomType).toEqual(GEOM_TYPE);
   });
 
   it('should get geom type from Feature', () => {
     const geomType = getGeomType(feature);
-    expect(geomType).toBe(GEOM_TYPE);
+    expect(geomType).toEqual(GEOM_TYPE);
   });
 
   it('should get geom type from Geometry', () => {
     const geomType = getGeomType(geometry);
-    expect(geomType).toBe(GEOM_TYPE);
+    expect(geomType).toEqual(GEOM_TYPE);
   });
 
   it('should return default geom type from empty FeatureCollection', () => {
@@ -60,7 +66,7 @@ describe('getGeomType', () => {
     };
 
     const geomType = getGeomType(emptyFeatureCollection);
-    expect(geomType).toBe(DEFAULT_GEOM);
+    expect(geomType).toEqual(DEFAULT_GEOM);
   });
 
   it('should return default geom type from empty GeometryCollection', () => {
@@ -70,29 +76,29 @@ describe('getGeomType', () => {
     };
 
     const geomType = getGeomType(emptyGeometryCollection);
-    expect(geomType).toBe(DEFAULT_GEOM);
+    expect(geomType).toEqual(DEFAULT_GEOM);
   });
 });
 
 describe('getFeatures', () => {
   it('should get features count from FeatureCollection', () => {
     const features = getFeatures(featureCollection);
-    expect(features.length).toBe(3);
+    expect(features.length).toEqual(3);
   });
 
   it('should get features count from GeometryCollection', () => {
     const features = getFeatures(geometryCollection);
-    expect(features.length).toBe(0);
+    expect(features.length).toEqual(0);
   });
 
   it('should get features count from Feature', () => {
     const features = getFeatures(feature);
-    expect(features.length).toBe(1);
+    expect(features.length).toEqual(1);
   });
 
   it('should get features count from Geometry', () => {
     const features = getFeatures(geometry);
-    expect(features.length).toBe(0);
+    expect(features.length).toEqual(0);
   });
 
   it('should return features count from empty FeatureCollection', () => {
@@ -102,7 +108,7 @@ describe('getFeatures', () => {
     };
 
     const features = getFeatures(emptyFeatureCollection);
-    expect(features.length).toBe(0);
+    expect(features.length).toEqual(0);
   });
 });
 
@@ -216,5 +222,49 @@ describe('SourceMetadata', () => {
         }
       ]
     });
+  });
+
+  it('should initialize always for first time (isInitialized === false)', () => {
+    const isInitialized = false;
+    const sample: Set<string> = new Set();
+    const aggregation: Set<string> = new Set();
+    const newFields = { sample, aggregation };
+    const currentFields: Set<string> = new Set();
+
+    const result = shouldInitialize(isInitialized, newFields, currentFields);
+    expect(result).toEqual(true);
+  });
+
+  it('should initialize with new fields', () => {
+    const isInitialized = true;
+    const sample: Set<string> = new Set(['field']);
+    const aggregation: Set<string> = new Set();
+    const newFields = { sample, aggregation };
+    const currentFields: Set<string> = new Set();
+
+    const result = shouldInitialize(isInitialized, newFields, currentFields);
+    expect(result).toEqual(true);
+  });
+
+  it('should not initialize with same fields', () => {
+    const isInitialized = true;
+    const sample: Set<string> = new Set(['field']);
+    const aggregation: Set<string> = new Set();
+    const newFields = { sample, aggregation };
+    const currentFields: Set<string> = new Set(['field']);
+
+    const result = shouldInitialize(isInitialized, newFields, currentFields);
+    expect(result).toEqual(false);
+  });
+
+  it('should not initialize with less fields', () => {
+    const isInitialized = true;
+    const sample: Set<string> = new Set(['field']);
+    const aggregation: Set<string> = new Set();
+    const newFields = { sample, aggregation };
+    const currentFields: Set<string> = new Set(['field']);
+
+    const result = shouldInitialize(isInitialized, newFields, currentFields);
+    expect(result).toEqual(false);
   });
 });

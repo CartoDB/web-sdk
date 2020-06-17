@@ -57,7 +57,7 @@ export class GeoJsonSource extends Source {
   }
 
   public async init(fields: StatFields): Promise<boolean> {
-    if (this.isInitialized && !getNewFields(fields, this._fields).length) {
+    if (!shouldInitialize(this.isInitialized, fields, this._fields)) {
       return true;
     }
 
@@ -261,5 +261,13 @@ function createSample(values: number[]) {
 
 function getNewFields(newFields: StatFields, currentFields: Set<string>) {
   const newFieldsSet = new Set([...newFields.sample, ...newFields.aggregation]);
-  return [...newFieldsSet].filter(f => currentFields.has(f));
+  return [...newFieldsSet].filter(f => !currentFields.has(f));
+}
+
+export function shouldInitialize(
+  isInitialized: boolean,
+  newFields: StatFields,
+  currentFields: Set<string>
+): boolean {
+  return !isInitialized || !!getNewFields(newFields, currentFields).length;
 }
