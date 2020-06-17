@@ -102,7 +102,7 @@ export class ViewportFeaturesGenerator {
   }
 
   private getSelectedTiles(): ViewportTile[] {
-    if (!this.deckLayer) {
+    if (!this.deckLayer || !this.deckLayer.state) {
       return [];
     }
 

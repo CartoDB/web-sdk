@@ -1,20 +1,18 @@
 import { WithEvents } from '@/core/mixins/WithEvents';
 import { Layer, Source } from '@/viz';
 import { Filter } from '@/viz/filters/types';
-import { DataViewMode, DataViewData } from './DataViewMode';
-import { AggregationType } from '../operations/aggregation/aggregation';
+import { DataViewModeBase, DataViewData } from './mode/DataViewModeBase';
+import { AggregationType } from '../data/operations/aggregation/aggregation';
 import { CartoDataViewError, dataViewErrorTypes } from './DataViewError';
 
-export abstract class DataViewBase<T extends DataViewMode<Layer | Source>> extends WithEvents {
+export abstract class DataViewImplBase<
+  T extends DataViewModeBase<Layer | Source>
+> extends WithEvents {
   protected dataView: T;
 
   public operation: AggregationType;
 
-  constructor(
-    dataView: T,
-    options: { operation: AggregationType },
-    events: string[] = ['optionChanged']
-  ) {
+  constructor(dataView: T, options: { operation: AggregationType }) {
     super();
 
     this.dataView = dataView;
@@ -25,7 +23,7 @@ export abstract class DataViewBase<T extends DataViewMode<Layer | Source>> exten
 
     this.operation = operation;
 
-    this.bindEvents(events);
+    this.bindEvents();
   }
 
   public get column() {
@@ -44,7 +42,8 @@ export abstract class DataViewBase<T extends DataViewMode<Layer | Source>> exten
     this.dataView.removeFilter(filterId);
   }
 
-  private bindEvents(events: string[]) {
+  private bindEvents() {
+    const events = this.dataView.availableEvents;
     this.registerAvailableEvents(events);
     events.forEach((e: string) => this.dataView.on(e, (args: any[]) => this.emit(e, args)));
   }

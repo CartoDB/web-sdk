@@ -1,7 +1,7 @@
-import { CategoryDataView } from '@/data/dataview/category/CategoryDataView';
+import { Category as CategoryDataView } from '@/dataviews/category/Category';
 import { Widget } from '../widget';
 
-export class CategoryWidget extends Widget {
+export class Category extends Widget {
   private options: CategoryWidgetOptions = {};
 
   constructor(
@@ -54,10 +54,10 @@ interface CategoryWidgetOptions {
 }
 
 interface HTMLAsCategoryWidgetElement {
-  categories?: Category[];
+  categories?: CategoryData[];
 }
 
-interface Category {
+interface CategoryData {
   name: string;
   value: number;
   color?: string;

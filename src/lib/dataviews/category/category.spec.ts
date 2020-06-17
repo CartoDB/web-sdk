@@ -1,15 +1,15 @@
-import { Layer } from '../../../viz/layer/Layer';
-import { CategoryDataView } from './CategoryDataView';
-import { AggregationType } from '../../operations/aggregation/aggregation';
+import { Layer } from '../../viz/layer/Layer';
+import { Category } from './Category';
+import { AggregationType } from '../../data/operations/aggregation/aggregation';
 import { CartoDataViewError, dataViewErrorTypes } from '../DataViewError';
-import { DataViewModeAlias } from '../DataViewMode';
+import { DataViewModeAlias } from '../mode/DataViewModeBase';
 
 describe('DataView', () => {
   describe('Instance Creation', () => {
     it('should create new DataView instance', () => {
       expect(
         () =>
-          new CategoryDataView(new Layer('fake_source'), 'fake_column', {
+          new Category(new Layer('fake_source'), 'fake_column', {
             operation: AggregationType.AVG,
             operationColumn: 'popEst'
           })
@@ -19,7 +19,7 @@ describe('DataView', () => {
     it('should throw an exception when operation is not provided', () => {
       expect(
         () =>
-          new CategoryDataView(new Layer('fake_source'), 'fake_column', {
+          new Category(new Layer('fake_source'), 'fake_column', {
             operation: undefined as never,
             operationColumn: 'fake_operation_column'
           })
@@ -34,7 +34,7 @@ describe('DataView', () => {
     it('should throw an exception when operationColumn is not provided', () => {
       expect(
         () =>
-          new CategoryDataView(new Layer('fake_source'), 'fake_column', {
+          new Category(new Layer('fake_source'), 'fake_column', {
             operation: AggregationType.AVG,
             operationColumn: undefined as never,
             mode: DataViewModeAlias.NON_PRECISE
@@ -61,7 +61,7 @@ describe('DataView', () => {
       const layer = new Layer('fake_source');
       spyOn(layer, 'getViewportFeatures').and.returnValue(Promise.resolve(sourceDataToGroup));
 
-      const dataView = new CategoryDataView(layer, 'country', {
+      const dataView = new Category(layer, 'country', {
         operation: AggregationType.AVG,
         operationColumn: 'popEst',
         mode: DataViewModeAlias.NON_PRECISE

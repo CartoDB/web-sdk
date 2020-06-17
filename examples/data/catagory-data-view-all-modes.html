@@ -98,32 +98,22 @@
       const countriesLayer = new carto.viz.Layer('ne_50m_admin_0_countries');
       await countriesLayer.addTo(deckMap);
 
-      cartegoryGlobal = new carto.data.CategoryDataView(
+      cartegoryGlobal = new carto.dataview.Category(
         countriesLayer.source,
         'continent',
         { operation: 'count', operationColumn: 'pop_est', mode: 'global' }
       );
-      categoryNonPrecise = new carto.data.CategoryDataView(
+      categoryNonPrecise = new carto.dataview.Category(
         countriesLayer,
         'continent',
         { operation: 'count', operationColumn: 'pop_est', mode: 'non-precise' }
       );
 
-      // intializes the widgets
-      const dataGlobal = await cartegoryGlobal.getData();
-      widgetGlobalElement.categories = dataGlobal.categories;
-      const dataNonPrecise = await categoryNonPrecise.getData();
-      widgetNonPreciseElement.categories = dataNonPrecise.categories;
-
-      categoryNonPrecise.on('dataUpdate', async () => {
-        const data = await categoryNonPrecise.getData();
-        widgetNonPreciseElement.categories = data.categories;
-      });
+      new carto.widget.CategoryWidget('#category-widget-global', cartegoryGlobal);
+      new carto.widget.CategoryWidget('#category-widget-non-precise', categoryNonPrecise);
 
       // bind events
       cartegoryGlobal.on('dataUpdate', async () => {
-        const data = await cartegoryGlobal.getData();
-        widgetGlobalElement.categories = data.categories;
         widgetGlobalElement.isLoading = 'false';
       });
 
@@ -131,7 +121,6 @@
         errorContainer.innerHTML = error.message;
         widgetGlobalElement.isLoading = 'false';
       });
-
     }
 
     function applyChanges() {

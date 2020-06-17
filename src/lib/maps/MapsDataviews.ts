@@ -11,13 +11,13 @@ export class MapsDataviews {
   }
 
   public async aggregation(params: Partial<MapDataviewsOptions>): Promise<AggregationResponse> {
-    const { column, aggregation, operationColumn, limit } = params;
+    const { column, aggregation, aggregationColumn, limit } = params;
     const dataviewName = `${this._source}_${Date.now()}`;
 
     const layergroup = await this._createMapWithDataviews(dataviewName, 'aggregation', {
       column,
       aggregation,
-      operationColumn
+      aggregationColumn
     });
 
     const aggregationResponse = this._mapClient.dataview(layergroup, dataviewName, limit);
@@ -82,6 +82,9 @@ export interface FormulaResponse {
   result: number;
   nulls: number;
   type: string;
+  // eslint-disable-next-line camelcase
+  errors_with_context?: { type: string; message: string }[];
+  errors?: string[];
 }
 
 export interface AggregationCategory {
@@ -117,6 +120,13 @@ interface MapDataviewsOptions {
    * `aggregation` is different than "count"
    */
   operationColumn?: string;
+
+  /**
+   * [Maps API parameter name]
+   * Same as operationColumn but this is the
+   * name which is used by Maps API as parameter
+   */
+  aggregationColumn?: string;
 }
 
 interface FormulaParameters {

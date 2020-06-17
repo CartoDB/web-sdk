@@ -1,11 +1,10 @@
-import { MapsDataviews as DataviewsApi } from '@/maps/MapsDataviews';
+import { MapsDataviews as DataviewsApi, AggregationType } from '@/maps/MapsDataviews';
 import { defaultCredentials } from '@/core/Credentials';
 import { Source, CARTOSource } from '@/viz';
-import { DataViewMode } from './DataViewMode';
-import { AggregationType } from '../operations/aggregation/aggregation';
-import { CartoDataViewError, dataViewErrorTypes } from './DataViewError';
+import { DataViewModeBase } from './DataViewModeBase';
+import { CartoDataViewError, dataViewErrorTypes } from '../DataViewError';
 
-export class DataViewRemote extends DataViewMode<Source> {
+export class DataViewRemote extends DataViewModeBase<Source> {
   protected dataviewsApi: DataviewsApi;
 
   constructor(dataSource: Source, column: string, credentials = defaultCredentials) {
@@ -28,7 +27,7 @@ export class DataViewRemote extends DataViewMode<Source> {
     const aggregationResponse = await this.dataviewsApi.aggregation({
       column: this.column,
       aggregation,
-      operationColumn,
+      aggregationColumn: operationColumn,
       limit
     });
 
@@ -36,7 +35,6 @@ export class DataViewRemote extends DataViewMode<Source> {
       aggregationResponse.errors_with_context &&
       aggregationResponse.errors_with_context.length > 0
     ) {
-      this.emit('error', aggregationResponse.errors_with_context);
       const { message, type } = aggregationResponse.errors_with_context[0];
       throw new CartoDataViewError(`${type}: ${message}`, dataViewErrorTypes.MAPS_API);
     }
@@ -65,6 +63,11 @@ export class DataViewRemote extends DataViewMode<Source> {
       column: this.column,
       operation
     });
+
+    if (formulaResponse.errors_with_context && formulaResponse.errors_with_context.length > 0) {
+      const { message, type } = formulaResponse.errors_with_context[0];
+      throw new CartoDataViewError(`${type}: ${message}`, dataViewErrorTypes.MAPS_API);
+    }
 
     const { result, nulls } = formulaResponse;
 

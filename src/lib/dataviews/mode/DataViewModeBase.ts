@@ -1,11 +1,11 @@
 import { WithEvents } from '@/core/mixins/WithEvents';
 import { Filterable } from '@/viz/filters/Filterable';
 import { Filter } from '@/viz/filters/types';
+import { AggregationType } from '@/data/operations/aggregation/aggregation';
 import { spatialFilter } from '@/viz/filters/spatial-filters';
-import { CartoDataViewError, dataViewErrorTypes } from './DataViewError';
-import { AggregationType } from '../operations/aggregation/aggregation';
+import { CartoDataViewError, dataViewErrorTypes } from '../DataViewError';
 
-export abstract class DataViewMode<T extends Filterable> extends WithEvents {
+export abstract class DataViewModeBase<T extends Filterable> extends WithEvents {
   protected dataSource: T;
   public column: string;
 
@@ -30,10 +30,13 @@ export abstract class DataViewMode<T extends Filterable> extends WithEvents {
     this.dataSource.removeFilter(filterId);
   }
 
-  // eslint-disable-next-line class-methods-use-this
-  async getData(): Promise<Partial<DataViewData>> {
-    throw new CartoDataViewError('Method getData is not implemented');
-  }
+  public abstract async aggregation(aggregationParams: {
+    aggregation: AggregationType;
+    operationColumn: string;
+    limit?: number;
+  }): Promise<Partial<DataViewData>>;
+
+  public abstract async formula(operation: AggregationType): Promise<Partial<DataViewData>>;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

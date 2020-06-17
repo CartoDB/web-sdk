@@ -1,15 +1,15 @@
 import { Layer, Source } from '@/viz';
-import { AggregationType } from '../../operations/aggregation/aggregation';
-import { DataViewMode, DataViewModeAlias } from '../DataViewMode';
-import { DataViewBase } from '../DataViewBase';
+import { AggregationType } from '../../data/operations/aggregation/aggregation';
+import { DataViewModeBase, DataViewModeAlias, DataViewData } from '../mode/DataViewModeBase';
+import { DataViewImplBase } from '../DataViewImplBase';
 import { CartoDataViewError, dataViewErrorTypes } from '../DataViewError';
 
-export abstract class CategoryBase<T extends DataViewMode<Layer | Source>> extends DataViewBase<T> {
+export class CategoryImpl<T extends DataViewModeBase<Layer | Source>> extends DataViewImplBase<T> {
   public operationColumn: string;
   public limit?: number;
 
-  constructor(dataView: T, options: CategoryOptions, events: string[] = ['optionChanged']) {
-    super(dataView, options, events);
+  constructor(dataView: T, options: CategoryOptions) {
+    super(dataView, options);
 
     const { operationColumn, limit } = options || {};
 
@@ -17,6 +17,23 @@ export abstract class CategoryBase<T extends DataViewMode<Layer | Source>> exten
 
     this.operationColumn = operationColumn;
     this.limit = limit;
+  }
+
+  public async getData(): Promise<Partial<DataViewData>> {
+    let aggregationResponse;
+
+    try {
+      aggregationResponse = await this.dataView.aggregation({
+        aggregation: this.operation,
+        operationColumn: this.operationColumn,
+        limit: this.limit
+      });
+    } catch (error) {
+      this.emit('error', [error]);
+      throw error;
+    }
+
+    return aggregationResponse;
   }
 }
 

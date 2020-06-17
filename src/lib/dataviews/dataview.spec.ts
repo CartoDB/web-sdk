@@ -1,5 +1,5 @@
-import { Layer } from '../../viz/layer/Layer';
-import { DataViewLocal } from './DataViewLocal';
+import { Layer } from '../viz/layer/Layer';
+import { DataViewLocal } from './mode/DataViewLocal';
 import { CartoDataViewError, dataViewErrorTypes } from './DataViewError';
 
 describe('DataView', () => {
