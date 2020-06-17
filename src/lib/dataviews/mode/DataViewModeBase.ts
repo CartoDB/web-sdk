@@ -25,10 +25,13 @@ export abstract class DataViewModeBase<T extends Filterable> extends WithEvents 
     this.dataSource.removeFilter(filterId);
   }
 
-  // eslint-disable-next-line class-methods-use-this
-  async getData(): Promise<Partial<DataViewData>> {
-    throw new CartoDataViewError('Method getData is not implemented');
-  }
+  public abstract async aggregation(aggregationParams: {
+    aggregation: AggregationType;
+    operationColumn: string;
+    limit?: number;
+  }): Promise<Partial<DataViewData>>;
+
+  public abstract async formula(operation: AggregationType): Promise<Partial<DataViewData>>;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

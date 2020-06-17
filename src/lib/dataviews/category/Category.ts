@@ -1,11 +1,9 @@
 import { Layer, Source } from '@/viz';
 import { DataViewLocal } from '../mode/DataViewLocal';
 import { DataViewRemote } from '../mode/DataViewRemote';
-import { CategoryLocal } from './CategoryLocal';
-import { CategoryRemote } from './CategoryRemote';
 import { DataViewModeAlias } from '../mode/DataViewModeBase';
 import { DataViewWrapperBase } from '../DataViewWrapperBase';
-import { CategoryOptions, CategoryBase } from './CategoryBase';
+import { CategoryOptions, CategoryImpl } from './CategoryImpl';
 
 export class Category extends DataViewWrapperBase {
   protected buildWrappee(
@@ -14,45 +12,46 @@ export class Category extends DataViewWrapperBase {
     options: CategoryOptions,
     mode: DataViewModeAlias
   ) {
+    let dataView;
+
     switch (mode) {
       case DataViewModeAlias.NON_PRECISE: {
-        const dataViewLocal = new DataViewLocal(dataSource as Layer, column);
-        this.dataviewWrappee = new CategoryLocal(dataViewLocal, options);
+        dataView = new DataViewLocal(dataSource as Layer, column);
         break;
       }
 
       case DataViewModeAlias.VIEWPORT: {
-        const dataViewRemote = new DataViewRemote(dataSource as Source, column);
-        this.dataviewWrappee = new CategoryRemote(dataViewRemote, options);
+        dataView = new DataViewRemote(dataSource as Source, column);
         break;
       }
 
       default: {
-        const dataViewRemote = new DataViewRemote(dataSource as Source, column);
-        this.dataviewWrappee = new CategoryRemote(dataViewRemote, options);
+        dataView = new DataViewRemote(dataSource as Source, column);
         break;
       }
     }
+
+    this.dataviewImpl = new CategoryImpl(dataView, options);
   }
 
   public get operationColumn() {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return (this.dataviewWrappee as CategoryBase<any>).operationColumn;
+    return (this.dataviewImpl as CategoryImpl<any>).operationColumn;
   }
   public set operationColumn(operationColumn: string) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (this.dataviewWrappee as CategoryBase<any>).operationColumn = operationColumn;
+    (this.dataviewImpl as CategoryImpl<any>).operationColumn = operationColumn;
     this.emit('optionChanged');
   }
 
   public get limit() {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return (this.dataviewWrappee as CategoryBase<any>).limit;
+    return (this.dataviewImpl as CategoryImpl<any>).limit;
   }
 
   public set limit(limit: number | undefined) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (this.dataviewWrappee as CategoryBase<any>).limit = limit;
+    (this.dataviewImpl as CategoryImpl<any>).limit = limit;
     this.emit('optionChanged');
   }
 }

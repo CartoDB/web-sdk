@@ -2,13 +2,13 @@ import { WithEvents } from '@/core/mixins/WithEvents';
 import { Layer, Source } from '@/viz';
 import { Filter } from '@/viz/filters/types';
 import { AggregationType } from '@/maps/MapsDataviews';
-import { DataViewBase } from './DataViewBase';
+import { DataViewImplBase } from './DataViewImplBase';
 import { DataViewModeBase, DataViewModeAlias } from './mode/DataViewModeBase';
 
 const OPTION_CHANGED_DELAY = 100;
 
 export abstract class DataViewWrapperBase extends WithEvents {
-  protected dataviewWrappee!: DataViewBase<DataViewModeBase<Layer | Source>>;
+  protected dataviewImpl!: DataViewImplBase<DataViewModeBase<Layer | Source>>;
 
   /**
    * optionChanged timeout to prevent multiple
@@ -41,37 +41,37 @@ export abstract class DataViewWrapperBase extends WithEvents {
   }
 
   public getData() {
-    return this.dataviewWrappee.getData();
+    return this.dataviewImpl.getData();
   }
 
   public addFilter(filterId: string, filter: Filter) {
-    this.dataviewWrappee.addFilter(filterId, filter);
+    this.dataviewImpl.addFilter(filterId, filter);
   }
 
   public removeFilter(filterId: string) {
-    this.dataviewWrappee.removeFilter(filterId);
+    this.dataviewImpl.removeFilter(filterId);
   }
 
   public get column() {
-    return this.dataviewWrappee.column;
+    return this.dataviewImpl.column;
   }
 
   public set column(column: string) {
-    this.dataviewWrappee.column = column;
+    this.dataviewImpl.column = column;
     this.emit('optionChanged');
   }
 
   public get operation() {
-    return this.dataviewWrappee.operation;
+    return this.dataviewImpl.operation;
   }
 
   public set operation(operation: AggregationType) {
-    this.dataviewWrappee.operation = operation;
+    this.dataviewImpl.operation = operation;
     this.emit('optionChanged');
   }
 
   private bindEvents() {
-    const events = [...this.dataviewWrappee.availableEvents];
+    const events = [...this.dataviewImpl.availableEvents];
 
     if (!events.includes('optionChanged')) {
       events.push('optionChanged');
@@ -82,8 +82,8 @@ export abstract class DataViewWrapperBase extends WithEvents {
     }
 
     this.registerAvailableEvents(events);
-    this.dataviewWrappee.availableEvents.forEach((e: string) =>
-      this.dataviewWrappee.on(e, (args: any[]) => this.emit(e, args))
+    this.dataviewImpl.availableEvents.forEach((e: string) =>
+      this.dataviewImpl.on(e, (args: any[]) => this.emit(e, args))
     );
   }
 

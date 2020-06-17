@@ -3,9 +3,8 @@ import { DataViewModeAlias } from '../mode/DataViewModeBase';
 import { AggregationType } from '../../data/operations/aggregation/aggregation';
 import { DataViewLocal } from '../mode/DataViewLocal';
 import { DataViewRemote } from '../mode/DataViewRemote';
-import { FormulaLocal } from './FormulaLocal';
-import { FormulaRemote } from './FormulaRemote';
 import { DataViewWrapperBase } from '../DataViewWrapperBase';
+import { FormulaImpl } from './FormulaImpl';
 
 export class Formula extends DataViewWrapperBase {
   protected buildWrappee(
@@ -14,25 +13,26 @@ export class Formula extends DataViewWrapperBase {
     options: FormulaDataViewOptions,
     mode: DataViewModeAlias
   ) {
+    let dataView;
+
     switch (mode) {
       case DataViewModeAlias.NON_PRECISE: {
-        const dataViewLocal = new DataViewLocal(dataSource as Layer, column);
-        this.dataviewWrappee = new FormulaLocal(dataViewLocal, options);
+        dataView = new DataViewLocal(dataSource as Layer, column);
         break;
       }
 
       case DataViewModeAlias.VIEWPORT: {
-        const dataViewRemote = new DataViewRemote(dataSource as Source, column);
-        this.dataviewWrappee = new FormulaRemote(dataViewRemote, options);
+        dataView = new DataViewRemote(dataSource as Source, column);
         break;
       }
 
       default: {
-        const dataViewRemote = new DataViewRemote(dataSource as Source, column);
-        this.dataviewWrappee = new FormulaRemote(dataViewRemote, options);
+        dataView = new DataViewRemote(dataSource as Source, column);
         break;
       }
     }
+
+    this.dataviewImpl = new FormulaImpl(dataView, options);
   }
 }
 
