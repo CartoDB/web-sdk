@@ -23,10 +23,10 @@ import {
 } from './viz/style';
 
 // Dataviews
-import { Category, Formula } from './dataview';
+import { Category, Formula } from './dataviews';
 
 // Widgets
-import { Category as CategoryWidget } from './widget';
+import { Category as CategoryWidget } from './widgets';
 
 /*
  * --- Public API ---
