@@ -143,11 +143,11 @@
         const countriesLayer = new carto.viz.Layer('world_commerce');
         await countriesLayer.addTo(deckMap);
 
-        formulaGlobal = new carto.data.FormulaDataView(countriesLayer.source, 'gdp', {
+        formulaGlobal = new carto.dataview.Formula(countriesLayer.source, 'gdp', {
           operation: 'sum',
           mode: 'global'
         });
-        formulaNonPrecise = new carto.data.FormulaDataView(countriesLayer, 'gdp', {
+        formulaNonPrecise = new carto.dataview.Formula(countriesLayer, 'gdp', {
           operation: 'sum',
           mode: 'non-precise'
         });
