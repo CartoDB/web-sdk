@@ -21,7 +21,7 @@ export abstract class DataViewWrapperBase extends WithEvents {
     super();
 
     const mode = options.mode || DataViewModeAlias.VIEWPORT;
-    this.buildWrappee(dataSource, column, options, mode);
+    this.buildImpl(dataSource, column, options, mode);
 
     // bind events with the mode
     this.bindEvents();
