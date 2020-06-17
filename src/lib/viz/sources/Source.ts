@@ -79,3 +79,16 @@ export abstract class Source extends WithEvents {
     throw new Error(`Method not implemented`);
   }
 }
+
+function getNewFields(newFields: StatFields, currentFields: Set<string>) {
+  const newFieldsSet = new Set([...newFields.sample, ...newFields.aggregation]);
+  return [...newFieldsSet].filter(f => !currentFields.has(f));
+}
+
+export function shouldInitialize(
+  isInitialized: boolean,
+  newFields: StatFields,
+  currentFields: Set<string>
+): boolean {
+  return !isInitialized || !!getNewFields(newFields, currentFields).length;
+}

@@ -9,7 +9,8 @@ import {
   NumericFieldStats,
   CategoryFieldStats,
   GeometryType,
-  StatFields
+  StatFields,
+  shouldInitialize
 } from './Source';
 
 import { sourceErrorTypes, SourceError } from '../errors/source-error';
@@ -257,17 +258,4 @@ function createSample(values: number[]) {
 
   const shuffled = values.sort(() => 0.5 - Math.random());
   return shuffled.slice(0, MAX_SAMPLE_SIZE);
-}
-
-function getNewFields(newFields: StatFields, currentFields: Set<string>) {
-  const newFieldsSet = new Set([...newFields.sample, ...newFields.aggregation]);
-  return [...newFieldsSet].filter(f => !currentFields.has(f));
-}
-
-export function shouldInitialize(
-  isInitialized: boolean,
-  newFields: StatFields,
-  currentFields: Set<string>
-): boolean {
-  return !isInitialized || !!getNewFields(newFields, currentFields).length;
 }
