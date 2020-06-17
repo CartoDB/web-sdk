@@ -6,7 +6,8 @@ import {
   SourceMetadata,
   NumericFieldStats,
   CategoryFieldStats,
-  StatFields
+  StatFields,
+  shouldInitialize
 } from './Source';
 import { parseGeometryType } from '../style/helpers/utils';
 import { sourceErrorTypes, SourceError } from '../errors/source-error';
@@ -45,15 +46,12 @@ export class CARTOSource extends Source {
   private _type: 'sql' | 'dataset';
   // value it should be a dataset name or a SQL query
   private _value: string;
-
   // Internal credentials of the user
   private _credentials: Credentials;
-
   private _props?: CARTOSourceProps;
-
   private _mapConfig: MapOptions;
-
   private _metadata?: SourceMetadata;
+  private _fields: Set<string>;
 
   constructor(source: string, options: SourceOptions = {}) {
     const { mapOptions = {}, credentials = defaultCredentials } = options;
@@ -70,6 +68,7 @@ export class CARTOSource extends Source {
     this._value = source;
     this._credentials = credentials;
     const sourceOpts = { [this._type]: source };
+    this._fields = new Set();
 
     // Set Map Config
     this._mapConfig = {
@@ -160,12 +159,12 @@ export class CARTOSource extends Source {
    * @param fields
    */
   public async init(fields: StatFields): Promise<boolean> {
-    if (this.isInitialized) {
-      // Maybe this is too hard, but I'd like to keep to check it's not a performance issue. We could move it to just a warning
-      throw new SourceError('Try to reinstantiate map multiple times');
+    if (!shouldInitialize(this.isInitialized, fields, this._fields)) {
+      return true;
     }
 
     if (fields.sample.size || fields.aggregation.size) {
+      this._fields = new Set([...fields.sample, ...fields.aggregation]);
       this._initConfigForStats(fields);
     }
 
