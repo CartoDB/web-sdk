@@ -5,6 +5,7 @@ import { MVTLayer } from '@deck.gl/geo-layers';
 import mitt from 'mitt';
 import deepmerge from 'deepmerge';
 import { GeoJSON } from 'geojson';
+import { WithEvents } from '@/core/mixins/WithEvents';
 import { Source, StatFields } from '../sources/Source';
 import { CARTOSource, DOSource, GeoJsonSource } from '../sources';
 import { DOLayer } from '../deck/DOLayer';
@@ -19,11 +20,10 @@ import { FiltersCollection } from '../filters/FiltersCollection';
 import { FunctionFilterApplicator } from '../filters/FunctionFilterApplicator';
 import { ColumnFilters } from '../filters/types';
 import { basicStyle } from '../style/helpers/basic-style';
-import { Filterable } from '../filters/Filterable';
 
 const DEFAULT_ID_PROPERTY = 'cartodb_id';
 
-export class Layer extends Filterable implements StyledLayer {
+export class Layer extends WithEvents implements StyledLayer {
   private _source: Source;
   private _style: Style;
   private _options: LayerOptions;

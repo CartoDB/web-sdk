@@ -1,14 +1,14 @@
+import { Source, Layer } from '@/viz';
 import { WithEvents } from '@/core/mixins/WithEvents';
-import { Filterable } from '@/viz/filters/Filterable';
 import { Filter } from '@/viz/filters/types';
 import { AggregationType } from '@/data/operations/aggregation/aggregation';
 import { CartoDataViewError, dataViewErrorTypes } from '../DataViewError';
 
-export abstract class DataViewModeBase<T extends Filterable> extends WithEvents {
-  protected dataSource: T;
+export abstract class DataViewModeBase extends WithEvents {
+  protected dataSource: Layer | Source;
   public column: string;
 
-  constructor(dataSource: T, column: string) {
+  constructor(dataSource: Layer | Source, column: string) {
     super();
 
     validateParameters(dataSource, column);

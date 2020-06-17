@@ -5,7 +5,7 @@ import { castToNumberOrUndefined } from '@/core/utils/number';
 import { DataViewModeBase, DataViewData } from './DataViewModeBase';
 import { CartoDataViewError, dataViewErrorTypes } from '../DataViewError';
 
-export class DataViewLocal extends DataViewModeBase<Layer> {
+export class DataViewLocal extends DataViewModeBase {
   constructor(dataSource: Layer, column: string) {
     super(dataSource, column);
 
@@ -49,7 +49,7 @@ export class DataViewLocal extends DataViewModeBase<Layer> {
   }
 
   private getSourceData(columns: string[] = []) {
-    return this.dataSource.getViewportFeatures([this.column, ...columns]);
+    return (this.dataSource as Layer).getViewportFeatures([this.column, ...columns]);
   }
 
   private async groupBy(operationColumn: string, operation: AggregationType) {

@@ -1,10 +1,9 @@
-import { Layer, Source } from '@/viz';
 import { AggregationType } from '../../data/operations/aggregation/aggregation';
 import { DataViewModeBase, DataViewModeAlias, DataViewData } from '../mode/DataViewModeBase';
 import { DataViewImplBase } from '../DataViewImplBase';
 import { CartoDataViewError, dataViewErrorTypes } from '../DataViewError';
 
-export class CategoryImpl<T extends DataViewModeBase<Layer | Source>> extends DataViewImplBase<T> {
+export class CategoryImpl<T extends DataViewModeBase> extends DataViewImplBase<T> {
   public operationColumn: string;
   public limit?: number;
 

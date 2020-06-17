@@ -1,9 +1,8 @@
-import { Layer, Source } from '@/viz';
 import { AggregationType } from '../../data/operations/aggregation/aggregation';
 import { DataViewData, DataViewModeBase } from '../mode/DataViewModeBase';
 import { DataViewImplBase } from '../DataViewImplBase';
 
-export class FormulaImpl<T extends DataViewModeBase<Layer | Source>> extends DataViewImplBase<T> {
+export class FormulaImpl<T extends DataViewModeBase> extends DataViewImplBase<T> {
   public async getData(): Promise<Partial<DataViewData>> {
     let formulaResponse;
 

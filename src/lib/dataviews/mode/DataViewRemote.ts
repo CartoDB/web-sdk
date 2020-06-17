@@ -4,7 +4,7 @@ import { Source, CARTOSource } from '@/viz';
 import { DataViewModeBase } from './DataViewModeBase';
 import { CartoDataViewError, dataViewErrorTypes } from '../DataViewError';
 
-export class DataViewRemote extends DataViewModeBase<Source> {
+export class DataViewRemote extends DataViewModeBase {
   protected dataviewsApi: DataviewsApi;
 
   constructor(dataSource: Source, column: string, credentials = defaultCredentials) {
