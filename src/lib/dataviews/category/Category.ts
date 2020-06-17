@@ -6,7 +6,7 @@ import { DataViewWrapperBase } from '../DataViewWrapperBase';
 import { CategoryOptions, CategoryImpl } from './CategoryImpl';
 
 export class Category extends DataViewWrapperBase {
-  protected buildWrappee(
+  protected buildImpl(
     dataSource: Layer | Source,
     column: string,
     options: CategoryOptions,
@@ -20,7 +20,7 @@ export class Category extends DataViewWrapperBase {
         break;
       }
 
-      case DataViewModeAlias.VIEWPORT: {
+      case DataViewModeAlias.GLOBAL: {
         dataView = new DataViewRemote(dataSource as Source, column);
         break;
       }

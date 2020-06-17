@@ -7,7 +7,7 @@ import { DataViewWrapperBase } from '../DataViewWrapperBase';
 import { FormulaImpl } from './FormulaImpl';
 
 export class Formula extends DataViewWrapperBase {
-  protected buildWrappee(
+  protected buildImpl(
     dataSource: Layer | Source,
     column: string,
     options: FormulaDataViewOptions,
@@ -21,7 +21,7 @@ export class Formula extends DataViewWrapperBase {
         break;
       }
 
-      case DataViewModeAlias.VIEWPORT: {
+      case DataViewModeAlias.GLOBAL: {
         dataView = new DataViewRemote(dataSource as Source, column);
         break;
       }

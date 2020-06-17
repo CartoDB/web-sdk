@@ -87,7 +87,7 @@ export abstract class DataViewWrapperBase extends WithEvents {
     );
   }
 
-  protected abstract buildWrappee(
+  protected abstract buildImpl(
     dataSource: Layer | Source,
     column: string,
     options: { mode?: DataViewModeAlias },
