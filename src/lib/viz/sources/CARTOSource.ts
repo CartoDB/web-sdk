@@ -163,6 +163,10 @@ export class CARTOSource extends Source {
       return true;
     }
 
+    if (this.isInitialized) {
+      console.warn('CARTOSource reinitialized');
+    }
+
     if (fields.sample.size || fields.aggregation.size) {
       this._fields = new Set([...fields.sample, ...fields.aggregation]);
       this._initConfigForStats(fields);

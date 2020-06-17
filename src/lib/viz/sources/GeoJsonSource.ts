@@ -62,6 +62,10 @@ export class GeoJsonSource extends Source {
       return true;
     }
 
+    if (this.isInitialized) {
+      console.warn('GeoJsonSource reinitialized');
+    }
+
     this._props = { type: 'GeoJsonLayer', data: this._geojson };
     this._metadata = this._buildMetadata(fields);
 
