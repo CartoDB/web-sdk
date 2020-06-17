@@ -13,8 +13,7 @@ export class FormulaRemote extends FormulaBase<DataViewRemote> {
     try {
       aggregationResponse = await this.dataView.formula(this.operation);
     } catch (error) {
-      const { message } = error;
-      this.emit('error', message);
+      this.emit('error', [error]);
       throw error;
     }
 

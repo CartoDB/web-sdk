@@ -17,8 +17,7 @@ export class CategoryRemote extends CategoryBase<DataViewRemote> {
         limit: this.limit
       });
     } catch (error) {
-      const { message } = error;
-      this.emit('error', message);
+      this.emit('error', [error]);
       throw error;
     }
 

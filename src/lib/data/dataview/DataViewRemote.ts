@@ -28,7 +28,7 @@ export class DataViewRemote extends DataViewMode<Source> {
     const aggregationResponse = await this.dataviewsApi.aggregation({
       column: this.column,
       aggregation,
-      operationColumn,
+      aggregationColumn: operationColumn,
       limit
     });
 
@@ -36,7 +36,6 @@ export class DataViewRemote extends DataViewMode<Source> {
       aggregationResponse.errors_with_context &&
       aggregationResponse.errors_with_context.length > 0
     ) {
-      this.emit('error', aggregationResponse.errors_with_context);
       const { message, type } = aggregationResponse.errors_with_context[0];
       throw new CartoDataViewError(`${type}: ${message}`, dataViewErrorTypes.MAPS_API);
     }
