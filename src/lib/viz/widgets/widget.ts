@@ -38,7 +38,7 @@ function validateParameters(element: HTMLElement | null, dataView: DataViewWrapp
     });
   }
 
-  if (!(dataView instanceof DataView)) {
+  if (!(dataView instanceof DataViewWrapper)) {
     throw new CartoError({
       type: '[Widget]',
       message: 'DataView passed to Category Widget is not valid'
