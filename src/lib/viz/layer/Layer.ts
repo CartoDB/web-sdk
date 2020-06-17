@@ -396,23 +396,6 @@ export class Layer extends WithEvents implements StyledLayer {
     });
   }
 
-  private _buildFields(): StatFields {
-    const sample: Set<string> = new Set();
-    const aggregation: Set<string> = new Set();
-    const fields = { sample, aggregation };
-
-    if (this._style && this._style.field) {
-      const { field } = this._style;
-      fields.sample.add(field);
-
-      if (field !== DEFAULT_ID_PROPERTY) {
-        fields.aggregation.add(field);
-      }
-    }
-
-    return fields;
-  }
-
   addFilter(filterId: string, filter: ColumnFilters) {
     this.filtersCollection.addFilter(filterId, filter);
 
@@ -431,6 +414,23 @@ export class Layer extends WithEvents implements StyledLayer {
     }
 
     return Promise.resolve();
+  }
+
+  private _buildFields(): StatFields {
+    const sample: Set<string> = new Set();
+    const aggregation: Set<string> = new Set();
+    const fields = { sample, aggregation };
+
+    if (this._style && this._style.field) {
+      const { field } = this._style;
+      fields.sample.add(field);
+
+      if (field !== DEFAULT_ID_PROPERTY) {
+        fields.aggregation.add(field);
+      }
+    }
+
+    return fields;
   }
 
   private _addPopupFields(elements: PopupElement[] | string[] | null = []) {
