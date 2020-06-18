@@ -20,7 +20,7 @@ export abstract class DataViewWrapperBase extends WithEvents {
   constructor(dataSource: Layer | Source, column: string, options: any) {
     super();
 
-    const mode = options.mode || DataViewModeAlias.VIEWPORT;
+    const mode = options.mode || DataViewModeAlias.REMOTE_FILTERED;
     this.buildImpl(dataSource, column, options, mode);
 
     // bind events with the mode

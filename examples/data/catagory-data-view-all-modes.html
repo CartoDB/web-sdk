@@ -80,16 +80,13 @@
       { text: 'MAX', value: 'max' },
       { text: 'MIN', value: 'min' }
     ];
-    const widgetGlobalElement = document.getElementById(
+    const widgetRemoteElement = document.getElementById(
       'category-widget-global'
       );
-    const widgetNonPreciseElement = document.getElementById(
-      'category-widget-non-precise'
-    );
     const errorContainer = document.getElementById('errorContainer');
 
-    let cartegoryGlobal;
-    let categoryNonPrecise;
+    let categoryRemote;
+    let categoryLocal;
 
     async function initialize() {
       carto.setDefaultCredentials({ username: 'public' });
@@ -98,28 +95,28 @@
       const countriesLayer = new carto.viz.Layer('ne_50m_admin_0_countries');
       await countriesLayer.addTo(deckMap);
 
-      cartegoryGlobal = new carto.dataview.Category(
+      categoryRemote = new carto.dataview.Category(
         countriesLayer.source,
         'continent',
-        { operation: 'count', operationColumn: 'pop_est', mode: 'global' }
+        { operation: 'count', operationColumn: 'pop_est', mode: 'remote' }
       );
-      categoryNonPrecise = new carto.dataview.Category(
+      categoryLocal = new carto.dataview.Category(
         countriesLayer,
         'continent',
-        { operation: 'count', operationColumn: 'pop_est', mode: 'non-precise' }
+        { operation: 'count', operationColumn: 'pop_est', mode: 'local' }
       );
 
-      new carto.widget.CategoryWidget('#category-widget-global', cartegoryGlobal);
-      new carto.widget.CategoryWidget('#category-widget-non-precise', categoryNonPrecise);
+      new carto.widget.CategoryWidget('#category-widget-global', categoryRemote);
+      new carto.widget.CategoryWidget('#category-widget-non-precise', categoryLocal);
 
       // bind events
-      cartegoryGlobal.on('dataUpdate', async () => {
-        widgetGlobalElement.isLoading = 'false';
+      categoryRemote.on('dataUpdate', async () => {
+        widgetRemoteElement.isLoading = 'false';
       });
 
-      cartegoryGlobal.on('error', ([error]) => {
+      categoryRemote.on('error', ([error]) => {
         errorContainer.innerHTML = error.message;
-        widgetGlobalElement.isLoading = 'false';
+        widgetRemoteElement.isLoading = 'false';
       });
     }
 
@@ -131,17 +128,17 @@
         .value;
 
       errorContainer.innerHTML = '';
-      widgetGlobalElement.isLoading = 'true';
+      widgetRemoteElement.isLoading = 'true';
 
-      categoryNonPrecise.column = column;
-      categoryNonPrecise.operationColumn = operationColumn;
-      categoryNonPrecise.operation = operation;
-      categoryNonPrecise.limit = limit;
+      categoryLocal.column = column;
+      categoryLocal.operationColumn = operationColumn;
+      categoryLocal.operation = operation;
+      categoryLocal.limit = limit;
 
-      cartegoryGlobal.column = column;
-      cartegoryGlobal.operationColumn = operationColumn;
-      cartegoryGlobal.operation = operation;
-      cartegoryGlobal.limit = limit;
+      categoryRemote.column = column;
+      categoryRemote.operationColumn = operationColumn;
+      categoryRemote.operation = operation;
+      categoryRemote.limit = limit;
     }
 
     initialize();

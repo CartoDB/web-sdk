@@ -129,12 +129,12 @@
         { text: 'MAX', value: 'max' },
         { text: 'MIN', value: 'min' }
       ];
-      const formulaGlobalElement = document.getElementById('formula-global');
-      const formulaNonPreciseElement = document.getElementById('formula-non-precise');
+      const formulaRemoteElement = document.getElementById('formula-global');
+      const formulaLocalElement = document.getElementById('formula-non-precise');
       const errorContainer = document.getElementById('errorContainer');
 
-      let formulaGlobal;
-      let formulaNonPrecise;
+      let formulaRemote;
+      let formulaLocal;
 
       async function initialize() {
         carto.setDefaultCredentials({ username: 'public' });
@@ -143,33 +143,33 @@
         const countriesLayer = new carto.viz.Layer('world_commerce');
         await countriesLayer.addTo(deckMap);
 
-        formulaGlobal = new carto.dataview.Formula(countriesLayer.source, 'gdp', {
+        formulaRemote = new carto.dataview.Formula(countriesLayer.source, 'gdp', {
           operation: 'sum',
-          mode: 'global'
+          mode: 'remote'
         });
-        formulaNonPrecise = new carto.dataview.Formula(countriesLayer, 'gdp', {
+        formulaLocal = new carto.dataview.Formula(countriesLayer, 'gdp', {
           operation: 'sum',
-          mode: 'non-precise'
+          mode: 'local'
         });
 
         // intializes the widgets
-        const globalData = await formulaGlobal.getData();
-        formulaGlobalElement.innerHTML = d3.format('.4s')(globalData.result);
-        const nonPreciseData = await formulaNonPrecise.getData();
-        formulaNonPreciseElement.innerHTML = d3.format('.4s')(nonPreciseData.result);
+        const remoteData = await formulaRemote.getData();
+        formulaRemoteElement.innerHTML = d3.format('.4s')(remoteData.result);
+        const localData = await formulaLocal.getData();
+        formulaLocalElement.innerHTML = d3.format('.4s')(localData.result);
 
-        formulaNonPrecise.on('dataUpdate', async () => {
-          const data = await formulaNonPrecise.getData();
-          formulaNonPreciseElement.innerHTML = d3.format('.4s')(data.result);
+        formulaLocal.on('dataUpdate', async () => {
+          const data = await formulaLocal.getData();
+          formulaLocalElement.innerHTML = d3.format('.4s')(data.result);
         });
 
         // bind events
-        formulaGlobal.on('dataUpdate', async () => {
-          const data = await formulaGlobal.getData();
-          formulaGlobalElement.innerHTML = d3.format('.4s')(data.result);
+        formulaRemote.on('dataUpdate', async () => {
+          const data = await formulaRemote.getData();
+          formulaRemoteElement.innerHTML = d3.format('.4s')(data.result);
         });
 
-        formulaGlobal.on('error', ([error]) => {
+        formulaRemote.on('error', ([error]) => {
           errorContainer.innerHTML = error.message;
         });
       }
@@ -180,11 +180,11 @@
 
         errorContainer.innerHTML = '';
 
-        formulaGlobal.column = column;
-        formulaGlobal.operation = operation;
+        formulaRemote.column = column;
+        formulaRemote.operation = operation;
 
-        formulaNonPrecise.column = column;
-        formulaNonPrecise.operation = operation;
+        formulaLocal.column = column;
+        formulaLocal.operation = operation;
       }
 
       initialize();

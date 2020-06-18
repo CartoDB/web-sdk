@@ -65,7 +65,7 @@ export interface DataViewData {
 }
 
 export enum DataViewModeAlias {
-  GLOBAL = 'global',
-  VIEWPORT = 'viewport',
-  NON_PRECISE = 'non-precise'
+  REMOTE = 'remote',
+  LOCAL = 'local',
+  REMOTE_FILTERED = 'remote-filtered'
 }

@@ -37,7 +37,7 @@ describe('DataView', () => {
           new Category(new Layer('fake_source'), 'fake_column', {
             operation: AggregationType.AVG,
             operationColumn: undefined as never,
-            mode: DataViewModeAlias.NON_PRECISE
+            mode: DataViewModeAlias.LOCAL
           })
       ).toThrow(
         new CartoDataViewError(
@@ -64,7 +64,7 @@ describe('DataView', () => {
       const dataView = new Category(layer, 'country', {
         operation: AggregationType.AVG,
         operationColumn: 'popEst',
-        mode: DataViewModeAlias.NON_PRECISE
+        mode: DataViewModeAlias.LOCAL
       });
 
       expect(await dataView.getData()).toMatchObject({
