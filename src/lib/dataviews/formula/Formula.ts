@@ -17,12 +17,12 @@ export class Formula extends DataViewWrapperBase {
     let dataView;
 
     switch (mode) {
-      case DataViewModeAlias.NON_PRECISE: {
+      case DataViewModeAlias.LOCAL: {
         dataView = new DataViewLocal(dataSource as Layer, column);
         break;
       }
 
-      case DataViewModeAlias.GLOBAL: {
+      case DataViewModeAlias.REMOTE: {
         dataView = new DataViewRemote(dataSource as Source, column);
         break;
       }

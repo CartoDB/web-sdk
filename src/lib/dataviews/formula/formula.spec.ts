@@ -49,7 +49,7 @@ describe('Formula', () => {
 
       const dataView = new Formula(layer, 'pop', {
         operation: AggregationType.AVG,
-        mode: DataViewModeAlias.NON_PRECISE
+        mode: DataViewModeAlias.LOCAL
       });
 
       expect(await dataView.getData()).toMatchObject({
@@ -74,7 +74,7 @@ describe('Formula', () => {
 
       const dataView = new Formula(layer, 'pop', {
         operation: AggregationType.SUM,
-        mode: DataViewModeAlias.NON_PRECISE
+        mode: DataViewModeAlias.LOCAL
       });
 
       try {
