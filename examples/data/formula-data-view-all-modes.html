@@ -37,7 +37,10 @@
           <div id="map"></div>
 
           <!-- panel -->
-          <div class="as-panel as-panel--vertical as-panel--top as-panel--right as-bg--ui-01">
+          <div
+            class="as-panel as-panel--vertical as-panel--top as-panel--right as-bg--ui-01"
+            style="overflow: visible;"
+          >
             <div
               class="as-panel__element as-p--16 as-body"
               style="max-width: fit-content; padding-bottom: 0px;"
@@ -77,10 +80,10 @@
     >
       <section class="as-body">
         <div>
-          <as-widget-header header="World commerce (global)" subheader="Sum of GDP">
+          <as-widget-header header="World commerce (remote)" subheader="Sum of GDP">
           </as-widget-header>
           <p
-            id="formula-global"
+            id="formula-remote"
             class="as-title as-m--4 as-p--0 as-font--medium"
             id="layer0_widget0-value"
           ></p>
@@ -101,10 +104,10 @@
     >
       <section class="as-body">
         <div>
-          <as-widget-header header="World commerce (viewport)" subheader="Sum of GDP">
+          <as-widget-header header="World commerce (remote-filtered)" subheader="Sum of GDP">
           </as-widget-header>
           <p
-            id="formula-viewport"
+            id="formula-remote-filtered"
             class="as-title as-m--4 as-p--0 as-font--medium"
             id="layer0_widget0-value"
           ></p>
@@ -125,10 +128,10 @@
     >
       <section class="as-body">
         <div>
-          <as-widget-header header="World commerce (non-precise)" subheader="Sum of GDP">
+          <as-widget-header header="World commerce (local)" subheader="Sum of GDP">
           </as-widget-header>
           <p
-            id="formula-non-precise"
+            id="formula-local"
             class="as-title as-m--4 as-p--0 as-font--medium"
             id="layer0_widget0-value"
           ></p>
@@ -153,11 +156,13 @@
         { text: 'MAX', value: 'max' },
         { text: 'MIN', value: 'min' }
       ];
-      const formulaRemoteElement = document.getElementById('formula-global');
-      const formulaLocalElement = document.getElementById('formula-non-precise');
+      const formulaRemoteElement = document.getElementById('formula-remote');
+      const formulaRemoteFilteredElement = document.getElementById('formula-remote-filtered');
+      const formulaLocalElement = document.getElementById('formula-local');
       const errorContainer = document.getElementById('errorContainer');
 
       let formulaRemote;
+      let formulaRemoteFiltered;
       let formulaLocal;
 
       async function initialize() {
@@ -171,6 +176,10 @@
           operation: 'sum',
           mode: 'remote'
         });
+        formulaRemoteFiltered = new carto.dataview.Formula(countriesLayer, 'gdp', {
+          operation: 'sum',
+          mode: 'remote-filtered'
+        });
         formulaLocal = new carto.dataview.Formula(countriesLayer, 'gdp', {
           operation: 'sum',
           mode: 'local'
@@ -179,21 +188,31 @@
         // intializes the widgets
         const remoteData = await formulaRemote.getData();
         formulaRemoteElement.innerHTML = d3.format('.4s')(remoteData.result);
+        const remoteFilteredData = await formulaRemoteFiltered.getData();
+        formulaRemoteFilteredElement.innerHTML = d3.format('.4s')(remoteFilteredData.result);
         const localData = await formulaLocal.getData();
         formulaLocalElement.innerHTML = d3.format('.4s')(localData.result);
 
+        // bind events
         formulaLocal.on('dataUpdate', async () => {
           const data = await formulaLocal.getData();
           formulaLocalElement.innerHTML = d3.format('.4s')(data.result);
         });
 
-        // bind events
         formulaRemote.on('dataUpdate', async () => {
           const data = await formulaRemote.getData();
           formulaRemoteElement.innerHTML = d3.format('.4s')(data.result);
         });
-
         formulaRemote.on('error', ([error]) => {
+          errorContainer.innerHTML = error.message;
+        });
+
+        formulaRemoteFiltered.on('dataUpdate', async () => {
+          const data = await formulaRemoteFiltered.getData();
+          formulaRemoteFilteredElement.innerHTML = d3.format('.4s')(data.result);
+        });
+
+        formulaRemoteFiltered.on('error', ([error]) => {
           errorContainer.innerHTML = error.message;
         });
       }
@@ -206,6 +225,9 @@
 
         formulaRemote.column = column;
         formulaRemote.operation = operation;
+
+        formulaRemoteFiltered.column = column;
+        formulaRemoteFiltered.operation = operation;
 
         formulaLocal.column = column;
         formulaLocal.operation = operation;

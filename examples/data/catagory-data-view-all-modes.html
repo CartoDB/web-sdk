@@ -30,7 +30,7 @@
         <div id="map"></div>
 
         <!-- panel -->
-        <div class="as-panel as-panel--vertical as-panel--top as-panel--right as-bg--ui-01">
+        <div class="as-panel as-panel--vertical as-panel--top as-panel--right as-bg--ui-01" style="overflow: visible;">
           <div class="as-panel__element as-p--16 as-body" style="max-width: fit-content; padding-bottom: 0px;">
             <p id="errorContainer" class="as-color--error"></p>
             <p>
@@ -39,7 +39,7 @@
             </p>
             <p>
               <span class="as-caption">Limit</span>
-              <input id="limit" class="as-input" type="number" value="10" />
+              <input id="limit" class="as-input" type="number" value="5" />
             </p>
             <p>
               <span class="as-caption">Operation</span>
@@ -56,9 +56,11 @@
         </div>
         <div class="as-panel as-panel--vertical as-panel--top as-panel--left as-bg--ui-01">
           <div class="as-panel__element as-p--16 as-body" style="max-width: fit-content; padding-top: 0px;">
-            <as-category-widget id="category-widget-global" class="as-p--16" heading="Cities (global)">
+            <as-category-widget id="category-widget-remote" class="as-p--16" heading="Cities (remote)">
             </as-category-widget>
-            <as-category-widget id="category-widget-non-precise" class="as-p--16" heading="Cities (non-precise)">
+            <as-category-widget id="category-widget-remote-filtered" class="as-p--16" heading="Cities (remote-filtered)">
+            </as-category-widget>
+            <as-category-widget id="category-widget-local" class="as-p--16" heading="Cities (local)">
             </as-category-widget>
           </div>
         </div>
@@ -81,11 +83,15 @@
       { text: 'MIN', value: 'min' }
     ];
     const widgetRemoteElement = document.getElementById(
-      'category-widget-global'
+      'category-widget-remote'
+      );
+    const widgetRemoteFilteredElement = document.getElementById(
+      'category-widget-remote-filtered'
       );
     const errorContainer = document.getElementById('errorContainer');
 
     let categoryRemote;
+    let categoryRemoteFiltered;
     let categoryLocal;
 
     async function initialize() {
@@ -100,35 +106,51 @@
         'continent',
         { operation: 'count', operationColumn: 'pop_est', mode: 'remote' }
       );
+      categoryRemoteFiltered = new carto.dataview.Category(
+        countriesLayer,
+        'continent',
+        { operation: 'count', operationColumn: 'pop_est', mode: 'remote-filtered' }
+      );
       categoryLocal = new carto.dataview.Category(
         countriesLayer,
         'continent',
         { operation: 'count', operationColumn: 'pop_est', mode: 'local' }
       );
 
-      new carto.widget.CategoryWidget('#category-widget-global', categoryRemote);
-      new carto.widget.CategoryWidget('#category-widget-non-precise', categoryLocal);
+      new carto.widget.CategoryWidget('#category-widget-remote', categoryRemote);
+      new carto.widget.CategoryWidget('#category-widget-remote-filtered', categoryRemoteFiltered);
+      new carto.widget.CategoryWidget('#category-widget-local', categoryLocal);
 
       // bind events
       categoryRemote.on('dataUpdate', async () => {
         widgetRemoteElement.isLoading = 'false';
       });
-
       categoryRemote.on('error', ([error]) => {
         errorContainer.innerHTML = error.message;
         widgetRemoteElement.isLoading = 'false';
       });
+
+      categoryRemoteFiltered.on('dataUpdate', async () => {
+        widgetRemoteFilteredElement.isLoading = 'false';
+      });
+      categoryRemoteFiltered.on('error', ([error]) => {
+        errorContainer.innerHTML = error.message;
+        widgetRemoteFilteredElement.isLoading = 'false';
+      });
+
+      applyChanges();
     }
 
     function applyChanges() {
       const operation = operationElem.selectedOption;
       const column = document.getElementById('column').value;
-      const limit = document.getElementById('limit').value;
+      const limit = Number.parseInt(document.getElementById('limit').value);
       const operationColumn = document.getElementById('operationColumn')
         .value;
 
       errorContainer.innerHTML = '';
       widgetRemoteElement.isLoading = 'true';
+      widgetRemoteFilteredElement.isLoading = 'true';
 
       categoryLocal.column = column;
       categoryLocal.operationColumn = operationColumn;
@@ -139,6 +161,11 @@
       categoryRemote.operationColumn = operationColumn;
       categoryRemote.operation = operation;
       categoryRemote.limit = limit;
+
+      categoryRemoteFiltered.column = column;
+      categoryRemoteFiltered.operationColumn = operationColumn;
+      categoryRemoteFiltered.operation = operation;
+      categoryRemoteFiltered.limit = limit;
     }
 
     initialize();
