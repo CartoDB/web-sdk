@@ -78,7 +78,11 @@ export class Client {
    * @param layergroup
    * @param options
    */
-  public async dataview(layergroup: any, dataview: string, categories?: number) {
+  public async dataview(
+    layergroup: any,
+    dataview: string,
+    dataViewOptions?: Partial<MapDataviewsOptions>
+  ) {
     const {
       metadata: {
         dataviews: {
@@ -89,9 +93,21 @@ export class Client {
 
     const parameters = [encodeParameter('api_key', this._credentials.apiKey)];
 
-    if (categories) {
-      const encodedCategories = encodeParameter('categories', categories.toString());
-      parameters.push(encodedCategories);
+    if (dataViewOptions) {
+      Object.entries(dataViewOptions).forEach(([option, value]) => {
+        let optionToEncode;
+
+        if (option === 'bbox') {
+          optionToEncode = (value as number[])?.join(',');
+        } else {
+          optionToEncode = value?.toString();
+        }
+
+        if (optionToEncode) {
+          const encodedOption = encodeParameter(option, optionToEncode);
+          parameters.push(encodedOption);
+        }
+      });
     }
 
     const getUrl = `${url.https}?${parameters.join('&')}`;
@@ -262,4 +278,53 @@ export interface MapInstance {
       };
     };
   };
+}
+
+export interface MapDataviewsOptions {
+  /**
+   * column name to aggregate by
+   */
+  column: string;
+
+  /**
+   * operation to perform
+   */
+  aggregation: AggregationType;
+
+  /**
+   * operation to perform
+   */
+  operation: AggregationType;
+
+  /**
+   * The num of categories
+   */
+  limit?: number;
+
+  /**
+   * Column value to aggregate.
+   * This param is required when
+   * `aggregation` is different than "count"
+   */
+  operationColumn?: string;
+
+  /**
+   * [Maps API parameter name]
+   * Same as operationColumn but this is the
+   * name which is used by Maps API as parameter
+   */
+  aggregationColumn?: string;
+
+  /**
+   * Bounding box to filter data
+   */
+  bbox?: number[];
+}
+export enum AggregationType {
+  COUNT = 'count',
+  AVG = 'avg',
+  MIN = 'min',
+  MAX = 'max',
+  SUM = 'sum',
+  PERCENTILE = 'percentile'
 }

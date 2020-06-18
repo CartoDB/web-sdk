@@ -1,5 +1,5 @@
 import { Credentials } from '../core/Credentials';
-import { Client } from './Client';
+import { Client, AggregationType, MapDataviewsOptions } from './Client';
 
 export class MapsDataviews {
   private _source: string;
@@ -11,22 +11,23 @@ export class MapsDataviews {
   }
 
   public async aggregation(params: Partial<MapDataviewsOptions>): Promise<AggregationResponse> {
-    const { column, aggregation, aggregationColumn, limit } = params;
+    const { column, aggregation, aggregationColumn, limit, bbox } = params;
     const dataviewName = `${this._source}_${Date.now()}`;
 
     const layergroup = await this._createMapWithDataviews(dataviewName, 'aggregation', {
       column,
       aggregation,
-      aggregationColumn
+      aggregationColumn,
+      bbox
     });
 
-    const aggregationResponse = this._mapClient.dataview(layergroup, dataviewName, limit);
+    const aggregationResponse = this._mapClient.dataview(layergroup, dataviewName, { limit });
 
     return (aggregationResponse as unknown) as AggregationResponse;
   }
 
   public async formula(params: FormulaParameters) {
-    const { column, operation } = params;
+    const { column, operation, bbox } = params;
 
     const dataviewName = `${this._source}_${Date.now()}`;
     const layergroup = await this._createMapWithDataviews(dataviewName, 'formula', {
@@ -34,7 +35,7 @@ export class MapsDataviews {
       column
     });
 
-    const formulaResponse = this._mapClient.dataview(layergroup, dataviewName);
+    const formulaResponse = this._mapClient.dataview(layergroup, dataviewName, { bbox });
 
     return (formulaResponse as unknown) as FormulaResponse;
   }
@@ -93,42 +94,6 @@ export interface AggregationCategory {
   value: number;
 }
 
-interface MapDataviewsOptions {
-  /**
-   * column name to aggregate by
-   */
-  column: string;
-
-  /**
-   * operation to perform
-   */
-  aggregation: AggregationType;
-
-  /**
-   * operation to perform
-   */
-  operation: AggregationType;
-
-  /**
-   * The num of categories
-   */
-  limit?: number;
-
-  /**
-   * Column value to aggregate.
-   * This param is required when
-   * `aggregation` is different than "count"
-   */
-  operationColumn?: string;
-
-  /**
-   * [Maps API parameter name]
-   * Same as operationColumn but this is the
-   * name which is used by Maps API as parameter
-   */
-  aggregationColumn?: string;
-}
-
 interface FormulaParameters {
   /**
    * column name to aggregate by
@@ -139,13 +104,9 @@ interface FormulaParameters {
    * operation to perform
    */
   operation: AggregationType;
-}
 
-export enum AggregationType {
-  COUNT = 'count',
-  AVG = 'avg',
-  MIN = 'min',
-  MAX = 'max',
-  SUM = 'sum',
-  PERCENTILE = 'percentile'
+  /**
+   * Bbox of the data
+   */
+  bbox?: number[];
 }

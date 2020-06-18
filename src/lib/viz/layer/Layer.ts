@@ -46,7 +46,9 @@ export class Layer extends WithEvents implements StyledLayer {
   private _pickableEventsCount = 0;
   private _fields: StatFields;
 
-  private filtersCollection = new FiltersCollection(FunctionFilterApplicator);
+  private filtersCollection = new FiltersCollection<ColumnFilters, FunctionFilterApplicator>(
+    FunctionFilterApplicator
+  );
 
   constructor(
     source: string | Source,
