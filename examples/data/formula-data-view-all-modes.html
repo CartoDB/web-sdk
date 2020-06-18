@@ -101,6 +101,30 @@
     >
       <section class="as-body">
         <div>
+          <as-widget-header header="World commerce (viewport)" subheader="Sum of GDP">
+          </as-widget-header>
+          <p
+            id="formula-viewport"
+            class="as-title as-m--4 as-p--0 as-font--medium"
+            id="layer0_widget0-value"
+          ></p>
+        </div>
+      </section>
+    </div>
+    <div
+      class="as-box"
+      style="
+        position: absolute;
+        left: 10px;
+        top: 250px;
+        height: 110px;
+        width: 250px;
+        padding: 16px;
+        background-color: #fff;
+      "
+    >
+      <section class="as-body">
+        <div>
           <as-widget-header header="World commerce (non-precise)" subheader="Sum of GDP">
           </as-widget-header>
           <p
@@ -130,10 +154,12 @@
         { text: 'MIN', value: 'min' }
       ];
       const formulaGlobalElement = document.getElementById('formula-global');
+      const formulaViewportElement = document.getElementById('formula-viewport');
       const formulaNonPreciseElement = document.getElementById('formula-non-precise');
       const errorContainer = document.getElementById('errorContainer');
 
       let formulaGlobal;
+      let formulaViewport;
       let formulaNonPrecise;
 
       async function initialize() {
@@ -147,6 +173,10 @@
           operation: 'sum',
           mode: 'global'
         });
+        formulaViewport = new carto.dataview.Formula(countriesLayer, 'gdp', {
+          operation: 'sum',
+          mode: 'viewport'
+        });
         formulaNonPrecise = new carto.dataview.Formula(countriesLayer, 'gdp', {
           operation: 'sum',
           mode: 'non-precise'
@@ -155,6 +185,8 @@
         // intializes the widgets
         const globalData = await formulaGlobal.getData();
         formulaGlobalElement.innerHTML = d3.format('.4s')(globalData.result);
+        const viewportData = await formulaViewport.getData();
+        formulaViewportElement.innerHTML = d3.format('.4s')(viewportData.result);
         const nonPreciseData = await formulaNonPrecise.getData();
         formulaNonPreciseElement.innerHTML = d3.format('.4s')(nonPreciseData.result);
 
@@ -164,6 +196,15 @@
         });
 
         // bind events
+        formulaViewport.on('dataUpdate', async () => {
+          const data = await formulaViewport.getData();
+          formulaViewportElement.innerHTML = d3.format('.4s')(data.result);
+        });
+
+        formulaViewport.on('error', ([error]) => {
+          errorContainer.innerHTML = error.message;
+        });
+
         formulaGlobal.on('dataUpdate', async () => {
           const data = await formulaGlobal.getData();
           formulaGlobalElement.innerHTML = d3.format('.4s')(data.result);
@@ -182,6 +223,9 @@
 
         formulaGlobal.column = column;
         formulaGlobal.operation = operation;
+
+        formulaViewport.column = column;
+        formulaViewport.operation = operation;
 
         formulaNonPrecise.column = column;
         formulaNonPrecise.operation = operation;
