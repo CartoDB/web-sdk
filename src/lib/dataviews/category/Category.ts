@@ -1,4 +1,5 @@
 import { Layer, Source } from '@/viz';
+import { spatialFilter } from '@/viz/filters/types';
 import { DataViewLocal } from '../mode/DataViewLocal';
 import { DataViewRemote } from '../mode/DataViewRemote';
 import { DataViewModeAlias } from '../mode/DataViewModeBase';
@@ -26,7 +27,8 @@ export class Category extends DataViewWrapperBase {
       }
 
       default: {
-        dataView = new DataViewRemote(dataSource as Source, column);
+        dataView = new DataViewRemote(dataSource as Layer, column);
+        dataView.addFilter(`VIEWPORT_FILTER_${Date.now()}`, spatialFilter.VIEWPORT);
         break;
       }
     }

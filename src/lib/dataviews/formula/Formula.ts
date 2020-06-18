@@ -28,7 +28,7 @@ export class Formula extends DataViewWrapperBase {
       }
 
       default: {
-        dataView = new DataViewRemote(dataSource as Source, column);
+        dataView = new DataViewRemote(dataSource as Layer, column);
         dataView.addFilter(`VIEWPORT_FILTER_${Date.now()}`, spatialFilter.VIEWPORT);
         break;
       }

@@ -11,17 +11,19 @@ export class MapsDataviews {
   }
 
   public async aggregation(params: Partial<MapDataviewsOptions>): Promise<AggregationResponse> {
-    const { column, aggregation, aggregationColumn, limit, bbox } = params;
+    const { column, aggregation, aggregationColumn, categories, bbox } = params;
     const dataviewName = `${this._source}_${Date.now()}`;
 
     const layergroup = await this._createMapWithDataviews(dataviewName, 'aggregation', {
       column,
       aggregation,
-      aggregationColumn,
-      bbox
+      aggregationColumn
     });
 
-    const aggregationResponse = this._mapClient.dataview(layergroup, dataviewName, { limit });
+    const aggregationResponse = this._mapClient.dataview(layergroup, dataviewName, {
+      categories,
+      bbox
+    });
 
     return (aggregationResponse as unknown) as AggregationResponse;
   }

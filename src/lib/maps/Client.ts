@@ -299,7 +299,7 @@ export interface MapDataviewsOptions {
   /**
    * The num of categories
    */
-  limit?: number;
+  categories?: number;
 
   /**
    * Column value to aggregate.

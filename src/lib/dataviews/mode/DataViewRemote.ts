@@ -37,7 +37,7 @@ export class DataViewRemote extends DataViewModeBase {
       column: this.column,
       aggregation,
       aggregationColumn: operationColumn,
-      limit,
+      categories: limit,
       bbox
     });
 
