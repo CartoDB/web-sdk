@@ -3,7 +3,7 @@ import { CARTOSource } from '@/viz/sources';
 import { colorBinsStyle } from '@/viz/style/helpers/color-bins-style';
 import { NumericFieldStats } from '@/viz/sources/Source';
 import { Layer } from '../layer/Layer';
-import { getStyles } from '../style';
+import { getStyles, Style } from '../style';
 
 const DEFAULT_DATASET = 'default_dataset';
 
@@ -147,7 +147,7 @@ describe('Layer', () => {
         setProps: null as unknown
       };
       deck.setProps = jest.fn().mockImplementation(props => {
-        deck.props = { ...props };
+        deck.props = { ...deck.props, ...props };
       });
 
       deckInstanceMock = (deck as unknown) as Deck;
@@ -155,6 +155,9 @@ describe('Layer', () => {
       CARTOSource.prototype.init = mockSourceInit;
       CARTOSource.prototype.getProps = mockSourceGetProps;
       CARTOSource.prototype.getMetadata = mockSourceGetMetadata;
+      Layer.prototype.getStyle = jest.fn().mockImplementation(() => {
+        return new Style({});
+      });
     });
 
     afterEach(() => {
@@ -177,7 +180,7 @@ describe('Layer', () => {
       expect(mockSourceInit).toHaveBeenCalledTimes(1);
 
       const styleWithNewColumn = colorBinsStyle('attributeName');
-      layer.setStyle(styleWithNewColumn);
+      await layer.setStyle(styleWithNewColumn);
       expect(mockSourceInit).toHaveBeenCalledTimes(2);
     });
 
@@ -186,15 +189,10 @@ describe('Layer', () => {
       const layer = new Layer(source);
 
       const styleWithNewColumn = colorBinsStyle('attributeName');
-      layer.setStyle(styleWithNewColumn);
+      await layer.setStyle(styleWithNewColumn);
       expect(mockSourceInit).toHaveBeenCalledTimes(0);
 
-      await layer.addTo(deckInstanceMock).catch(err => {
-        // catching this error is better than mocking everything
-        if (err.message !== "Cannot read property 'sample' of undefined") {
-          throw err;
-        }
-      });
+      await layer.addTo(deckInstanceMock);
       expect(mockSourceInit).toHaveBeenCalledTimes(1);
     });
 
@@ -206,12 +204,12 @@ describe('Layer', () => {
 
       source.isInitialized = true;
 
-      layer.setPopupClick(['fake_column']);
+      await layer.setPopupClick(['fake_column']);
       expect(mockSourceInit).toHaveBeenCalledTimes(2);
 
       source.isInitialized = true;
 
-      layer.setPopupHover(['another_fake_column']);
+      await layer.setPopupHover(['another_fake_column']);
       expect(mockSourceInit).toHaveBeenCalledTimes(3);
     });
 
@@ -219,7 +217,7 @@ describe('Layer', () => {
       const source = new CARTOSource(DEFAULT_DATASET);
       const layer = new Layer(source);
 
-      layer.setPopupClick(['fake_column']);
+      await layer.setPopupClick(['fake_column']);
       expect(mockSourceInit).toHaveBeenCalledTimes(0);
 
       await layer.addTo(deckInstanceMock);
