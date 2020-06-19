@@ -1,11 +1,11 @@
 import { Layer, Source } from '@/viz';
 import { DataViewLocal } from '../mode/DataViewLocal';
 import { DataViewRemote } from '../mode/DataViewRemote';
-import { DataViewModeAlias } from '../mode/DataViewModeBase';
-import { DataViewWrapperBase } from '../DataViewWrapperBase';
+import { DataViewModeAlias } from '../mode/DataViewMode';
+import { DataViewWrapper } from '../DataViewWrapper';
 import { CategoryOptions, CategoryImpl } from './CategoryImpl';
 
-export class Category extends DataViewWrapperBase {
+export class Category extends DataViewWrapper {
   protected buildImpl(dataSource: Layer | Source, column: string, options: CategoryOptions) {
     let dataView;
     const { mode } = options;

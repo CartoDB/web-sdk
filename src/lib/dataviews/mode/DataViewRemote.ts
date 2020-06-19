@@ -1,10 +1,10 @@
 import { MapsDataviews as DataviewsApi, AggregationType } from '@/maps/MapsDataviews';
 import { defaultCredentials } from '@/core/Credentials';
 import { Source, CARTOSource } from '@/viz';
-import { DataViewModeBase } from './DataViewModeBase';
+import { DataViewMode } from './DataViewMode';
 import { CartoDataViewError, dataViewErrorTypes } from '../DataViewError';
 
-export class DataViewRemote extends DataViewModeBase {
+export class DataViewRemote extends DataViewMode {
   protected dataviewsApi: DataviewsApi;
 
   constructor(dataSource: Source, column: string, credentials = defaultCredentials) {

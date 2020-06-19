@@ -2,7 +2,7 @@ import { Layer } from '../../viz/layer/Layer';
 import { Formula } from './Formula';
 import { AggregationType } from '../../data/operations/aggregation/aggregation';
 import { CartoDataViewError, dataViewErrorTypes } from '../DataViewError';
-import { DataViewModeAlias } from '../mode/DataViewModeBase';
+import { DataViewModeAlias } from '../mode/DataViewMode';
 
 describe('Formula', () => {
   describe('Instance Creation', () => {

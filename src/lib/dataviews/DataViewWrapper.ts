@@ -2,13 +2,13 @@ import { WithEvents } from '@/core/mixins/WithEvents';
 import { Layer, Source } from '@/viz';
 import { Filter } from '@/viz/filters/types';
 import { AggregationType } from '@/maps/MapsDataviews';
-import { DataViewImplBase } from './DataViewImplBase';
-import { DataViewModeBase, DataViewModeAlias } from './mode/DataViewModeBase';
+import { DataViewImpl } from './DataViewImpl';
+import { DataViewMode, DataViewModeAlias } from './mode/DataViewMode';
 
 const OPTION_CHANGED_DELAY = 100;
 
-export abstract class DataViewWrapperBase extends WithEvents {
-  protected dataviewImpl!: DataViewImplBase<DataViewModeBase>;
+export abstract class DataViewWrapper extends WithEvents {
+  protected dataviewImpl!: DataViewImpl<DataViewMode>;
 
   /**
    * optionChanged timeout to prevent multiple

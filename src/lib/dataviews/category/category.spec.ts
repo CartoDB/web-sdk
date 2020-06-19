@@ -2,7 +2,7 @@ import { Layer } from '../../viz/layer/Layer';
 import { Category } from './Category';
 import { AggregationType } from '../../data/operations/aggregation/aggregation';
 import { CartoDataViewError, dataViewErrorTypes } from '../DataViewError';
-import { DataViewModeAlias } from '../mode/DataViewModeBase';
+import { DataViewModeAlias } from '../mode/DataViewMode';
 
 describe('DataView', () => {
   describe('Instance Creation', () => {
