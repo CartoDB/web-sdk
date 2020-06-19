@@ -28,7 +28,7 @@ export class GeoJsonSource extends Source {
   private _props?: GeoJsonSourceProps;
   private _numericFieldValues: Record<string, number[]>;
   private _categoryFieldValues: Record<string, string[]>;
-  private _fields: Set<string>;
+  private _fields: StatFields;
 
   constructor(geojson: GeoJSON) {
     const id = `geojson-${uuidv4()}`;
@@ -38,7 +38,7 @@ export class GeoJsonSource extends Source {
     this._geojson = geojson;
     this._numericFieldValues = {};
     this._categoryFieldValues = {};
-    this._fields = new Set();
+    this._fields = { sample: new Set(), aggregation: new Set() };
   }
 
   public getProps(): GeoJsonSourceProps {
@@ -76,7 +76,7 @@ export class GeoJsonSource extends Source {
   private _buildMetadata(fields: StatFields) {
     const geometryType = getGeomType(this._geojson);
 
-    this._fields = new Set([...fields.sample, ...fields.aggregation]);
+    this._fields = fields;
     const stats = this._getStats();
 
     return { geometryType, stats };
@@ -85,7 +85,7 @@ export class GeoJsonSource extends Source {
   private _getStats(): (NumericFieldStats | CategoryFieldStats)[] {
     let stats: (NumericFieldStats | CategoryFieldStats)[] = [];
 
-    const fields = [...this._fields];
+    const fields = [...new Set([...this._fields.sample, ...this._fields.aggregation])];
 
     if (!fields.length) {
       return stats;

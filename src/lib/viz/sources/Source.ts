@@ -80,15 +80,28 @@ export abstract class Source extends WithEvents {
   }
 }
 
-function getNewFields(newFields: StatFields, currentFields: Set<string>) {
-  const newFieldsSet = new Set([...newFields.sample, ...newFields.aggregation]);
-  return [...newFieldsSet].filter(f => !currentFields.has(f));
+function getNewFields(newFields: StatFields, currentFields: StatFields): StatFields {
+  const newSampleFields = new Set([...newFields.sample].filter(f => !currentFields.sample.has(f)));
+
+  const newAggregationFields = new Set(
+    [...newFields.aggregation].filter(f => !currentFields.aggregation.has(f))
+  );
+
+  return {
+    sample: newSampleFields,
+    aggregation: newAggregationFields
+  };
 }
 
 export function shouldInitialize(
   isInitialized: boolean,
   newFields: StatFields,
-  currentFields: Set<string>
+  currentFields: StatFields
 ): boolean {
-  return !isInitialized || !!getNewFields(newFields, currentFields).length;
+  if (!isInitialized) {
+    return true;
+  }
+
+  const difference = getNewFields(newFields, currentFields);
+  return difference.sample.size > 0 || difference.aggregation.size > 0;
 }

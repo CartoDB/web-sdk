@@ -51,7 +51,7 @@ export class CARTOSource extends Source {
   private _props?: CARTOSourceProps;
   private _mapConfig: MapOptions;
   private _metadata?: SourceMetadata;
-  private _fields: Set<string>;
+  private _fields: StatFields;
 
   constructor(source: string, options: SourceOptions = {}) {
     const { mapOptions = {}, credentials = defaultCredentials } = options;
@@ -68,7 +68,7 @@ export class CARTOSource extends Source {
     this._value = source;
     this._credentials = credentials;
     const sourceOpts = { [this._type]: source };
-    this._fields = new Set();
+    this._fields = { sample: new Set(), aggregation: new Set() };
 
     // Set Map Config
     this._mapConfig = {
@@ -122,7 +122,7 @@ export class CARTOSource extends Source {
     return this._metadata;
   }
 
-  private _initConfigForStats(fields: StatFields) {
+  private _initConfigForStats() {
     if (this._mapConfig.metadata === undefined) {
       throw new SourceError('Map Config has not metadata field');
     }
@@ -137,11 +137,11 @@ export class CARTOSource extends Source {
 
     this._mapConfig.metadata.sample = {
       num_rows: 1000,
-      include_columns: [...fields.sample]
+      include_columns: [...this._fields.sample]
     };
 
     const dimensions: Record<string, { column: string }> = {};
-    fields.aggregation.forEach(field => {
+    this._fields.aggregation.forEach(field => {
       dimensions[field] = { column: field };
     });
 
@@ -159,6 +159,8 @@ export class CARTOSource extends Source {
    * @param fields
    */
   public async init(fields: StatFields): Promise<boolean> {
+    console.log('init', shouldInitialize(this.isInitialized, fields, this._fields));
+
     if (!shouldInitialize(this.isInitialized, fields, this._fields)) {
       return true;
     }
@@ -167,10 +169,8 @@ export class CARTOSource extends Source {
       console.warn('CARTOSource reinitialized');
     }
 
-    if (fields.sample.size || fields.aggregation.size) {
-      this._fields = new Set([...fields.sample, ...fields.aggregation]);
-      this._initConfigForStats(fields);
-    }
+    this._fields = fields;
+    this._initConfigForStats();
 
     const mapsClient = new Client(this._credentials);
     const mapInstance: MapInstance = await mapsClient.instantiateMapFrom(this._mapConfig);
