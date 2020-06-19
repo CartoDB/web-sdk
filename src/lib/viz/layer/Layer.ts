@@ -167,10 +167,10 @@ export class Layer extends WithEvents implements StyledLayer {
 
       if (!this._options.pickable) {
         this._options.pickable = true;
+      }
 
-        if (this._deckLayer) {
-          await this.replaceDeckGLLayer();
-        }
+      if (this._deckLayer) {
+        await this.replaceDeckGLLayer();
       }
     }
 
