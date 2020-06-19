@@ -159,8 +159,6 @@ export class CARTOSource extends Source {
    * @param fields
    */
   public async init(fields: StatFields): Promise<boolean> {
-    console.log('init', shouldInitialize(this.isInitialized, fields, this._fields));
-
     if (!shouldInitialize(this.isInitialized, fields, this._fields)) {
       return true;
     }
@@ -169,7 +167,7 @@ export class CARTOSource extends Source {
       console.warn('CARTOSource reinitialized');
     }
 
-    this._fields = fields;
+    this._saveFields(fields);
     this._initConfigForStats();
 
     const mapsClient = new Client(this._credentials);
@@ -181,6 +179,11 @@ export class CARTOSource extends Source {
 
     this.isInitialized = true;
     return this.isInitialized;
+  }
+
+  private _saveFields(fields: StatFields) {
+    this._fields.sample = new Set([...fields.sample]);
+    this._fields.aggregation = new Set([...fields.aggregation]);
   }
 }
 

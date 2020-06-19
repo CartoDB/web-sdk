@@ -71,7 +71,8 @@ export class Layer extends WithEvents implements StyledLayer {
     };
 
     this._interactivity = this._buildInteractivity(options);
-    this._fields = this._buildFields();
+    this._fields = { sample: new Set(), aggregation: new Set() };
+    this._addStyleFields();
   }
 
   getMapInstance(): Deck {
@@ -105,7 +106,7 @@ export class Layer extends WithEvents implements StyledLayer {
    */
   public async setStyle(style: Style) {
     this._style = buildStyle(style);
-    this._fields = this._buildFields();
+    this._addStyleFields();
 
     if (this._deckLayer) {
       await this.replaceDeckGLLayer();
@@ -408,21 +409,15 @@ export class Layer extends WithEvents implements StyledLayer {
     return Promise.resolve();
   }
 
-  private _buildFields(): StatFields {
-    const sample: Set<string> = new Set();
-    const aggregation: Set<string> = new Set();
-    const fields = { sample, aggregation };
-
+  private _addStyleFields() {
     if (this._style && this._style.field) {
       const { field } = this._style;
-      fields.sample.add(field);
+      this._fields.sample.add(field);
 
       if (field !== DEFAULT_ID_PROPERTY) {
-        fields.aggregation.add(field);
+        this._fields.aggregation.add(field);
       }
     }
-
-    return fields;
   }
 
   private _addPopupFields(elements: PopupElement[] | string[] | null = []) {
