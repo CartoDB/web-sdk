@@ -10,7 +10,13 @@ export class DataViewRemote extends DataViewMode {
   constructor(dataSource: Source, column: string, credentials = defaultCredentials) {
     super(dataSource, column);
 
-    // TODO what about the other sources?
+    if (!(dataSource instanceof CARTOSource)) {
+      throw new CartoDataViewError(
+        'The provided source has to be an instance of CARTOSource',
+        dataViewErrorTypes.PROPERTY_INVALID
+      );
+    }
+
     const dataset = (dataSource as CARTOSource).value;
     this.dataviewsApi = new DataviewsApi(dataset, credentials);
 
