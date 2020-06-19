@@ -325,25 +325,13 @@ export class Layer extends WithEvents implements StyledLayer {
    * user clicks on one or more features of the layer.
    */
   public async setPopupClick(elements: PopupElement[] | string[] | null = []) {
-    this._interactivity.setPopupClick(elements);
     this._addPopupFields(elements);
-
-    if (this._deckLayer) {
-      return this.replaceDeckGLLayer();
-    }
-
-    return Promise.resolve();
+    await this._interactivity.setPopupClick(elements);
   }
 
   public async setPopupHover(elements: PopupElement[] | string[] | null = []) {
-    this._interactivity.setPopupHover(elements);
     this._addPopupFields(elements);
-
-    if (this._deckLayer) {
-      return this.replaceDeckGLLayer();
-    }
-
-    return Promise.resolve();
+    await this._interactivity.setPopupHover(elements);
   }
 
   public remove() {
