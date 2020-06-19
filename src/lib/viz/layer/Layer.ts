@@ -206,9 +206,9 @@ export class Layer extends WithEvents implements StyledLayer {
   /**
    * Method to create the Deck.gl layer
    */
-  public async _createDeckGLLayer() {
+  public async _createDeckGLLayer(forceInit = false) {
     // The first step is to initialize the source to get the geometryType and the stats
-    if (!this._source.isInitialized) {
+    if (!this._source.isInitialized || forceInit) {
       await this._source.init(this._fields);
     }
 
@@ -296,7 +296,7 @@ export class Layer extends WithEvents implements StyledLayer {
       );
 
       const updatedLayers = [...otherDeckLayers];
-      const newLayer = await this._createDeckGLLayer();
+      const newLayer = await this._createDeckGLLayer(true);
       updatedLayers.splice(originalPosition, 0, newLayer);
 
       this._deckInstance.setProps({
@@ -328,18 +328,22 @@ export class Layer extends WithEvents implements StyledLayer {
     this._interactivity.setPopupClick(elements);
     this._addPopupFields(elements);
 
-    if (this._source.isInitialized) {
-      await this._source.init(this._fields);
+    if (this._deckLayer) {
+      return this.replaceDeckGLLayer();
     }
+
+    return Promise.resolve();
   }
 
   public async setPopupHover(elements: PopupElement[] | string[] | null = []) {
     this._interactivity.setPopupHover(elements);
     this._addPopupFields(elements);
 
-    if (this._source.isInitialized) {
-      await this._source.init(this._fields);
+    if (this._deckLayer) {
+      return this.replaceDeckGLLayer();
     }
+
+    return Promise.resolve();
   }
 
   public remove() {
