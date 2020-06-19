@@ -7,13 +7,9 @@ import { DataViewWrapperBase } from '../DataViewWrapperBase';
 import { FormulaImpl } from './FormulaImpl';
 
 export class Formula extends DataViewWrapperBase {
-  protected buildImpl(
-    dataSource: Layer | Source,
-    column: string,
-    options: FormulaDataViewOptions,
-    mode: DataViewModeAlias
-  ) {
+  protected buildImpl(dataSource: Layer | Source, column: string, options: FormulaDataViewOptions) {
     let dataView;
+    const { mode } = options;
 
     switch (mode) {
       case DataViewModeAlias.LOCAL: {

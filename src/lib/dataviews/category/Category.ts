@@ -6,13 +6,9 @@ import { DataViewWrapperBase } from '../DataViewWrapperBase';
 import { CategoryOptions, CategoryImpl } from './CategoryImpl';
 
 export class Category extends DataViewWrapperBase {
-  protected buildImpl(
-    dataSource: Layer | Source,
-    column: string,
-    options: CategoryOptions,
-    mode: DataViewModeAlias
-  ) {
+  protected buildImpl(dataSource: Layer | Source, column: string, options: CategoryOptions) {
     let dataView;
+    const { mode } = options;
 
     switch (mode) {
       case DataViewModeAlias.LOCAL: {
