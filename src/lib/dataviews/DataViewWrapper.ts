@@ -22,7 +22,7 @@ export abstract class DataViewWrapper extends WithEvents {
     super();
 
     this.buildImpl(dataSource, column, {
-      mode: DataViewModeAlias.REMOTE_FILTERED,
+      mode: DataViewModeAlias.REMOTE,
       ...options
     });
 
