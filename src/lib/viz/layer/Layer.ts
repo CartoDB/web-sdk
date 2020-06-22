@@ -269,7 +269,7 @@ export class Layer extends WithEvents implements StyledLayer {
           styleProperties.onViewportLoad(...args);
         }
 
-        this.emit('viewportLoad', args);
+        this.emit('viewportLoad');
       },
       onClick: this._interactivity.onClick.bind(this._interactivity),
       onHover: this._interactivity.onHover.bind(this._interactivity)
