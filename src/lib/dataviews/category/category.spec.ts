@@ -2,7 +2,7 @@ import { Layer } from '../../viz/layer/Layer';
 import { Category } from './Category';
 import { AggregationType } from '../../data/operations/aggregation/aggregation';
 import { CartoDataViewError, dataViewErrorTypes } from '../DataViewError';
-import { DataViewModeAlias } from '../mode/DataViewMode';
+import { DataViewCalculation } from '../mode/DataViewMode';
 
 describe('DataView', () => {
   describe('Instance Creation', () => {
@@ -12,7 +12,7 @@ describe('DataView', () => {
           new Category(new Layer('fake_source'), 'fake_column', {
             operation: AggregationType.AVG,
             operationColumn: 'popEst',
-            mode: DataViewModeAlias.LOCAL
+            mode: DataViewCalculation.LOCAL
           })
       ).not.toThrow();
     });
@@ -23,7 +23,7 @@ describe('DataView', () => {
           new Category(new Layer('fake_source'), 'fake_column', {
             operation: undefined as never,
             operationColumn: 'fake_operation_column',
-            mode: DataViewModeAlias.LOCAL
+            mode: DataViewCalculation.LOCAL
           })
       ).toThrow(
         new CartoDataViewError(
@@ -39,7 +39,7 @@ describe('DataView', () => {
           new Category(new Layer('fake_source'), 'fake_column', {
             operation: AggregationType.AVG,
             operationColumn: undefined as never,
-            mode: DataViewModeAlias.LOCAL
+            mode: DataViewCalculation.LOCAL
           })
       ).toThrow(
         new CartoDataViewError(
@@ -66,7 +66,7 @@ describe('DataView', () => {
       const dataView = new Category(layer, 'country', {
         operation: AggregationType.AVG,
         operationColumn: 'popEst',
-        mode: DataViewModeAlias.LOCAL
+        mode: DataViewCalculation.LOCAL
       });
 
       expect(await dataView.getData()).toMatchObject({

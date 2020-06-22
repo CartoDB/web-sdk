@@ -1,5 +1,5 @@
 import { AggregationType } from '../../data/operations/aggregation/aggregation';
-import { DataViewMode, DataViewModeAlias, DataViewData } from '../mode/DataViewMode';
+import { DataViewMode, DataViewCalculation, DataViewData } from '../mode/DataViewMode';
 import { DataViewImpl } from '../DataViewImpl';
 import { CartoDataViewError, dataViewErrorTypes } from '../DataViewError';
 
@@ -49,7 +49,7 @@ export interface CategoryOptions {
   limit?: number;
   operation: AggregationType;
   operationColumn: string;
-  mode?: DataViewModeAlias;
+  mode?: DataViewCalculation;
 }
 
 export interface CategoryData {

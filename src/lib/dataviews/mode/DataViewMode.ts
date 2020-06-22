@@ -64,7 +64,7 @@ export interface DataViewData {
   nullCount: number;
 }
 
-export enum DataViewModeAlias {
+export enum DataViewCalculation {
   REMOTE = 'remote',
   LOCAL = 'local',
   REMOTE_FILTERED = 'remote-filtered'
