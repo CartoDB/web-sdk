@@ -2,7 +2,7 @@ import { Layer } from '../../viz/layer/Layer';
 import { Category } from './Category';
 import { AggregationType } from '../../data/operations/aggregation/aggregation';
 import { CartoDataViewError, dataViewErrorTypes } from '../DataViewError';
-import { DataViewModeAlias } from '../mode/DataViewModeBase';
+import { DataViewModeAlias } from '../mode/DataViewMode';
 
 describe('DataView', () => {
   describe('Instance Creation', () => {
@@ -11,7 +11,8 @@ describe('DataView', () => {
         () =>
           new Category(new Layer('fake_source'), 'fake_column', {
             operation: AggregationType.AVG,
-            operationColumn: 'popEst'
+            operationColumn: 'popEst',
+            mode: DataViewModeAlias.LOCAL
           })
       ).not.toThrow();
     });
@@ -21,7 +22,8 @@ describe('DataView', () => {
         () =>
           new Category(new Layer('fake_source'), 'fake_column', {
             operation: undefined as never,
-            operationColumn: 'fake_operation_column'
+            operationColumn: 'fake_operation_column',
+            mode: DataViewModeAlias.LOCAL
           })
       ).toThrow(
         new CartoDataViewError(

@@ -1,20 +1,16 @@
 import { Layer, Source } from '@/viz';
 import { spatialFilter } from '@/viz/filters/types';
-import { DataViewModeAlias } from '../mode/DataViewModeBase';
+import { DataViewModeAlias } from '../mode/DataViewMode';
 import { AggregationType } from '../../data/operations/aggregation/aggregation';
 import { DataViewLocal } from '../mode/DataViewLocal';
 import { DataViewRemote } from '../mode/DataViewRemote';
-import { DataViewWrapperBase } from '../DataViewWrapperBase';
+import { DataViewWrapper } from '../DataViewWrapper';
 import { FormulaImpl } from './FormulaImpl';
 
-export class Formula extends DataViewWrapperBase {
-  protected buildImpl(
-    dataSource: Layer | Source,
-    column: string,
-    options: FormulaDataViewOptions,
-    mode: DataViewModeAlias
-  ) {
+export class Formula extends DataViewWrapper {
+  protected buildImpl(dataSource: Layer | Source, column: string, options: FormulaDataViewOptions) {
     let dataView;
+    const { mode } = options;
 
     switch (mode) {
       case DataViewModeAlias.LOCAL: {

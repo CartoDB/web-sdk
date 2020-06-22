@@ -5,10 +5,10 @@ import { Source, CARTOSource, Layer } from '@/viz';
 import { Filter, spatialFilter, SpatialFilters } from '@/viz/filters/types';
 import { FiltersCollection } from '@/viz/filters/FiltersCollection';
 import { RemoteFilterApplicator } from '@/viz/filters/RemoteFilterApplicator';
-import { DataViewModeBase } from './DataViewModeBase';
+import { DataViewMode } from './DataViewMode';
 import { CartoDataViewError, dataViewErrorTypes } from '../DataViewError';
 
-export class DataViewRemote extends DataViewModeBase {
+export class DataViewRemote extends DataViewMode {
   protected dataviewsApi: DataviewsApi;
 
   private filtersCollection = new FiltersCollection<SpatialFilters, RemoteFilterApplicator>(

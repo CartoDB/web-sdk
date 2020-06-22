@@ -22,6 +22,3 @@ export {
 
 // Basemap helpers
 export { createGoogleMap, createMap } from './basemap';
-
-// Widgets
-export { Category } from '../widgets';

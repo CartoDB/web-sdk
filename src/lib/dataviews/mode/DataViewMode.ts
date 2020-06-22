@@ -4,7 +4,7 @@ import { Filter } from '@/viz/filters/types';
 import { AggregationType } from '@/data/operations/aggregation/aggregation';
 import { CartoDataViewError, dataViewErrorTypes } from '../DataViewError';
 
-export abstract class DataViewModeBase extends WithEvents {
+export abstract class DataViewMode extends WithEvents {
   protected dataSource: Layer | Source;
   public column: string;
 

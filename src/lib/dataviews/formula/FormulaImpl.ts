@@ -1,8 +1,8 @@
 import { AggregationType } from '../../data/operations/aggregation/aggregation';
-import { DataViewData, DataViewModeBase } from '../mode/DataViewModeBase';
-import { DataViewImplBase } from '../DataViewImplBase';
+import { DataViewData, DataViewMode } from '../mode/DataViewMode';
+import { DataViewImpl } from '../DataViewImpl';
 
-export class FormulaImpl<T extends DataViewModeBase> extends DataViewImplBase<T> {
+export class FormulaImpl<T extends DataViewMode> extends DataViewImpl<T> {
   public async getData(): Promise<Partial<DataViewData>> {
     let formulaResponse;
 

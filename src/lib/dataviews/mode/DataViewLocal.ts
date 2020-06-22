@@ -2,10 +2,10 @@ import { Layer } from '@/viz';
 import { AggregationType, aggregate } from '@/data/operations/aggregation/aggregation';
 import { groupValuesByAnotherColumn } from '@/data/operations/grouping';
 import { castToNumberOrUndefined } from '@/core/utils/number';
-import { DataViewModeBase, DataViewData } from './DataViewModeBase';
+import { DataViewMode, DataViewData } from './DataViewMode';
 import { CartoDataViewError, dataViewErrorTypes } from '../DataViewError';
 
-export class DataViewLocal extends DataViewModeBase {
+export class DataViewLocal extends DataViewMode {
   constructor(dataSource: Layer, column: string) {
     super(dataSource, column);
 
