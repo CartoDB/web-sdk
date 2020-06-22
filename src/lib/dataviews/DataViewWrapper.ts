@@ -4,17 +4,18 @@ import { Filter } from '@/viz/filters/types';
 import { AggregationType } from '@/maps/MapsDataviews';
 import { DataViewImpl } from './DataViewImpl';
 import { DataViewMode, DataViewModeAlias } from './mode/DataViewMode';
+import { debounce } from './utils';
 
-const OPTION_CHANGED_DELAY = 100;
+export const OPTION_CHANGED_DELAY = 100;
 
 export abstract class DataViewWrapper extends WithEvents {
   protected dataviewImpl!: DataViewImpl<DataViewMode>;
 
   /**
-   * optionChanged timeout to prevent multiple
-   * calls when user sets several options in a row
+   * Debounce scope to prevent multiple calls
+   * when options changed in a row
    */
-  private optionChangedTimeoutId?: number;
+  protected setOptionScope: { timeoutId?: number } = {};
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   constructor(dataSource: Layer | Source, column: string, options: any) {
@@ -27,19 +28,6 @@ export abstract class DataViewWrapper extends WithEvents {
 
     // bind events with the mode
     this.bindEvents();
-
-    this.on('optionChanged', () => {
-      // timeout prevents multiple calls to getData
-      // when user sets several options in a row
-      if (this.optionChangedTimeoutId) {
-        window.clearTimeout(this.optionChangedTimeoutId);
-      }
-
-      this.optionChangedTimeoutId = window.setTimeout(
-        () => this.emit('dataUpdate'),
-        OPTION_CHANGED_DELAY
-      );
-    });
   }
 
   public getData() {
@@ -59,8 +47,14 @@ export abstract class DataViewWrapper extends WithEvents {
   }
 
   public set column(column: string) {
-    this.dataviewImpl.column = column;
-    this.emit('optionChanged');
+    debounce(
+      () => {
+        this.dataviewImpl.column = column;
+        this.emit('dataUpdate');
+      },
+      OPTION_CHANGED_DELAY,
+      this.setOptionScope
+    )(column);
   }
 
   public get operation() {
@@ -68,16 +62,18 @@ export abstract class DataViewWrapper extends WithEvents {
   }
 
   public set operation(operation: AggregationType) {
-    this.dataviewImpl.operation = operation;
-    this.emit('optionChanged');
+    debounce(
+      () => {
+        this.dataviewImpl.operation = operation;
+        this.emit('dataUpdate');
+      },
+      OPTION_CHANGED_DELAY,
+      this.setOptionScope
+    )(operation);
   }
 
   private bindEvents() {
     const events = [...this.dataviewImpl.availableEvents];
-
-    if (!events.includes('optionChanged')) {
-      events.push('optionChanged');
-    }
 
     if (!events.includes('dataUpdate')) {
       events.push('dataUpdate');
