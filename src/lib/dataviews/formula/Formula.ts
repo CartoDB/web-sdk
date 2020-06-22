@@ -1,6 +1,6 @@
 import { Layer, Source } from '@/viz';
 import { spatialFilter } from '@/viz/filters/types';
-import { DataViewModeAlias } from '../mode/DataViewMode';
+import { DataViewCalculation } from '../mode/DataViewMode';
 import { AggregationType } from '../../data/operations/aggregation/aggregation';
 import { DataViewLocal } from '../mode/DataViewLocal';
 import { DataViewRemote } from '../mode/DataViewRemote';
@@ -13,12 +13,12 @@ export class Formula extends DataViewWrapper {
     const { mode } = options;
 
     switch (mode) {
-      case DataViewModeAlias.LOCAL: {
+      case DataViewCalculation.LOCAL: {
         dataView = new DataViewLocal(dataSource as Layer, column);
         break;
       }
 
-      case DataViewModeAlias.REMOTE: {
+      case DataViewCalculation.REMOTE: {
         dataView = new DataViewRemote(dataSource as Source, column);
         break;
       }
@@ -36,5 +36,5 @@ export class Formula extends DataViewWrapper {
 
 interface FormulaDataViewOptions {
   operation: AggregationType;
-  mode?: DataViewModeAlias;
+  mode?: DataViewCalculation;
 }

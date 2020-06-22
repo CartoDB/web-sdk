@@ -3,7 +3,7 @@ import { Layer, Source } from '@/viz';
 import { Filter } from '@/viz/filters/types';
 import { AggregationType } from '@/maps/Client';
 import { DataViewImpl } from './DataViewImpl';
-import { DataViewMode, DataViewModeAlias } from './mode/DataViewMode';
+import { DataViewMode, DataViewCalculation } from './mode/DataViewMode';
 import { debounce } from './utils';
 
 export const OPTION_CHANGED_DELAY = 100;
@@ -22,7 +22,7 @@ export abstract class DataViewWrapper extends WithEvents {
     super();
 
     this.buildImpl(dataSource, column, {
-      mode: DataViewModeAlias.REMOTE,
+      mode: DataViewCalculation.REMOTE,
       ...options
     });
 
@@ -88,6 +88,6 @@ export abstract class DataViewWrapper extends WithEvents {
   protected abstract buildImpl(
     dataSource: Layer | Source,
     column: string,
-    options: { mode?: DataViewModeAlias }
+    options: { mode?: DataViewCalculation }
   ): void;
 }

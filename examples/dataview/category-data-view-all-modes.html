@@ -117,9 +117,9 @@
         { operation: 'count', operationColumn: 'pop_est', mode: 'local' }
       );
 
-      new carto.widget.CategoryWidget('#category-widget-remote', categoryRemote);
-      new carto.widget.CategoryWidget('#category-widget-remote-filtered', categoryRemoteFiltered);
-      new carto.widget.CategoryWidget('#category-widget-local', categoryLocal);
+      new carto.widget.Category('#category-widget-remote', categoryRemote);
+      new carto.widget.Category('#category-widget-remote-filtered', categoryRemoteFiltered);
+      new carto.widget.Category('#category-widget-local', categoryLocal);
 
       // bind events
       categoryRemote.on('dataUpdate', async () => {

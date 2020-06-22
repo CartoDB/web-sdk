@@ -2,7 +2,7 @@ import { Layer, Source } from '@/viz';
 import { spatialFilter } from '@/viz/filters/types';
 import { DataViewLocal } from '../mode/DataViewLocal';
 import { DataViewRemote } from '../mode/DataViewRemote';
-import { DataViewModeAlias } from '../mode/DataViewMode';
+import { DataViewCalculation } from '../mode/DataViewMode';
 import { DataViewWrapper, OPTION_CHANGED_DELAY } from '../DataViewWrapper';
 import { CategoryOptions, CategoryImpl } from './CategoryImpl';
 import { debounce } from '../utils';
@@ -13,12 +13,12 @@ export class Category extends DataViewWrapper {
     const { mode } = options;
 
     switch (mode) {
-      case DataViewModeAlias.LOCAL: {
+      case DataViewCalculation.LOCAL: {
         dataView = new DataViewLocal(dataSource as Layer, column);
         break;
       }
 
-      case DataViewModeAlias.REMOTE: {
+      case DataViewCalculation.REMOTE: {
         dataView = new DataViewRemote(dataSource as Source, column);
         break;
       }

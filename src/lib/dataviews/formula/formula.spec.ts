@@ -2,7 +2,7 @@ import { Layer } from '../../viz/layer/Layer';
 import { Formula } from './Formula';
 import { AggregationType } from '../../data/operations/aggregation/aggregation';
 import { CartoDataViewError, dataViewErrorTypes } from '../DataViewError';
-import { DataViewModeAlias } from '../mode/DataViewMode';
+import { DataViewCalculation } from '../mode/DataViewMode';
 
 describe('Formula', () => {
   describe('Instance Creation', () => {
@@ -11,7 +11,7 @@ describe('Formula', () => {
         () =>
           new Formula(new Layer('fake_source'), 'fake_column', {
             operation: AggregationType.AVG,
-            mode: DataViewModeAlias.LOCAL
+            mode: DataViewCalculation.LOCAL
           })
       ).not.toThrow();
     });
@@ -21,7 +21,7 @@ describe('Formula', () => {
         () =>
           new Formula(new Layer('fake_source'), 'fake_column', {
             operation: undefined as never,
-            mode: DataViewModeAlias.LOCAL
+            mode: DataViewCalculation.LOCAL
           })
       ).toThrow(
         new CartoDataViewError(
@@ -51,7 +51,7 @@ describe('Formula', () => {
 
       const dataView = new Formula(layer, 'pop', {
         operation: AggregationType.AVG,
-        mode: DataViewModeAlias.LOCAL
+        mode: DataViewCalculation.LOCAL
       });
 
       expect(await dataView.getData()).toMatchObject({
@@ -76,7 +76,7 @@ describe('Formula', () => {
 
       const dataView = new Formula(layer, 'pop', {
         operation: AggregationType.SUM,
-        mode: DataViewModeAlias.LOCAL
+        mode: DataViewCalculation.LOCAL
       });
 
       try {

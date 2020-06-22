@@ -82,7 +82,7 @@
         const countriesLayer = new carto.viz.Layer('world_commerce');
         await countriesLayer.addTo(deckMap);
 
-        const dataview = new carto.data.FormulaDataView(countriesLayer, 'gdp', {
+        const dataview = new carto.dataview.Formula(countriesLayer, 'gdp', {
           operation: 'sum'
         });
 
