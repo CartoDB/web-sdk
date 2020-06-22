@@ -142,10 +142,19 @@ export class Layer extends WithEvents implements StyledLayer {
     const createdDeckGLLayer = await this._createDeckGLLayer();
 
     // collection may have changed during instantiation...
-    const currentDeckLayers = deckInstance.props.layers;
+    const layers = [...deckInstance.props.layers, createdDeckGLLayer];
 
     deckInstance.setProps({
-      layers: [...currentDeckLayers, createdDeckGLLayer]
+      layers,
+      onViewStateChange: ({ interactionState }) => {
+        if (interactionState.isPanning || interactionState.isZooming) {
+          layers.forEach(layer => {
+            if (layer instanceof GeoJsonLayer) {
+              this.emit('viewportLoad');
+            }
+          });
+        }
+      }
     });
 
     this._deckInstance = deckInstance;
