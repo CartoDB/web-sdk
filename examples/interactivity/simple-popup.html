@@ -3,14 +3,13 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>YOUR_TITLE</title>
+    <title>Simple Popup</title>
 
     <link
       rel="stylesheet"
       type="text/css"
       href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.css"
     />
-
     <link
       rel="stylesheet"
       type="text/css"
@@ -74,8 +73,13 @@
       function initialize() {
         carto.setDefaultCredentials({ username: 'public' });
         const deckMap = carto.viz.createMap();
-        const countriesLayer = new carto.viz.Layer('world_ports');
-        countriesLayer.addTo(deckMap);
+
+        // deckMap.props.map.on('load', () => {
+        const popup = new carto.viz.Popup();
+        popup.setContent('This <b>is</b> a simple popup');
+        popup.setCoordinates([0, 0]);
+        popup.addTo(deckMap);
+        // });
       }
 
       initialize();
