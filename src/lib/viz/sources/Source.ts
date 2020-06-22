@@ -3,6 +3,9 @@
  * Base Source definition. We should keep here the code shared between different sources
  */
 
+import { WithEvents } from '@/core/mixins/WithEvents';
+import { ColumnFilters } from '../filters/types';
+
 export type GeometryType = 'Point' | 'Line' | 'Polygon';
 
 export interface Stats {
@@ -43,13 +46,15 @@ export interface StatFields {
   aggregation: Set<string>;
 }
 
-export abstract class Source {
+export abstract class Source extends WithEvents {
   // ID of the source. It's mandatory for the source but not for the user.
   public id: string;
 
   public isInitialized: boolean;
 
   constructor(id: string) {
+    super();
+
     this.id = id;
     this.isInitialized = false;
   }
@@ -59,4 +64,14 @@ export abstract class Source {
   abstract getProps(): SourceProps;
 
   abstract getMetadata(): SourceMetadata;
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars, class-methods-use-this
+  async addFilter(_filterId: string, _filter: ColumnFilters) {
+    throw new Error(`Method not implemented`);
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars, class-methods-use-this
+  async removeFilter(_filterId: string) {
+    throw new Error(`Method not implemented`);
+  }
 }

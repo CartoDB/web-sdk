@@ -3,10 +3,10 @@ import { CartoError } from '../errors/CartoError';
 
 export abstract class WithEvents {
   protected emitter = mitt();
-  protected availableEvents = ['*'];
+  protected _availableEvents = ['*'];
 
   protected registerAvailableEvents(eventArray: string[]) {
-    this.availableEvents = ['*', ...eventArray];
+    this._availableEvents = ['*', ...eventArray];
   }
 
   public emit(type: string, event?: unknown) {
@@ -36,6 +36,10 @@ export abstract class WithEvents {
     }
 
     this.emitter.off(type, handler);
+  }
+
+  public get availableEvents() {
+    return [...this._availableEvents];
   }
 
   private throwEventNotFoundError(eventType: string) {

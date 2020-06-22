@@ -1,11 +1,11 @@
 import { Deck } from '@deck.gl/core';
 import { CartoError } from '@/core/errors/CartoError';
-import { WithEvents } from '@/core/mixins/WithEvents';
 import { GeoJsonLayer } from '@deck.gl/layers';
 import { MVTLayer } from '@deck.gl/geo-layers';
 import mitt from 'mitt';
 import deepmerge from 'deepmerge';
 import { GeoJSON } from 'geojson';
+import { WithEvents } from '@/core/mixins/WithEvents';
 import { Source, StatFields } from '../sources/Source';
 import { CARTOSource, DOSource, GeoJsonSource } from '../sources';
 import { DOLayer } from '../deck/DOLayer';
