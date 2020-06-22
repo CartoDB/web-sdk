@@ -65,10 +65,5 @@ export const dataview = {
 
 // carto.widget
 export const widget = {
-  CategoryWidget
-};
-
-// carto.widgets
-export const widgets = {
-  Category
+  Category: CategoryWidget
 };
