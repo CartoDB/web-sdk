@@ -40,12 +40,13 @@
 
     <!-- Map libraries-->
     <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.js"></script>
-    <script src="https://unpkg.com/deck.gl@8.2.0-alpha.2/dist.min.js"></script>
+    <script src="https://unpkg.com/deck.gl@8.2.0-beta.1/dist.min.js"></script>
 
     <script>
-      const user = 'jbotella';
+      const user = 'cartoframes';
       const apikey = 'default_public';
-      const table = 'gadm36_usa_2';
+      const table = 'clev_sales';
+      const column = 'sale_price';
 
       async function instantiateMap() {
         const instantiation = await fetch(
@@ -78,15 +79,42 @@
         });
       }
 
+      const getRadiusConstant = feature => {
+        return 300;
+      };
+
+      const getRadius = feature => {
+        const value = feature.properties[column] / 10000;
+
+        const viewports = deckInstance.getViewports(undefined);
+
+        if (viewports.length > 0) {
+          const { metersPerPixel } = viewports[0];
+          return value * metersPerPixel;
+        }
+
+        return value;
+      };
+
       async function initialize() {
         const mvtURLs = await instantiateMap();
 
         const mvtLayer = new window.deck.MVTLayer({
           data: mvtURLs,
-          pickable: true,
-          autoHighlight: true,
-          highlightColor: [255, 255, 255, 64],
-          getFillColor: [0, 0, 0, 128]
+          type: 'TileLayer',
+          opacity: 0.8,
+          filled: true,
+          getFillColor: [238, 77, 90, 255],
+          pointRadiusMinPixels: 5,
+          pointRadiusMaxPixels: 30,
+          pointRadiusScale: 0.5,
+          stroked: true,
+          getLineColor: [34, 0, 34, 34],
+          getLineWidth: 1,
+          lineWidthUnits: 'pixels',
+          // radiusUnits: "pixels",
+          getRadius,
+          updateTriggers: { getRadius }
         });
 
         const deckInstance = new window.deck.DeckGL({
@@ -95,9 +123,9 @@
           mapStyle:
             'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
           initialViewState: {
-            longitude: -115.42616039127863,
-            latitude: 50.79104529446759,
-            zoom: 3
+            longitude: -81.6830062866211,
+            latitude: 41.49057783237735,
+            zoom: 12
           },
           controller: true,
           layers: [mvtLayer]

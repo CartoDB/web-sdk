@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Change the source of a Layer</title>
+    <title>Helper for simple google basemap using Google Maps JS API</title>
 
     <link
       rel="stylesheet"
@@ -40,13 +40,11 @@
           <!-- panel -->
           <div class="as-panel as-panel--top as-panel--right as-bg--ui-01">
             <div class="as-panel__element as-p--16 as-body">
-              <h1 class="as-title">Set source</h1>
+              <h1 class="as-title">CARTO basemap</h1>
               <h4 class="as-subheader as-mb--12">
-                Set a new source to a CARTO Layer, using a SQL query
+                An easy way to create a CARTO basemap, using DeckGL and Mapbox GL under the hood
               </h4>
-              <div>
-                <button class="as-btn as-btn--primary" onclick="updateSource()">Update Source</button>
-              </div>
+            </div>
           </div>
         </div>
       </main>
@@ -54,24 +52,25 @@
 
     <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.js"></script>
     <script src="https://unpkg.com/deck.gl@8.2.0-beta.1/dist.min.js"></script>
+    <!-- TODO: Set up a proper API_KEY for Google Maps -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=visualization&v=3.39"></script>
     <script src="/dist/umd/index.min.js"></script>
 
     <script>
-      let countries;
-
-      async function initialize() {
+      function initialize() {
         carto.setDefaultCredentials({ username: 'public' });
-        const deckMap = carto.viz.createMap();
-        countries = new carto.viz.Layer('ne_50m_admin_0_countries');
-        countries.addTo(deckMap);
+
+        const deckMap = carto.viz.createGoogleMap();
+        // All these variations are also allowed:
+        //   const deckMap = carto.viz.createGoogleMap({ mapOptions: { mapTypeId: 'satellite' } });
+        //   const deckMap = carto.viz.createGoogleMap({ mapOptions: { mapTypeId: 'hybrid', zoom: 4 } });
+        //   const deckMap = carto.viz.createGoogleMap({ container: 'map', mapOptions: { mapTypeId: 'terrain', zoom: 4, center: { lng: 3, lat: 40 } } });
+
+        let ports = new carto.viz.Layer('world_ports');
+        ports.addTo(deckMap);
       }
 
       initialize();
-
-      function updateSource() {
-        // See the dataset at https://public.carto.com/tables/ne_50m_admin_0_countries/
-        countries.setSource(`SELECT * FROM ne_50m_admin_0_countries WHERE continent='North America'`);
-      }
     </script>
   </body>
 </html>
