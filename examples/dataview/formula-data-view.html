@@ -83,7 +83,8 @@
         await countriesLayer.addTo(deckMap);
 
         const dataview = new carto.dataview.Formula(countriesLayer, 'gdp', {
-          operation: 'sum'
+          operation: 'sum',
+          mode: 'local'
         });
 
         dataview.on('dataUpdate', async () => {
