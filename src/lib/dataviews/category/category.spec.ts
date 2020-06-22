@@ -11,7 +11,8 @@ describe('DataView', () => {
         () =>
           new Category(new Layer('fake_source'), 'fake_column', {
             operation: AggregationType.AVG,
-            operationColumn: 'popEst'
+            operationColumn: 'popEst',
+            mode: DataViewModeAlias.LOCAL
           })
       ).not.toThrow();
     });
@@ -21,7 +22,8 @@ describe('DataView', () => {
         () =>
           new Category(new Layer('fake_source'), 'fake_column', {
             operation: undefined as never,
-            operationColumn: 'fake_operation_column'
+            operationColumn: 'fake_operation_column',
+            mode: DataViewModeAlias.LOCAL
           })
       ).toThrow(
         new CartoDataViewError(

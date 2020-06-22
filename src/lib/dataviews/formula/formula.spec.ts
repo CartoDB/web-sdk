@@ -10,7 +10,8 @@ describe('Formula', () => {
       expect(
         () =>
           new Formula(new Layer('fake_source'), 'fake_column', {
-            operation: AggregationType.AVG
+            operation: AggregationType.AVG,
+            mode: DataViewModeAlias.LOCAL
           })
       ).not.toThrow();
     });
@@ -19,7 +20,8 @@ describe('Formula', () => {
       expect(
         () =>
           new Formula(new Layer('fake_source'), 'fake_column', {
-            operation: undefined as never
+            operation: undefined as never,
+            mode: DataViewModeAlias.LOCAL
           })
       ).toThrow(
         new CartoDataViewError(
