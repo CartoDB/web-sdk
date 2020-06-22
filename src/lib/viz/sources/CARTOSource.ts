@@ -61,7 +61,7 @@ export class CARTOSource extends Source {
 
   private _metadata?: SourceMetadata;
 
-  constructor(source: string, options: SourceOptions = {}) {
+  constructor(source: string | MapInstance, options: SourceOptions = {}) {
     const { mapOptions = {}, credentials = defaultCredentials } = options;
 
     // set layer id
