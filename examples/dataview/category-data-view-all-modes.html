@@ -106,8 +106,8 @@
         { operation: 'count', operationColumn: 'pop_est', mode: 'local' }
       );
 
-      new carto.widget.CategoryWidget('#category-widget-global', categoryRemote);
-      new carto.widget.CategoryWidget('#category-widget-non-precise', categoryLocal);
+      new carto.widget.Category('#category-widget-global', categoryRemote);
+      new carto.widget.Category('#category-widget-non-precise', categoryLocal);
 
       // bind events
       categoryRemote.on('dataUpdate', async () => {
