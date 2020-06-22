@@ -8,7 +8,7 @@ import {
   CategoryFieldStats,
   StatFields
 } from './Source';
-import { parseGeometryType } from '../style/helpers/utils';
+import { isObject, parseGeometryType } from '../style/helpers/utils';
 import { sourceErrorTypes, SourceError } from '../errors/source-error';
 
 export interface SourceOptions {
@@ -27,9 +27,13 @@ const defaultMapOptions: MapOptions = {
   }
 };
 
-function getSourceType(source: string) {
-  const containsSpace = source.search(' ') > -1;
-  return containsSpace ? 'sql' : 'dataset';
+function getSourceType(source: any) {
+  let type: 'custom' | 'sql' | 'dataset' = 'custom';
+  if (!isObject(source)) {
+    const containsSpace = source.search(' ') > -1;
+    type = containsSpace ? 'sql' : 'dataset';
+  }
+  return type;
 }
 
 interface CARTOSourceProps extends SourceProps {
@@ -42,9 +46,9 @@ interface CARTOSourceProps extends SourceProps {
  * * */
 export class CARTOSource extends Source {
   // type of the source.
-  private _type: 'sql' | 'dataset';
-  // value it should be a dataset name or a SQL query
-  private _value: string;
+  private _type: 'sql' | 'dataset' | 'custom';
+  // value it should be a dataset name, a SQL query or a Maps API response
+  private _value: any; // string | MapInstance;
 
   // Internal credentials of the user
   private _credentials: Credentials;
@@ -97,10 +101,14 @@ export class CARTOSource extends Source {
   }
 
   public get value(): string {
-    return this._value;
+    let res = this._value;
+    if (this._type === 'custom') {
+      res = (this._value as MapInstance).layergroupid;
+    }
+    return res;
   }
 
-  public get type(): 'sql' | 'dataset' {
+  public get type(): 'sql' | 'dataset' | 'custom' {
     return this._type;
   }
 
@@ -178,8 +186,11 @@ export class CARTOSource extends Source {
       this._initConfigForStats(fields);
     }
 
-    const mapsClient = new Client(this._credentials);
-    const mapInstance: MapInstance = await mapsClient.instantiateMapFrom(this._mapConfig);
+    let mapInstance: MapInstance = this._value as MapInstance;
+    if (this._type !== 'custom') {
+      const mapsClient = new Client(this._credentials);
+      mapInstance = await mapsClient.instantiateMapFrom(this._mapConfig);
+    }
 
     const urlTemplate = getUrlsFrom(mapInstance);
     this._props = { type: 'TileLayer', data: urlTemplate }; // TODO refactor / include in metadata ?

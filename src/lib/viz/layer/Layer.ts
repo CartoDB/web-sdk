@@ -20,6 +20,7 @@ import { FiltersCollection } from '../filters/FiltersCollection';
 import { FunctionFilterApplicator } from '../filters/FunctionFilterApplicator';
 import { ColumnFilters } from '../filters/types';
 import { basicStyle } from '../style/helpers/basic-style';
+import { MapInstance } from '@/maps/Client';
 
 const DEFAULT_ID_PROPERTY = 'cartodb_id';
 
@@ -441,17 +442,17 @@ export class Layer extends WithEvents implements StyledLayer {
  * Internal function to auto convert string to CARTO source
  * @param source source object to be converted
  */
-function buildSource(source: string | Source | GeoJSON): Source {
+function buildSource(source: string | Source | GeoJSON | MapInstance): Source {
   if (source instanceof Source) {
     return source;
   }
 
-  if (typeof source === 'string') {
-    return new CARTOSource(source);
+  if (typeof source === 'string' || typeof source === 'object' && (source as MapInstance).layergroupid) {
+    return new CARTOSource(source as any);
   }
 
   if (typeof source === 'object') {
-    return new GeoJsonSource(source);
+    return new GeoJsonSource(source as GeoJSON);
   }
 
   throw new CartoLayerError('Unsupported source type', layerErrorTypes.UNKNOWN_SOURCE);
