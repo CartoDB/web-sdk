@@ -65,7 +65,7 @@ export class Client {
           type: 'source',
           id: `${source}_${Date.now()}`,
           params: {
-            query: `SELECT * FROM ${source}`
+            query: type === 'sql' ? source : `SELECT * FROM ${source}`
           }
         }
       ],

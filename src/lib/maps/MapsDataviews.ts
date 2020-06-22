@@ -12,7 +12,7 @@ export class MapsDataviews {
 
   public async aggregation(params: Partial<MapDataviewsOptions>): Promise<AggregationResponse> {
     const { column, aggregation, aggregationColumn, limit } = params;
-    const dataviewName = `${this._source}_${Date.now()}`;
+    const dataviewName = this.getDataviewName();
 
     const layergroup = await this._createMapWithDataviews(dataviewName, 'aggregation', {
       column,
@@ -27,8 +27,8 @@ export class MapsDataviews {
 
   public async formula(params: FormulaParameters) {
     const { column, operation } = params;
+    const dataviewName = this.getDataviewName();
 
-    const dataviewName = `${this._source}_${Date.now()}`;
     const layergroup = await this._createMapWithDataviews(dataviewName, 'formula', {
       operation,
       column
@@ -59,6 +59,18 @@ export class MapsDataviews {
 
     const response = this._mapClient.instantiateMap(mapConfig);
     return response;
+  }
+
+  private getDataviewName(): string {
+    let dataviewName = this._source;
+
+    if (dataviewName.search(' ') > -1) {
+      dataviewName = 'dataview';
+    }
+
+    dataviewName = `${dataviewName}_${Date.now()}`;
+
+    return dataviewName;
   }
 }
 
