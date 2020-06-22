@@ -1,6 +1,6 @@
 import { MapsDataviews as DataviewsApi, AggregationType } from '@/maps/MapsDataviews';
 import { defaultCredentials } from '@/core/Credentials';
-import { Source, CARTOSource } from '@/viz';
+import { Source, CARTOSource, Layer } from '@/viz';
 import { DataViewMode } from './DataViewMode';
 import { CartoDataViewError, dataViewErrorTypes } from '../DataViewError';
 
@@ -10,7 +10,13 @@ export class DataViewRemote extends DataViewMode {
   constructor(dataSource: Source, column: string, credentials = defaultCredentials) {
     super(dataSource, column);
 
-    if (!(dataSource instanceof CARTOSource)) {
+    let source = dataSource;
+
+    if (dataSource instanceof Layer) {
+      source = dataSource.source;
+    }
+
+    if (!(source instanceof CARTOSource)) {
       throw new CartoDataViewError(
         'The provided source has to be an instance of CARTOSource',
         dataViewErrorTypes.PROPERTY_INVALID
