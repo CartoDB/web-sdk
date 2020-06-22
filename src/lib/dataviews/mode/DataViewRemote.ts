@@ -23,7 +23,7 @@ export class DataViewRemote extends DataViewMode {
       );
     }
 
-    const dataset = (dataSource as CARTOSource).value;
+    const dataset = source.value;
     this.dataviewsApi = new DataviewsApi(dataset, credentials);
 
     this.registerAvailableEvents(['error']);
