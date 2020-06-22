@@ -43,14 +43,14 @@
               <h1 class="as-title">Add layer</h1>
               <h4 class="as-subheader as-mb--12">
                 Add one CARTO layer to your map
-              </h4>             
+              </h4>
           </div>
         </div>
       </main>
     </div>
 
     <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.js"></script>
-    <script src="https://unpkg.com/deck.gl@8.2.0-alpha.2/dist.min.js"></script>
+    <script src="https://unpkg.com/deck.gl@8.2.0-beta.1/dist.min.js"></script>
     <script src="/dist/umd/index.min.js"></script>
 
     <script>
@@ -60,7 +60,7 @@
         const countriesLayer = new carto.viz.Layer('ne_50m_admin_0_countries');
         countriesLayer.addTo(deckMap);
       }
-      
+
       initialize();
     </script>
   </body>
