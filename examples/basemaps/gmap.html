@@ -3,14 +3,19 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Viewport features</title>
+    <title>Helper for simple google basemap using Google Maps JS API</title>
 
     <link
       rel="stylesheet"
       type="text/css"
       href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.css"
     />
-    <link rel="stylesheet" href="https://libs.cartocdn.com/airship-style/v2.3/airship.css" />
+
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://libs.cartocdn.com/airship-style/v2.3/airship.css"
+    />
 
     <style>
       body {
@@ -35,36 +40,34 @@
           <!-- panel -->
           <div class="as-panel as-panel--top as-panel--right as-bg--ui-01">
             <div class="as-panel__element as-p--16 as-body">
-              <h1 class="as-subheader">Viewport features</h1>
-              <p class="as-body">
-                Get the visible features, updated on every viewport change.
-              </p>
-              <div id="result" class="as-subheader"></div>
+              <h1 class="as-title">CARTO basemap</h1>
+              <h4 class="as-subheader as-mb--12">
+                An easy way to create a CARTO basemap, using DeckGL and Mapbox GL under the hood
+              </h4>
             </div>
           </div>
         </div>
       </main>
     </div>
 
-    <!-- Map libraries-->
     <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.js"></script>
     <script src="https://unpkg.com/deck.gl@8.2.0-alpha.2/dist.min.js"></script>
-
+    <!-- TODO: Set up a proper API_KEY for Google Maps -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=visualization&v=3.39"></script>
     <script src="/dist/umd/index.min.js"></script>
 
     <script>
-      async function initialize() {
+      function initialize() {
         carto.setDefaultCredentials({ username: 'public' });
-        const deckMap = carto.viz.createMap();
-        const countriesLayer = new carto.viz.Layer('ne_50m_admin_0_countries');
 
-        countriesLayer.on('viewportLoad', async () => {
-          const features = await countriesLayer.getViewportFeatures();
-          document.getElementById('result').innerText = `${features.length} countries`;
-          console.log(features);
-        });
+        const deckMap = carto.viz.createGoogleMap();
+        // All these variations are also allowed:
+        //   const deckMap = carto.viz.createGoogleMap({ mapOptions: { mapTypeId: 'satellite' } });
+        //   const deckMap = carto.viz.createGoogleMap({ mapOptions: { mapTypeId: 'hybrid', zoom: 4 } });
+        //   const deckMap = carto.viz.createGoogleMap({ container: 'map', mapOptions: { mapTypeId: 'terrain', zoom: 4, center: { lng: 3, lat: 40 } } });
 
-        countriesLayer.addTo(deckMap);
+        let ports = new carto.viz.Layer('world_ports');
+        ports.addTo(deckMap);
       }
 
       initialize();
