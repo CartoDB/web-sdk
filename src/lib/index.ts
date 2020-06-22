@@ -23,10 +23,10 @@ import {
 } from './viz/style';
 
 // Dataviews
-import { CategoryDataView, FormulaDataView, CategorySourceDataView } from './data/dataview';
+import { Category, Formula } from './dataviews';
 
 // Widgets
-import { Category } from './widgets';
+import { Category as CategoryWidget } from './widgets';
 
 /*
  * --- Public API ---
@@ -57,14 +57,13 @@ export const viz = {
   ...basics
 };
 
-// carto.data
-const dataviews = { CategoryDataView, FormulaDataView, CategorySourceDataView };
-
-export const data = {
-  ...dataviews
+// carto.dataview
+export const dataview = {
+  Category,
+  Formula
 };
 
-// carto.widgets
-export const widgets = {
-  Category
+// carto.widget
+export const widget = {
+  Category: CategoryWidget
 };

@@ -10,45 +10,49 @@ export class MapsDataviews {
     this._mapClient = new Client(credentials);
   }
 
-  public async aggregation(params: AggregationParameters): Promise<AggregationResponse> {
-    const { column, aggregation, operationColumn, limit } = params;
-
+  public async aggregation(params: Partial<MapDataviewsOptions>): Promise<AggregationResponse> {
+    const { column, aggregation, aggregationColumn, limit } = params;
     const dataviewName = `${this._source}_${Date.now()}`;
-    const layergroup = await this._createMapWithAggregationDataviews(
-      dataviewName,
+
+    const layergroup = await this._createMapWithDataviews(dataviewName, 'aggregation', {
       column,
       aggregation,
-      operationColumn
-    );
+      aggregationColumn
+    });
 
-    const aggregationResponse = this._mapClient.aggregationDataview(
-      layergroup,
-      dataviewName,
-      limit
-    );
+    const aggregationResponse = this._mapClient.dataview(layergroup, dataviewName, limit);
 
     return (aggregationResponse as unknown) as AggregationResponse;
   }
 
-  private _createMapWithAggregationDataviews(
-    name: string,
-    column: string,
-    aggregation: AggregationType,
-    operationColumn?: string
+  public async formula(params: FormulaParameters) {
+    const { column, operation } = params;
+
+    const dataviewName = `${this._source}_${Date.now()}`;
+    const layergroup = await this._createMapWithDataviews(dataviewName, 'formula', {
+      operation,
+      column
+    });
+
+    const formulaResponse = this._mapClient.dataview(layergroup, dataviewName);
+
+    return (formulaResponse as unknown) as FormulaResponse;
+  }
+
+  private _createMapWithDataviews(
+    dataviewName: string,
+    type: string,
+    options: Partial<MapDataviewsOptions>
   ) {
     const sourceMapConfig = Client.generateMapConfigFromSource(this._source);
     const sourceId = sourceMapConfig.analyses[0].id;
     const mapConfig = {
       ...sourceMapConfig,
       dataviews: {
-        [name]: {
-          type: 'aggregation',
+        [dataviewName]: {
+          type,
           source: { id: sourceId },
-          options: {
-            column,
-            aggregation,
-            aggregationColumn: operationColumn
-          }
+          options
         }
       }
     };
@@ -73,13 +77,23 @@ export interface AggregationResponse {
   errors?: string[];
 }
 
+export interface FormulaResponse {
+  operation: string;
+  result: number;
+  nulls: number;
+  type: string;
+  // eslint-disable-next-line camelcase
+  errors_with_context?: { type: string; message: string }[];
+  errors?: string[];
+}
+
 export interface AggregationCategory {
   agg: boolean;
   category: string;
   value: number;
 }
 
-export interface AggregationParameters {
+interface MapDataviewsOptions {
   /**
    * column name to aggregate by
    */
@@ -89,6 +103,11 @@ export interface AggregationParameters {
    * operation to perform
    */
   aggregation: AggregationType;
+
+  /**
+   * operation to perform
+   */
+  operation: AggregationType;
 
   /**
    * The num of categories
@@ -101,6 +120,25 @@ export interface AggregationParameters {
    * `aggregation` is different than "count"
    */
   operationColumn?: string;
+
+  /**
+   * [Maps API parameter name]
+   * Same as operationColumn but this is the
+   * name which is used by Maps API as parameter
+   */
+  aggregationColumn?: string;
+}
+
+interface FormulaParameters {
+  /**
+   * column name to aggregate by
+   */
+  column: string;
+
+  /**
+   * operation to perform
+   */
+  operation: AggregationType;
 }
 
 export enum AggregationType {

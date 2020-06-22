@@ -1,15 +1,17 @@
-import { CartoError } from '../../../core/errors/CartoError';
-import { Layer } from '../../../viz/layer/Layer';
-import { FormulaDataView } from './formula';
-import { AggregationType } from '../../operations/aggregation/aggregation';
+import { Layer } from '../../viz/layer/Layer';
+import { Formula } from './Formula';
+import { AggregationType } from '../../data/operations/aggregation/aggregation';
+import { CartoDataViewError, dataViewErrorTypes } from '../DataViewError';
+import { DataViewCalculation } from '../mode/DataViewMode';
 
-describe('FormulaDataView', () => {
+describe('Formula', () => {
   describe('Instance Creation', () => {
     it('should create new DataView instance', () => {
       expect(
         () =>
-          new FormulaDataView(new Layer('fake_source'), 'fake_column', {
-            operation: AggregationType.AVG
+          new Formula(new Layer('fake_source'), 'fake_column', {
+            operation: AggregationType.AVG,
+            mode: DataViewCalculation.LOCAL
           })
       ).not.toThrow();
     });
@@ -17,15 +19,15 @@ describe('FormulaDataView', () => {
     it('should throw an exception when operation is not provided', () => {
       expect(
         () =>
-          new FormulaDataView(new Layer('fake_source'), 'fake_column', {
-            operation: undefined as never
+          new Formula(new Layer('fake_source'), 'fake_column', {
+            operation: undefined as never,
+            mode: DataViewCalculation.LOCAL
           })
       ).toThrow(
-        new CartoError({
-          type: '[DataView]',
-          message:
-            'Operation property not provided while creating dataview. Please check documentation.'
-        })
+        new CartoDataViewError(
+          'Operation property not provided while creating dataview. Please check documentation.',
+          dataViewErrorTypes.PROPERTY_MISSING
+        )
       );
     });
   });
@@ -47,8 +49,9 @@ describe('FormulaDataView', () => {
 
       spyOn(layer, 'getViewportFeatures').and.returnValue(Promise.resolve(sourceData));
 
-      const dataView = new FormulaDataView(layer, 'pop', {
-        operation: AggregationType.AVG
+      const dataView = new Formula(layer, 'pop', {
+        operation: AggregationType.AVG,
+        mode: DataViewCalculation.LOCAL
       });
 
       expect(await dataView.getData()).toMatchObject({
@@ -71,18 +74,19 @@ describe('FormulaDataView', () => {
 
       spyOn(layer, 'getViewportFeatures').and.returnValue(Promise.resolve(sourceData));
 
-      const dataView = new FormulaDataView(layer, 'pop', {
-        operation: AggregationType.SUM
+      const dataView = new Formula(layer, 'pop', {
+        operation: AggregationType.SUM,
+        mode: DataViewCalculation.LOCAL
       });
 
       try {
         await dataView.getData();
       } catch (error) {
         expect(error).toMatchObject(
-          new CartoError({
-            type: '[DataView]',
-            message: `Column property for Formula can just contain numbers (or nulls) and a string with 30 value was found. Please check documentation.`
-          })
+          new CartoDataViewError(
+            `Column property for Formula can just contain numbers (or nulls) and a string with 30 value was found. Please check documentation.`,
+            dataViewErrorTypes.PROPERTY_INVALID
+          )
         );
       }
     });
