@@ -29,10 +29,12 @@ const defaultMapOptions: MapOptions = {
 
 function getSourceType(source: any) {
   let type: 'custom' | 'sql' | 'dataset' = 'custom';
+
   if (!isObject(source)) {
     const containsSpace = source.search(' ') > -1;
     type = containsSpace ? 'sql' : 'dataset';
   }
+
   return type;
 }
 
@@ -102,9 +104,11 @@ export class CARTOSource extends Source {
 
   public get value(): string {
     let res = this._value;
+
     if (this._type === 'custom') {
       res = (this._value as MapInstance).layergroupid;
     }
+
     return res;
   }
 
@@ -187,6 +191,7 @@ export class CARTOSource extends Source {
     }
 
     let mapInstance: MapInstance = this._value as MapInstance;
+
     if (this._type !== 'custom') {
       const mapsClient = new Client(this._credentials);
       mapInstance = await mapsClient.instantiateMapFrom(this._mapConfig);
