@@ -6,6 +6,7 @@ import { MVTLayer } from '@deck.gl/geo-layers';
 import mitt from 'mitt';
 import deepmerge from 'deepmerge';
 import { GeoJSON } from 'geojson';
+import { MapInstance } from '@/maps/Client';
 import { Source, StatFields } from '../sources/Source';
 import { CARTOSource, DOSource, GeoJsonSource } from '../sources';
 import { DOLayer } from '../deck/DOLayer';
@@ -20,7 +21,6 @@ import { FiltersCollection } from '../filters/FiltersCollection';
 import { FunctionFilterApplicator } from '../filters/FunctionFilterApplicator';
 import { ColumnFilters } from '../filters/types';
 import { basicStyle } from '../style/helpers/basic-style';
-import { MapInstance } from '@/maps/Client';
 
 const DEFAULT_ID_PROPERTY = 'cartodb_id';
 
