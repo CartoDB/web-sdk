@@ -7,6 +7,7 @@ import mitt from 'mitt';
 import deepmerge from 'deepmerge';
 import { GeoJSON } from 'geojson';
 import { MapInstance } from '@/maps/Client';
+import { uuidv4 } from '@/core/utils/uuid';
 import { Source, StatFields } from '../sources/Source';
 import { CARTOSource, DOSource, GeoJsonSource } from '../sources';
 import { DOLayer } from '../deck/DOLayer';
@@ -66,7 +67,7 @@ export class Layer extends WithEvents implements StyledLayer {
     ]);
 
     this._options = {
-      id: `${this._source.id}-${Date.now()}`,
+      id: `${this._source.id}-${uuidv4()}`,
       ...options
     };
 
