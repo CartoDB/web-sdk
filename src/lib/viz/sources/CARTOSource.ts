@@ -6,7 +6,8 @@ import {
   SourceMetadata,
   NumericFieldStats,
   CategoryFieldStats,
-  StatFields
+  StatFields,
+  shouldInitialize
 } from './Source';
 import { parseGeometryType } from '../style/helpers/utils';
 import { sourceErrorTypes, SourceError } from '../errors/source-error';
@@ -45,15 +46,12 @@ export class CARTOSource extends Source {
   private _type: 'sql' | 'dataset';
   // value it should be a dataset name or a SQL query
   private _value: string;
-
   // Internal credentials of the user
   private _credentials: Credentials;
-
   private _props?: CARTOSourceProps;
-
   private _mapConfig: MapOptions;
-
   private _metadata?: SourceMetadata;
+  private _fields: StatFields;
 
   constructor(source: string, options: SourceOptions = {}) {
     const { mapOptions = {}, credentials = defaultCredentials } = options;
@@ -63,12 +61,14 @@ export class CARTOSource extends Source {
 
     // call to super class
     super(id);
+    this.sourceType = 'CARTOSource';
 
     // Set object properties
     this._type = getSourceType(source);
     this._value = source;
     this._credentials = credentials;
     const sourceOpts = { [this._type]: source };
+    this._fields = { sample: new Set(), aggregation: new Set() };
 
     // Set Map Config
     this._mapConfig = {
@@ -122,7 +122,7 @@ export class CARTOSource extends Source {
     return this._metadata;
   }
 
-  private _initConfigForStats(fields: StatFields) {
+  private _initConfigForStats() {
     if (this._mapConfig.metadata === undefined) {
       throw new SourceError('Map Config has not metadata field');
     }
@@ -137,11 +137,11 @@ export class CARTOSource extends Source {
 
     this._mapConfig.metadata.sample = {
       num_rows: 1000,
-      include_columns: [...fields.sample]
+      include_columns: [...this._fields.sample]
     };
 
     const dimensions: Record<string, { column: string }> = {};
-    fields.aggregation.forEach(field => {
+    this._fields.aggregation.forEach(field => {
       dimensions[field] = { column: field };
     });
 
@@ -159,14 +159,16 @@ export class CARTOSource extends Source {
    * @param fields
    */
   public async init(fields: StatFields): Promise<boolean> {
-    if (this.isInitialized) {
-      // Maybe this is too hard, but I'd like to keep to check it's not a performance issue. We could move it to just a warning
-      throw new SourceError('Try to reinstantiate map multiple times');
+    if (!shouldInitialize(this.isInitialized, fields, this._fields)) {
+      return true;
     }
 
-    if (fields.sample.size || fields.aggregation.size) {
-      this._initConfigForStats(fields);
+    if (this.isInitialized) {
+      console.warn('CARTOSource reinitialized');
     }
+
+    this._saveFields(fields);
+    this._initConfigForStats();
 
     const mapsClient = new Client(this._credentials);
     const mapInstance: MapInstance = await mapsClient.instantiateMapFrom(this._mapConfig);
@@ -177,6 +179,11 @@ export class CARTOSource extends Source {
 
     this.isInitialized = true;
     return this.isInitialized;
+  }
+
+  private _saveFields(fields: StatFields) {
+    this._fields.sample = new Set([...fields.sample]);
+    this._fields.aggregation = new Set([...fields.aggregation]);
   }
 }
 

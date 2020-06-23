@@ -1,4 +1,5 @@
 import { AggregationType } from '@/data/operations/aggregation/aggregation';
+import { uuidv4 } from '@/core/utils/uuid';
 import { Credentials } from '../core/Credentials';
 import { Client, MapDataviewsOptions } from './Client';
 
@@ -13,7 +14,7 @@ export class MapsDataviews {
 
   public async aggregation(params: Partial<MapDataviewsOptions>): Promise<AggregationResponse> {
     const { column, aggregation, aggregationColumn, categories, bbox } = params;
-    const dataviewName = `${this._source}_${Date.now()}`;
+    const dataviewName = this.getDataviewName();
 
     const layergroup = await this._createMapWithDataviews(dataviewName, 'aggregation', {
       column,
@@ -31,8 +32,8 @@ export class MapsDataviews {
 
   public async formula(params: FormulaParameters) {
     const { column, operation, bbox } = params;
+    const dataviewName = this.getDataviewName();
 
-    const dataviewName = `${this._source}_${Date.now()}`;
     const layergroup = await this._createMapWithDataviews(dataviewName, 'formula', {
       operation,
       column
@@ -63,6 +64,19 @@ export class MapsDataviews {
 
     const response = this._mapClient.instantiateMap(mapConfig);
     return response;
+  }
+
+  private getDataviewName(): string {
+    const uuid = uuidv4();
+    let dataviewName = this._source;
+
+    if (dataviewName.search(' ') > -1) {
+      dataviewName = 'dataview';
+    }
+
+    dataviewName = `${dataviewName}_${uuid}`;
+
+    return dataviewName;
   }
 }
 
