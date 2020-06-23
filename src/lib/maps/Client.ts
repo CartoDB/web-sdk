@@ -78,7 +78,7 @@ export class Client {
    * @param layergroup
    * @param options
    */
-  public async aggregationDataview(layergroup: any, dataview: string, categories?: number) {
+  public async dataview(layergroup: any, dataview: string, categories?: number) {
     const {
       metadata: {
         dataviews: {
