@@ -79,7 +79,7 @@ export class Client {
    * @param options
    */
   public async dataview(
-    layergroup: any,
+    layergroup: MapInstance,
     dataview: string,
     dataViewOptions?: Partial<MapDataviewsOptions>
   ) {
@@ -250,6 +250,14 @@ export interface MapInstance {
         };
       }
     ];
+    dataviews: {
+      [dataview: string]: {
+        url: {
+          http: string;
+          https: string;
+        };
+      };
+    };
     tilejson: {
       vector: {
         tilejson: string;
@@ -262,19 +270,19 @@ export interface MapInstance {
         subdomains: string[];
       };
     };
-    // eslint-disable-next-line camelcase
-    cdn_url: {
-      http: string;
-      https: string;
-      templates: {
-        http: {
-          subdomains: string[];
-          url: string;
-        };
-        https: {
-          subdomains: string[];
-          url: string;
-        };
+  };
+  // eslint-disable-next-line camelcase
+  cdn_url: {
+    http: string;
+    https: string;
+    templates: {
+      http: {
+        subdomains: string[];
+        url: string;
+      };
+      https: {
+        subdomains: string[];
+        url: string;
       };
     };
   };
