@@ -1,3 +1,4 @@
+import { uuidv4 } from '@/core/utils/uuid';
 import { Credentials } from '../core/Credentials';
 import { Client } from './Client';
 
@@ -62,13 +63,14 @@ export class MapsDataviews {
   }
 
   private getDataviewName(): string {
+    const uuid = uuidv4();
     let dataviewName = this._source;
 
     if (dataviewName.search(' ') > -1) {
       dataviewName = 'dataview';
     }
 
-    dataviewName = `${dataviewName}_${Date.now()}`;
+    dataviewName = `${dataviewName}_${uuid}`;
 
     return dataviewName;
   }
