@@ -2,16 +2,17 @@ import { Deck, Viewport } from '@deck.gl/core';
 import { MVTLayer } from '@deck.gl/geo-layers';
 import { Matrix4 } from '@math.gl/core';
 import { GeoJSON } from 'geojson';
+import { GeoJsonLayer } from '@deck.gl/layers';
+import { getFeatures } from '@/viz/sources/GeoJsonSource';
 import { selectPropertiesFrom } from '../../utils/object';
 import { ViewportTile } from '../../declarations/deckgl';
 import { GeometryData, ViewportFrustumPlanes } from './geometry/types';
 import { checkIfGeometryIsInsideFrustum } from './geometry/check';
 import {
   getTransformationMatrixFromTile,
-  transformGeometryCoordinatesToCommonSpace
+  transformGeometryCoordinatesToCommonSpaceByMatrix,
+  transformGeometryCoordinatesToCommonSpaceByViewport
 } from './geometry/transform';
-import { GeoJsonLayer } from '@deck.gl/layers';
-import { getFeatures } from '@/viz/sources/GeoJsonSource'
 
 const DEFAULT_OPTIONS = {
   uniqueIdProperty: 'cartodb_id'
@@ -19,7 +20,7 @@ const DEFAULT_OPTIONS = {
 
 export class ViewportFeaturesGenerator {
   private deckInstance: Deck | undefined;
-  private deckLayer: MVTLayer<string> | GeoJsonLayer<any> | undefined;
+  private deckLayer: MVTLayer<string> | GeoJsonLayer<GeoJSON> | undefined;
   private uniqueIdProperty: string;
 
   constructor(
@@ -59,7 +60,8 @@ export class ViewportFeaturesGenerator {
 
   private async getGeoJSONLayerFeatures(properties: string[] = []) {
     const features = this.getGeoJSONFeatures();
-    const currentFrustumPlanes = this.getFrustumPlanes();
+    const viewport = this.getViewport();
+    const currentFrustumPlanes = viewport.getFrustumPlanes();
 
     return features
       .filter(feature => {
@@ -68,18 +70,21 @@ export class ViewportFeaturesGenerator {
         }
 
         return checkIfGeometryIsInsideFrustum(
-          feature.geometry as GeometryData,
+          transformGeometryCoordinatesToCommonSpaceByViewport(
+            feature.geometry as GeometryData,
+            viewport
+          ),
           currentFrustumPlanes
-        )
+        );
       })
       .map(feature => {
-        return selectPropertiesFrom(feature.properties as Record<string, unknown>, properties)
+        return selectPropertiesFrom(feature.properties as Record<string, unknown>, properties);
       })
       .flat();
   }
 
   private getMVTViewportFilteredFeatures(selectedTiles: ViewportTile[], properties: string[]) {
-    const currentFrustumPlanes = this.getFrustumPlanes();
+    const currentFrustumPlanes = this.getViewport().getFrustumPlanes();
     const featureCache = new Set<number>();
 
     return selectedTiles
@@ -118,7 +123,7 @@ export class ViewportFeaturesGenerator {
     }
 
     const isInside = checkIfGeometryIsInsideFrustum(
-      transformGeometryCoordinatesToCommonSpace(
+      transformGeometryCoordinatesToCommonSpaceByMatrix(
         feature.geometry as GeometryData,
         transformationMatrix
       ),
@@ -145,14 +150,14 @@ export class ViewportFeaturesGenerator {
       return [];
     }
 
-    const geoJSON: GeoJSON = this.deckLayer.props.data;
+    const geoJSON = (this.deckLayer.props.data as unknown) as GeoJSON;
     return getFeatures(geoJSON);
   }
 
-  private getFrustumPlanes() {
+  private getViewport() {
     // WebMercatorViewport is there by default
     const viewports: Viewport[] = this.deckInstance?.getViewports(undefined);
-    return viewports[0].getFrustumPlanes();
+    return viewports[0];
   }
 
   public setDeckInstance(deckInstance: Deck) {
