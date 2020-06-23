@@ -1,7 +1,7 @@
 import { WithEvents } from '@/core/mixins/WithEvents';
 import { Layer, Source } from '@/viz';
 import { Filter } from '@/viz/filters/types';
-import { AggregationType } from '@/maps/Client';
+import { AggregationType } from '@/data/operations/aggregation/aggregation';
 import { DataViewImpl } from './DataViewImpl';
 import { DataViewMode, DataViewCalculation } from './mode/DataViewMode';
 import { debounce } from './utils';

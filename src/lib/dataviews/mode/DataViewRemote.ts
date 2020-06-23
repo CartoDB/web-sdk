@@ -1,10 +1,10 @@
 import { MapsDataviews as DataviewsApi } from '@/maps/MapsDataviews';
-import { AggregationType } from '@/maps/Client';
 import { defaultCredentials } from '@/core/Credentials';
 import { Source, CARTOSource, Layer } from '@/viz';
 import { Filter, SpatialFilters, BuiltInFilters } from '@/viz/filters/types';
 import { FiltersCollection } from '@/viz/filters/FiltersCollection';
 import { RemoteFilterApplicator } from '@/viz/filters/RemoteFilterApplicator';
+import { AggregationType } from '@/data/operations/aggregation/aggregation';
 import { DataViewMode } from './DataViewMode';
 import { CartoDataViewError, dataViewErrorTypes } from '../DataViewError';
 

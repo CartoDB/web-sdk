@@ -1,5 +1,6 @@
+import { AggregationType } from '@/data/operations/aggregation/aggregation';
 import { Credentials } from '../core/Credentials';
-import { Client, AggregationType, MapDataviewsOptions } from './Client';
+import { Client, MapDataviewsOptions } from './Client';
 
 export class MapsDataviews {
   private _source: string;

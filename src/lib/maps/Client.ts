@@ -1,3 +1,4 @@
+import { AggregationType } from '@/data/operations/aggregation/aggregation';
 import { Credentials } from '../core/Credentials';
 import errorHandlers from './errors';
 import { encodeParameter, getRequest, postRequest } from './utils';
@@ -317,13 +318,4 @@ export interface MapDataviewsOptions {
    * Bounding box to filter data
    */
   bbox?: number[];
-}
-
-export enum AggregationType {
-  COUNT = 'count',
-  AVG = 'avg',
-  MIN = 'min',
-  MAX = 'max',
-  SUM = 'sum',
-  PERCENTILE = 'percentile'
 }
