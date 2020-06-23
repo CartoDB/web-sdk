@@ -91,26 +91,16 @@ export class Client {
       }
     } = layergroup;
 
-    const parameters = [encodeParameter('api_key', this._credentials.apiKey)];
+    const params = {
+      api_key: this._credentials.apiKey,
+      ...dataViewOptions
+    };
 
-    if (dataViewOptions) {
-      Object.entries(dataViewOptions).forEach(([option, value]) => {
-        let optionToEncode;
-
-        if (option === 'bbox') {
-          optionToEncode = (value as number[])?.join(',');
-        } else {
-          optionToEncode = value?.toString();
-        }
-
-        if (optionToEncode) {
-          const encodedOption = encodeParameter(option, optionToEncode);
-          parameters.push(encodedOption);
-        }
-      });
-    }
-
-    const getUrl = `${url.https}?${parameters.join('&')}`;
+    const definedParams = Object.fromEntries(Object.entries(params).filter(([, v]) => !!v));
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    const urlSearchParams = new URLSearchParams(definedParams);
+    const getUrl = `${url.https}?${urlSearchParams.toString()}`;
     const response = await fetch(getRequest(getUrl));
     const dataviewResponse = await response.json();
 
