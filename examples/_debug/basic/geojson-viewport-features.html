@@ -66,8 +66,6 @@
         countriesLayer.on('viewportLoad', async () => {
           const features = await countriesLayer.getViewportFeatures();
 
-          console.log(features)
-
           // clear the panel
           const $result = document.getElementById('result');
           $result.innerHTML = '';
