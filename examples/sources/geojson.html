@@ -42,15 +42,15 @@
             <div class="as-panel__element as-p--16 as-body">
               <h1 class="as-title">GeoJSON</h1>
               <h4 class="as-subheader as-mb--12">
-                Add one GeoJSON layer to your map                              
-              </h4>             
+                Add one GeoJSON layer to your map
+              </h4>
           </div>
         </div>
       </main>
     </div>
 
     <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.js"></script>
-    <script src="https://unpkg.com/deck.gl@8.2.0-alpha.2/dist.min.js"></script>
+    <script src="https://unpkg.com/deck.gl@8.2.0-beta.1/dist.min.js"></script>
     <script src="/dist/umd/index.min.js"></script>
 
     <script>
@@ -71,7 +71,7 @@
         const layer = new carto.viz.Layer(geojsonData, basicStyle);
         // equivalent to...
         // const layer = new carto.viz.Layer(new carto.viz.GeoJsonSource(geojsonData), basicStyle);
-        
+
         layer.addTo(deckMap);
       }
 

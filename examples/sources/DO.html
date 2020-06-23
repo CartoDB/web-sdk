@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Change the source of a Layer</title>
+    <title>Data Observatory (DO) Layer</title>
 
     <link
       rel="stylesheet"
@@ -40,13 +40,11 @@
           <!-- panel -->
           <div class="as-panel as-panel--top as-panel--right as-bg--ui-01">
             <div class="as-panel__element as-p--16 as-body">
-              <h1 class="as-title">Set source</h1>
+              <h1 class="as-title">DO Layer</h1>
               <h4 class="as-subheader as-mb--12">
-                Set a new source to a CARTO Layer, using a SQL query
+                A layer from CARTO Data Observatory (DO)
               </h4>
-              <div>
-                <button class="as-btn as-btn--primary" onclick="updateSource()">Update Source</button>
-              </div>
+            </div>
           </div>
         </div>
       </main>
@@ -57,21 +55,39 @@
     <script src="/dist/umd/index.min.js"></script>
 
     <script>
-      let countries;
+      function findGetParameter(parameterName) {
+        var result = null,
+          tmp = [];
+        location.search
+          .substr(1)
+          .split('&')
+          .forEach(function (item) {
+            tmp = item.split('=');
+            if (tmp[0] === parameterName) result = decodeURIComponent(tmp[1]);
+          });
+        return result;
+      }
+
+      const apiKey = findGetParameter('api_key');
 
       async function initialize() {
-        carto.setDefaultCredentials({ username: 'public' });
+        carto.setDefaultCredentials({ username: 'aasuero', apiKey: apiKey });
         const deckMap = carto.viz.createMap();
-        countries = new carto.viz.Layer('ne_50m_admin_0_countries');
-        countries.addTo(deckMap);
+
+        const DOVariable = 'total_pop_624c2d45';
+
+        const styles = carto.viz.colorBinsStyle(DOVariable, {
+          // breaks: [0, 2*(10**6), 5*(10**6), 8*(10**6), 100*(10**6)],
+          // Methods allowed are quantiles, equal and stdev
+          method: 'equal',
+          palette: 'teal'
+        });
+        const source = new carto.viz.DOSource(DOVariable);
+        const layer = new carto.viz.Layer(source, styles);
+        layer.addTo(deckMap);
       }
 
       initialize();
-
-      function updateSource() {
-        // See the dataset at https://public.carto.com/tables/ne_50m_admin_0_countries/
-        countries.setSource(`SELECT * FROM ne_50m_admin_0_countries WHERE continent='North America'`);
-      }
     </script>
   </body>
 </html>
