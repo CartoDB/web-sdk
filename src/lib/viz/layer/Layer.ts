@@ -50,6 +50,7 @@ export class Layer extends WithEvents implements StyledLayer {
   private filtersCollection = new FiltersCollection<ColumnFilters, FunctionFilterApplicator>(
     FunctionFilterApplicator
   );
+  private callToViewportLoad = false;
 
   constructor(
     source: string | Source,
@@ -144,15 +145,19 @@ export class Layer extends WithEvents implements StyledLayer {
     // collection may have changed during instantiation...
     const layers = [...deckInstance.props.layers, createdDeckGLLayer];
 
+    const hasGeoJsonLayer = layers.some(layer => layer instanceof GeoJsonLayer);
+
     deckInstance.setProps({
       layers,
       onViewStateChange: ({ interactionState }) => {
-        if (interactionState.isPanning || interactionState.isZooming) {
-          layers.forEach(layer => {
-            if (layer instanceof GeoJsonLayer) {
-              this.emit('viewportLoad');
-            }
-          });
+        if ((interactionState.isPanning || interactionState.isZooming) && hasGeoJsonLayer) {
+          this.callToViewportLoad = true;
+        }
+      },
+      onAfterRender: () => {
+        if (this.callToViewportLoad) {
+          this.callToViewportLoad = false;
+          this.emit('viewportLoad');
         }
       }
     });

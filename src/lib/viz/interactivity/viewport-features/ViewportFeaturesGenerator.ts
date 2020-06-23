@@ -25,7 +25,7 @@ export class ViewportFeaturesGenerator {
 
   constructor(
     deckInstance?: Deck,
-    deckLayer?: MVTLayer<string>,
+    deckLayer?: MVTLayer<string> | GeoJsonLayer<GeoJSON>,
     options: ViewportFeaturesGeneratorOptions = DEFAULT_OPTIONS
   ) {
     const { uniqueIdProperty = DEFAULT_OPTIONS.uniqueIdProperty } = options;
