@@ -2,7 +2,7 @@ import { MapsDataviews as DataviewsApi } from '@/maps/MapsDataviews';
 import { AggregationType } from '@/maps/Client';
 import { defaultCredentials } from '@/core/Credentials';
 import { Source, CARTOSource, Layer } from '@/viz';
-import { Filter, spatialFilter, SpatialFilters } from '@/viz/filters/types';
+import { Filter, SpatialFilters, BuiltInFilters } from '@/viz/filters/types';
 import { FiltersCollection } from '@/viz/filters/FiltersCollection';
 import { RemoteFilterApplicator } from '@/viz/filters/RemoteFilterApplicator';
 import { DataViewMode } from './DataViewMode';
@@ -91,8 +91,8 @@ export class DataViewRemote extends DataViewMode {
     };
   }
 
-  public addFilter(filterId: string, filter: Filter | spatialFilter) {
-    if (filter === spatialFilter.VIEWPORT) {
+  public addFilter(filterId: string, filter: Filter | BuiltInFilters) {
+    if (filter === BuiltInFilters.VIEWPORT) {
       this.createViewportSpatialFilter(filterId);
     } else {
       this.dataSource.addFilter(filterId, { [this.column]: filter });
@@ -100,32 +100,6 @@ export class DataViewRemote extends DataViewMode {
   }
 
   private createViewportSpatialFilter(filterId: string) {
-    // const deckInstance = (this.dataSource as Layer).getMapInstance();
-    // const { onViewStateChange } = deckInstance.props;
-
-    // deckInstance.setProps({
-    //   onViewStateChange: (...args: any) => {
-    //     const { viewState, interactionState } = args[0];
-    //     const { inTransition, isDragging, isPanning, isRotating, isZooming } = interactionState;
-
-    //     // if (!inTransition && !isDragging && !isPanning && !isRotating && !isZooming) {
-    //     if (!isDragging && !isRotating) {
-    //       const viewport = new WebMercatorViewport(viewState);
-
-    //       const nw = viewport.unproject([0, 0]);
-    //       const se = viewport.unproject([viewport.width, viewport.height]);
-
-    //       const bbox = [nw[0], se[1], se[0], nw[1]];
-    //       this.filtersCollection.removeFilter(filterId);
-    //       this.filtersCollection.addFilter(filterId, { within: bbox });
-    //       this.emit('dataUpdate');
-    //     }
-
-    //     if (onViewStateChange) {
-    //       onViewStateChange(args);
-    //     }
-    //   }
-    // });
     (this.dataSource as Layer).on('viewportLoad', () => {
       const deckInstance = (this.dataSource as Layer).getMapInstance();
       const viewport = deckInstance.getViewports(undefined)[0];

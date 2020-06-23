@@ -5,6 +5,6 @@ export type FilterTypes = 'in';
 export type Filter = Dictionary<FilterTypes, string[]>;
 export type ColumnFilters = Dictionary<string, Filter>;
 export type SpatialFilters = Dictionary<SpatialFilterTypes, number[]>;
-export enum spatialFilter {
+export enum BuiltInFilters {
   VIEWPORT = 'viewport'
 }

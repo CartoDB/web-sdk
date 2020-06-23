@@ -1,5 +1,5 @@
 import { Layer, Source } from '@/viz';
-import { spatialFilter } from '@/viz/filters/types';
+import { BuiltInFilters } from '@/viz/filters/types';
 import { DataViewCalculation } from '../mode/DataViewMode';
 import { AggregationType } from '../../data/operations/aggregation/aggregation';
 import { DataViewLocal } from '../mode/DataViewLocal';
@@ -25,7 +25,7 @@ export class Formula extends DataViewWrapper {
 
       default: {
         dataView = new DataViewRemote(dataSource as Layer, column);
-        dataView.addFilter(`VIEWPORT_FILTER_${Date.now()}`, spatialFilter.VIEWPORT);
+        dataView.addFilter(`VIEWPORT_FILTER_${Date.now()}`, BuiltInFilters.VIEWPORT);
         break;
       }
     }

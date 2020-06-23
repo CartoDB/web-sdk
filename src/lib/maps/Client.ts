@@ -320,6 +320,7 @@ export interface MapDataviewsOptions {
    */
   bbox?: number[];
 }
+
 export enum AggregationType {
   COUNT = 'count',
   AVG = 'avg',
