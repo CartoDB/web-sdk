@@ -26,7 +26,7 @@ import {
 import { Category, Formula } from './dataviews';
 
 // Widgets
-import { Category as CategoryWidget } from './widgets';
+import { Category as CategoryWidget, Formula as FormulaWidget } from './widgets';
 
 /*
  * --- Public API ---
@@ -65,5 +65,6 @@ export const dataview = {
 
 // carto.widget
 export const widget = {
-  Category: CategoryWidget
+  Category: CategoryWidget,
+  Formula: FormulaWidget
 };
