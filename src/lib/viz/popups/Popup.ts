@@ -5,7 +5,7 @@ import { CartoPopupError, popupErrorTypes } from '../errors/popup-error';
 /**
  * Default options for the Popup
  */
-const defaultOptions = {
+const defaultOptions: PopupOptions = {
   closeButton: true,
   containerClassName: 'carto-popup',
   contentClassName: 'as-body',
