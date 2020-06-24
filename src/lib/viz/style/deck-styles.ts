@@ -36,7 +36,7 @@ function lineStyles(opts: any) {
 }
 
 function polygonStyles(opts: any) {
-  return {
+  const styles: any = {
     opacity: getStyleValue('opacity', 'Polygon', opts),
 
     getFillColor: hexToRgb(getStyleValue('color', 'Polygon', opts)),
@@ -50,6 +50,12 @@ function polygonStyles(opts: any) {
     lineWidthMaxPixels: getStyleValue('strokeWidthMax', 'Polygon', opts),
     lineWidthUnits: 'pixels'
   };
+  /* eslint-disable no-param-reassign */
+  return Object.keys(styles).filter((k: string) => styles[k] !== undefined && styles[k] !== null).reduce((total: any, k: string) => {
+    total[k] = styles[k];
+    return total;
+  }, {});
+  /* eslint-enable no-param-reassign */
 }
 
 export function getStyleValue(variable: string, geometryType: GeometryType, options: any) {
