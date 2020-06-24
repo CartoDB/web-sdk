@@ -39,15 +39,9 @@ export class Category extends DataViewWrapper {
     return (this.dataviewImpl as CategoryImpl<any>).operationColumn;
   }
   public set operationColumn(operationColumn: string) {
-    debounce(
-      () => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (this.dataviewImpl as CategoryImpl<any>).operationColumn = operationColumn;
-        this.emit('dataUpdate');
-      },
-      OPTION_CHANGED_DELAY,
-      this.setOptionScope
-    )(operationColumn);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (this.dataviewImpl as CategoryImpl<any>).operationColumn = operationColumn;
+    debounce(() => this.emit('dataUpdate'), OPTION_CHANGED_DELAY, this.setOptionScope)();
   }
 
   public get limit() {
@@ -56,14 +50,8 @@ export class Category extends DataViewWrapper {
   }
 
   public set limit(limit: number | undefined) {
-    debounce(
-      () => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (this.dataviewImpl as CategoryImpl<any>).limit = limit;
-        this.emit('dataUpdate');
-      },
-      OPTION_CHANGED_DELAY,
-      this.setOptionScope
-    )(limit);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (this.dataviewImpl as CategoryImpl<any>).limit = limit;
+    debounce(() => this.emit('dataUpdate'), OPTION_CHANGED_DELAY, this.setOptionScope)();
   }
 }
