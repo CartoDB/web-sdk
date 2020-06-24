@@ -47,14 +47,8 @@ export abstract class DataViewWrapper extends WithEvents {
   }
 
   public set column(column: string) {
-    debounce(
-      () => {
-        this.dataviewImpl.column = column;
-        this.emit('dataUpdate');
-      },
-      OPTION_CHANGED_DELAY,
-      this.setOptionScope
-    )(column);
+    this.dataviewImpl.column = column;
+    debounce(() => this.emit('dataUpdate'), OPTION_CHANGED_DELAY, this.setOptionScope)();
   }
 
   public get operation() {
@@ -62,14 +56,8 @@ export abstract class DataViewWrapper extends WithEvents {
   }
 
   public set operation(operation: AggregationType) {
-    debounce(
-      () => {
-        this.dataviewImpl.operation = operation;
-        this.emit('dataUpdate');
-      },
-      OPTION_CHANGED_DELAY,
-      this.setOptionScope
-    )(operation);
+    this.dataviewImpl.operation = operation;
+    debounce(() => this.emit('dataUpdate'), OPTION_CHANGED_DELAY, this.setOptionScope)();
   }
 
   private bindEvents() {
