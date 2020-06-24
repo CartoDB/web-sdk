@@ -20,12 +20,12 @@ export class Category extends DataViewWrapper {
       }
 
       case DataViewCalculation.REMOTE: {
-        dataView = new DataViewRemote(dataSource as Source, column);
+        dataView = new DataViewRemote(dataSource, column);
         break;
       }
 
       default: {
-        dataView = new DataViewRemote(dataSource as Layer, column);
+        dataView = new DataViewRemote(dataSource, column);
         dataView.addFilter(`VIEWPORT_FILTER_${uuidv4()}`, BuiltInFilters.VIEWPORT);
         break;
       }
