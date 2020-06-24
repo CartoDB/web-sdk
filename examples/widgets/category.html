@@ -87,8 +87,7 @@
 
         // A data-view to count
         const dataview = new carto.dataview.Category(countriesLayer, 'continent', {
-          operation: 'count',
-          operationColumn: 'cartodb_id'
+          operation: 'count'
         });
 
         new carto.widget.Category('as-category-widget', dataview);
