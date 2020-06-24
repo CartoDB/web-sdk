@@ -1,7 +1,7 @@
 import { WithEvents } from '@/core/mixins/WithEvents';
 import { Layer, Source } from '@/viz';
 import { Filter } from '@/viz/filters/types';
-import { AggregationType } from '@/maps/MapsDataviews';
+import { AggregationType } from '@/data/operations/aggregation/aggregation';
 import { DataViewImpl } from './DataViewImpl';
 import { DataViewMode, DataViewCalculation } from './mode/DataViewMode';
 import { debounce } from './utils';
@@ -81,7 +81,7 @@ export abstract class DataViewWrapper extends WithEvents {
 
     this.registerAvailableEvents(events);
     this.dataviewImpl.availableEvents.forEach((e: string) =>
-      this.dataviewImpl.on(e, (args: any[]) => this.emit(e, args))
+      this.dataviewImpl.on(e, (args: unknown[]) => this.emit(e, args))
     );
   }
 

@@ -2,18 +2,13 @@ import { DataFilterExtension } from '@deck.gl/extensions';
 import { GeoJsonProperties } from 'geojson';
 import { CartoError } from '@/core/errors/CartoError';
 import { ColumnFilters, FilterTypes } from './types';
+import { FilterApplicator } from './FilterApplicator';
 
 export enum FilterType {
   IN = 'IN'
 }
 
-export class FunctionFilterApplicator {
-  private filters: ColumnFilters;
-
-  constructor(filters: ColumnFilters) {
-    this.filters = { ...filters };
-  }
-
+export class FunctionFilterApplicator extends FilterApplicator<ColumnFilters> {
   getOptions() {
     return {
       getFilterValue: (f: GeoJSON.Feature) => this.applicator(f.properties || {}),
