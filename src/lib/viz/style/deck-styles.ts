@@ -1,4 +1,4 @@
-import { hexToRgb } from './helpers/utils';
+import { hexToRgb, isFunction } from './helpers/utils';
 import { GeometryType } from '../sources/Source';
 import { defaultStyles } from './default-styles';
 import { colorValidation } from './validators';
@@ -43,7 +43,7 @@ function polygonStyles(opts: any) {
     filled: true,
 
     stroked: true,
-    getLineColor: hexToRgb(getStyleValue('strokeColor', 'Polygon', opts)),
+    getLineColor: isFunction(opts.strokeColor) ? opts.strokeColor : hexToRgb(getStyleValue('strokeColor', 'Polygon', opts)),
     getLineWidth: getStyleValue('strokeWidth', 'Polygon', opts),
     lineWidthScale: getStyleValue('strokeWidthScale', 'Polygon', opts),
     lineWidthMinPixels: getStyleValue('strokeWidthMin', 'Polygon', opts),
@@ -116,7 +116,7 @@ function validateBasicParameters(options: Partial<BasicOptionsStyle>) {
     );
   }
 
-  if (options.strokeColor && !colorValidation(options.strokeColor)) {
+  if (options.strokeColor && typeof options.strokeColor !== 'function' && !colorValidation(options.strokeColor)) {
     throw new CartoStylingError(
       `strokeColor '${options.strokeColor}' is not valid`,
       stylingErrorTypes.PROPERTY_MISMATCH
