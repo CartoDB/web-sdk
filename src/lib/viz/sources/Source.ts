@@ -8,6 +8,8 @@ import { ColumnFilters } from '../filters/types';
 
 export type GeometryType = 'Point' | 'Line' | 'Polygon';
 
+export type SourceType = 'CARTOSource' | 'DOSource' | 'GeoJsonSource';
+
 export interface Stats {
   min: number;
   max: number;
@@ -52,6 +54,8 @@ export abstract class Source extends WithEvents {
 
   public isInitialized: boolean;
 
+  public sourceType: SourceType | unknown;
+
   constructor(id: string) {
     super();
 
@@ -74,4 +78,30 @@ export abstract class Source extends WithEvents {
   async removeFilter(_filterId: string) {
     throw new Error(`Method not implemented`);
   }
+}
+
+function getNewFields(newFields: StatFields, currentFields: StatFields): StatFields {
+  const newSampleFields = new Set([...newFields.sample].filter(f => !currentFields.sample.has(f)));
+
+  const newAggregationFields = new Set(
+    [...newFields.aggregation].filter(f => !currentFields.aggregation.has(f))
+  );
+
+  return {
+    sample: newSampleFields,
+    aggregation: newAggregationFields
+  };
+}
+
+export function shouldInitialize(
+  isInitialized: boolean,
+  newFields: StatFields,
+  currentFields: StatFields
+): boolean {
+  if (!isInitialized) {
+    return true;
+  }
+
+  const difference = getNewFields(newFields, currentFields);
+  return difference.sample.size > 0 || difference.aggregation.size > 0;
 }
