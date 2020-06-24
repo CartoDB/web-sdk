@@ -48,6 +48,16 @@ describe('DataView', () => {
         )
       );
     });
+
+    it('should create an instance with COUNT operation although the operationColumn is not provided', () => {
+      expect(
+        () =>
+          new Category(new Layer('fake_source'), 'fake_column', {
+            operation: AggregationType.COUNT,
+            mode: DataViewCalculation.LOCAL
+          })
+      ).not.toThrow();
+    });
   });
 
   describe('getData', () => {
@@ -79,6 +89,37 @@ describe('DataView', () => {
         operation: AggregationType.AVG,
         max: 50,
         min: 15,
+        nullCount: 0
+      });
+    });
+
+    it('should return the number of features grouped by category', async () => {
+      const sourceDataToGroup = [
+        { country: 'Country 2', popEst: 10 },
+        { country: 'Country 2', popEst: 20 },
+        { country: 'Country 4', popEst: 30 },
+        { country: 'Country 4', popEst: 40 },
+        { country: 'Country 5', popEst: 50 }
+      ];
+
+      const layer = new Layer('fake_source');
+      spyOn(layer, 'getViewportFeatures').and.returnValue(Promise.resolve(sourceDataToGroup));
+
+      const dataView = new Category(layer, 'country', {
+        operation: AggregationType.COUNT,
+        mode: DataViewCalculation.LOCAL
+      });
+
+      expect(await dataView.getData()).toMatchObject({
+        categories: [
+          { name: 'Country 2', value: 2 },
+          { name: 'Country 4', value: 2 },
+          { name: 'Country 5', value: 1 }
+        ],
+        count: 3,
+        operation: AggregationType.COUNT,
+        max: 2,
+        min: 1,
         nullCount: 0
       });
     });
