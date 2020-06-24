@@ -45,7 +45,9 @@ function polygonStyles(opts: any) {
     stroked: true,
     getLineColor: hexToRgb(getStyleValue('strokeColor', 'Polygon', opts)),
     getLineWidth: getStyleValue('strokeWidth', 'Polygon', opts),
-    lineWidthMinPixels: 0,
+    lineWidthScale: getStyleValue('strokeWidthScale', 'Polygon', opts),
+    lineWidthMinPixels: getStyleValue('strokeWidthMin', 'Polygon', opts),
+    lineWidthMaxPixels: getStyleValue('strokeWidthMax', 'Polygon', opts),
     lineWidthUnits: 'pixels'
   };
 }
