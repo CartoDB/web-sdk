@@ -1,6 +1,6 @@
 import { Layer } from '@/viz';
 import { AggregationType, aggregate } from '@/data/operations/aggregation/aggregation';
-import { groupValuesByAnotherColumn } from '@/data/operations/grouping';
+import { groupValuesByAnotherColumn, groupValues } from '@/data/operations/grouping';
 import { castToNumberOrUndefined } from '@/core/utils/number';
 import { DataViewMode, DataViewData } from './DataViewMode';
 import { CartoDataViewError, dataViewErrorTypes } from '../DataViewError';
@@ -53,15 +53,19 @@ export class DataViewLocal extends DataViewMode {
   }
 
   private async groupBy(operationColumn: string, operation: AggregationType) {
-    const sourceData = await this.getSourceData([operationColumn]);
-    const { groups, nullCount } = groupValuesByAnotherColumn(
-      sourceData,
-      operationColumn,
-      this.column
-    );
+    let groupedValues;
 
+    if (operationColumn) {
+      const sourceData = await this.getSourceData([operationColumn]);
+      groupedValues = groupValuesByAnotherColumn(sourceData, operationColumn, this.column);
+    } else {
+      const sourceData = await this.getSourceData();
+      groupedValues = groupValues(sourceData, this.column);
+    }
+
+    const { groups, nullCount } = groupedValues;
     const categories = Object.keys(groups).map(group =>
-      createCategory(group, groups[group] as number[], operation)
+      createCategory(group, groups[group] as number[] | number, operation)
     );
 
     return { nullCount, categories };
@@ -82,18 +86,26 @@ export class DataViewLocal extends DataViewMode {
   }
 }
 
-function createCategory(name: string, data: number[], operation: AggregationType) {
-  const numberFilter = function numberFilter(value: number | undefined) {
-    return Number.isFinite(value as number);
-  };
+function createCategory(name: string, data: number[] | number, operation: AggregationType) {
+  let categoryValue;
 
-  const filteredValues = data
-    .map(number => castToNumberOrUndefined(number))
-    .filter(numberFilter) as number[];
+  if (operation === AggregationType.COUNT) {
+    categoryValue = data as number;
+  } else {
+    const numberFilter = function numberFilter(value: number | undefined) {
+      return Number.isFinite(value as number);
+    };
+
+    const filteredValues = (data as number[])
+      .map(number => castToNumberOrUndefined(number))
+      .filter(numberFilter) as number[];
+
+    categoryValue = aggregate(filteredValues, operation);
+  }
 
   return {
     name,
-    value: aggregate(filteredValues, operation)
+    value: categoryValue
   };
 }
 
