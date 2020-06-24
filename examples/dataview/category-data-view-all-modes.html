@@ -43,9 +43,9 @@
             </p>
             <p>
               <span class="as-caption">Operation</span>
-              <as-dropdown default-text="Operation" can-clear="false" selected-option="count"></as-dropdown>
+              <as-dropdown default-text="Operation" can-clear="false" selected-option="sum"></as-dropdown>
             </p>
-            <p>
+            <p id="operationColumnSection">
               <span class="as-caption">Operation column</span>
               <input id="operationColumn" class="as-input" type="text" value="pop_est" />
             </p>
@@ -74,6 +74,7 @@
   <script src="/dist/umd/index.min.js"></script>
 
   <script>
+    const operationColumnSection = document.getElementById('operationColumnSection');
     const operationElem = document.querySelector('as-dropdown');
     operationElem.options = [
       { text: 'SUM', value: 'sum' },
@@ -82,6 +83,9 @@
       { text: 'MAX', value: 'max' },
       { text: 'MIN', value: 'min' }
     ];
+    operationElem.addEventListener('optionChanged', function (event) {
+      operationColumnSection.style.display = (event.detail === 'count') ? 'none' : '';
+    });
     const widgetRemoteElement = document.getElementById(
       'category-widget-remote'
       );
@@ -104,17 +108,17 @@
       categoryRemote = new carto.dataview.Category(
         countriesLayer.source,
         'continent',
-        { operation: 'count', operationColumn: 'pop_est', mode: 'remote' }
+        { operation: 'sum', operationColumn: 'pop_est', mode: 'remote' }
       );
       categoryRemoteFiltered = new carto.dataview.Category(
         countriesLayer,
         'continent',
-        { operation: 'count', operationColumn: 'pop_est', mode: 'remote-filtered' }
+        { operation: 'sum', operationColumn: 'pop_est', mode: 'remote-filtered' }
       );
       categoryLocal = new carto.dataview.Category(
         countriesLayer,
         'continent',
-        { operation: 'count', operationColumn: 'pop_est', mode: 'local' }
+        { operation: 'sum', operationColumn: 'pop_est', mode: 'local' }
       );
 
       new carto.widget.Category('#category-widget-remote', categoryRemote);
@@ -145,27 +149,33 @@
       const operation = operationElem.selectedOption;
       const column = document.getElementById('column').value;
       const limit = Number.parseInt(document.getElementById('limit').value);
-      const operationColumn = document.getElementById('operationColumn')
-        .value;
+      const operationColumn = document.getElementById('operationColumn').value;
 
       errorContainer.innerHTML = '';
       widgetRemoteElement.isLoading = 'true';
       widgetRemoteFilteredElement.isLoading = 'true';
 
       categoryLocal.column = column;
-      categoryLocal.operationColumn = operationColumn;
       categoryLocal.operation = operation;
       categoryLocal.limit = limit;
 
       categoryRemote.column = column;
-      categoryRemote.operationColumn = operationColumn;
       categoryRemote.operation = operation;
       categoryRemote.limit = limit;
 
       categoryRemoteFiltered.column = column;
-      categoryRemoteFiltered.operationColumn = operationColumn;
       categoryRemoteFiltered.operation = operation;
       categoryRemoteFiltered.limit = limit;
+
+      if (operation === 'count') {
+        categoryLocal.operationColumn = undefined;
+        categoryRemote.operationColumn = undefined;
+        categoryRemoteFiltered.operationColumn = undefined;
+      } else {
+        categoryLocal.operationColumn = operationColumn;
+        categoryRemote.operationColumn = operationColumn;
+        categoryRemoteFiltered.operationColumn = operationColumn;
+      }
     }
 
     initialize();
