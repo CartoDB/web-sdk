@@ -1,4 +1,6 @@
 import { Layer, Source } from '@/viz';
+import { BuiltInFilters } from '@/viz/filters/types';
+import { uuidv4 } from '@/core/utils/uuid';
 import { DataViewLocal } from '../mode/DataViewLocal';
 import { DataViewRemote } from '../mode/DataViewRemote';
 import { DataViewCalculation } from '../mode/DataViewMode';
@@ -23,7 +25,8 @@ export class Category extends DataViewWrapper {
       }
 
       default: {
-        dataView = new DataViewRemote(dataSource as Source, column);
+        dataView = new DataViewRemote(dataSource as Layer, column);
+        dataView.addFilter(`VIEWPORT_FILTER_${uuidv4()}`, BuiltInFilters.VIEWPORT);
         break;
       }
     }

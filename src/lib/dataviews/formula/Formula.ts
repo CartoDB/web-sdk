@@ -1,4 +1,6 @@
 import { Layer, Source } from '@/viz';
+import { BuiltInFilters } from '@/viz/filters/types';
+import { uuidv4 } from '@/core/utils/uuid';
 import { DataViewCalculation } from '../mode/DataViewMode';
 import { AggregationType } from '../../data/operations/aggregation/aggregation';
 import { DataViewLocal } from '../mode/DataViewLocal';
@@ -23,7 +25,8 @@ export class Formula extends DataViewWrapper {
       }
 
       default: {
-        dataView = new DataViewRemote(dataSource as Source, column);
+        dataView = new DataViewRemote(dataSource as Layer, column);
+        dataView.addFilter(`VIEWPORT_FILTER_${uuidv4()}`, BuiltInFilters.VIEWPORT);
         break;
       }
     }

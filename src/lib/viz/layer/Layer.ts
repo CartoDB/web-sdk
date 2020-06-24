@@ -5,9 +5,10 @@ import { MVTLayer } from '@deck.gl/geo-layers';
 import mitt from 'mitt';
 import deepmerge from 'deepmerge';
 import { GeoJSON } from 'geojson';
+import { uuidv4 } from '@/core/utils/uuid';
 import { WithEvents } from '@/core/mixins/WithEvents';
 import { Source, StatFields } from '../sources/Source';
-import { CARTOSource, DOSource, GeoJsonSource } from '../sources';
+import { CARTOSource, GeoJsonSource } from '../sources';
 import { DOLayer } from '../deck/DOLayer';
 import { getStyles, StyleProperties, Style } from '../style';
 import { ViewportFeaturesGenerator } from '../interactivity/viewport-features/ViewportFeaturesGenerator';
@@ -46,7 +47,9 @@ export class Layer extends WithEvents implements StyledLayer {
   private _pickableEventsCount = 0;
   private _fields: StatFields;
 
-  private filtersCollection = new FiltersCollection(FunctionFilterApplicator);
+  private filtersCollection = new FiltersCollection<ColumnFilters, FunctionFilterApplicator>(
+    FunctionFilterApplicator
+  );
 
   constructor(
     source: string | Source,
@@ -65,12 +68,13 @@ export class Layer extends WithEvents implements StyledLayer {
     ]);
 
     this._options = {
-      id: `${this._source.id}-${Date.now()}`,
+      id: `${this._source.id}-${uuidv4()}`,
       ...options
     };
 
     this._interactivity = this._buildInteractivity(options);
-    this._fields = this._buildFields();
+    this._fields = { sample: new Set(), aggregation: new Set() };
+    this._addStyleFields();
   }
 
   getMapInstance(): Deck {
@@ -104,7 +108,7 @@ export class Layer extends WithEvents implements StyledLayer {
    */
   public async setStyle(style: Style) {
     this._style = buildStyle(style);
-    this._fields = this._buildFields();
+    this._addStyleFields();
 
     if (this._deckLayer) {
       await this.replaceDeckGLLayer();
@@ -165,10 +169,10 @@ export class Layer extends WithEvents implements StyledLayer {
 
       if (!this._options.pickable) {
         this._options.pickable = true;
+      }
 
-        if (this._deckLayer) {
-          await this.replaceDeckGLLayer();
-        }
+      if (this._deckLayer) {
+        await this.replaceDeckGLLayer();
       }
     }
 
@@ -205,20 +209,20 @@ export class Layer extends WithEvents implements StyledLayer {
   /**
    * Method to create the Deck.gl layer
    */
-  public async _createDeckGLLayer() {
+  public async _createDeckGLLayer(forceInit = false) {
     // The first step is to initialize the source to get the geometryType and the stats
-    if (!this._source.isInitialized) {
+    if (!this._source.isInitialized || forceInit) {
       await this._source.init(this._fields);
     }
 
     const layerProperties = await this._getLayerProperties();
 
     // Create the Deck.gl instance
-    if (this._source instanceof CARTOSource) {
+    if (this._source.sourceType === 'CARTOSource') {
       this._deckLayer = new MVTLayer(layerProperties);
-    } else if (this._source instanceof GeoJsonSource) {
+    } else if (this._source.sourceType === 'GeoJsonSource') {
       this._deckLayer = new GeoJsonLayer(layerProperties);
-    } else if (this._source instanceof DOSource) {
+    } else if (this._source.sourceType === 'DOSource') {
       this._deckLayer = new DOLayer(layerProperties);
     } else {
       throw new CartoLayerError('Unsupported source instance', layerErrorTypes.UNKNOWN_SOURCE);
@@ -295,7 +299,7 @@ export class Layer extends WithEvents implements StyledLayer {
       );
 
       const updatedLayers = [...otherDeckLayers];
-      const newLayer = await this._createDeckGLLayer();
+      const newLayer = await this._createDeckGLLayer(true);
       updatedLayers.splice(originalPosition, 0, newLayer);
 
       this._deckInstance.setProps({
@@ -324,13 +328,13 @@ export class Layer extends WithEvents implements StyledLayer {
    * user clicks on one or more features of the layer.
    */
   public async setPopupClick(elements: PopupElement[] | string[] | null = []) {
-    this._interactivity.setPopupClick(elements);
     this._addPopupFields(elements);
+    await this._interactivity.setPopupClick(elements);
   }
 
   public async setPopupHover(elements: PopupElement[] | string[] | null = []) {
-    this._interactivity.setPopupHover(elements);
     this._addPopupFields(elements);
+    await this._interactivity.setPopupHover(elements);
   }
 
   public remove() {
@@ -387,23 +391,6 @@ export class Layer extends WithEvents implements StyledLayer {
     });
   }
 
-  private _buildFields(): StatFields {
-    const sample: Set<string> = new Set();
-    const aggregation: Set<string> = new Set();
-    const fields = { sample, aggregation };
-
-    if (this._style && this._style.field) {
-      const { field } = this._style;
-      fields.sample.add(field);
-
-      if (field !== DEFAULT_ID_PROPERTY) {
-        fields.aggregation.add(field);
-      }
-    }
-
-    return fields;
-  }
-
   addFilter(filterId: string, filter: ColumnFilters) {
     this.filtersCollection.addFilter(filterId, filter);
 
@@ -422,6 +409,17 @@ export class Layer extends WithEvents implements StyledLayer {
     }
 
     return Promise.resolve();
+  }
+
+  private _addStyleFields() {
+    if (this._style && this._style.field) {
+      const { field } = this._style;
+      this._fields.sample.add(field);
+
+      if (field !== DEFAULT_ID_PROPERTY) {
+        this._fields.aggregation.add(field);
+      }
+    }
   }
 
   private _addPopupFields(elements: PopupElement[] | string[] | null = []) {

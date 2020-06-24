@@ -105,7 +105,7 @@ export class LayerInteractivity {
    * This method creates popups every time the
    * user clicks on one or more features of the layer.
    */
-  public setPopupClick(elements: PopupElement[] | string[] | null = []) {
+  public async setPopupClick(elements: PopupElement[] | string[] | null = []) {
     // if the popup was not created yet then we create it and add it to the map
     if (!this._clickPopup) {
       this._clickPopup = new Popup();
@@ -115,10 +115,10 @@ export class LayerInteractivity {
       }
     }
 
-    this._popupHandler(InteractivityEventType.CLICK, this._clickPopup, elements);
+    await this._popupHandler(InteractivityEventType.CLICK, this._clickPopup, elements);
   }
 
-  public setPopupHover(elements: PopupElement[] | string[] | null = []) {
+  public async setPopupHover(elements: PopupElement[] | string[] | null = []) {
     // if the popup was not created yet then we create it and add it to the map
     if (!this._hoverPopup) {
       this._hoverPopup = new Popup({ closeButton: false });
@@ -128,10 +128,10 @@ export class LayerInteractivity {
       }
     }
 
-    this._popupHandler(InteractivityEventType.HOVER, this._hoverPopup, elements);
+    await this._popupHandler(InteractivityEventType.HOVER, this._hoverPopup, elements);
   }
 
-  private _popupHandler(
+  private async _popupHandler(
     eventType: InteractivityEventType,
     popup: Popup,
     elements: PopupElement[] | string[] | null = []
@@ -153,13 +153,14 @@ export class LayerInteractivity {
     }
 
     if (elements && elements.length > 0) {
-      this._layerOnFn(eventType, handlerFn);
+      // can reinit source
+      await this._layerOnFn(eventType, handlerFn);
     } else if (!elements || elements.length === 0) {
       if (popup) {
         popup.close();
       }
 
-      this._layerOffFn(eventType, handlerFn);
+      await this._layerOffFn(eventType, handlerFn);
     }
   }
 

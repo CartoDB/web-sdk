@@ -1,3 +1,5 @@
+import { AggregationType } from '@/data/operations/aggregation/aggregation';
+import { uuidv4 } from '@/core/utils/uuid';
 import { Credentials } from '../core/Credentials';
 import errorHandlers from './errors';
 import { encodeParameter, getRequest, postRequest } from './utils';
@@ -54,6 +56,7 @@ export class Client {
   }
 
   public static generateMapConfigFromSource(source: string) {
+    const uuid = uuidv4();
     const type = source.search(' ') > -1 ? 'sql' : 'dataset';
 
     return {
@@ -63,9 +66,9 @@ export class Client {
       analyses: [
         {
           type: 'source',
-          id: `${source}_${Date.now()}`,
+          id: `${source}_${uuid}`,
           params: {
-            query: `SELECT * FROM ${source}`
+            query: type === 'sql' ? source : `SELECT * FROM ${source}`
           }
         }
       ],
@@ -78,7 +81,11 @@ export class Client {
    * @param layergroup
    * @param options
    */
-  public async dataview(layergroup: any, dataview: string, categories?: number) {
+  public async dataview(
+    layergroup: MapInstance,
+    dataview: string,
+    dataViewOptions?: Partial<MapDataviewsOptions>
+  ) {
     const {
       metadata: {
         dataviews: {
@@ -87,14 +94,16 @@ export class Client {
       }
     } = layergroup;
 
-    const parameters = [encodeParameter('api_key', this._credentials.apiKey)];
+    const params = {
+      api_key: this._credentials.apiKey,
+      ...dataViewOptions
+    };
 
-    if (categories) {
-      const encodedCategories = encodeParameter('categories', categories.toString());
-      parameters.push(encodedCategories);
-    }
-
-    const getUrl = `${url.https}?${parameters.join('&')}`;
+    const definedParams = Object.fromEntries(Object.entries(params).filter(([, v]) => !!v));
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    const urlSearchParams = new URLSearchParams(definedParams);
+    const getUrl = `${url.https}?${urlSearchParams.toString()}`;
     const response = await fetch(getRequest(getUrl));
     const dataviewResponse = await response.json();
 
@@ -234,6 +243,14 @@ export interface MapInstance {
         };
       }
     ];
+    dataviews: {
+      [dataview: string]: {
+        url: {
+          http: string;
+          https: string;
+        };
+      };
+    };
     tilejson: {
       vector: {
         tilejson: string;
@@ -246,20 +263,61 @@ export interface MapInstance {
         subdomains: string[];
       };
     };
-    // eslint-disable-next-line camelcase
-    cdn_url: {
-      http: string;
-      https: string;
-      templates: {
-        http: {
-          subdomains: string[];
-          url: string;
-        };
-        https: {
-          subdomains: string[];
-          url: string;
-        };
+  };
+  // eslint-disable-next-line camelcase
+  cdn_url: {
+    http: string;
+    https: string;
+    templates: {
+      http: {
+        subdomains: string[];
+        url: string;
+      };
+      https: {
+        subdomains: string[];
+        url: string;
       };
     };
   };
+}
+
+export interface MapDataviewsOptions {
+  /**
+   * column name to aggregate by
+   */
+  column: string;
+
+  /**
+   * operation to perform
+   */
+  aggregation: AggregationType;
+
+  /**
+   * operation to perform
+   */
+  operation: AggregationType;
+
+  /**
+   * The num of categories
+   */
+  categories?: number;
+
+  /**
+   * Column value to aggregate.
+   * This param is required when
+   * `aggregation` is different than "count"
+   */
+  operationColumn?: string;
+
+  /**
+   * [Maps API parameter name]
+   * Same as operationColumn but this is the
+   * name which is used by Maps API as parameter
+   */
+  aggregationColumn?: string;
+
+  /**
+   * Bounding box to filter data
+   */
+  bbox?: number[];
 }

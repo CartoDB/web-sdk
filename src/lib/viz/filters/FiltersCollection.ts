@@ -1,16 +1,15 @@
 import deepmerge from 'deepmerge';
-import { FunctionFilterApplicator } from './FunctionFilterApplicator';
-import { ColumnFilters } from './types';
+import { FilterApplicator } from './FilterApplicator';
 
-export class FiltersCollection {
-  private collection: Map<string, ColumnFilters> = new Map();
-  private FilterApplicator: typeof FunctionFilterApplicator;
+export class FiltersCollection<T, K extends FilterApplicator<T>> {
+  private collection: Map<string, T> = new Map();
+  private FilterApplicatorClass: { new (filters: T): K };
 
-  constructor(FilterApplicator: typeof FunctionFilterApplicator) {
-    this.FilterApplicator = FilterApplicator;
+  constructor(FilterApplicatorClass: { new (filters: T): K }) {
+    this.FilterApplicatorClass = FilterApplicatorClass;
   }
 
-  addFilter(filterId: string, filterDefinition: ColumnFilters) {
+  addFilter(filterId: string, filterDefinition: T) {
     this.collection.set(filterId, filterDefinition);
   }
 
@@ -20,7 +19,7 @@ export class FiltersCollection {
 
   getApplicatorInstance() {
     const filters = this._mergeFilters();
-    return new this.FilterApplicator(filters);
+    return new this.FilterApplicatorClass(filters);
   }
 
   getUpdateTriggers() {
@@ -29,11 +28,11 @@ export class FiltersCollection {
     };
   }
 
-  private _getUniqueID() {
+  protected _getUniqueID() {
     return JSON.stringify(Array.from(this.collection.values()));
   }
 
-  private _mergeFilters(): ColumnFilters {
-    return deepmerge.all(Array.from(this.collection.values())) as ColumnFilters;
+  protected _mergeFilters(): T {
+    return deepmerge.all(Array.from(this.collection.values())) as T;
   }
 }
