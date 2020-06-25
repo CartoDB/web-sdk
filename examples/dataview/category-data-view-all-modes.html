@@ -106,7 +106,7 @@
       await countriesLayer.addTo(deckMap);
 
       categoryRemote = new carto.dataview.Category(
-        countriesLayer.source,
+        countriesLayer,
         'continent',
         { operation: 'sum', operationColumn: 'pop_est', mode: 'remote' }
       );
