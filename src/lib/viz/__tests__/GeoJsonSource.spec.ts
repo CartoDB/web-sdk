@@ -218,7 +218,7 @@ describe('SourceMetadata', () => {
     });
   });
 
-  it('should fail if fields does not exist in geoJSON', async () => {
+  it('should fail if sample fields does not exist in geoJSON', async () => {
     const fields = {
       sample: new Set(['number', 'cat']),
       aggregation: new Set(['number'])
@@ -236,7 +236,7 @@ describe('SourceMetadata', () => {
     }).rejects.toEqual(new Error("Field/s 'number, cat' do/es not exist in geoJSON properties"));
   });
 
-  it('should fail if a field does not exist in geoJSON', async () => {
+  it('should fail if a sample field does not exist in geoJSON', async () => {
     const fields = {
       sample: new Set(['number', 'cat']),
       aggregation: new Set(['number'])
