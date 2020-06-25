@@ -81,9 +81,9 @@ describe('DataView', () => {
 
       expect(await dataView.getData()).toMatchObject({
         categories: [
-          { name: 'Country 2', value: 15 },
+          { name: 'Country 5', value: 50 },
           { name: 'Country 4', value: 35 },
-          { name: 'Country 5', value: 50 }
+          { name: 'Country 2', value: 15 }
         ],
         count: 3,
         operation: AggregationType.AVG,
@@ -95,11 +95,11 @@ describe('DataView', () => {
 
     it('should return the number of features grouped by category', async () => {
       const sourceDataToGroup = [
-        { country: 'Country 2', popEst: 10 },
-        { country: 'Country 2', popEst: 20 },
-        { country: 'Country 4', popEst: 30 },
+        { country: 'Country 5', popEst: 50 },
         { country: 'Country 4', popEst: 40 },
-        { country: 'Country 5', popEst: 50 }
+        { country: 'Country 4', popEst: 30 },
+        { country: 'Country 2', popEst: 20 },
+        { country: 'Country 2', popEst: 10 }
       ];
 
       const layer = new Layer('fake_source');

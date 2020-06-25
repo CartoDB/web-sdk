@@ -53,10 +53,15 @@ export interface CategoryOptions {
 }
 
 export interface CategoryData {
-  categories: { name: string; value: number }[];
+  categories: CategoryElement[];
   count: number;
   max: number;
   min: number;
   nullCount: number;
   operation: AggregationType;
+}
+
+export interface CategoryElement {
+  name: string;
+  value: number;
 }
