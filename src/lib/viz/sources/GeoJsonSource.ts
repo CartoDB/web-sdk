@@ -9,7 +9,8 @@ import {
   NumericFieldStats,
   CategoryFieldStats,
   GeometryType,
-  StatFields
+  StatFields,
+  shouldInitialize
 } from './Source';
 
 import { sourceErrorTypes, SourceError } from '../errors/source-error';
@@ -27,14 +28,17 @@ export class GeoJsonSource extends Source {
   private _props?: GeoJsonSourceProps;
   private _numericFieldValues: Record<string, number[]>;
   private _categoryFieldValues: Record<string, string[]>;
+  private _fields: StatFields;
 
   constructor(geojson: GeoJSON) {
     const id = `geojson-${uuidv4()}`;
     super(id);
+    this.sourceType = 'GeoJsonSource';
 
     this._geojson = geojson;
     this._numericFieldValues = {};
     this._categoryFieldValues = {};
+    this._fields = { sample: new Set(), aggregation: new Set() };
   }
 
   public getProps(): GeoJsonSourceProps {
@@ -54,24 +58,34 @@ export class GeoJsonSource extends Source {
   }
 
   public async init(fields: StatFields): Promise<boolean> {
+    if (!shouldInitialize(this.isInitialized, fields, this._fields)) {
+      return true;
+    }
+
+    if (this.isInitialized) {
+      console.warn('GeoJsonSource reinitialized');
+    }
+
     this._props = { type: 'GeoJsonLayer', data: this._geojson };
     this._metadata = this._buildMetadata(fields);
 
     this.isInitialized = true;
-    return Promise.resolve(true);
+    return true;
   }
 
   private _buildMetadata(fields: StatFields) {
     const geometryType = getGeomType(this._geojson);
 
-    const columns = new Set([...fields.sample, ...fields.aggregation]);
-    const stats = this._getStats([...columns]);
+    this._fields = fields;
+    const stats = this._getStats();
 
     return { geometryType, stats };
   }
 
-  private _getStats(fields: string[]): (NumericFieldStats | CategoryFieldStats)[] {
+  private _getStats(): (NumericFieldStats | CategoryFieldStats)[] {
     let stats: (NumericFieldStats | CategoryFieldStats)[] = [];
+
+    const fields = [...new Set([...this._fields.sample, ...this._fields.aggregation])];
 
     if (!fields.length) {
       return stats;
@@ -140,6 +154,11 @@ export class GeoJsonSource extends Source {
   private _calculateStats() {
     const numericStats = this._calculateNumericStats();
     const categoryStats = this._calculateCategoryStats();
+
+    // free memory
+    this._numericFieldValues = {};
+    this._categoryFieldValues = {};
+
     return [...numericStats, ...categoryStats];
   }
 

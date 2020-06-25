@@ -1,4 +1,5 @@
 import { AggregationType } from '@/data/operations/aggregation/aggregation';
+import { uuidv4 } from '@/core/utils/uuid';
 import { Credentials } from '../core/Credentials';
 import errorHandlers from './errors';
 import { encodeParameter, getRequest, postRequest } from './utils';
@@ -55,6 +56,7 @@ export class Client {
   }
 
   public static generateMapConfigFromSource(source: string) {
+    const uuid = uuidv4();
     const type = source.search(' ') > -1 ? 'sql' : 'dataset';
 
     return {
@@ -64,9 +66,9 @@ export class Client {
       analyses: [
         {
           type: 'source',
-          id: `${source}_${Date.now()}`,
+          id: `${source}_${uuid}`,
           params: {
-            query: `SELECT * FROM ${source}`
+            query: type === 'sql' ? source : `SELECT * FROM ${source}`
           }
         }
       ],
