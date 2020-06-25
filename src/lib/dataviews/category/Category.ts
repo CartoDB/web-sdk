@@ -21,6 +21,12 @@ export class Category extends DataViewWrapper {
       }
 
       case DataViewCalculation.REMOTE: {
+        if (isGeoJSONSource(dataSource)) {
+          const useViewport = false;
+          dataView = new DataViewLocal(dataSource as Layer, column, useViewport);
+          break;
+        }
+
         dataView = new DataViewRemote(dataSource, column);
         break;
       }
@@ -29,10 +35,7 @@ export class Category extends DataViewWrapper {
 
       // eslint-disable-next-line no-fallthrough
       default: {
-        if (
-          (dataSource instanceof Layer && dataSource.source instanceof GeoJsonSource) ||
-          dataSource instanceof GeoJsonSource
-        ) {
+        if (isGeoJSONSource(dataSource)) {
           dataView = new DataViewLocal(dataSource as Layer, column);
           break;
         }
@@ -66,4 +69,11 @@ export class Category extends DataViewWrapper {
     (this.dataviewImpl as CategoryImpl<any>).limit = limit;
     debounce(() => this.emit('dataUpdate'), OPTION_CHANGED_DELAY, this.setOptionScope)();
   }
+}
+
+function isGeoJSONSource(dataSource: Layer | Source) {
+  return (
+    (dataSource instanceof Layer && dataSource.source instanceof GeoJsonSource) ||
+    dataSource instanceof GeoJsonSource
+  );
 }

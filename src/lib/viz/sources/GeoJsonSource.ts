@@ -14,6 +14,7 @@ import {
 } from './Source';
 
 import { sourceErrorTypes, SourceError } from '../errors/source-error';
+import { selectPropertiesFrom } from '../utils/object';
 
 interface GeoJsonSourceProps extends SourceProps {
   data: GeoJSON;
@@ -55,6 +56,16 @@ export class GeoJsonSource extends Source {
     }
 
     return this._metadata;
+  }
+
+  public getFeatures(properties: string[] = []) {
+    const features = getFeatures(this._geojson);
+
+    return features
+      .map(feature => {
+        return selectPropertiesFrom(feature.properties as Record<string, unknown>, properties);
+      })
+      .flat();
   }
 
   public async init(fields: StatFields): Promise<boolean> {
