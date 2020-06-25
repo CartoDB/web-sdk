@@ -63,6 +63,7 @@ export class GeoJsonSource extends Source {
     }
 
     if (this.isInitialized) {
+      // eslint-disable-next-line no-console
       console.warn('GeoJsonSource reinitialized');
     }
 
@@ -76,7 +77,7 @@ export class GeoJsonSource extends Source {
   private _buildMetadata(fields: StatFields) {
     const geometryType = getGeomType(this._geojson);
 
-    this._fields = fields;
+    this._saveFields(fields);
     const stats = this._getStats();
 
     return { geometryType, stats };
@@ -216,19 +217,28 @@ export class GeoJsonSource extends Source {
     return categoryStats;
   }
 
+  private _saveFields(fields: StatFields) {
+    this._fields.sample = new Set([...fields.sample]);
+    this._fields.aggregation = new Set([...fields.aggregation]);
+  }
+
   private _validateFieldsInStats(stats: (NumericFieldStats | CategoryFieldStats)[]) {
     if (this._fields.sample.size) {
-      const requiredFields = [...this._fields.sample];
-      const existingStatsFields = stats
-        .filter(s => requiredFields.includes(s.name))
-        .map(s => s.name);
+      const noDataFields = validateFieldNamesInStats([...this._fields.sample], stats);
 
-      // some required fields do not have data in the geoJSON
-      if (existingStatsFields.length !== requiredFields.length) {
-        const noDataFields = requiredFields.filter(f => !existingStatsFields.includes(f));
+      if (noDataFields.length) {
         throw new Error(
           `Field/s '${noDataFields.join(', ')}' do/es not exist in geoJSON properties`
         );
+      }
+    }
+
+    if (this._fields.aggregation.size) {
+      const noDataFields = validateFieldNamesInStats([...this._fields.aggregation], stats);
+
+      if (noDataFields.length) {
+        // eslint-disable-next-line no-console
+        console.warn(`Field/s '${noDataFields.join(', ')}' do/es not exist in geoJSON properties`);
       }
     }
   }
@@ -281,4 +291,18 @@ function createSample(values: number[]) {
 
   const shuffled = values.sort(() => 0.5 - Math.random());
   return shuffled.slice(0, MAX_SAMPLE_SIZE);
+}
+
+export function validateFieldNamesInStats(
+  fields: string[],
+  stats: (NumericFieldStats | CategoryFieldStats)[]
+) {
+  const existingStatsFields = stats.filter(s => fields.includes(s.name)).map(s => s.name);
+
+  // some required fields do not have data in the geoJSON
+  if (existingStatsFields.length !== fields.length) {
+    return fields.filter(f => !existingStatsFields.includes(f));
+  }
+
+  return [];
 }
