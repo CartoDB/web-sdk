@@ -99,7 +99,7 @@ export class GeoJsonSource extends Source {
       stats = this._calculateStats();
     }
 
-    this._validateFieldsInStats(stats);
+    validateFieldNamesInStats(fields, stats);
 
     return stats;
   }
@@ -221,27 +221,6 @@ export class GeoJsonSource extends Source {
     this._fields.sample = new Set([...fields.sample]);
     this._fields.aggregation = new Set([...fields.aggregation]);
   }
-
-  private _validateFieldsInStats(stats: (NumericFieldStats | CategoryFieldStats)[]) {
-    if (this._fields.sample.size) {
-      const noDataFields = validateFieldNamesInStats([...this._fields.sample], stats);
-
-      if (noDataFields.length) {
-        throw new Error(
-          `Field/s '${noDataFields.join(', ')}' do/es not exist in geoJSON properties`
-        );
-      }
-    }
-
-    if (this._fields.aggregation.size) {
-      const noDataFields = validateFieldNamesInStats([...this._fields.aggregation], stats);
-
-      if (noDataFields.length) {
-        // eslint-disable-next-line no-console
-        console.warn(`Field/s '${noDataFields.join(', ')}' do/es not exist in geoJSON properties`);
-      }
-    }
-  }
 }
 
 export function getGeomType(geojson: GeoJSON): GeometryType {
@@ -299,10 +278,12 @@ export function validateFieldNamesInStats(
 ) {
   const existingStatsFields = stats.filter(s => fields.includes(s.name)).map(s => s.name);
 
-  // some required fields do not have data in the geoJSON
+  // some fields do not have data in the geoJSON
   if (existingStatsFields.length !== fields.length) {
-    return fields.filter(f => !existingStatsFields.includes(f));
-  }
+    const noDataFields = fields.filter(f => !existingStatsFields.includes(f));
 
-  return [];
+    throw new SourceError(
+      `Field/s '${noDataFields.join(', ')}' do/es not exist in geoJSON properties`
+    );
+  }
 }
