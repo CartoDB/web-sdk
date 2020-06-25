@@ -12,7 +12,7 @@ export class CategoryImpl<T extends DataViewMode> extends DataViewImpl<T> {
 
     const { operationColumn, limit } = options || {};
 
-    validateParameters(operationColumn);
+    validateParameters(this.operation, operationColumn);
 
     this.operationColumn = operationColumn;
     this.limit = limit;
@@ -36,8 +36,8 @@ export class CategoryImpl<T extends DataViewMode> extends DataViewImpl<T> {
   }
 }
 
-function validateParameters(operationColumn: string) {
-  if (!operationColumn) {
+function validateParameters(operation: AggregationType, operationColumn: string) {
+  if (!operationColumn && operation !== AggregationType.COUNT) {
     throw new CartoDataViewError(
       'Operation column property not provided while creating dataview. Please check documentation.',
       dataViewErrorTypes.PROPERTY_MISSING
@@ -53,10 +53,15 @@ export interface CategoryOptions {
 }
 
 export interface CategoryData {
-  categories: { name: string; value: number }[];
+  categories: CategoryElement[];
   count: number;
   max: number;
   min: number;
   nullCount: number;
   operation: AggregationType;
+}
+
+export interface CategoryElement {
+  name: string;
+  value: number;
 }
