@@ -78,16 +78,26 @@
       const widgetElement = document.querySelector('as-category-widget');
 
       async function initialize() {
-        carto.setDefaultCredentials({ username: 'public' });
+        const url =
+          'https://public.carto.com/api/v2/sql?api_key=default_public&q=select* from world_ports&format=geojson';
+        const geojsonData = await fetch(url).then(response => response.json());
 
         const deckMap = carto.viz.createMap();
 
-        const countriesLayer = new carto.viz.Layer('ne_50m_admin_0_countries');
-        await countriesLayer.addTo(deckMap);
+        const basicStyle = carto.viz.basicStyle({
+          color: '#0000FF',
+          size: 14,
+          strokeColor: '#0000FF44',
+          strokeWidth: 6
+        });
+
+        const layer = new carto.viz.Layer(geojsonData, basicStyle);
+        await layer.addTo(deckMap);
 
         // A data-view to count
-        const dataview = new carto.dataview.Category(countriesLayer, 'continent', {
-          operation: 'count'
+        const dataview = new carto.dataview.Category(layer, 'harbortype', {
+          operation: 'count',
+          mode: 'local'
         });
 
         new carto.widget.Category('as-category-widget', dataview);

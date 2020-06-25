@@ -1,9 +1,10 @@
 import { Layer } from '@/viz';
 import { AggregationType, aggregate } from '@/data/operations/aggregation/aggregation';
-import { groupValuesByAnotherColumn } from '@/data/operations/grouping';
+import { groupValuesByColumn } from '@/data/operations/grouping';
 import { castToNumberOrUndefined } from '@/core/utils/number';
 import { DataViewMode, DataViewData } from './DataViewMode';
 import { CartoDataViewError, dataViewErrorTypes } from '../DataViewError';
+import { CategoryElement } from '../category/CategoryImpl';
 
 export class DataViewLocal extends DataViewMode {
   constructor(dataSource: Layer, column: string) {
@@ -49,20 +50,23 @@ export class DataViewLocal extends DataViewMode {
   }
 
   private getSourceData(columns: string[] = []) {
-    return (this.dataSource as Layer).getViewportFeatures([this.column, ...columns]);
+    if (!columns.includes(this.column)) {
+      columns.push(this.column);
+    }
+
+    return (this.dataSource as Layer).getViewportFeatures(columns);
   }
 
   private async groupBy(operationColumn: string, operation: AggregationType) {
-    const sourceData = await this.getSourceData([operationColumn]);
-    const { groups, nullCount } = groupValuesByAnotherColumn(
+    const sourceData = await this.getSourceData([operationColumn || this.column]);
+    const { groups, nullCount } = groupValuesByColumn(
       sourceData,
-      operationColumn,
+      operationColumn || this.column,
       this.column
     );
-
-    const categories = Object.keys(groups).map(group =>
-      createCategory(group, groups[group] as number[], operation)
-    );
+    const categories = Object.keys(groups)
+      .map(group => createCategory(group, groups[group] as number[], operation))
+      .sort(categoryOrder());
 
     return { nullCount, categories };
   }
@@ -82,18 +86,49 @@ export class DataViewLocal extends DataViewMode {
   }
 }
 
-function createCategory(name: string, data: number[], operation: AggregationType) {
-  const numberFilter = function numberFilter(value: number | undefined) {
-    return Number.isFinite(value as number);
-  };
+function createCategory(name: string, data: number[], operation: AggregationType): CategoryElement {
+  let categoryValues = data;
+  const shouldFilterValues = operation !== AggregationType.COUNT;
 
-  const filteredValues = data
-    .map(number => castToNumberOrUndefined(number))
-    .filter(numberFilter) as number[];
+  if (shouldFilterValues) {
+    const numberFilter = function numberFilter(value: number | undefined) {
+      return Number.isFinite(value as number);
+    };
+
+    categoryValues = (data as number[])
+      .map(number => castToNumberOrUndefined(number))
+      .filter(numberFilter) as number[];
+  }
 
   return {
     name,
-    value: aggregate(filteredValues, operation)
+    value: aggregate(categoryValues, operation)
+  };
+}
+
+/**
+ * Function to sort categories. In case two categories
+ * have the same value then is sorted alphabetically
+ *
+ * @param desc - flag to indicate the order direction:
+ * true for descending order (by default)
+ * false for ascending order
+ */
+function categoryOrder(desc = true) {
+  return (categoryA: CategoryElement, categoryB: CategoryElement) => {
+    let order;
+
+    if (desc) {
+      order = categoryB.value - categoryA.value;
+    } else {
+      order = categoryA.value - categoryB.value;
+    }
+
+    if (order === 0) {
+      order = categoryA.name >= categoryB.name ? 1 : -1;
+    }
+
+    return order;
   };
 }
 

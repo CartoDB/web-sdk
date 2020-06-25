@@ -1,4 +1,4 @@
-export function groupValuesByAnotherColumn<T>(
+export function groupValuesByColumn<T>(
   data: Record<string, T>[],
   valuesColumn: string,
   keysColumn: string
@@ -11,8 +11,7 @@ export function groupValuesByAnotherColumn<T>(
 
       accumulator[group] = accumulator[group] || [];
 
-      const isValid =
-        item[valuesColumn] !== null && item[valuesColumn] !== undefined;
+      const isValid = item[valuesColumn] !== null && item[valuesColumn] !== undefined;
 
       if (isValid) {
         accumulator[group].push(item[valuesColumn] as T);
