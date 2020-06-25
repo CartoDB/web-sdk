@@ -98,6 +98,8 @@ export class GeoJsonSource extends Source {
       stats = this._calculateStats();
     }
 
+    this._validateFieldsInStats(stats);
+
     return stats;
   }
 
@@ -212,6 +214,23 @@ export class GeoJsonSource extends Source {
     }
 
     return categoryStats;
+  }
+
+  private _validateFieldsInStats(stats: (NumericFieldStats | CategoryFieldStats)[]) {
+    if (this._fields.sample.size) {
+      const requiredFields = [...this._fields.sample];
+      const existingStatsFields = stats
+        .filter(s => requiredFields.includes(s.name))
+        .map(s => s.name);
+
+      // some required fields do not have data in the geoJSON
+      if (existingStatsFields.length !== requiredFields.length) {
+        const noDataFields = requiredFields.filter(f => !existingStatsFields.includes(f));
+        throw new Error(
+          `Field/s '${noDataFields.join(', ')}' do/es not exist in geoJSON properties`
+        );
+      }
+    }
   }
 }
 
