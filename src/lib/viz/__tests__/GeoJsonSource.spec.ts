@@ -217,4 +217,65 @@ describe('SourceMetadata', () => {
       ]
     });
   });
+
+  it('should fail if fields does not exist in geoJSON', async () => {
+    const fields = {
+      sample: new Set(['number', 'cat']),
+      aggregation: new Set(['number'])
+    };
+
+    const emptyGeojson: FeatureCollection = {
+      type: 'FeatureCollection',
+      features: []
+    };
+
+    const source = new GeoJsonSource(emptyGeojson);
+
+    expect(async () => {
+      await source.init(fields);
+    }).rejects.toEqual(new Error("Field/s 'number, cat' do/es not exist in geoJSON properties"));
+  });
+
+  it('should fail if a field does not exist in geoJSON', async () => {
+    const fields = {
+      sample: new Set(['number', 'cat']),
+      aggregation: new Set(['number'])
+    };
+
+    const geojsonWithoutNumberField: FeatureCollection = {
+      type: 'FeatureCollection',
+      features: [
+        {
+          type: 'Feature',
+          id: 1,
+          geometry,
+          properties: {
+            cat: 'cat1'
+          }
+        },
+        {
+          type: 'Feature',
+          id: 1,
+          geometry,
+          properties: {
+            cat: 'cat1'
+          }
+        },
+        {
+          type: 'Feature',
+          id: 1,
+          geometry,
+          properties: {
+            cat: 'cat2'
+          }
+        }
+      ]
+    };
+
+    const source = new GeoJsonSource(geojsonWithoutNumberField);
+
+    expect(async () => {
+      await source.init(fields);
+    }).rejects.toEqual(new Error("Field/s 'number' do/es not exist in geoJSON properties"));
+  });
 });
