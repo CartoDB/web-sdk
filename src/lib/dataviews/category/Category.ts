@@ -1,4 +1,5 @@
 import { Layer, Source } from '@/viz';
+import { GeoJsonSource } from '@/viz/sources';
 import { BuiltInFilters } from '@/viz/filters/types';
 import { uuidv4 } from '@/core/utils/uuid';
 import { DataViewLocal } from '../mode/DataViewLocal';
@@ -24,7 +25,18 @@ export class Category extends DataViewWrapper {
         break;
       }
 
+      case DataViewCalculation.REMOTE_FILTERED:
+
+      // eslint-disable-next-line no-fallthrough
       default: {
+        if (
+          (dataSource instanceof Layer && dataSource.source instanceof GeoJsonSource) ||
+          dataSource instanceof GeoJsonSource
+        ) {
+          dataView = new DataViewLocal(dataSource as Layer, column);
+          break;
+        }
+
         dataView = new DataViewRemote(dataSource, column);
         dataView.addFilter(`VIEWPORT_FILTER_${uuidv4()}`, BuiltInFilters.VIEWPORT);
         break;
