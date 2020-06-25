@@ -1,4 +1,4 @@
-import { Deck, Viewport } from '@deck.gl/core';
+import { Deck, Viewport, WebMercatorViewport } from '@deck.gl/core';
 import { MVTLayer } from '@deck.gl/geo-layers';
 import { Matrix4 } from '@math.gl/core';
 import { GeoJSON } from 'geojson';
@@ -22,6 +22,7 @@ export class ViewportFeaturesGenerator {
   private deckInstance: Deck | undefined;
   private deckLayer: MVTLayer<string> | GeoJsonLayer<GeoJSON> | undefined;
   private uniqueIdProperty: string;
+  private viewport: WebMercatorViewport | undefined;
 
   constructor(
     deckInstance?: Deck,
@@ -155,6 +156,10 @@ export class ViewportFeaturesGenerator {
   }
 
   private getViewport() {
+    if (this.viewport) {
+      return this.viewport;
+    }
+
     // WebMercatorViewport is there by default
     const viewports: Viewport[] = this.deckInstance?.getViewports(undefined);
     return viewports[0];
@@ -166,6 +171,10 @@ export class ViewportFeaturesGenerator {
 
   public setDeckLayer(deckLayer: MVTLayer<string>) {
     this.deckLayer = deckLayer;
+  }
+
+  public setViewport(viewport: WebMercatorViewport) {
+    this.viewport = viewport;
   }
 }
 

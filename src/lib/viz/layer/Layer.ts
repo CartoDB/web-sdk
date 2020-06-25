@@ -1,4 +1,4 @@
-import { Deck } from '@deck.gl/core';
+import { Deck, WebMercatorViewport } from '@deck.gl/core';
 import { CartoError } from '@/core/errors/CartoError';
 import { GeoJsonLayer } from '@deck.gl/layers';
 import { MVTLayer } from '@deck.gl/geo-layers';
@@ -149,8 +149,11 @@ export class Layer extends WithEvents implements StyledLayer {
 
     deckInstance.setProps({
       layers,
-      onViewStateChange: ({ interactionState }) => {
+      onViewStateChange: ({ interactionState, viewState }) => {
         if ((interactionState.isPanning || interactionState.isZooming) && hasGeoJsonLayer) {
+          const viewport = new WebMercatorViewport(viewState);
+          this._viewportFeaturesGenerator.setViewport(viewport);
+
           this.callToViewportLoad = true;
         }
       },
