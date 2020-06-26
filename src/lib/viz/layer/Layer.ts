@@ -171,6 +171,10 @@ export class Layer extends WithEvents implements StyledLayer {
 
     this._viewportFeaturesGenerator.setDeckInstance(deckInstance);
     this._viewportFeaturesGenerator.setDeckLayer(createdDeckGLLayer);
+
+    if (hasGeoJsonLayer) {
+      this.emit('viewportLoad');
+    }
   }
 
   /**
