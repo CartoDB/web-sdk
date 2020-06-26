@@ -160,7 +160,7 @@
         const username = findGetParameter('username');
         const geography = geographies[0];
 
-        carto.setDefaultCredentials({ username: username, apiKey: apiKey });
+        carto.auth.setDefaultCredentials({ username: username, apiKey: apiKey });
         map = carto.viz.createMap({
           view: {
             longitude: -102.630157,
