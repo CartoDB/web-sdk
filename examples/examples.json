@@ -1,0 +1,32 @@
+{
+  "main": {
+    "file": "basic/layer.html"
+  },
+  "categories": [
+    {
+      "title": "Basic",
+      "samples": [
+        {
+          "title": "Add layer",
+          "file": "basic/layer.html"
+        },
+        {
+          "title": "Set source",
+          "file": "basic/set-source.html"
+        },
+        {
+          "title": "Set style",
+          "file": "basic/set-style.html"
+        },
+        {
+          "title": "Several layers",
+          "file": "basic/several-layers.html"
+        },
+        {
+          "title": "Viewport features",
+          "file": "basic/viewport-features.html"
+        }
+      ]
+    }
+  ]
+}
