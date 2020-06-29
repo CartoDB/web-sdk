@@ -7,7 +7,7 @@ import { DataViewRemote } from '../mode/DataViewRemote';
 import { DataViewCalculation } from '../mode/DataViewMode';
 import { DataViewWrapper, OPTION_CHANGED_DELAY } from '../DataViewWrapper';
 import { CategoryOptions, CategoryImpl } from './CategoryImpl';
-import { debounce } from '../utils';
+import { debounce, isGeoJSONSource } from '../utils';
 
 export class Category extends DataViewWrapper {
   protected buildImpl(dataSource: Layer | Source, column: string, options: CategoryOptions) {
@@ -69,11 +69,4 @@ export class Category extends DataViewWrapper {
     (this.dataviewImpl as CategoryImpl<any>).limit = limit;
     debounce(() => this.emit('dataUpdate'), OPTION_CHANGED_DELAY, this.setOptionScope)();
   }
-}
-
-function isGeoJSONSource(dataSource: Layer | Source) {
-  return (
-    (dataSource instanceof Layer && dataSource.source instanceof GeoJsonSource) ||
-    dataSource instanceof GeoJsonSource
-  );
 }
