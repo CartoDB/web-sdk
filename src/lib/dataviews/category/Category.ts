@@ -7,7 +7,7 @@ import { DataViewRemote } from '../mode/DataViewRemote';
 import { DataViewCalculation } from '../mode/DataViewMode';
 import { DataViewWrapper, OPTION_CHANGED_DELAY } from '../DataViewWrapper';
 import { CategoryOptions, CategoryImpl } from './CategoryImpl';
-import { debounce } from '../utils';
+import { debounce, isGeoJSONSource } from '../utils';
 
 export class Category extends DataViewWrapper {
   protected buildImpl(dataSource: Layer | Source, column: string, options: CategoryOptions) {
@@ -21,11 +21,25 @@ export class Category extends DataViewWrapper {
       }
 
       case DataViewCalculation.REMOTE: {
+        if (isGeoJSONSource(dataSource)) {
+          const useViewport = false;
+          dataView = new DataViewLocal(dataSource as Layer, column, useViewport);
+          break;
+        }
+
         dataView = new DataViewRemote(dataSource, column);
         break;
       }
 
+      case DataViewCalculation.REMOTE_FILTERED:
+
+      // eslint-disable-next-line no-fallthrough
       default: {
+        if (isGeoJSONSource(dataSource)) {
+          dataView = new DataViewLocal(dataSource as Layer, column);
+          break;
+        }
+
         dataView = new DataViewRemote(dataSource, column);
         dataView.addFilter(`VIEWPORT_FILTER_${uuidv4()}`, BuiltInFilters.VIEWPORT);
         break;
