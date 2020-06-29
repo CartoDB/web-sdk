@@ -5,7 +5,7 @@ import { Filter, SpatialFilters, BuiltInFilters } from '@/viz/filters/types';
 import { FiltersCollection } from '@/viz/filters/FiltersCollection';
 import { RemoteFilterApplicator } from '@/viz/filters/RemoteFilterApplicator';
 import { AggregationType } from '@/data/operations/aggregation/aggregation';
-import { DataViewMode } from './DataViewMode';
+import { DataViewMode, DataViewCalculation } from './DataViewMode';
 import { CartoDataViewError, dataViewErrorTypes } from '../DataViewError';
 
 export class DataViewRemote extends DataViewMode {
@@ -100,7 +100,14 @@ export class DataViewRemote extends DataViewMode {
   }
 
   private createViewportSpatialFilter(filterId: string) {
-    (this.dataSource as Layer).on('viewportLoad', () => {
+    if (this.dataSource instanceof Source) {
+      throw new CartoDataViewError(
+        `The ${DataViewCalculation.REMOTE_FILTERED.toString()} mode needs a Layer but a Source was provided`,
+        dataViewErrorTypes.PROPERTY_INVALID
+      );
+    }
+
+    this.dataSource.on('viewportLoad', () => {
       const deckInstance = (this.dataSource as Layer).getMapInstance();
       const viewport = deckInstance.getViewports(undefined)[0];
 
