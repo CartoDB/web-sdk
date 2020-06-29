@@ -24,7 +24,8 @@ import {
   colorContinuousStyle,
   sizeBinsStyle,
   sizeCategoriesStyle,
-  sizeContinuousStyle
+  sizeContinuousStyle,
+  iconStyle
 } from './viz/style';
 
 // Dataviews
