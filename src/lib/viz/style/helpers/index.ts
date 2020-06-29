@@ -5,3 +5,4 @@ export { colorContinuousStyle, ColorContinuousOptionsStyle } from './color-conti
 export { sizeBinsStyle, SizeBinsOptionsStyle } from './size-bins-style';
 export { sizeCategoriesStyle, SizeCategoriesOptionsStyle } from './size-categories-style';
 export { sizeContinuousStyle, SizeContinuousOptionsStyle } from './size-continuous-style';
+export { iconStyle, IconOptionsStyle } from './icon-style';
