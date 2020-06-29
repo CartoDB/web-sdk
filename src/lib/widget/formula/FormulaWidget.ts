@@ -1,7 +1,7 @@
-import { FormulaDataView } from '@/dataview/formula/FormulaDataView';
+import { FormulaDataView } from '@/dataview';
 import { Widget } from '../widget';
 
-export class Formula extends Widget {
+export class FormulaWidget extends Widget {
   private options: FormulaWidgetOptions = {};
 
   constructor(

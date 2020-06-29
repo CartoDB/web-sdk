@@ -26,7 +26,7 @@ import {
 import { CategoryDataView, FormulaDataView } from './dataview';
 
 // Widgets
-import { Category as CategoryWidget, Formula as FormulaWidget } from './widgets';
+import { CategoryWidget, FormulaWidget } from './widget';
 
 /*
  * --- Public API ---

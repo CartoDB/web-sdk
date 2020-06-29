@@ -1,7 +1,7 @@
-import { CategoryDataView } from '@/dataview/category/CategoryDataView';
+import { CategoryDataView } from '@/dataview';
 import { Widget } from '../widget';
 
-export class Category extends Widget {
+export class CategoryWidget extends Widget {
   private options: CategoryWidgetOptions = {};
 
   constructor(
