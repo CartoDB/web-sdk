@@ -63,6 +63,7 @@ export class GeoJsonSource extends Source {
     }
 
     if (this.isInitialized) {
+      // eslint-disable-next-line no-console
       console.warn('GeoJsonSource reinitialized');
     }
 
@@ -76,7 +77,7 @@ export class GeoJsonSource extends Source {
   private _buildMetadata(fields: StatFields) {
     const geometryType = getGeomType(this._geojson);
 
-    this._fields = fields;
+    this._saveFields(fields);
     const stats = this._getStats();
 
     return { geometryType, stats };
@@ -97,6 +98,8 @@ export class GeoJsonSource extends Source {
       this._extractFeaturesValues(features, fields);
       stats = this._calculateStats();
     }
+
+    validateFieldNamesInStats(fields, stats);
 
     return stats;
   }
@@ -213,6 +216,11 @@ export class GeoJsonSource extends Source {
 
     return categoryStats;
   }
+
+  private _saveFields(fields: StatFields) {
+    this._fields.sample = new Set([...fields.sample]);
+    this._fields.aggregation = new Set([...fields.aggregation]);
+  }
 }
 
 export function getGeomType(geojson: GeoJSON): GeometryType {
@@ -262,4 +270,20 @@ function createSample(values: number[]) {
 
   const shuffled = values.sort(() => 0.5 - Math.random());
   return shuffled.slice(0, MAX_SAMPLE_SIZE);
+}
+
+export function validateFieldNamesInStats(
+  fields: string[],
+  stats: (NumericFieldStats | CategoryFieldStats)[]
+) {
+  const existingStatsFields = stats.filter(s => fields.includes(s.name)).map(s => s.name);
+
+  // some fields do not have data in the geoJSON
+  if (existingStatsFields.length !== fields.length) {
+    const noDataFields = fields.filter(f => !existingStatsFields.includes(f));
+
+    throw new SourceError(
+      `Field/s '${noDataFields.join(', ')}' do/es not exist in geoJSON properties`
+    );
+  }
 }
