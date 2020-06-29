@@ -1,5 +1,6 @@
 import { WithEvents } from '@/core/mixins/WithEvents';
-import { Layer, Source } from '@/viz';
+import { Layer } from '@/viz';
+import { Source } from '@/source';
 import { Filter } from '@/viz/filters/types';
 import { AggregationType } from '@/data/operations/aggregation/aggregation';
 import { DataViewImpl } from './DataViewImpl';

@@ -1,8 +1,8 @@
+import { CategoryFieldStats, Category, GeometryType } from '@/source';
 import { calculateSizeBins } from './utils';
 import { Style, getStyleValue, BasicOptionsStyle, getStyles } from '..';
 import { CartoStylingError, stylingErrorTypes } from '../../errors/styling-error';
 import { StyledLayer } from '../layer-style';
-import { CategoryFieldStats, Category, GeometryType } from '../../sources/Source';
 import { sizeRangeValidation } from '../validators';
 
 export interface SizeCategoriesOptionsStyle extends Partial<BasicOptionsStyle> {

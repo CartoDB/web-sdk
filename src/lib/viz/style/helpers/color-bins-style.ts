@@ -1,8 +1,8 @@
+import { NumericFieldStats, GeometryType } from '@/source';
 import { getColors, getUpdateTriggers, hexToRgb, findIndexForBinBuckets } from './utils';
 import { Classifier, ClassificationMethod } from '../../utils/Classifier';
 import { CartoStylingError, stylingErrorTypes } from '../../errors/styling-error';
 import { StyledLayer } from '../layer-style';
-import { NumericFieldStats, GeometryType } from '../../sources/Source';
 import { getStyleValue, getStyles, Style, BasicOptionsStyle } from '..';
 import { colorValidation } from '../validators';
 

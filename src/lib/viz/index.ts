@@ -1,6 +1,5 @@
 export { Popup } from './popups/Popup';
 export { Layer } from './layer/Layer';
-export { Source, CARTOSource, DOSource } from './sources';
 
 // Style helpers
 export {

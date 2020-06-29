@@ -62,7 +62,7 @@
           method: 'equal',
           palette: 'teal'
         });
-        const source = new carto.viz.DOSource(DOVariable);
+        const source = new carto.source.DO(DOVariable);
         const layer = new carto.viz.Layer(source, styles);
         layer.addTo(deckMap);
       }
