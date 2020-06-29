@@ -48,7 +48,7 @@
       const widgetElement = document.querySelector('as-category-widget');
 
       async function initialize() {
-        carto.setDefaultCredentials({ username: 'public' });
+        carto.auth.setDefaultCredentials({ username: 'public' });
 
         const deckMap = carto.viz.createMap();
 

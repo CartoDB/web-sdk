@@ -1,4 +1,4 @@
-import { Credentials, defaultCredentials } from '@/core/Credentials';
+import { Credentials, defaultCredentials } from '@/auth';
 import { MapInstance, MapOptions, Client } from '@/maps/Client';
 import {
   Source,

@@ -35,10 +35,11 @@
     <script src="/dist/umd/index.min.js"></script>
 
     <script>
-
       async function initialize() {
-        carto.setDefaultCredentials({ username: 'public' });
-        const data = await fetch('https://public.carto.com/api/v2/sql?api_key=default_public&q=select* from world_ports&format=geojson').then(response => response.json())
+        carto.auth.setDefaultCredentials({ username: 'public' });
+        const data = await fetch(
+          'https://public.carto.com/api/v2/sql?api_key=default_public&q=select* from world_ports&format=geojson'
+        ).then(response => response.json());
 
         const deckMap = carto.viz.createMap({
           basemap: 'voyager',

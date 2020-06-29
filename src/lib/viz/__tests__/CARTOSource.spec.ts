@@ -1,4 +1,4 @@
-import { Credentials, defaultCredentials, setDefaultCredentials } from '@/core/Credentials';
+import { Credentials, defaultCredentials, setDefaultCredentials } from '@/auth';
 
 import { CARTOSource } from '../sources/CARTOSource';
 

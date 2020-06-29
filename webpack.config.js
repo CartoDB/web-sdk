@@ -4,6 +4,8 @@ const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 
 const mode = process.env.NODE_ENV || 'development';
 const path = require('path');
+const webpack = require('webpack');
+const packagejson = require('./package.json');
 
 // This is main configuration object.
 // Here you write different options and tell Webpack what to do
@@ -71,5 +73,8 @@ module.exports = {
   plugins: [
     // Uncomment for bundle analysis
     // new BundleAnalyzerPlugin()
+    new webpack.DefinePlugin({
+      WEBSDK_VERSION: JSON.stringify(packagejson.version)
+    })
   ]
 };

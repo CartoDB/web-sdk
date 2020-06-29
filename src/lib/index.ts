@@ -1,5 +1,5 @@
 // Auth
-import { Credentials, setDefaultCredentials } from './core/Credentials';
+import { Credentials, setDefaultCredentials } from './auth';
 
 // Sources
 import { DOSource, CARTOSource, GeoJsonSource } from './viz/sources';
@@ -33,8 +33,15 @@ import { Category as CategoryWidget, Formula as FormulaWidget } from './widgets'
  */
 
 // carto
-// const auth = [ Credentials, setDefaultCredentials ];
-export { Credentials, setDefaultCredentials };
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+export const version = WEBSDK_VERSION;
+
+// carto.auth
+export const auth = {
+  Credentials,
+  setDefaultCredentials
+};
 
 // carto.viz
 const sources = { DOSource, CARTOSource, GeoJsonSource };

@@ -71,7 +71,7 @@
       const apiKey = findGetParameter('api_key');
 
       async function initialize() {
-        carto.setDefaultCredentials({ username: 'aasuero', apiKey: apiKey });
+        carto.auth.setDefaultCredentials({ username: 'aasuero', apiKey: apiKey });
         const deckMap = carto.viz.createMap();
 
         const DOVariable = 'total_pop_624c2d45';

@@ -72,7 +72,7 @@
 
     <script>
       function initialize() {
-        carto.setDefaultCredentials({ username: 'public' });
+        carto.auth.setDefaultCredentials({ username: 'public' });
         const deckMap = carto.viz.createMap();
         const countriesLayer = new carto.viz.Layer('world_ports');
         countriesLayer.addTo(deckMap);

@@ -1,4 +1,4 @@
-import { Credentials } from '../../core/Credentials';
+import { Credentials } from '../../auth';
 import { MapOptions, Client } from '../Client';
 
 describe('maps', () => {
