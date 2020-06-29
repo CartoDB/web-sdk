@@ -4,5 +4,6 @@
 coverage/
 dist/
 docs/public
+docs/api
 node_modules/
 secrets.json
