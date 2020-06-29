@@ -1,5 +1,6 @@
 import { Credentials, defaultCredentials } from '@/auth';
 import { MapInstance, MapOptions, Client } from '@/maps/Client';
+import { uuidv4 } from '@/core/utils/uuid';
 import {
   Source,
   SourceProps,
@@ -9,15 +10,15 @@ import {
   StatFields,
   shouldInitialize
 } from './Source';
-import { parseGeometryType } from '../style/helpers/utils';
-import { sourceErrorTypes, SourceError } from '../errors/source-error';
+import { parseGeometryType } from '../viz/style/helpers/utils';
+import { sourceErrorTypes, SourceError } from '../viz/errors/source-error';
 
 export interface SourceOptions {
   credentials?: Credentials;
   mapOptions?: MapOptions;
 }
 
-const defaultMapOptions: MapOptions = {
+export const defaultMapOptions: MapOptions = {
   vectorExtent: 2048,
   vectorSimplifyExtent: 2048,
   bufferSize: {
@@ -28,12 +29,7 @@ const defaultMapOptions: MapOptions = {
   }
 };
 
-function getSourceType(source: string) {
-  const containsSpace = source.search(' ') > -1;
-  return containsSpace ? 'sql' : 'dataset';
-}
-
-interface CARTOSourceProps extends SourceProps {
+interface SQLSourceProps extends SourceProps {
   // Tile URL template. It should be in the format of https://server/{z}/{x}/{y}..
   data: string | Array<string>;
 }
@@ -41,33 +37,30 @@ interface CARTOSourceProps extends SourceProps {
 /**
  * Implementation of a Source compatible with CARTO's MAPs API
  * * */
-export class CARTOSource extends Source {
-  // type of the source.
-  private _type: 'sql' | 'dataset';
+export class SQLSource extends Source {
   // value it should be a dataset name or a SQL query
-  private _value: string;
+  protected _value: string;
   // Internal credentials of the user
-  private _credentials: Credentials;
-  private _props?: CARTOSourceProps;
-  private _mapConfig: MapOptions;
-  private _metadata?: SourceMetadata;
-  private _fields: StatFields;
+  protected _credentials: Credentials;
+  protected _props?: SQLSourceProps;
+  protected _mapConfig: MapOptions;
+  protected _metadata?: SourceMetadata;
+  protected _fields: StatFields;
 
-  constructor(source: string, options: SourceOptions = {}) {
+  constructor(sql: string, options: SourceOptions = {}) {
     const { mapOptions = {}, credentials = defaultCredentials } = options;
 
     // set layer id
-    const id = `CARTO-${source}`;
+    const id = `CARTO-SQL-${uuidv4()}`;
 
     // call to super class
     super(id);
-    this.sourceType = 'CARTOSource';
+    this.sourceType = 'SQLSource';
 
     // Set object properties
-    this._type = getSourceType(source);
-    this._value = source;
+    this._value = sql;
     this._credentials = credentials;
-    const sourceOpts = { [this._type]: source };
+    const sourceOpts = { sql };
     this._fields = { sample: new Set(), aggregation: new Set() };
 
     // Set Map Config
@@ -84,7 +77,7 @@ export class CARTOSource extends Source {
    *   - URL of the tiles provided by MAPs API
    *   - geometryType
    */
-  public getProps(): CARTOSourceProps {
+  public getProps(): SQLSourceProps {
     if (!this.isInitialized) {
       throw new SourceError('getProps requires init call', sourceErrorTypes.INIT_SKIPPED);
     }
@@ -98,10 +91,6 @@ export class CARTOSource extends Source {
 
   public get value(): string {
     return this._value;
-  }
-
-  public get type(): 'sql' | 'dataset' {
-    return this._type;
   }
 
   public get credentials(): Credentials {
@@ -164,7 +153,7 @@ export class CARTOSource extends Source {
     }
 
     if (this.isInitialized) {
-      console.warn('CARTOSource reinitialized');
+      console.warn('Source reinitialized');
     }
 
     this._saveFields(fields);

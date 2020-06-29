@@ -2,7 +2,7 @@
 import { Credentials, setDefaultCredentials } from './auth';
 
 // Sources
-import { DOSource, CARTOSource, GeoJsonSource } from './viz/sources';
+import { DOSource, GeoJSONSource, SQLSource, DatasetSource } from './source';
 
 // Basemaps
 import { createMap, createGoogleMap } from './viz/basemap';
@@ -43,8 +43,15 @@ export const auth = {
   setDefaultCredentials
 };
 
+// carto.source
+export const source = {
+  DO: DOSource,
+  GeoJSON: GeoJSONSource,
+  SQL: SQLSource,
+  Dataset: DatasetSource
+};
+
 // carto.viz
-const sources = { DOSource, CARTOSource, GeoJsonSource };
 const basemaps = { createMap, createGoogleMap };
 const basics = { Layer, Popup };
 const styles = {
@@ -58,7 +65,6 @@ const styles = {
 };
 
 export const viz = {
-  ...sources,
   ...basemaps,
   ...styles,
   ...basics

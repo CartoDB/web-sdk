@@ -4,11 +4,11 @@
  */
 
 import { WithEvents } from '@/core/mixins/WithEvents';
-import { ColumnFilters } from '../filters/types';
+import { ColumnFilters } from '../viz/filters/types';
 
 export type GeometryType = 'Point' | 'Line' | 'Polygon';
 
-export type SourceType = 'CARTOSource' | 'DOSource' | 'GeoJsonSource';
+export type SourceType = 'SQLSource' | 'DatasetSource' | 'DOSource' | 'GeoJSONSource';
 
 export interface Stats {
   min: number;
@@ -40,7 +40,7 @@ export interface SourceMetadata {
 }
 
 export interface SourceProps {
-  type: 'TileLayer' | 'GeoJsonLayer';
+  type: 'TileLayer' | 'GeoJSONLayer';
 }
 
 export interface StatFields {

@@ -1,6 +1,5 @@
 import { Credentials, defaultCredentials, setDefaultCredentials } from '@/auth';
-
-import { CARTOSource } from '../sources/CARTOSource';
+import { DatasetSource } from '../DatasetSource';
 
 const TEST_CREDENTIALS = {
   username: 'test_username',
@@ -10,10 +9,10 @@ const TEST_CREDENTIALS = {
 
 const DEFAULT_DATASET = 'default_dataset';
 
-describe('CARTOSource', () => {
+describe('DatasetSource', () => {
   describe('Source creation', () => {
     it('should create a new Layer instance properly', () => {
-      expect(() => new CARTOSource(DEFAULT_DATASET)).not.toThrow();
+      expect(() => new DatasetSource(DEFAULT_DATASET)).not.toThrow();
     });
   });
 
@@ -29,12 +28,12 @@ describe('CARTOSource', () => {
         'https://notdefaultserver.com'
       );
 
-      const source = new CARTOSource(DEFAULT_DATASET, { credentials });
+      const source = new DatasetSource(DEFAULT_DATASET, { credentials });
       expect(source.credentials).toBe(credentials);
     });
 
     it('should use default credentials if not provided', () => {
-      const source = new CARTOSource(DEFAULT_DATASET);
+      const source = new DatasetSource(DEFAULT_DATASET);
       expect(source.credentials).toBe(defaultCredentials);
     });
   });

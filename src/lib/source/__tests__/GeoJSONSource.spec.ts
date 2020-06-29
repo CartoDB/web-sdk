@@ -1,5 +1,5 @@
 import { Feature, FeatureCollection, Geometry, GeometryCollection } from 'geojson';
-import { GeoJsonSource, getGeomType, getFeatures, DEFAULT_GEOM } from '../sources/GeoJsonSource';
+import { GeoJSONSource, getGeomType, getFeatures, DEFAULT_GEOM } from '../GeoJSONSource';
 
 const GEOJSON_GEOM_TYPE = 'LineString';
 const GEOM_TYPE = 'Line';
@@ -146,11 +146,11 @@ describe('SourceMetadata', () => {
       aggregation: new Set(['number'])
     };
 
-    const source = new GeoJsonSource(geojson);
+    const source = new GeoJSONSource(geojson);
     await source.init(fields);
 
     const props = source.getProps();
-    expect(props).toEqual({ type: 'GeoJsonLayer', data: geojson });
+    expect(props).toEqual({ type: 'GeoJSONLayer', data: geojson });
 
     const metadata = source.getMetadata();
     expect(metadata).toEqual({
@@ -176,7 +176,7 @@ describe('SourceMetadata', () => {
   });
 
   it('should rebuild props and metadata properly after calling init again with different fields', async () => {
-    const source = new GeoJsonSource(geojson);
+    const source = new GeoJSONSource(geojson);
 
     const fields1 = {
       sample: new Set(['number']),
@@ -193,7 +193,7 @@ describe('SourceMetadata', () => {
     await source.init(fields2);
 
     const props = source.getProps();
-    expect(props).toEqual({ type: 'GeoJsonLayer', data: geojson });
+    expect(props).toEqual({ type: 'GeoJSONLayer', data: geojson });
 
     const metadata = source.getMetadata();
     expect(metadata).toEqual({

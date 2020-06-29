@@ -1,6 +1,7 @@
 import { MapsDataviews as DataviewsApi } from '@/maps/MapsDataviews';
 import { defaultCredentials } from '@/auth';
-import { Source, CARTOSource, Layer } from '@/viz';
+import { Layer } from '@/viz';
+import { Source, SQLSource, DatasetSource } from '@/source';
 import { Filter, SpatialFilters, BuiltInFilters } from '@/viz/filters/types';
 import { FiltersCollection } from '@/viz/filters/FiltersCollection';
 import { RemoteFilterApplicator } from '@/viz/filters/RemoteFilterApplicator';
@@ -129,10 +130,10 @@ function getDatasetName(dataSource: Layer | Source) {
 
   if (dataSource instanceof Source) {
     // TODO what about the other sources?
-    source = dataSource as CARTOSource;
+    source = dataSource as SQLSource | DatasetSource;
   } else {
     const layer = dataSource as Layer;
-    source = layer.source as CARTOSource;
+    source = layer.source as SQLSource | DatasetSource;
   }
 
   return source.value;
