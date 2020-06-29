@@ -4,7 +4,7 @@ import { groupValuesByColumn } from '@/data/operations/grouping';
 import { castToNumberOrUndefined } from '@/core/utils/number';
 import { DataViewMode, DataViewData } from './DataViewMode';
 import { CartoDataViewError, dataViewErrorTypes } from '../DataViewError';
-import { CategoryElement } from '../category/CategoryImpl';
+import { CategoryElement } from '../category/CategoryDataViewImpl';
 
 export class DataViewLocal extends DataViewMode {
   constructor(dataSource: Layer, column: string) {

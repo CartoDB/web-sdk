@@ -1,5 +1,5 @@
 import { Layer } from '../../viz/layer/Layer';
-import { Category } from './Category';
+import { CategoryDataView } from './CategoryDataView';
 import { AggregationType } from '../../data/operations/aggregation/aggregation';
 import { CartoDataViewError, dataViewErrorTypes } from '../DataViewError';
 import { DataViewCalculation } from '../mode/DataViewMode';
@@ -9,7 +9,7 @@ describe('DataView', () => {
     it('should create new DataView instance', () => {
       expect(
         () =>
-          new Category(new Layer('fake_source'), 'fake_column', {
+          new CategoryDataView(new Layer('fake_source'), 'fake_column', {
             operation: AggregationType.AVG,
             operationColumn: 'popEst',
             mode: DataViewCalculation.LOCAL
@@ -20,7 +20,7 @@ describe('DataView', () => {
     it('should throw an exception when operation is not provided', () => {
       expect(
         () =>
-          new Category(new Layer('fake_source'), 'fake_column', {
+          new CategoryDataView(new Layer('fake_source'), 'fake_column', {
             operation: undefined as never,
             operationColumn: 'fake_operation_column',
             mode: DataViewCalculation.LOCAL
@@ -36,7 +36,7 @@ describe('DataView', () => {
     it('should throw an exception when operationColumn is not provided', () => {
       expect(
         () =>
-          new Category(new Layer('fake_source'), 'fake_column', {
+          new CategoryDataView(new Layer('fake_source'), 'fake_column', {
             operation: AggregationType.AVG,
             operationColumn: undefined as never,
             mode: DataViewCalculation.LOCAL
@@ -52,7 +52,7 @@ describe('DataView', () => {
     it('should create an instance with COUNT operation although the operationColumn is not provided', () => {
       expect(
         () =>
-          new Category(new Layer('fake_source'), 'fake_column', {
+          new CategoryDataView(new Layer('fake_source'), 'fake_column', {
             operation: AggregationType.COUNT,
             mode: DataViewCalculation.LOCAL
           })
@@ -73,7 +73,7 @@ describe('DataView', () => {
       const layer = new Layer('fake_source');
       spyOn(layer, 'getViewportFeatures').and.returnValue(Promise.resolve(sourceDataToGroup));
 
-      const dataView = new Category(layer, 'country', {
+      const dataView = new CategoryDataView(layer, 'country', {
         operation: AggregationType.AVG,
         operationColumn: 'popEst',
         mode: DataViewCalculation.LOCAL
@@ -105,7 +105,7 @@ describe('DataView', () => {
       const layer = new Layer('fake_source');
       spyOn(layer, 'getViewportFeatures').and.returnValue(Promise.resolve(sourceDataToGroup));
 
-      const dataView = new Category(layer, 'country', {
+      const dataView = new CategoryDataView(layer, 'country', {
         operation: AggregationType.COUNT,
         mode: DataViewCalculation.LOCAL
       });

@@ -1,15 +1,15 @@
 import { Layer } from '../../viz/layer/Layer';
-import { Formula } from './Formula';
+import { FormulaDataView } from './FormulaDataView';
 import { AggregationType } from '../../data/operations/aggregation/aggregation';
 import { CartoDataViewError, dataViewErrorTypes } from '../DataViewError';
 import { DataViewCalculation } from '../mode/DataViewMode';
 
-describe('Formula', () => {
+describe('FormulaDataView', () => {
   describe('Instance Creation', () => {
     it('should create new DataView instance', () => {
       expect(
         () =>
-          new Formula(new Layer('fake_source'), 'fake_column', {
+          new FormulaDataView(new Layer('fake_source'), 'fake_column', {
             operation: AggregationType.AVG,
             mode: DataViewCalculation.LOCAL
           })
@@ -19,7 +19,7 @@ describe('Formula', () => {
     it('should throw an exception when operation is not provided', () => {
       expect(
         () =>
-          new Formula(new Layer('fake_source'), 'fake_column', {
+          new FormulaDataView(new Layer('fake_source'), 'fake_column', {
             operation: undefined as never,
             mode: DataViewCalculation.LOCAL
           })
@@ -49,7 +49,7 @@ describe('Formula', () => {
 
       spyOn(layer, 'getViewportFeatures').and.returnValue(Promise.resolve(sourceData));
 
-      const dataView = new Formula(layer, 'pop', {
+      const dataView = new FormulaDataView(layer, 'pop', {
         operation: AggregationType.AVG,
         mode: DataViewCalculation.LOCAL
       });
@@ -74,7 +74,7 @@ describe('Formula', () => {
 
       spyOn(layer, 'getViewportFeatures').and.returnValue(Promise.resolve(sourceData));
 
-      const dataView = new Formula(layer, 'pop', {
+      const dataView = new FormulaDataView(layer, 'pop', {
         operation: AggregationType.SUM,
         mode: DataViewCalculation.LOCAL
       });

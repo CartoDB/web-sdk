@@ -7,9 +7,9 @@ import { AggregationType } from '../../data/operations/aggregation/aggregation';
 import { DataViewLocal } from '../mode/DataViewLocal';
 import { DataViewRemote } from '../mode/DataViewRemote';
 import { DataViewWrapper } from '../DataViewWrapper';
-import { FormulaImpl } from './FormulaImpl';
+import { FormulaDataViewImpl } from './FormulaDataViewImpl';
 
-export class Formula extends DataViewWrapper {
+export class FormulaDataView extends DataViewWrapper {
   protected buildImpl(dataSource: Layer | Source, column: string, options: FormulaDataViewOptions) {
     let dataView;
     const { mode } = options;
@@ -32,7 +32,7 @@ export class Formula extends DataViewWrapper {
       }
     }
 
-    this.dataviewImpl = new FormulaImpl(dataView, options);
+    this.dataviewImpl = new FormulaDataViewImpl(dataView, options);
   }
 }
 
