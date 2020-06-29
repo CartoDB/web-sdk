@@ -135,6 +135,14 @@ export class Popup {
   }
 
   /**
+   * Set popup position
+   */
+  public setPosition(position: 'top-center' | 'top-left' | 'top-right' | 'bottom-center' | 'bottom-left' | 'bottom-right') {
+    this._options.position = position;
+    this._render();
+  }
+
+  /**
    * Creates a function to handler popup.
    *
    * @param elements popup elements to generate popup
