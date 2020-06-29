@@ -1,6 +1,6 @@
 import { CartoError } from '@/core/errors/CartoError';
 import { uuidv4 } from '@/core/utils/uuid';
-import { DataViewWrapper } from '@/dataviews/DataViewWrapper';
+import { DataViewWrapper } from '@/dataview/DataViewWrapper';
 import { queryDOMElement } from '@/core/utils/dom';
 
 export abstract class Widget {

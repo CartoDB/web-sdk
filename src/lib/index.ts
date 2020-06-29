@@ -23,7 +23,7 @@ import {
 } from './viz/style';
 
 // Dataviews
-import { Category, Formula } from './dataviews';
+import { CategoryDataView, FormulaDataView } from './dataview';
 
 // Widgets
 import { Category as CategoryWidget, Formula as FormulaWidget } from './widgets';
@@ -72,8 +72,8 @@ export const viz = {
 
 // carto.dataview
 export const dataview = {
-  Category,
-  Formula
+  Category: CategoryDataView,
+  Formula: FormulaDataView
 };
 
 // carto.widget
