@@ -320,4 +320,19 @@ export interface MapDataviewsOptions {
    * Bounding box to filter data
    */
   bbox?: number[];
+
+  /**
+   * Number of bins to aggregate the data range into
+   */
+  bins?: number;
+
+  /**
+   * Lower limit of the data range, if not present, the lower limit of the actual data will be used.
+   */
+  start?: number;
+
+  /**
+   * Upper limit of the data range, if not present, the upper limit of the actual data will be used.
+   */
+  end?: number;
 }
