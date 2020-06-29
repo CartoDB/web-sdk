@@ -1,5 +1,4 @@
 import { Layer, Source } from '@/viz';
-import { GeoJsonSource } from '@/viz/sources';
 import { BuiltInFilters } from '@/viz/filters/types';
 import { uuidv4 } from '@/core/utils/uuid';
 import { DataViewLocal } from '../mode/DataViewLocal';
