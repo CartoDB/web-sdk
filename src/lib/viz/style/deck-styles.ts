@@ -39,7 +39,7 @@ function polygonStyles(opts: any) {
   const styles: any = {
     opacity: getStyleValue('opacity', 'Polygon', opts),
 
-    getFillColor: hexToRgb(getStyleValue('color', 'Polygon', opts)),
+    getFillColor: isFunction(opts.color) ? opts.color : hexToRgb(getStyleValue('color', 'Polygon', opts)),
     filled: true,
 
     stroked: true,
@@ -101,7 +101,7 @@ export function getStyles(geometryType: GeometryType, options: Partial<BasicOpti
 }
 
 function validateBasicParameters(options: Partial<BasicOptionsStyle>) {
-  if (options.color && !colorValidation(options.color)) {
+  if (options.color && !isFunction(options.color) && !colorValidation(options.color)) {
     throw new CartoStylingError(
       `color '${options.color}' is not valid`,
       stylingErrorTypes.PROPERTY_MISMATCH
@@ -122,7 +122,7 @@ function validateBasicParameters(options: Partial<BasicOptionsStyle>) {
     );
   }
 
-  if (options.strokeColor && typeof options.strokeColor !== 'function' && !colorValidation(options.strokeColor)) {
+  if (options.strokeColor && !isFunction(options.strokeColor) && !colorValidation(options.strokeColor)) {
     throw new CartoStylingError(
       `strokeColor '${options.strokeColor}' is not valid`,
       stylingErrorTypes.PROPERTY_MISMATCH
