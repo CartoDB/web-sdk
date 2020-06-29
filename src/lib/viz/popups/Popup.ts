@@ -10,7 +10,7 @@ const defaultOptions: PopupOptions = {
   containerClassName: 'carto-popup',
   contentClassName: 'as-body',
   closeButtonClassName: 'as-btn',
-  position: 'right'
+  position: 'top-right'
 };
 
 /**
@@ -202,18 +202,25 @@ export class Popup {
     const containerHeight = this._container.offsetHeight;
     const containerWidth = this._container.offsetWidth;
     const [x, y] = pixels;
+
+    const [yPosition, xPosition] = this._options.position.split('-');
+
     let left = x;
 
-    if (this._options.position === 'center') {
+    if (xPosition === 'center') {
       left = x - containerWidth / 2;
-    } else if (this._options.position === 'right') {
-      left = x;
-    } else if (this._options.position === 'left') {
+    } else if (xPosition === 'left') {
       left = x - containerWidth;
     }
 
+    let top = y - containerHeight - HOOK_HEIGHT;
+
+    if (yPosition === 'bottom') {
+      top = y + containerHeight + HOOK_HEIGHT;
+    }
+
     this._container.style.left = `${left}px`;
-    this._container.style.top = `${y - containerHeight - HOOK_HEIGHT}px`;
+    this._container.style.top = `${top}px`;
   }
 }
 
@@ -318,7 +325,7 @@ interface PopupOptions {
   /**
    * Position of the popup around the mouse
    */
-  position: 'center' | 'left' | 'right'
+  position: 'top-center' | 'top-left' | 'top-right' | 'bottom-center' | 'bottom-left' | 'bottom-right';
 }
 
 // function pixels2coordinates(pixels: number[], deckInstance?: Deck) {
