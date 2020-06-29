@@ -3,7 +3,7 @@ import { MVTLayer } from '@deck.gl/geo-layers';
 import { Matrix4 } from '@math.gl/core';
 import { GeoJSON } from 'geojson';
 import { GeoJsonLayer } from '@deck.gl/layers';
-import { getFeatures } from '@/viz/sources/GeoJsonSource';
+import { getFeatures } from '@/source/GeoJSONSource';
 import { selectPropertiesFrom } from '../../utils/object';
 import { ViewportTile } from '../../declarations/deckgl';
 import { GeometryData, ViewportFrustumPlanes } from './geometry/types';
