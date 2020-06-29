@@ -62,7 +62,7 @@ export class DataViewLocal extends DataViewMode {
       return (this.dataSource as Layer).getViewportFeatures(columns);
     }
 
-    return (this.dataSource as GeoJsonSource).getFeatures(columns);
+    return ((this.dataSource as Layer).source as GeoJsonSource).getFeatures(columns);
   }
 
   private async groupBy(operationColumn: string, operation: AggregationType) {
