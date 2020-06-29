@@ -2,7 +2,12 @@
 import { Credentials, setDefaultCredentials } from './auth';
 
 // Sources
-import { DOSource, GeoJSONSource, SQLSource, DatasetSource } from './source';
+import {
+  // DOSource,
+  GeoJSONSource,
+  SQLSource,
+  DatasetSource
+} from './source';
 
 // Basemaps
 import { createMap, createGoogleMap } from './viz/basemap';
@@ -45,7 +50,7 @@ export const auth = {
 
 // carto.source
 export const source = {
-  DO: DOSource,
+  // DO: DOSource,
   GeoJSON: GeoJSONSource,
   SQL: SQLSource,
   Dataset: DatasetSource
