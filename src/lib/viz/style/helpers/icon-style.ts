@@ -1,5 +1,6 @@
 import { Texture2D } from '@luma.gl/core';
 import { IconLayer } from '@deck.gl/layers';
+import { Feature, Point, MultiPoint } from 'geojson';
 import { StyledLayer } from '../layer-style';
 import { Style, BasicOptionsStyle, getStyles } from '..';
 import { GeometryType } from '../../sources/Source';
@@ -46,10 +47,11 @@ export function iconStyle(options: Partial<IconOptionsStyle> = {}) {
 
     const pointStyles = getStyles(meta.geometryType, iconOptions);
 
-    // eslint-disable-next-line @typescript-eslint/ban-types
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const renderSubLayers = (props: any) => new IconLayer(props);
 
     return {
+      getPosition,
       renderSubLayers,
       ...iconOptions,
       ...pointStyles
@@ -99,4 +101,8 @@ function validateParameters(options: Partial<IconOptionsStyle>, geometryType: Ge
       }
     }
   }
+}
+
+function getPosition(f: Feature<Point | MultiPoint>) {
+  return f.geometry.coordinates;
 }
