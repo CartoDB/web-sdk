@@ -1,4 +1,4 @@
-import { Stats } from '@/source';
+import { Stats } from '@/viz/source';
 import { CartoStylingError, stylingErrorTypes } from '../errors/styling-error';
 
 export type ClassificationMethod = 'quantiles' | 'stdev' | 'equal';

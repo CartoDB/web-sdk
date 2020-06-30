@@ -10,8 +10,8 @@ import {
   StatFields,
   shouldInitialize
 } from './Source';
-import { parseGeometryType } from '../viz/style/helpers/utils';
-import { sourceErrorTypes, SourceError } from '../viz/errors/source-error';
+import { parseGeometryType } from '../style/helpers/utils';
+import { sourceErrorTypes, SourceError } from '../errors/source-error';
 
 export interface SourceOptions {
   credentials?: Credentials;

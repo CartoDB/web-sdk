@@ -7,7 +7,7 @@ import {
   GeoJSONSource,
   SQLSource,
   DatasetSource
-} from './source';
+} from './viz/source';
 
 // Basemaps
 import { createMap, createGoogleMap } from './viz/basemap';

@@ -1,4 +1,4 @@
-import { NumericFieldStats, GeometryType } from '@/source';
+import { NumericFieldStats, GeometryType } from '@/viz/source';
 import { scale as chromaScale } from 'chroma-js';
 import { getColors, getUpdateTriggers, hexToRgb } from './utils';
 import { StyledLayer } from '../layer-style';

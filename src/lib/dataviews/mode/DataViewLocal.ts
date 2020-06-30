@@ -2,7 +2,7 @@ import { Layer } from '@/viz';
 import { AggregationType, aggregate } from '@/data/operations/aggregation/aggregation';
 import { groupValuesByColumn } from '@/data/operations/grouping';
 import { castToNumberOrUndefined } from '@/core/utils/number';
-import { GeoJSONSource } from '@/source';
+import { GeoJSONSource } from '@/viz/source';
 import { DataViewMode, DataViewData } from './DataViewMode';
 import { CartoDataViewError, dataViewErrorTypes } from '../DataViewError';
 import { CategoryElement } from '../category/CategoryImpl';

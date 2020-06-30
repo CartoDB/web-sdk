@@ -1,5 +1,5 @@
 import { Layer } from '@/viz';
-import { Source, GeoJSONSource } from '@/source';
+import { Source, GeoJSONSource } from '@/viz/source';
 
 /**
  * This prevents multiple calls to a function by establishing

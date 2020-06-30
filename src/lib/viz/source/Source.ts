@@ -4,7 +4,7 @@
  */
 
 import { WithEvents } from '@/core/mixins/WithEvents';
-import { ColumnFilters } from '../viz/filters/types';
+import { ColumnFilters } from '../filters/types';
 
 export type GeometryType = 'Point' | 'Line' | 'Polygon';
 
