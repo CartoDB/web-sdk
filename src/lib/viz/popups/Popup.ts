@@ -24,6 +24,7 @@ export class Popup {
   private _container: HTMLElement;
   private _parentElement: HTMLElement | undefined;
   private _isOpened: boolean;
+  private _previousParentOverflow?: string;
 
   constructor(options: Partial<PopupOptions> = defaultOptions) {
     this._options = {
@@ -116,6 +117,9 @@ export class Popup {
    */
   public open() {
     if (this._parentElement && !this._isOpened) {
+      // prevent scroll-bar appearing when the popup exceeds the viewport bounds
+      this._previousParentOverflow = this._parentElement.style.overflow;
+      this._parentElement.style.overflow = 'hidden';
       this._parentElement.appendChild(this._container);
     }
 
@@ -127,6 +131,11 @@ export class Popup {
    */
   public close() {
     if (this._parentElement && this._isOpened) {
+      // restore the previous overflow style
+      if (this._previousParentOverflow) {
+        this._parentElement.style.overflow = this._previousParentOverflow;
+      }
+
       this._parentElement.removeChild(this._container);
     }
 
@@ -176,7 +185,7 @@ export class Popup {
 
   private _createContainerElem() {
     const containerElem = document.createElement('as-infowindow');
-    containerElem.setAttribute('style', 'position: absolute; z-index: 1; pointer-events: none');
+    containerElem.style.cssText = 'position: absolute; z-index: 1; pointer-events: none';
 
     if (this._options.closeButton) {
       // enable pointer events
