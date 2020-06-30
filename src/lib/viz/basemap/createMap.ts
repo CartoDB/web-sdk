@@ -9,9 +9,9 @@ interface DeckViewState {
   zoom?: number;
 }
 
-interface IWithViewState {
-  viewState: DeckViewState;
-}
+// interface IWithViewState {
+//   viewState: DeckViewState;
+// }
 
 interface DeckGLMapOptions {
   basemap?: string;
@@ -61,12 +61,14 @@ export function createMap(options: DeckGLMapOptions = DEFAULT_OPTIONS) {
 
   const deckMap = new (window.deck.DeckGL as any)({
     mapStyle: CartoMapStyle[chosenOptions.basemap.toUpperCase() as keyof typeof CartoMapStyle],
-    viewState: chosenOptions.view,
+    initialViewState: chosenOptions.view, // stateful
     container: chosenOptions.container,
-    controller: true,
-    onViewStateChange: ({ viewState }: IWithViewState) => {
-      deckMap.setProps({ viewState });
-    }
+    controller: true
+    // stateless
+    // viewState: chosenOptions.view,
+    // onViewStateChange: ({ viewState }: IWithViewState) => {
+    //   deckMap.setProps({ viewState });
+    // }
   });
 
   return deckMap;
