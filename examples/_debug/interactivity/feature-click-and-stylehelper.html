@@ -63,7 +63,7 @@
 
     <script>
       async function initialize() {
-        carto.setDefaultCredentials({ username: 'cartoframes' });
+        carto.auth.setDefaultCredentials({ username: 'cartoframes' });
 
         const deckMap = carto.viz.createMap({
           basemap: 'voyager',

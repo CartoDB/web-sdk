@@ -1,98 +1,111 @@
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Add popup on click example</title>
 
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Add popup on click example</title>
+    <!-- Custom CSS -->
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.css"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://libs.cartocdn.com/airship-style/v2.3/airship.min.css"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://libs.cartocdn.com/airship-icons/v2.3/icons.css"
+    />
 
-  <!-- Custom CSS -->
-  <link rel="stylesheet" type="text/css" href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.css" />
-  <link rel="stylesheet" type="text/css" href="https://libs.cartocdn.com/airship-style/v2.3/airship.min.css" />
-  <link rel="stylesheet" type="text/css" href="https://libs.cartocdn.com/airship-icons/v2.3/icons.css" />
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+      }
 
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-    }
+      #map {
+        width: 100vw;
+        height: 100vh;
+      }
 
-    #map {
-      width: 100vw;
-      height: 100vh;
-    }
+      div.as-infowindow > div.as-infowindow__content > button.as-btn {
+        float: right;
+        margin-top: -10px;
+        margin-right: -10px;
+      }
+    </style>
+  </head>
 
-    div.as-infowindow>div.as-infowindow__content>button.as-btn {
-      float: right;
-      margin-top: -10px;
-      margin-right: -10px;
-    }
-  </style>
-</head>
-
-<body>
-  <div class="as-app" style="height: 100vh;">
-    <div class="as-content">
-      <main class="as-main">
-        <div class="as-map-area">
-          <section id="map"></section>
-          <div class="as-map-panels">
-            <div class="as-panel as-panel--top as-panel--right as-bg--ui-01">
-              <div class="as-container">
-                <section class="as-box">
-                  <h1 class="as-title">Pop-ups on click</h1>
-                  <p class="as-body">Configure pop-up windows on click</p>
-                </section>
-                <div class="as-body" id="controls">
-                  <div id="content"></div>
+  <body>
+    <div class="as-app" style="height: 100vh;">
+      <div class="as-content">
+        <main class="as-main">
+          <div class="as-map-area">
+            <section id="map"></section>
+            <div class="as-map-panels">
+              <div class="as-panel as-panel--top as-panel--right as-bg--ui-01">
+                <div class="as-container">
+                  <section class="as-box">
+                    <h1 class="as-title">Pop-ups on click</h1>
+                    <p class="as-body">Configure pop-up windows on click</p>
+                  </section>
+                  <div class="as-body" id="controls">
+                    <div id="content"></div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      </main>
+        </main>
+      </div>
     </div>
-  </div>
 
-  <!-- Map libraries-->
-  <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.js"></script>
-  <script src="https://unpkg.com/deck.gl@8.2.0-beta.1/dist.min.js"></script>
-  <!-- Airship -->
-  <script src="https://libs.cartocdn.com/airship-components/v2.3/airship.js"></script>
+    <!-- Map libraries-->
+    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.js"></script>
+    <script src="https://unpkg.com/deck.gl@8.2.0-beta.1/dist.min.js"></script>
+    <!-- Airship -->
+    <script src="https://libs.cartocdn.com/airship-components/v2.3/airship.js"></script>
 
-  <!-- CARTO Deck.gl's Tile Layer -->
-  <script src="/dist/umd/index.min.js"></script>
+    <!-- CARTO Deck.gl's Tile Layer -->
+    <script src="/dist/umd/index.min.js"></script>
 
-  <script>
-    async function initialize() {
+    <script>
+      async function initialize() {
+        carto.auth.setDefaultCredentials({
+          username: 'cartovl',
+          apiKey: 'default_public'
+        });
 
-      carto.setDefaultCredentials({
-        username: 'cartovl',
-        apiKey: 'default_public'
-      });
+        const deckMap = carto.viz.createMap({
+          basemap: 'voyager',
+          view: {
+            longitude: 0,
+            latitude: 30,
+            zoom: 1.5
+          }
+        });
 
-      const deckMap = carto.viz.createMap({
-        basemap: 'voyager',
-        view: {
-          longitude: 0,
-          latitude: 30,
-          zoom: 1.5
-        }
-      });
+        const sizeBinStyle = new carto.viz.sizeBinsStyle('pop_2015', {
+          color: '#0000FF'
+        });
 
-      const sizeBinStyle = new carto.viz.sizeBinsStyle('pop_2015', {
-        color: '#0000FF'
-      });
-
-
-      const populationLayer = new carto.viz.Layer('world_population_2015');
-      await populationLayer.addTo(deckMap);
-      await populationLayer.setStyle(sizeBinStyle);
-      await populationLayer.setPopupClick(['cartodb_id', { attr: 'thousands', title: 'thousands' }, { attr: 'pop_2015', title: 'Population' }]);
-      populationLayer.on('click', ([features, coordinates]) => {
+        const populationLayer = new carto.viz.Layer('world_population_2015');
+        await populationLayer.addTo(deckMap);
+        await populationLayer.setStyle(sizeBinStyle);
+        await populationLayer.setPopupClick([
+          'cartodb_id',
+          { attr: 'thousands', title: 'thousands' },
+          { attr: 'pop_2015', title: 'Population' }
+        ]);
+        populationLayer.on('click', ([features, coordinates]) => {
           let content = '';
           features.forEach(f => {
-            console.log(f)
+            console.log(f);
             content += `
             <div class="container">
               <h3 class="as-title">${f.properties.thousands} - ${f.properties.pop_2015}</h3>
@@ -103,10 +116,9 @@
           });
           document.getElementById('content').innerHTML = content;
         });
-      // await populationLayer.setSource('polygon_test');
-    }
-    initialize();
-  </script>
-</body>
-
+        // await populationLayer.setSource('polygon_test');
+      }
+      initialize();
+    </script>
+  </body>
 </html>
