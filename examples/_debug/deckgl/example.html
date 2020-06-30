@@ -40,7 +40,7 @@
 
     <!-- Map libraries-->
     <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.js"></script>
-    <script src="https://unpkg.com/deck.gl@8.2.0-beta.1/dist.min.js"></script>
+    <script src="https://unpkg.com/deck.gl@8.2.0/dist.min.js"></script>
 
     <script>
       const user = 'jbotella';
@@ -92,8 +92,7 @@
         const deckInstance = new window.deck.DeckGL({
           container: 'map',
           mapboxApiAccessToken: '',
-          mapStyle:
-            'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
+          mapStyle: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
           initialViewState: {
             longitude: -115.42616039127863,
             latitude: 50.79104529446759,
