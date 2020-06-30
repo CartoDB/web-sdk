@@ -25,6 +25,9 @@ const DEFAULT_OPTIONS: GoogleMapOptions = {
  *    const deckMap = carto.viz.createGoogleMap({ mapOptions: { mapTypeId: 'hybrid', zoom: 4 } });
  *    const deckMap = carto.viz.createGoogleMap({ container: 'map', mapOptions: { mapTypeId: 'terrain', zoom: 4, center: { lng: 3, lat: 40 } } });
  * ```
+ *
+ * **IMPORTANT NOTE**: deck.gl's general zoom is Google Map's zoom - 1
+ *
  * @export
  * @param {GoogleMapOptions} options
  * @returns
