@@ -28,7 +28,7 @@ import {
 } from './viz/style';
 
 // Dataviews
-import { CategoryDataView, FormulaDataView } from './dataview';
+import { CategoryDataView, FormulaDataView } from './viz/dataview';
 
 // Widgets
 import { CategoryWidget, FormulaWidget } from './widget';
@@ -70,17 +70,18 @@ const styles = {
   sizeContinuousStyle
 };
 
+// dataview
+const dataview = {
+  Category: CategoryDataView,
+  Formula: FormulaDataView
+};
+
 export const viz = {
   source,
+  dataview,
   ...basemaps,
   ...styles,
   ...basics
-};
-
-// carto.dataview
-export const dataview = {
-  Category: CategoryDataView,
-  Formula: FormulaDataView
 };
 
 // carto.widget

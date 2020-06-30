@@ -1,4 +1,4 @@
-import { FormulaDataView } from '@/dataview';
+import { FormulaDataView } from '@/viz/dataview';
 import { Widget } from '../widget';
 
 export class FormulaWidget extends Widget {

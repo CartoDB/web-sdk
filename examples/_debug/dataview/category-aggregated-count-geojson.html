@@ -95,7 +95,7 @@
         await layer.addTo(deckMap);
 
         // A data-view to count
-        const dataview = new carto.dataview.Category(layer, 'harbortype', {
+        const dataview = new carto.viz.dataview.Category(layer, 'harbortype', {
           operation: 'count',
           mode: 'local'
         });

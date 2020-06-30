@@ -1,4 +1,4 @@
-import { CategoryDataView } from '@/dataview';
+import { CategoryDataView } from '@/viz/dataview';
 import { Widget } from '../widget';
 
 export class CategoryWidget extends Widget {
