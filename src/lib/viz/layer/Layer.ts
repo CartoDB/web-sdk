@@ -1,6 +1,6 @@
 import { Deck, WebMercatorViewport } from '@deck.gl/core';
 import { CartoError } from '@/core/errors/CartoError';
-import { GeoJsonLayer } from '@deck.gl/layers';
+import { GeoJsonLayer, IconLayer } from '@deck.gl/layers';
 import { MVTLayer } from '@deck.gl/geo-layers';
 import mitt from 'mitt';
 import deepmerge from 'deepmerge';
@@ -266,9 +266,8 @@ export class Layer extends WithEvents implements StyledLayer {
     if (this._source.sourceType === 'SQLSource' || this._source.sourceType === 'DatasetSource') {
       this._deckLayer = new MVTLayer(layerProperties);
     } else if (this._source.sourceType === 'GeoJSONSource') {
-      if (layerProperties._forceLayer) {
-        layerProperties.data = layerProperties.data.features;
-        this._deckLayer = new layerProperties._forceLayer(layerProperties);
+      if (layerProperties._isIconLayer) {
+        this._deckLayer = new IconLayer(layerProperties);
       } else {
         this._deckLayer = new GeoJsonLayer(layerProperties);
       }
