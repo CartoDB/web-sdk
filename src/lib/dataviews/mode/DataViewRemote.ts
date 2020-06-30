@@ -1,5 +1,5 @@
 import { MapsDataviews as DataviewsApi } from '@/maps/MapsDataviews';
-import { defaultCredentials } from '@/core/Credentials';
+import { defaultCredentials } from '@/auth';
 import { Source, CARTOSource, Layer } from '@/viz';
 import { Filter, SpatialFilters, BuiltInFilters } from '@/viz/filters/types';
 import { FiltersCollection } from '@/viz/filters/FiltersCollection';

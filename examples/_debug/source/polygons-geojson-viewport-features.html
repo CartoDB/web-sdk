@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Viewport features</title>
+    <title>GeoJSON viewport features</title>
 
     <link
       rel="stylesheet"
@@ -43,8 +43,8 @@
               <h1 class="as-title">Viewport features</h1>
               <h4 class="as-subheader as-mb--12">
                 Get the visible features, updated on every viewport change.
-              </h4>    
-              <div id="result" class="as-subheader"></div>         
+              </h4>
+              <div id="result" class="as-subheader"></div>
           </div>
         </div>
       </main>
@@ -56,9 +56,10 @@
 
     <script>
       async function initialize() {
-        carto.auth.setDefaultCredentials({ username: 'public' });
         const deckMap = carto.viz.createMap();
-        const countriesLayer = new carto.viz.Layer('ne_50m_admin_0_countries');
+
+        const data = await fetch('https://public.carto.com/api/v2/sql?api_key=default_public&q=select* from ne_50m_admin_0_countries&format=geojson').then(response => response.json());
+        const countriesLayer = new carto.viz.Layer(data);
 
         // vieportLoad will be triggered after every viewport change (zoom, pan...)
         countriesLayer.on('viewportLoad', async () => {

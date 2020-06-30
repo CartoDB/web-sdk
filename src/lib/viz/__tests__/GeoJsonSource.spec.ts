@@ -1,5 +1,6 @@
 import { Feature, FeatureCollection, Geometry, GeometryCollection } from 'geojson';
 import { GeoJsonSource, getGeomType, getFeatures, DEFAULT_GEOM } from '../sources/GeoJsonSource';
+import { SourceError } from '../errors/source-error';
 
 const GEOJSON_GEOM_TYPE = 'LineString';
 const GEOM_TYPE = 'Line';
@@ -216,5 +217,68 @@ describe('SourceMetadata', () => {
         }
       ]
     });
+  });
+
+  it('should fail if fields does not exist in geoJSON', async () => {
+    const fields = {
+      sample: new Set(['number', 'cat']),
+      aggregation: new Set(['number'])
+    };
+
+    const emptyGeojson: FeatureCollection = {
+      type: 'FeatureCollection',
+      features: []
+    };
+
+    const source = new GeoJsonSource(emptyGeojson);
+
+    expect(async () => {
+      await source.init(fields);
+    }).rejects.toEqual(
+      new SourceError("Field/s 'number, cat' do/es not exist in geoJSON properties")
+    );
+  });
+
+  it('should fail if a field does not exist in geoJSON', async () => {
+    const fields = {
+      sample: new Set(['number', 'cat']),
+      aggregation: new Set(['number'])
+    };
+
+    const geojsonWithoutNumberField: FeatureCollection = {
+      type: 'FeatureCollection',
+      features: [
+        {
+          type: 'Feature',
+          id: 1,
+          geometry,
+          properties: {
+            cat: 'cat1'
+          }
+        },
+        {
+          type: 'Feature',
+          id: 1,
+          geometry,
+          properties: {
+            cat: 'cat1'
+          }
+        },
+        {
+          type: 'Feature',
+          id: 1,
+          geometry,
+          properties: {
+            cat: 'cat2'
+          }
+        }
+      ]
+    };
+
+    const source = new GeoJsonSource(geojsonWithoutNumberField);
+
+    expect(async () => {
+      await source.init(fields);
+    }).rejects.toEqual(new SourceError("Field/s 'number' do/es not exist in geoJSON properties"));
   });
 });

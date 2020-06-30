@@ -1,3 +1,6 @@
+import { Layer, Source } from '@/viz';
+import { GeoJsonSource } from '@/viz/sources';
+
 /**
  * This prevents multiple calls to a function by establishing
  * a timeout.
@@ -22,4 +25,11 @@ export function debounce(
 
     scope.timeoutId = window.setTimeout(() => func.apply(this, args), timeToWait);
   };
+}
+
+export function isGeoJSONSource(dataSource: Layer | Source) {
+  return (
+    (dataSource instanceof Layer && dataSource.source instanceof GeoJsonSource) ||
+    dataSource instanceof GeoJsonSource
+  );
 }

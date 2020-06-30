@@ -36,7 +36,7 @@
 
     <script>
       function initializePoints() {
-        carto.setDefaultCredentials({ username: 'josemacarto' });
+        carto.auth.setDefaultCredentials({ username: 'josemacarto' });
 
         const deckMap = carto.viz.createMap({
           basemap: 'voyager',
@@ -53,7 +53,7 @@
       }
 
       function initializeLines() {
-        carto.setDefaultCredentials({ username: 'cartoframes' });
+        carto.auth.setDefaultCredentials({ username: 'cartoframes' });
 
         const deckMap = carto.viz.createMap({
           basemap: 'voyager',

@@ -1,4 +1,4 @@
-import { Credentials } from '../core/Credentials';
+import { Credentials } from '../auth';
 
 const unauthorized = (credentials: Credentials) => {
   throw new Error(

@@ -166,21 +166,21 @@
       let formulaLocal;
 
       async function initialize() {
-        carto.auth.setDefaultCredentials({ username: 'public' });
         const deckMap = carto.viz.createMap();
 
-        const countriesLayer = new carto.viz.Layer('world_commerce');
+        const geojson = await fetch('https://public.carto.com/api/v2/sql?api_key=default_public&q=select* from ne_50m_admin_0_countries&format=geojson').then(response => response.json())
+        const countriesLayer = new carto.viz.Layer(geojson);
         await countriesLayer.addTo(deckMap);
 
-        formulaRemote = new carto.dataview.Formula(countriesLayer.source, 'gdp', {
+        formulaRemote = new carto.dataview.Formula(countriesLayer, 'gdp_md_est', {
           operation: 'sum',
           mode: 'remote'
         });
-        formulaRemoteFiltered = new carto.dataview.Formula(countriesLayer, 'gdp', {
+        formulaRemoteFiltered = new carto.dataview.Formula(countriesLayer, 'gdp_md_est', {
           operation: 'sum',
           mode: 'remote-filtered'
         });
-        formulaLocal = new carto.dataview.Formula(countriesLayer, 'gdp', {
+        formulaLocal = new carto.dataview.Formula(countriesLayer, 'gdp_md_est', {
           operation: 'sum',
           mode: 'local'
         });

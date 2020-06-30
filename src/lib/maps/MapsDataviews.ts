@@ -1,6 +1,6 @@
 import { AggregationType } from '@/data/operations/aggregation/aggregation';
 import { uuidv4 } from '@/core/utils/uuid';
-import { Credentials } from '../core/Credentials';
+import { Credentials } from '../auth';
 import { Client, MapDataviewsOptions } from './Client';
 
 export class MapsDataviews {

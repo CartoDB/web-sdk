@@ -1,4 +1,4 @@
-import { Credentials, defaultCredentials } from '@/core/Credentials';
+import { Credentials, defaultCredentials } from '@/auth';
 import { Source, SourceProps, SourceMetadata, NumericFieldStats } from './Source';
 import { parseGeometryType } from '../style/helpers/utils';
 import { sourceErrorTypes, SourceError } from '../errors/source-error';

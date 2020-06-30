@@ -36,7 +36,7 @@
 
     <script>
       function initialize() {
-        carto.setDefaultCredentials({ username: 'public' });
+        carto.auth.setDefaultCredentials({ username: 'public' });
 
         const deckMap = carto.viz.createMap({
           basemap: 'voyager',
