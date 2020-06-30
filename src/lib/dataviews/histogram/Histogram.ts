@@ -12,7 +12,7 @@ export class HistogramDataView extends DataViewWrapper {
   protected buildImpl(
     dataSource: Layer | Source,
     column: string,
-    options: HistogramDataViewOptions
+    options: HistogramDataViewOptions = { bins: 10 }
   ) {
     const { mode } = options;
 

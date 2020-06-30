@@ -94,7 +94,7 @@ export interface HistogramDataViewData {
 }
 
 export interface HistogramDataViewOptions {
-  bins: number;
+  bins?: number;
   start?: number;
   end?: number;
   mode?: DataViewCalculation;

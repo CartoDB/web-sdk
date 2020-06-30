@@ -18,7 +18,7 @@ export abstract class DataViewWrapper extends WithEvents {
   protected setOptionScope: { timeoutId?: number } = {};
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  constructor(dataSource: Layer | Source, column: string, options: any) {
+  constructor(dataSource: Layer | Source, column: string, options: any = {}) {
     super();
 
     this.buildImpl(dataSource, column, {
