@@ -1,4 +1,4 @@
-import { GeometryType } from '@/source';
+import { GeometryType } from '@/viz/source';
 import { hexToRgb } from './helpers/utils';
 import { defaultStyles } from './default-styles';
 import { colorValidation } from './validators';

@@ -2,14 +2,18 @@ import { Layer } from '@/viz';
 import { AggregationType, aggregate } from '@/data/operations/aggregation/aggregation';
 import { groupValuesByColumn } from '@/data/operations/grouping';
 import { castToNumberOrUndefined } from '@/core/utils/number';
+import { GeoJSONSource } from '@/viz/source';
 import { DataViewMode, DataViewData } from './DataViewMode';
 import { CartoDataViewError, dataViewErrorTypes } from '../DataViewError';
 import { CategoryElement } from '../category/CategoryDataViewImpl';
 
 export class DataViewLocal extends DataViewMode {
-  constructor(dataSource: Layer, column: string) {
+  private useViewport = true;
+
+  constructor(dataSource: Layer, column: string, useViewport = true) {
     super(dataSource, column);
 
+    this.useViewport = useViewport;
     this.bindEvents();
   }
 
@@ -54,7 +58,11 @@ export class DataViewLocal extends DataViewMode {
       columns.push(this.column);
     }
 
-    return (this.dataSource as Layer).getViewportFeatures(columns);
+    if (this.useViewport) {
+      return (this.dataSource as Layer).getViewportFeatures(columns);
+    }
+
+    return ((this.dataSource as Layer).source as GeoJSONSource).getFeatures(columns);
   }
 
   private async groupBy(operationColumn: string, operation: AggregationType) {

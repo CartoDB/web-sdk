@@ -1,4 +1,4 @@
-import { NumericFieldStats, GeometryType } from '@/source';
+import { NumericFieldStats, GeometryType } from '@/viz/source';
 import { getColors, getUpdateTriggers, hexToRgb, findIndexForBinBuckets } from './utils';
 import { Classifier, ClassificationMethod } from '../../utils/Classifier';
 import { CartoStylingError, stylingErrorTypes } from '../../errors/styling-error';

@@ -1,4 +1,4 @@
-import { NumericFieldStats, GeometryType } from '@/source';
+import { NumericFieldStats, GeometryType } from '@/viz/source';
 import { findIndexForBinBuckets, calculateSizeBins } from './utils';
 import { Classifier, ClassificationMethod } from '../../utils/Classifier';
 import { CartoStylingError, stylingErrorTypes } from '../../errors/styling-error';

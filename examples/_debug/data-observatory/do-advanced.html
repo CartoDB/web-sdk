@@ -40,7 +40,7 @@
 
     <!-- Map libraries-->
     <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.js"></script>
-    <script src="https://unpkg.com/deck.gl@8.2.0-beta.1/dist.min.js"></script>
+    <script src="https://unpkg.com/deck.gl@8.2.0/dist.min.js"></script>
 
     <!-- CARTO Deck.gl's Tile Layer -->
     <script src="/dist/umd/index.min.js"></script>
@@ -148,7 +148,7 @@
           method: 'equal',
           palette: 'teal'
         });
-        const source = new carto.source.DO(g.variable);
+        const source = new carto.viz.source.DO(g.variable);
         layer = new carto.viz.Layer(source, styles);
         await layer.addTo(map);
       }

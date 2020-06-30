@@ -1,2 +1,2 @@
-export { createGoogleMap } from './create-google-map';
-export { createMap } from './create-map';
+export { createGoogleMap } from './createGoogleMap';
+export { createMap } from './createMap';

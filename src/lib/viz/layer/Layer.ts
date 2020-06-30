@@ -1,4 +1,4 @@
-import { Deck } from '@deck.gl/core';
+import { Deck, WebMercatorViewport } from '@deck.gl/core';
 import { CartoError } from '@/core/errors/CartoError';
 import { GeoJsonLayer } from '@deck.gl/layers';
 import { MVTLayer } from '@deck.gl/geo-layers';
@@ -7,7 +7,7 @@ import deepmerge from 'deepmerge';
 import { GeoJSON } from 'geojson';
 import { uuidv4 } from '@/core/utils/uuid';
 import { WithEvents } from '@/core/mixins/WithEvents';
-import { DatasetSource, SQLSource, GeoJSONSource, Source, StatFields } from '@/source';
+import { DatasetSource, SQLSource, GeoJSONSource, Source, StatFields } from '@/viz/source';
 import { DOLayer } from '../deck/DOLayer';
 import { getStyles, StyleProperties, Style } from '../style';
 import { ViewportFeaturesGenerator } from '../interactivity/viewport-features/ViewportFeaturesGenerator';
@@ -49,6 +49,7 @@ export class Layer extends WithEvents implements StyledLayer {
   private filtersCollection = new FiltersCollection<ColumnFilters, FunctionFilterApplicator>(
     FunctionFilterApplicator
   );
+  private callToViewportLoad = false;
 
   constructor(
     source: string | Source,
@@ -141,10 +142,26 @@ export class Layer extends WithEvents implements StyledLayer {
     const createdDeckGLLayer = await this._createDeckGLLayer();
 
     // collection may have changed during instantiation...
-    const currentDeckLayers = deckInstance.props.layers;
+    const layers = [...deckInstance.props.layers, createdDeckGLLayer];
+
+    const hasGeoJsonLayer = layers.some(layer => layer instanceof GeoJsonLayer);
 
     deckInstance.setProps({
-      layers: [...currentDeckLayers, createdDeckGLLayer]
+      layers,
+      onViewStateChange: ({ interactionState, viewState }) => {
+        if ((interactionState.isPanning || interactionState.isZooming) && hasGeoJsonLayer) {
+          const viewport = new WebMercatorViewport(viewState);
+          this._viewportFeaturesGenerator.setViewport(viewport);
+
+          this.callToViewportLoad = true;
+        }
+      },
+      onAfterRender: () => {
+        if (this.callToViewportLoad) {
+          this.callToViewportLoad = false;
+          this.emit('viewportLoad');
+        }
+      }
     });
 
     this._deckInstance = deckInstance;
@@ -153,6 +170,10 @@ export class Layer extends WithEvents implements StyledLayer {
 
     this._viewportFeaturesGenerator.setDeckInstance(deckInstance);
     this._viewportFeaturesGenerator.setDeckLayer(createdDeckGLLayer);
+
+    if (hasGeoJsonLayer) {
+      this.emit('viewportLoad');
+    }
   }
 
   /**
@@ -259,7 +280,7 @@ export class Layer extends WithEvents implements StyledLayer {
           styleProperties.onViewportLoad(...args);
         }
 
-        this.emit('viewportLoad', args);
+        this.emit('viewportLoad');
       },
       onClick: this._interactivity.onClick.bind(this._interactivity),
       onHover: this._interactivity.onHover.bind(this._interactivity)

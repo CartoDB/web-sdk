@@ -99,10 +99,10 @@
     let categoryLocal;
 
     async function initialize() {
-      carto.auth.setDefaultCredentials({ username: 'public' });
       const deckMap = carto.viz.createMap();
 
-      const countriesLayer = new carto.viz.Layer('ne_50m_admin_0_countries');
+      const geojson = await fetch('https://public.carto.com/api/v2/sql?api_key=default_public&q=select* from ne_50m_admin_0_countries&format=geojson').then(response => response.json())
+      const countriesLayer = new carto.viz.Layer(geojson);
       await countriesLayer.addTo(deckMap);
 
       categoryRemote = new carto.dataview.Category(
@@ -156,14 +156,17 @@
       widgetRemoteFilteredElement.isLoading = 'true';
 
       categoryLocal.column = column;
+      categoryLocal.operationColumn = operationColumn;
       categoryLocal.operation = operation;
       categoryLocal.limit = limit;
 
       categoryRemote.column = column;
+      categoryRemote.operationColumn = operationColumn;
       categoryRemote.operation = operation;
       categoryRemote.limit = limit;
 
       categoryRemoteFiltered.column = column;
+      categoryRemoteFiltered.operationColumn = operationColumn;
       categoryRemoteFiltered.operation = operation;
       categoryRemoteFiltered.limit = limit;
 

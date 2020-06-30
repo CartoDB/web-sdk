@@ -1,4 +1,4 @@
-import { CategoryFieldStats, Category, GeometryType } from '@/source';
+import { CategoryFieldStats, Category, GeometryType } from '@/viz/source';
 import { calculateSizeBins } from './utils';
 import { Style, getStyleValue, BasicOptionsStyle, getStyles } from '..';
 import { CartoStylingError, stylingErrorTypes } from '../../errors/styling-error';

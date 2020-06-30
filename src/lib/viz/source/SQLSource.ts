@@ -10,8 +10,8 @@ import {
   StatFields,
   shouldInitialize
 } from './Source';
-import { parseGeometryType } from '../viz/style/helpers/utils';
-import { sourceErrorTypes, SourceError } from '../viz/errors/source-error';
+import { parseGeometryType } from '../style/helpers/utils';
+import { sourceErrorTypes, SourceError } from '../errors/source-error';
 
 export interface SourceOptions {
   credentials?: Credentials;
@@ -111,6 +111,33 @@ export class SQLSource extends Source {
     return this._metadata;
   }
 
+  /**
+   * Instantiate the map, getting proper stats for input fields
+   * @param fields
+   */
+  public async init(fields: StatFields): Promise<boolean> {
+    if (!shouldInitialize(this.isInitialized, fields, this._fields)) {
+      return true;
+    }
+
+    if (this.isInitialized) {
+      console.warn('Source reinitialized');
+    }
+
+    this._saveFields(fields);
+    this._initConfigForStats();
+
+    const mapsClient = new Client(this._credentials);
+    const mapInstance: MapInstance = await mapsClient.instantiateMapFrom(this._mapConfig);
+
+    const urlTemplate = getUrlsFrom(mapInstance);
+    this._props = { type: 'TileLayer', data: urlTemplate }; // TODO refactor / include in metadata ?
+    this._metadata = extractMetadataFrom(mapInstance, fields);
+
+    this.isInitialized = true;
+    return this.isInitialized;
+  }
+
   private _initConfigForStats() {
     if (this._mapConfig.metadata === undefined) {
       throw new SourceError('Map Config has not metadata field');
@@ -141,33 +168,6 @@ export class SQLSource extends Source {
       resolution: 1,
       threshold: 1
     };
-  }
-
-  /**
-   * Instantiate the map, getting proper stats for input fields
-   * @param fields
-   */
-  public async init(fields: StatFields): Promise<boolean> {
-    if (!shouldInitialize(this.isInitialized, fields, this._fields)) {
-      return true;
-    }
-
-    if (this.isInitialized) {
-      console.warn('Source reinitialized');
-    }
-
-    this._saveFields(fields);
-    this._initConfigForStats();
-
-    const mapsClient = new Client(this._credentials);
-    const mapInstance: MapInstance = await mapsClient.instantiateMapFrom(this._mapConfig);
-
-    const urlTemplate = getUrlsFrom(mapInstance);
-    this._props = { type: 'TileLayer', data: urlTemplate }; // TODO refactor / include in metadata ?
-    this._metadata = extractMetadataFrom(mapInstance, fields);
-
-    this.isInitialized = true;
-    return this.isInitialized;
   }
 
   private _saveFields(fields: StatFields) {

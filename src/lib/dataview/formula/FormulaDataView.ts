@@ -1,5 +1,5 @@
 import { Layer } from '@/viz';
-import { Source } from '@/source';
+import { Source } from '@/viz/source';
 import { BuiltInFilters } from '@/viz/filters/types';
 import { uuidv4 } from '@/core/utils/uuid';
 import { DataViewCalculation } from '../mode/DataViewMode';
@@ -8,6 +8,7 @@ import { DataViewLocal } from '../mode/DataViewLocal';
 import { DataViewRemote } from '../mode/DataViewRemote';
 import { DataViewWrapper } from '../DataViewWrapper';
 import { FormulaDataViewImpl } from './FormulaDataViewImpl';
+import { isGeoJSONSource } from '../utils';
 
 export class FormulaDataView extends DataViewWrapper {
   protected buildImpl(dataSource: Layer | Source, column: string, options: FormulaDataViewOptions) {
@@ -21,11 +22,25 @@ export class FormulaDataView extends DataViewWrapper {
       }
 
       case DataViewCalculation.REMOTE: {
+        if (isGeoJSONSource(dataSource)) {
+          const useViewport = false;
+          dataView = new DataViewLocal(dataSource as Layer, column, useViewport);
+          break;
+        }
+
         dataView = new DataViewRemote(dataSource as Source, column);
         break;
       }
 
+      case DataViewCalculation.REMOTE_FILTERED:
+
+      // eslint-disable-next-line no-fallthrough
       default: {
+        if (isGeoJSONSource(dataSource)) {
+          dataView = new DataViewLocal(dataSource as Layer, column);
+          break;
+        }
+
         dataView = new DataViewRemote(dataSource as Layer, column);
         dataView.addFilter(`VIEWPORT_FILTER_${uuidv4()}`, BuiltInFilters.VIEWPORT);
         break;
