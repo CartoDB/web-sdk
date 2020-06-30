@@ -40,7 +40,7 @@
 
     <!-- Map libraries-->
     <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.js"></script>
-    <script src="https://unpkg.com/deck.gl@8.2.0-beta.1/dist.min.js"></script>
+    <script src="https://unpkg.com/deck.gl@8.2.0/dist.min.js"></script>
 
     <script>
       // // Local environment
@@ -111,8 +111,7 @@
 
       function getURLTemplates(suffix) {
         const domains = ['a', 'b', 'c', 'd'];
-        const urlTemplate =
-          'https://do-gusc-{domain}.cartocdn.com/USER/api/v4/data/observatory/';
+        const urlTemplate = 'https://do-gusc-{domain}.cartocdn.com/USER/api/v4/data/observatory/';
         return domains.map(d => urlTemplate.replace('{domain}', d) + suffix);
       }
 
@@ -160,8 +159,7 @@
 
         map = new window.deck.DeckGL({
           container: 'map',
-          mapStyle:
-            'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
+          mapStyle: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
           initialViewState: {
             longitude: -102.630157,
             latitude: 40.133741,
