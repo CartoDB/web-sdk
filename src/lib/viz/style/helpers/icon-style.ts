@@ -51,6 +51,7 @@ export function iconStyle(options: Partial<IconOptionsStyle> = {}) {
     const renderSubLayers = (props: any) => new IconLayer(props);
 
     return {
+      _forceLayer: IconLayer,
       getPosition,
       renderSubLayers,
       ...iconOptions,
