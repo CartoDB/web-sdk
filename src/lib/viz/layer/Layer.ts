@@ -266,7 +266,12 @@ export class Layer extends WithEvents implements StyledLayer {
     if (this._source.sourceType === 'SQLSource' || this._source.sourceType === 'DatasetSource') {
       this._deckLayer = new MVTLayer(layerProperties);
     } else if (this._source.sourceType === 'GeoJSONSource') {
-      this._deckLayer = new GeoJsonLayer(layerProperties);
+      if (layerProperties._forceLayer) {
+        layerProperties.data = layerProperties.data.features;
+        this._deckLayer = new layerProperties._forceLayer(layerProperties);
+      } else {
+        this._deckLayer = new GeoJsonLayer(layerProperties);
+      }
     } else if (this._source.sourceType === 'DOSource') {
       this._deckLayer = new DOLayer(layerProperties);
     } else {
