@@ -53,7 +53,7 @@
                 <as-histogram-widget class="local" heading="Local Estimated Population" description="Distribution of estimated population in countries" show-clear>
                 </as-histogram-widget>
 
-                <as-histogram-widget class="remote" heading="Remote Estimated Population" description="Distribution of estimated population in countries">
+                <as-histogram-widget class="remote" heading="Remote Estimated Population" description="Distribution of estimated population in countries" show-clear>
                 </as-histogram-widget>
               </section>
             </div>
@@ -79,16 +79,24 @@
       const countriesLayer = new carto.viz.Layer('ne_50m_admin_0_countries');
       await countriesLayer.addTo(deckMap);
 
-      const localDataview = new carto.dataview.Histogram(countriesLayer, 'pop_est', {
-        bins: 10, start: 1000000, end: 127078679, mode: 'REMOTE_FILTERED'
-      });
-      const localHistogramWidget = new carto.widget.Histogram(document.querySelector('.local'), localDataview);
-
-
-      const remoteDataview = new carto.dataview.Histogram(countriesLayer, 'pop_est', {
+      const viewportHistogramDataview = new carto.dataview.Histogram(countriesLayer, 'pop_est', {
         bins: 10, start: 1000000, end: 127078679, mode: 'LOCAL'
       });
-      const remoteHistogramWidget = new carto.widget.Histogram(document.querySelector('.remote'), remoteDataview);
+
+      const viewportHistogramWidget = new carto.widget.Histogram(
+        document.querySelector('.local'),
+        viewportHistogramDataview
+      );
+
+
+      const viewportRemoteHistogramDataview = new carto.dataview.Histogram(countriesLayer, 'pop_est', {
+        bins: 10, start: 1000000, end: 127078679, mode: 'REMOTE_FILTERED'
+      });
+
+      const viewportRemoteHistogramWidget = new carto.widget.Histogram(
+        document.querySelector('.remote'),
+        viewportRemoteHistogramDataview
+      );
     }
 
     initialize();
