@@ -18,7 +18,7 @@ import { sourceErrorTypes, SourceError } from '../errors/source-error';
 import { selectPropertiesFrom } from '../utils/object';
 
 interface GeoJSONSourceProps extends SourceProps {
-  data: GeoJSON;
+  data: Feature[];
 }
 
 export const DEFAULT_GEOM = 'Point';
@@ -75,7 +75,7 @@ export class GeoJSONSource extends Source {
       return true;
     }
 
-    this._props = { type: 'GeoJSONLayer', data: this._geojson };
+    this._props = { type: 'GeoJSONLayer', data: getFeatures(this._geojson) };
     this._metadata = this._buildMetadata();
 
     this.needsInitialization = false;
