@@ -105,17 +105,17 @@
       const countriesLayer = new carto.viz.Layer(geojson);
       await countriesLayer.addTo(deckMap);
 
-      categoryRemote = new carto.dataview.Category(
+      categoryRemote = new carto.viz.dataview.Category(
         countriesLayer,
         'continent',
         { operation: 'sum', operationColumn: 'pop_est', mode: 'remote' }
       );
-      categoryRemoteFiltered = new carto.dataview.Category(
+      categoryRemoteFiltered = new carto.viz.dataview.Category(
         countriesLayer,
         'continent',
         { operation: 'sum', operationColumn: 'pop_est', mode: 'remote-filtered' }
       );
-      categoryLocal = new carto.dataview.Category(
+      categoryLocal = new carto.viz.dataview.Category(
         countriesLayer,
         'continent',
         { operation: 'sum', operationColumn: 'pop_est', mode: 'local' }

@@ -1,6 +1,6 @@
-import { Layer } from '../../viz/layer/Layer';
+import { Layer } from '../../layer/Layer';
 import { FormulaDataView } from './FormulaDataView';
-import { AggregationType } from '../../data/operations/aggregation/aggregation';
+import { AggregationType } from '../../../data/operations/aggregation/aggregation';
 import { CartoDataViewError, dataViewErrorTypes } from '../DataViewError';
 import { DataViewCalculation } from '../mode/DataViewMode';
 

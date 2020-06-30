@@ -3,7 +3,7 @@ import { Source } from '@/viz/source';
 import { BuiltInFilters } from '@/viz/filters/types';
 import { uuidv4 } from '@/core/utils/uuid';
 import { DataViewCalculation } from '../mode/DataViewMode';
-import { AggregationType } from '../../data/operations/aggregation/aggregation';
+import { AggregationType } from '../../../data/operations/aggregation/aggregation';
 import { DataViewLocal } from '../mode/DataViewLocal';
 import { DataViewRemote } from '../mode/DataViewRemote';
 import { DataViewWrapper } from '../DataViewWrapper';

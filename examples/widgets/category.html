@@ -86,7 +86,7 @@
         await countriesLayer.addTo(deckMap);
 
         // A data-view to count
-        const dataview = new carto.dataview.Category(countriesLayer, 'continent', {
+        const dataview = new carto.viz.dataview.Category(countriesLayer, 'continent', {
           operation: 'count'
         });
 

@@ -1,4 +1,4 @@
-import { AggregationType } from '../../data/operations/aggregation/aggregation';
+import { AggregationType } from '../../../data/operations/aggregation/aggregation';
 import { DataViewData, DataViewMode } from '../mode/DataViewMode';
 import { DataViewImpl } from '../DataViewImpl';
 

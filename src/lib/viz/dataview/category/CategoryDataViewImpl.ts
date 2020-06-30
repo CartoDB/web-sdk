@@ -1,4 +1,4 @@
-import { AggregationType } from '../../data/operations/aggregation/aggregation';
+import { AggregationType } from '../../../data/operations/aggregation/aggregation';
 import { DataViewMode, DataViewCalculation, DataViewData } from '../mode/DataViewMode';
 import { DataViewImpl } from '../DataViewImpl';
 import { CartoDataViewError, dataViewErrorTypes } from '../DataViewError';

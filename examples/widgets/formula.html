@@ -84,7 +84,7 @@
         await countriesLayer.addTo(deckMap);
 
         // Formula Widget
-        const formulaDataview = new carto.dataview.Formula(countriesLayer, 'pop_est', {
+        const formulaDataview = new carto.viz.dataview.Formula(countriesLayer, 'pop_est', {
           operation: 'max'
         });
 
