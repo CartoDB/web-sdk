@@ -47,7 +47,7 @@
           }
         });
 
-        const basicStyle = carto.viz.iconStyle({
+        const style = carto.viz.iconStyle({
           getIcon: () => ({
             url: 'https://avatars2.githubusercontent.com/u/421145?s=60&v=4',
             height: 60,
@@ -56,9 +56,9 @@
         });
 
         // const data = await fetch('https://cartoframes.carto.com/api/v2/sql?api_key=default_public&q=select* from sf_nbhd_crime&format=geojson').then(response => response.json())
-        // const layer = new carto.viz.Layer(data, basicStyle);
+        // const layer = new carto.viz.Layer(data, style);
 
-        const layer = new carto.viz.Layer('sf_nbhd_crime', basicStyle);
+        const layer = new carto.viz.Layer('sf_nbhd_crime', style);
 
         layer.addTo(deckMap);
       }
