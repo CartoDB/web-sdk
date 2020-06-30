@@ -56,7 +56,7 @@
 
     <script>
       async function initialize() {
-        carto.setDefaultCredentials({ username: 'public' });
+        carto.auth.setDefaultCredentials({ username: 'public' });
 
         // standard deckgl map using scripting API (see https://deck.gl/#/documentation/getting-started/using-standalone?section=using-the-scripting-api)
         const deckMap = new window.deck.DeckGL({
