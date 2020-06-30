@@ -70,7 +70,7 @@
 
         const layer = new carto.viz.Layer(geojsonData, basicStyle);
         // equivalent to...
-        // const layer = new carto.viz.Layer(new carto.source.GeoJSON(geojsonData), basicStyle);
+        // const layer = new carto.viz.Layer(new carto.viz.source.GeoJSON(geojsonData), basicStyle);
 
         layer.addTo(deckMap);
       }

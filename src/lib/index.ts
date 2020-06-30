@@ -48,15 +48,16 @@ export const auth = {
   setDefaultCredentials
 };
 
-// carto.source
-export const source = {
+// carto.viz
+
+// source
+const source = {
   // DO: DOSource,
   GeoJSON: GeoJSONSource,
   SQL: SQLSource,
   Dataset: DatasetSource
 };
 
-// carto.viz
 const basemaps = { createMap, createGoogleMap };
 const basics = { Layer, Popup };
 const styles = {
@@ -70,6 +71,7 @@ const styles = {
 };
 
 export const viz = {
+  source,
   ...basemaps,
   ...styles,
   ...basics
