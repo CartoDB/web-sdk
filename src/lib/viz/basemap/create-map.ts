@@ -1,15 +1,21 @@
 import { CartoMapStyle } from './CartoMapStyle';
 import { CartoBaseMapError } from '../errors/basemap-error';
 
+interface DeckViewState {
+  bearing?: number;
+  latitude?: number;
+  longitude?: number;
+  pitch?: number;
+  zoom?: number;
+}
+
+interface IWithViewState {
+  viewState: DeckViewState;
+}
+
 interface DeckGLMapOptions {
   basemap?: string;
-  view?: {
-    bearing?: number;
-    latitude?: number;
-    longitude?: number;
-    pitch?: number;
-    zoom?: number;
-  };
+  view?: DeckViewState;
   container?: HTMLElement | string;
 }
 
@@ -58,8 +64,8 @@ export function createMap(options: DeckGLMapOptions = DEFAULT_OPTIONS) {
     viewState: chosenOptions.view,
     container: chosenOptions.container,
     controller: true,
-    onViewStateChange: ({ viewState }) => {
-      deckMap.setProps({ viewState })
+    onViewStateChange: ({ viewState }: IWithViewState) => {
+      deckMap.setProps({ viewState });
     }
   });
 
