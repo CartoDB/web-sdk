@@ -5,7 +5,7 @@ import { Filter, SpatialFilters, BuiltInFilters } from '@/viz/filters/types';
 import { FiltersCollection } from '@/viz/filters/FiltersCollection';
 import { RemoteFilterApplicator } from '@/viz/filters/RemoteFilterApplicator';
 import { AggregationType } from '@/data/operations/aggregation/aggregation';
-import { DataViewMode, DataViewCalculation } from './DataViewMode';
+import { DataViewMode, DataViewCalculation, HistogramDataViewData } from './DataViewMode';
 import { CartoDataViewError, dataViewErrorTypes } from '../DataViewError';
 
 export class DataViewRemote extends DataViewMode {
@@ -88,6 +88,53 @@ export class DataViewRemote extends DataViewMode {
       result,
       operation,
       nullCount: nulls
+    };
+  }
+
+  public async histogram(
+    binsNumber: number,
+    start = 0,
+    end = 1000
+  ): Promise<HistogramDataViewData> {
+    const applicator = this.filtersCollection.getApplicatorInstance();
+    const bbox = (applicator as RemoteFilterApplicator).getBbox();
+
+    const aggregationResponse = await this.dataviewsApi.histogram({
+      bins: binsNumber,
+      start,
+      end,
+      bbox,
+      column: this.column
+    });
+
+    if (
+      aggregationResponse.errors_with_context &&
+      aggregationResponse.errors_with_context.length > 0
+    ) {
+      const { message, type } = aggregationResponse.errors_with_context[0];
+      throw new CartoDataViewError(`${type}: ${message}`, dataViewErrorTypes.MAPS_API);
+    }
+
+    const transformedBins = aggregationResponse.bins.map(
+      (binContainer: Record<string, number>) => ({
+        min: binContainer.min,
+        max: binContainer.max,
+        avg: binContainer.avg,
+        bin: binContainer.bin,
+        value: binContainer.freq,
+        normalized: binContainer.freq / aggregationResponse.totalAmount,
+        start: aggregationResponse.bins_start + binContainer.bin * aggregationResponse.bin_width,
+        end:
+          aggregationResponse.bins_start +
+          binContainer.bin * aggregationResponse.bin_width +
+          aggregationResponse.bin_width
+      })
+    );
+
+    return {
+      bins: transformedBins,
+      nulls: aggregationResponse.nulls,
+      totalAmount: aggregationResponse.totalAmount
     };
   }
 

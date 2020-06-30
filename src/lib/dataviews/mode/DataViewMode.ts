@@ -32,6 +32,12 @@ export abstract class DataViewMode extends WithEvents {
   }): Promise<Partial<DataViewData>>;
 
   public abstract async formula(operation: AggregationType): Promise<Partial<DataViewData>>;
+
+  public abstract async histogram(
+    binsNumber: number,
+    start: number | undefined,
+    end: number | undefined
+  ): Promise<HistogramDataViewData>;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -68,4 +74,28 @@ export enum DataViewCalculation {
   REMOTE = 'remote',
   LOCAL = 'local',
   REMOTE_FILTERED = 'remote-filtered'
+}
+
+export interface BinData {
+  min: number;
+  max: number;
+  avg: number;
+  normalized: number;
+  bin: number;
+  start: number;
+  end: number;
+  value: number;
+}
+
+export interface HistogramDataViewData {
+  bins: BinData[];
+  nulls: number;
+  totalAmount: number;
+}
+
+export interface HistogramDataViewOptions {
+  bins?: number;
+  start?: number;
+  end?: number;
+  mode?: DataViewCalculation;
 }

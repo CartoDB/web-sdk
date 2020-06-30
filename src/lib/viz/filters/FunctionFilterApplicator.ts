@@ -5,7 +5,8 @@ import { ColumnFilters, FilterTypes } from './types';
 import { FilterApplicator } from './FilterApplicator';
 
 export enum FilterType {
-  IN = 'IN'
+  IN = 'IN',
+  WITHIN = 'WITHIN'
 }
 
 export class FunctionFilterApplicator extends FilterApplicator<ColumnFilters> {
@@ -54,5 +55,11 @@ export class FunctionFilterApplicator extends FilterApplicator<ColumnFilters> {
 const filterFunctions: Record<FilterType, Function> = {
   [FilterType.IN](filterValues: string[], featureValue: string) {
     return filterValues.includes(featureValue);
+  },
+
+  [FilterType.WITHIN](filterValues: string[], featureValue: string) {
+    const [lowerBound, upperBound] = filterValues;
+
+    return featureValue >= lowerBound && featureValue < upperBound;
   }
 };
