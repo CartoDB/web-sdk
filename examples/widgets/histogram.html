@@ -44,10 +44,10 @@
             <div class="as-container as-container--scrollable">
               <section class="as-box">
                 <h1 class="as-title">Histogram widget</h1>
-                <!-- <h4 class="as-subheader as-mb--12">
-                  Create a widget, aggregating values per category, for those features currently
+                <h4 class="as-subheader as-mb--12">
+                  Create an Histogram widget, aggregating values in bins, for those features currently
                   visible. It includes a filtering feature out of the box
-                </h4> -->
+                </h4>
               </section>
               <section class="as-box">
                 <as-histogram-widget class="local" heading="Local Estimated Population" description="Distribution of estimated population in countries" show-clear>
@@ -72,7 +72,7 @@
     const widgetElement = document.querySelector('as-category-widget');
 
     async function initialize() {
-      carto.setDefaultCredentials({ username: 'public' });
+      carto.auth.setDefaultCredentials({ username: 'public' });
 
       const deckMap = carto.viz.createMap();
 
