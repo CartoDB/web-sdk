@@ -41,24 +41,10 @@
           <!-- panel -->
           <div class="as-panel as-panel--top as-panel--right as-bg--ui-01">
             <div class="as-panel__element as-p--16 as-body">
-              <h1 class="as-title">Basic example template</h1>
+              <h1 class="as-title">Fit bounds</h1>
               <h4 class="as-subheader as-mb--12">
-                A (short) description of the example
+                Fit bounds to an extent
               </h4>
-
-              <div>
-                <!-- extra controls, if required -->
-              </div>
-              <div id="result">
-                <!-- add here the interactive result, if required -->
-                <p>References to be used are:</p>
-                <ul class="as-list">
-                  <li class="as-list__item">MapboxGL 1.10.0</li>
-                  <li class="as-list__item">DeckGL 8.2.0</li>
-                  <li class="as-list__item">GoogleMaps JS 3.39</li>
-                  <li class="as-list__item">[Airship 2.3]</li>
-                </ul>
-              </div>
             </div>
           </div>
         </div>
@@ -71,11 +57,26 @@
     <script src="/dist/umd/index.min.js"></script>
 
     <script>
-      function initialize() {
-        carto.auth.setDefaultCredentials({ username: 'public' });
-        const deckMap = carto.viz.createMap();
-        const countriesLayer = new carto.viz.Layer('world_ports');
-        countriesLayer.addTo(deckMap);
+      async function initialize() {
+        carto.auth.setDefaultCredentials({
+          username: 'cartoframes',
+          apiKey: 'default_public'
+        });
+        const deckMap = carto.viz.createMap({
+          basemap: 'Positron'
+        });
+
+        const layer = new carto.viz.Layer('SELECT * FROM "cartoframes"."pittsburgh_311"');
+        await layer.addTo(deckMap);
+
+        const { viewport } = deckMap.layerManager.context;
+        const { longitude, latitude, zoom } = viewport.fitBounds([
+          [-80.0884561, 40.3632247055829],
+          [-79.868772, 40.5000326]
+        ]);
+        deckMap.setProps({
+          viewState: { longitude, latitude, zoom }
+        });
       }
 
       initialize();
