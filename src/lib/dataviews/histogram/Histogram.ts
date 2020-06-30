@@ -1,7 +1,7 @@
 import { Layer, Source } from '@/viz';
 import { BuiltInFilters } from '@/viz/filters/types';
 import { uuidv4 } from '@/core/utils/uuid';
-import { isGeoJSONSource } from '@/viz/utils/check';
+import { isGeoJSONSource } from '../utils';
 import { DataViewCalculation, HistogramDataViewOptions } from '../mode/DataViewMode';
 import { DataViewLocal } from '../mode/DataViewLocal';
 import { DataViewRemote } from '../mode/DataViewRemote';
@@ -40,6 +40,10 @@ const createDataView = {
   },
 
   [DataViewCalculation.REMOTE_FILTERED](dataSource: Layer | Source, column: string) {
+    if (isGeoJSONSource(dataSource)) {
+      return new DataViewLocal(dataSource as Layer, column);
+    }
+
     const dataView = new DataViewRemote(dataSource as Layer, column);
     dataView.addFilter(`VIEWPORT_FILTER_${uuidv4()}`, BuiltInFilters.VIEWPORT);
     return dataView;
