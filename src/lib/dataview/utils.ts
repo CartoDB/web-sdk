@@ -1,5 +1,5 @@
-import { Layer, Source } from '@/viz';
-import { GeoJsonSource } from '@/viz/sources';
+import { Layer } from '@/viz';
+import { Source, GeoJSONSource } from '@/viz/source';
 
 /**
  * This prevents multiple calls to a function by establishing
@@ -29,7 +29,7 @@ export function debounce(
 
 export function isGeoJSONSource(dataSource: Layer | Source) {
   return (
-    (dataSource instanceof Layer && dataSource.source instanceof GeoJsonSource) ||
-    dataSource instanceof GeoJsonSource
+    (dataSource instanceof Layer && dataSource.source instanceof GeoJSONSource) ||
+    dataSource instanceof GeoJSONSource
   );
 }

@@ -1,4 +1,4 @@
-import { CategoryFieldStats, Category, GeometryType } from '@/source';
+import { CategoryFieldStats, Category, GeometryType } from '@/viz/source';
 import { convertArrayToObjectWithValues } from '../../utils/object';
 import { getColors, getUpdateTriggers, hexToRgb } from './utils';
 import { CartoStylingError, stylingErrorTypes } from '../../errors/styling-error';

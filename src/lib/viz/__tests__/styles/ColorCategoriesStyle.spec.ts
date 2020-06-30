@@ -1,5 +1,5 @@
 import { Deck } from '@deck.gl/core';
-import { DatasetSource } from '@/source';
+import { DatasetSource } from '@/viz/source';
 import { colorCategoriesStyle } from '../../style';
 import * as mapsResponse from '../data-mocks/maps.category.json';
 import { CartoStylingError } from '../../errors/styling-error';
@@ -21,7 +21,7 @@ const getMetadata = jest.fn().mockImplementation(() => {
   };
 });
 
-jest.mock('../../../source/DatasetSource', () => ({
+jest.mock('../../source/DatasetSource', () => ({
   DatasetSource: jest.fn().mockImplementation(() => ({ getMetadata }))
 }));
 

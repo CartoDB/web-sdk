@@ -148,7 +148,7 @@
           method: 'equal',
           palette: 'teal'
         });
-        const source = new carto.source.DO(g.variable);
+        const source = new carto.viz.source.DO(g.variable);
         layer = new carto.viz.Layer(source, styles);
         await layer.addTo(map);
       }

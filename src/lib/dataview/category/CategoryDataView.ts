@@ -1,5 +1,5 @@
 import { Layer } from '@/viz';
-import { Source } from '@/source';
+import { Source } from '@/viz/source';
 import { BuiltInFilters } from '@/viz/filters/types';
 import { uuidv4 } from '@/core/utils/uuid';
 import { DataViewLocal } from '../mode/DataViewLocal';

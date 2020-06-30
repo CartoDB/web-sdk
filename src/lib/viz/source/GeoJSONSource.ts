@@ -13,8 +13,8 @@ import {
   shouldInitialize
 } from './Source';
 
-import { sourceErrorTypes, SourceError } from '../viz/errors/source-error';
-import { selectPropertiesFrom } from '../viz/utils/object';
+import { sourceErrorTypes, SourceError } from '../errors/source-error';
+import { selectPropertiesFrom } from '../utils/object';
 
 interface GeoJSONSourceProps extends SourceProps {
   data: GeoJSON;
@@ -74,6 +74,7 @@ export class GeoJSONSource extends Source {
     }
 
     if (this.isInitialized) {
+      // eslint-disable-next-line no-console
       console.warn('GeoJSONSource reinitialized');
     }
 

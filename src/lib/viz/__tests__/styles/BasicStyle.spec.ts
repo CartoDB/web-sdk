@@ -1,5 +1,5 @@
 import { Deck } from '@deck.gl/core';
-import { NumericFieldStats, DatasetSource } from '@/source';
+import { NumericFieldStats, DatasetSource } from '@/viz/source';
 import { basicStyle, defaultStyles } from '../../style';
 import { hexToRgb } from '../../style/helpers/utils';
 
@@ -10,7 +10,7 @@ const getMetadata = jest.fn().mockImplementation(() => {
   };
 });
 
-jest.mock('../../../source/DatasetSource', () => ({
+jest.mock('../../source/DatasetSource', () => ({
   DatasetSource: jest.fn().mockImplementation(() => ({ getMetadata }))
 }));
 

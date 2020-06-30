@@ -1,6 +1,6 @@
 import { Deck } from '@deck.gl/core';
 import { scale as chromaScale } from 'chroma-js';
-import { DatasetSource } from '@/source';
+import { DatasetSource } from '@/viz/source';
 import { colorContinuousStyle } from '../../style';
 import * as mapsResponse from '../data-mocks/maps.number.json';
 import { hexToRgb } from '../../style/helpers/utils';
@@ -21,7 +21,7 @@ const getMetadata = jest.fn().mockImplementation(() => {
   };
 });
 
-jest.mock('../../../source/DatasetSource', () => ({
+jest.mock('../../source/DatasetSource', () => ({
   DatasetSource: jest.fn().mockImplementation(() => ({ getMetadata }))
 }));
 
