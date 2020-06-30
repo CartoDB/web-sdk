@@ -35,7 +35,7 @@
     <script src="/dist/umd/index.min.js"></script>
 
     <script>
-      function initializePoints() {
+      async function initializePoints() {
         carto.auth.setDefaultCredentials({ username: 'cartoframes' });
 
         const deckMap = carto.viz.createMap({
@@ -54,7 +54,12 @@
             width: 60
           })
         });
+
+        // const data = await fetch('https://cartoframes.carto.com/api/v2/sql?api_key=default_public&q=select* from sf_nbhd_crime&format=geojson').then(response => response.json())
+        // const layer = new carto.viz.Layer(data, basicStyle);
+
         const layer = new carto.viz.Layer('sf_nbhd_crime', basicStyle);
+
         layer.addTo(deckMap);
       }
 
