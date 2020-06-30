@@ -3,7 +3,7 @@ import { AggregationType, aggregate } from '@/data/operations/aggregation/aggreg
 import { groupValuesByColumn } from '@/data/operations/grouping';
 import { castToNumberOrUndefined } from '@/core/utils/number';
 import { GeoJsonSource } from '@/viz/sources';
-import { DataViewMode, DataViewData, HistogramDataViewResult } from './DataViewMode';
+import { DataViewMode, DataViewData, HistogramDataViewData } from './DataViewMode';
 import { CartoDataViewError, dataViewErrorTypes } from '../DataViewError';
 import { CategoryElement } from '../category/CategoryImpl';
 
@@ -57,7 +57,7 @@ export class DataViewLocal extends DataViewMode {
     binsNumber: number,
     start: number | undefined,
     end: number | undefined
-  ): Promise<HistogramDataViewResult> {
+  ): Promise<HistogramDataViewData> {
     const features = (await this.getSourceData([this.column])) as Record<string, number>[];
     const sortedFeatures = features.map(feature => feature[this.column]).sort((a, b) => a - b);
 

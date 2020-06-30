@@ -37,7 +37,7 @@ export abstract class DataViewMode extends WithEvents {
     binsNumber: number,
     start: number | undefined,
     end: number | undefined
-  ): Promise<HistogramDataViewResult>;
+  ): Promise<HistogramDataViewData>;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -87,7 +87,7 @@ export interface BinData {
   value: number;
 }
 
-export interface HistogramDataViewResult {
+export interface HistogramDataViewData {
   bins: BinData[];
   nulls: number;
   totalAmount: number;

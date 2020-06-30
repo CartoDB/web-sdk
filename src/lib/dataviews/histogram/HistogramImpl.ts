@@ -1,7 +1,7 @@
 import {
   DataViewMode,
   HistogramDataViewOptions,
-  HistogramDataViewResult
+  HistogramDataViewData
 } from '../mode/DataViewMode';
 import { DataViewImpl } from '../DataViewImpl';
 import { AggregationType } from '../../data/operations/aggregation/aggregation';
@@ -14,7 +14,7 @@ export class HistogramImpl<T extends DataViewMode> extends DataViewImpl<T> {
     this.options = options;
   }
 
-  public async getData(): Promise<HistogramDataViewResult> {
+  public async getData(): Promise<HistogramDataViewData> {
     try {
       return await this.dataView.histogram(this.options.bins, this.options.start, this.options.end);
     } catch (error) {

@@ -5,7 +5,7 @@ import { Filter, SpatialFilters, BuiltInFilters } from '@/viz/filters/types';
 import { FiltersCollection } from '@/viz/filters/FiltersCollection';
 import { RemoteFilterApplicator } from '@/viz/filters/RemoteFilterApplicator';
 import { AggregationType } from '@/data/operations/aggregation/aggregation';
-import { DataViewMode, DataViewCalculation, HistogramDataViewResult } from './DataViewMode';
+import { DataViewMode, DataViewCalculation, HistogramDataViewData } from './DataViewMode';
 import { CartoDataViewError, dataViewErrorTypes } from '../DataViewError';
 
 export class DataViewRemote extends DataViewMode {
@@ -95,7 +95,7 @@ export class DataViewRemote extends DataViewMode {
     binsNumber: number,
     start = 0,
     end = 1000
-  ): Promise<HistogramDataViewResult> {
+  ): Promise<HistogramDataViewData> {
     const applicator = this.filtersCollection.getApplicatorInstance();
     const bbox = (applicator as RemoteFilterApplicator).getBbox();
 
