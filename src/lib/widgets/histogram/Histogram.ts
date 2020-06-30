@@ -1,5 +1,5 @@
 import { HistogramDataView } from '@/dataviews/histogram/Histogram';
-import { HistogramDataViewResult, BinData } from '@/dataviews/mode/DataViewMode';
+import { HistogramDataViewData, BinData } from '@/dataviews/mode/DataViewMode';
 import { Widget } from '../widget';
 
 export class Histogram extends Widget {
@@ -41,7 +41,7 @@ export class Histogram extends Widget {
   protected async updateData() {
     const data = await this.dataView.getData();
     const histogramWidget = this.element as HTMLAsHistogramWidgetElement;
-    histogramWidget.data = (data as HistogramDataViewResult).bins;
+    histogramWidget.data = (data as HistogramDataViewData).bins;
   }
 }
 
