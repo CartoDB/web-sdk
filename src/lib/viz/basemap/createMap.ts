@@ -17,6 +17,7 @@ interface DeckGLMapOptions {
   basemap?: string;
   view?: DeckViewState;
   container?: HTMLElement | string;
+  onContextLoad?: () => void;
 }
 
 const DEFAULT_OPTIONS: DeckGLMapOptions = {
@@ -63,7 +64,8 @@ export function createMap(options: DeckGLMapOptions = DEFAULT_OPTIONS) {
   const chosenOptions = {
     basemap: options.basemap || DEFAULT_OPTIONS.basemap || 'positron',
     view: { ...DEFAULT_OPTIONS.view, ...options.view },
-    container: options.container || DEFAULT_OPTIONS.container
+    container: options.container || DEFAULT_OPTIONS.container,
+    onContextLoad: options.onContextLoad
   };
 
   const deckMap = new (window.deck.DeckGL as any)({
@@ -73,7 +75,8 @@ export function createMap(options: DeckGLMapOptions = DEFAULT_OPTIONS) {
     viewState: chosenOptions.view,
     onViewStateChange: ({ viewState }: IWithViewState) => {
       deckMap.setProps({ viewState });
-    }
+    },
+    onLoad: chosenOptions.onContextLoad
   });
 
   return deckMap;
