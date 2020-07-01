@@ -147,14 +147,20 @@ export class Layer extends WithEvents implements StyledLayer {
 
     const hasGeoJsonLayer = layers.some(layer => layer instanceof GeoJsonLayer);
 
+    const { onViewStateChange } = deckInstance.props;
     deckInstance.setProps({
       layers,
-      onViewStateChange: ({ interactionState, viewState }) => {
+      onViewStateChange: args => {
+        const { interactionState, viewState } = args;
+
         if ((interactionState.isPanning || interactionState.isZooming) && hasGeoJsonLayer) {
           const viewport = new WebMercatorViewport(viewState);
           this._viewportFeaturesGenerator.setViewport(viewport);
-
           this.callToViewportLoad = true;
+        }
+
+        if (onViewStateChange) {
+          onViewStateChange(args); // keep stateless view management, if set up initially
         }
       },
       onAfterRender: () => {
