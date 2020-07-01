@@ -47,7 +47,7 @@
           }
         });
 
-        const style = carto.viz.colorContinuousStyle('value', {});
+        const style = carto.viz.style.colorContinuous('value', {});
         const tempLayer = new carto.viz.Layer('temps', style);
         tempLayer.addTo(deckMap);
       }
@@ -64,7 +64,7 @@
           }
         });
 
-        const style = carto.viz.colorContinuousStyle('businesses', {});
+        const style = carto.viz.style.colorContinuous('businesses', {});
         const tempLayer = new carto.viz.Layer('sf_businesses_neighborhoods', style);
         tempLayer.addTo(deckMap);
       }

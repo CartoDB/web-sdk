@@ -47,7 +47,7 @@
           }
         });
 
-        const availabilityStyle = carto.viz.sizeBinsStyle('availability_365');
+        const availabilityStyle = carto.viz.style.sizeBins('availability_365');
         const airbnbLayer = new carto.viz.Layer('listings_madrid', availabilityStyle);
         airbnbLayer.addTo(deckMap);
       }
