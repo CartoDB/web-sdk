@@ -25,7 +25,18 @@ export const defaultMapOptions: MapOptions = {
     mvt: 10
   },
   metadata: {
-    geometryType: true
+    geometryType: true,
+    columnStats: {
+      topCategories: 32768,
+      includeNulls: true
+    },
+    dimensions: true
+  },
+  aggregation: {
+    columns: {},
+    placement: 'centroid',
+    resolution: 1,
+    threshold: 1
   }
 };
 
@@ -124,8 +135,8 @@ export class SQLSource extends Source {
       console.warn('Source reinitialized');
     }
 
-    this._saveFields(fields);
-    this._initConfigForStats();
+    this.saveFields(fields);
+    this.buildMapConfig();
 
     const mapsClient = new Client(this._credentials);
     const mapInstance: MapInstance = await mapsClient.instantiateMapFrom(this._mapConfig);
@@ -138,39 +149,40 @@ export class SQLSource extends Source {
     return this.isInitialized;
   }
 
-  private _initConfigForStats() {
+  private buildMapConfig() {
+    this.buildMapConfigMetadata();
+    this.buildMapConfigAggregation();
+  }
+
+  private buildMapConfigMetadata() {
     if (this._mapConfig.metadata === undefined) {
       throw new SourceError('Map Config has not metadata field');
     }
 
-    // Modify mapConfig to add the field stats
-    this._mapConfig.metadata.columnStats = {
-      topCategories: 32768,
-      includeNulls: true
+    const metadata = {
+      sample: {
+        num_rows: 1000,
+        include_columns: [...this._fields.sample]
+      }
     };
 
-    this._mapConfig.metadata.dimensions = true;
+    this._mapConfig.metadata = Object.assign(metadata, this._mapConfig.metadata);
+  }
 
-    this._mapConfig.metadata.sample = {
-      num_rows: 1000,
-      include_columns: [...this._fields.sample]
-    };
-
+  private buildMapConfigAggregation() {
     const dimensions: Record<string, { column: string }> = {};
     this._fields.aggregation.forEach(field => {
       dimensions[field] = { column: field };
     });
 
-    this._mapConfig.aggregation = {
-      columns: {},
-      dimensions,
-      placement: 'centroid',
-      resolution: 1,
-      threshold: 1
+    const aggregation = {
+      dimensions
     };
+
+    this._mapConfig.aggregation = Object.assign(aggregation, this._mapConfig.aggregation);
   }
 
-  private _saveFields(fields: StatFields) {
+  private saveFields(fields: StatFields) {
     this._fields.sample = new Set([...fields.sample]);
     this._fields.aggregation = new Set([...fields.aggregation]);
   }
