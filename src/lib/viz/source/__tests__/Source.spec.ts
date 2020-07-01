@@ -1,4 +1,4 @@
-import { shouldInitialize } from '../sources/Source';
+import { shouldInitialize } from '../Source';
 
 describe('Source', () => {
   describe('shouldInitialize', () => {

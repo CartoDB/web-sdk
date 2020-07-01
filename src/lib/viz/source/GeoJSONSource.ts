@@ -1,4 +1,4 @@
-import { GeoJSON, GeoJsonGeometryTypes, Feature } from 'geojson';
+import { GeoJSON, Feature, GeoJsonGeometryTypes } from 'geojson';
 import { uuidv4 } from '@/core/utils/uuid';
 import { aggregate, AggregationType } from '@/data/operations/aggregation/aggregation';
 
@@ -16,17 +16,17 @@ import {
 import { sourceErrorTypes, SourceError } from '../errors/source-error';
 import { selectPropertiesFrom } from '../utils/object';
 
-interface GeoJsonSourceProps extends SourceProps {
+interface GeoJSONSourceProps extends SourceProps {
   data: GeoJSON;
 }
 
 export const DEFAULT_GEOM = 'Point';
 const MAX_SAMPLE_SIZE = 1000;
 
-export class GeoJsonSource extends Source {
+export class GeoJSONSource extends Source {
   private _geojson: GeoJSON;
   private _metadata?: SourceMetadata;
-  private _props?: GeoJsonSourceProps;
+  private _props?: GeoJSONSourceProps;
   private _numericFieldValues: Record<string, number[]>;
   private _categoryFieldValues: Record<string, string[]>;
   private _fields: StatFields;
@@ -34,7 +34,7 @@ export class GeoJsonSource extends Source {
   constructor(geojson: GeoJSON) {
     const id = `geojson-${uuidv4()}`;
     super(id);
-    this.sourceType = 'GeoJsonSource';
+    this.sourceType = 'GeoJSONSource';
 
     this._geojson = geojson;
     this._numericFieldValues = {};
@@ -42,7 +42,7 @@ export class GeoJsonSource extends Source {
     this._fields = { sample: new Set(), aggregation: new Set() };
   }
 
-  public getProps(): GeoJsonSourceProps {
+  public getProps(): GeoJSONSourceProps {
     if (!this.isInitialized || !this._props) {
       throw new SourceError('getProps requires init call', sourceErrorTypes.INIT_SKIPPED);
     }
@@ -75,10 +75,10 @@ export class GeoJsonSource extends Source {
 
     if (this.isInitialized) {
       // eslint-disable-next-line no-console
-      console.warn('GeoJsonSource reinitialized');
+      console.warn('GeoJSONSource reinitialized');
     }
 
-    this._props = { type: 'GeoJsonLayer', data: this._geojson };
+    this._props = { type: 'GeoJSONLayer', data: this._geojson };
     this._metadata = this._buildMetadata(fields);
 
     this.isInitialized = true;

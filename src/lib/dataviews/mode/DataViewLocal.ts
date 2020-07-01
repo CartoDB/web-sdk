@@ -1,8 +1,7 @@
-import { Layer } from '@/viz';
+import { Layer, GeoJSONSource } from '@/viz';
 import { AggregationType, aggregate } from '@/data/operations/aggregation/aggregation';
 import { groupValuesByColumn } from '@/data/operations/grouping';
 import { castToNumberOrUndefined } from '@/core/utils/number';
-import { GeoJsonSource } from '@/viz/sources';
 import { DataViewMode, DataViewData, HistogramDataViewData } from './DataViewMode';
 import { CartoDataViewError, dataViewErrorTypes } from '../DataViewError';
 import { CategoryElement } from '../category/CategoryImpl';
@@ -123,7 +122,7 @@ export class DataViewLocal extends DataViewMode {
       return (this.dataSource as Layer).getViewportFeatures(columns);
     }
 
-    return ((this.dataSource as Layer).source as GeoJsonSource).getFeatures(columns);
+    return ((this.dataSource as Layer).source as GeoJSONSource).getFeatures(columns);
   }
 
   private async groupBy(operationColumn: string, operation: AggregationType) {

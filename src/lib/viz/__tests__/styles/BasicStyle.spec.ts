@@ -1,7 +1,7 @@
 import { Deck } from '@deck.gl/core';
+import { DatasetSource } from '@/viz';
+import { NumericFieldStats } from '@/viz/source';
 import { basicStyle, defaultStyles } from '../../style';
-import { CARTOSource } from '../../sources/CARTOSource';
-import { NumericFieldStats } from '../../sources/Source';
 import { hexToRgb } from '../../style/helpers/utils';
 
 const getMetadata = jest.fn().mockImplementation(() => {
@@ -11,13 +11,13 @@ const getMetadata = jest.fn().mockImplementation(() => {
   };
 });
 
-jest.mock('../../sources/CARTOSource', () => ({
-  CARTOSource: jest.fn().mockImplementation(() => ({ getMetadata }))
+jest.mock('../../source/DatasetSource', () => ({
+  DatasetSource: jest.fn().mockImplementation(() => ({ getMetadata }))
 }));
 
 const styledLayer = {
   getMapInstance: () => ({} as Deck),
-  source: new CARTOSource('table')
+  source: new DatasetSource('table')
 };
 
 describe('BasicStyle', () => {
