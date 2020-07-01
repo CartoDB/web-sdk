@@ -115,7 +115,8 @@ describe('DatasetSource', () => {
           placement: 'centroid',
           resolution: 1,
           threshold: 1
-        }
+        },
+        sql: `SELECT * FROM ${DEFAULT_DATASET}`
       };
 
       expect(instantiateMapFromMock.mock.calls[0][0]).toMatchObject(expectedmapConfig);
@@ -169,7 +170,8 @@ describe('DatasetSource', () => {
           placement: 'centroid',
           resolution: 2,
           threshold: 2
-        }
+        },
+        sql: `SELECT * FROM ${DEFAULT_DATASET}`
       };
 
       expect(instantiateMapFromMock.mock.calls[0][0]).toMatchObject(expectedmapConfig);
