@@ -60,15 +60,6 @@ const source = {
 
 const basemaps = { createMap, createGoogleMap };
 const basics = { Layer, Popup };
-const styles = {
-  basicStyle,
-  colorBinsStyle,
-  colorCategoriesStyle,
-  colorContinuousStyle,
-  sizeBinsStyle,
-  sizeCategoriesStyle,
-  sizeContinuousStyle
-};
 
 // dataview
 const dataview = {
@@ -84,11 +75,22 @@ const widget = {
   Histogram: HistogramWidget
 };
 
+// style
+const style = {
+  basic: basicStyle,
+  colorBins: colorBinsStyle,
+  colorCategories: colorCategoriesStyle,
+  colorContinuous: colorContinuousStyle,
+  sizeBins: sizeBinsStyle,
+  sizeCategories: sizeCategoriesStyle,
+  sizeContinuous: sizeContinuousStyle
+};
+
 export const viz = {
   source,
   dataview,
   widget,
+  style,
   ...basemaps,
-  ...styles,
   ...basics
 };
