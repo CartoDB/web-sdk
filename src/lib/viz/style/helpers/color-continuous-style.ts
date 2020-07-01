@@ -1,7 +1,7 @@
+import { NumericFieldStats, GeometryType } from '@/viz/source';
 import { scale as chromaScale } from 'chroma-js';
 import { getColors, getUpdateTriggers, hexToRgb } from './utils';
 import { StyledLayer } from '../layer-style';
-import { NumericFieldStats, GeometryType } from '../../sources/Source';
 import { BasicOptionsStyle, getStyleValue, getStyles, Style } from '..';
 import { CartoStylingError, stylingErrorTypes } from '../../errors/styling-error';
 import { colorValidation } from '../validators';

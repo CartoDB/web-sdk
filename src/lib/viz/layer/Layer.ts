@@ -7,8 +7,8 @@ import deepmerge from 'deepmerge';
 import { GeoJSON } from 'geojson';
 import { uuidv4 } from '@/core/utils/uuid';
 import { WithEvents } from '@/core/mixins/WithEvents';
-import { Source, StatFields } from '../sources/Source';
-import { CARTOSource, GeoJsonSource } from '../sources';
+import { DatasetSource, SQLSource, GeoJSONSource, Source } from '@/viz';
+import { StatFields } from '@/viz/source';
 import { DOLayer } from '../deck/DOLayer';
 import { getStyles, StyleProperties, Style } from '../style';
 import { ViewportFeaturesGenerator } from '../interactivity/viewport-features/ViewportFeaturesGenerator';
@@ -147,14 +147,20 @@ export class Layer extends WithEvents implements StyledLayer {
 
     const hasGeoJsonLayer = layers.some(layer => layer instanceof GeoJsonLayer);
 
+    const { onViewStateChange } = deckInstance.props;
     deckInstance.setProps({
       layers,
-      onViewStateChange: ({ interactionState, viewState }) => {
+      onViewStateChange: args => {
+        const { interactionState, viewState } = args;
+
         if ((interactionState.isPanning || interactionState.isZooming) && hasGeoJsonLayer) {
           const viewport = new WebMercatorViewport(viewState);
           this._viewportFeaturesGenerator.setViewport(viewport);
-
           this.callToViewportLoad = true;
+        }
+
+        if (onViewStateChange) {
+          onViewStateChange(args); // keep stateless view management, if set up initially
         }
       },
       onAfterRender: () => {
@@ -239,9 +245,9 @@ export class Layer extends WithEvents implements StyledLayer {
     const layerProperties = await this._getLayerProperties();
 
     // Create the Deck.gl instance
-    if (this._source.sourceType === 'CARTOSource') {
+    if (this._source.sourceType === 'SQLSource' || this._source.sourceType === 'DatasetSource') {
       this._deckLayer = new MVTLayer(layerProperties);
-    } else if (this._source.sourceType === 'GeoJsonSource') {
+    } else if (this._source.sourceType === 'GeoJSONSource') {
       this._deckLayer = new GeoJsonLayer(layerProperties);
     } else if (this._source.sourceType === 'DOSource') {
       this._deckLayer = new DOLayer(layerProperties);
@@ -466,11 +472,15 @@ function buildSource(source: string | Source | GeoJSON): Source {
   }
 
   if (typeof source === 'string') {
-    return new CARTOSource(source);
+    if (source.search(' ') > -1) {
+      return new SQLSource(source);
+    }
+
+    return new DatasetSource(source);
   }
 
   if (typeof source === 'object') {
-    return new GeoJsonSource(source);
+    return new GeoJSONSource(source);
   }
 
   throw new CartoLayerError('Unsupported source type', layerErrorTypes.UNKNOWN_SOURCE);

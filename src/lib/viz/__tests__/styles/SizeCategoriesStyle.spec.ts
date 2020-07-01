@@ -1,7 +1,7 @@
 import { Deck } from '@deck.gl/core';
+import { DatasetSource } from '@/viz';
 import * as mapsResponse from '../data-mocks/maps.category.json';
 import { sizeCategoriesStyle } from '../../style';
-import { CARTOSource } from '../../sources/CARTOSource';
 import { defaultStyles } from '../../style/default-styles';
 import { CartoStylingError } from '../../errors/styling-error';
 import { getDefaultSizeRange } from '../../style/helpers/size-categories-style';
@@ -21,13 +21,13 @@ const getMetadata = jest.fn().mockImplementation(() => {
   };
 });
 
-jest.mock('../../sources/CARTOSource', () => ({
-  CARTOSource: jest.fn().mockImplementation(() => ({ getMetadata }))
+jest.mock('../../source/DatasetSource', () => ({
+  DatasetSource: jest.fn().mockImplementation(() => ({ getMetadata }))
 }));
 
 const styledLayer = {
   getMapInstance: () => ({} as Deck),
-  source: new CARTOSource('table')
+  source: new DatasetSource('table')
 };
 
 describe('SizeCategoriesStyle', () => {

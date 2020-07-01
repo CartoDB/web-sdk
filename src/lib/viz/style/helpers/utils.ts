@@ -1,8 +1,8 @@
 import { RGBAColor } from '@deck.gl/core';
 import { CartoError } from '@/core/errors/CartoError';
+import { GeometryType } from '@/viz/source';
 import { getColorPalette } from '../palettes';
 import { Classifier } from '../../utils/Classifier';
-import { GeometryType } from '../../sources/Source';
 
 export function getUpdateTriggers(accessorFunction: Record<string, unknown>) {
   return {
