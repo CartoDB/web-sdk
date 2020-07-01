@@ -2,14 +2,18 @@ import { Layer } from '@/viz';
 import { AggregationType, aggregate } from '@/data/operations/aggregation/aggregation';
 import { groupValuesByColumn } from '@/data/operations/grouping';
 import { castToNumberOrUndefined } from '@/core/utils/number';
-import { DataViewMode, DataViewData } from './DataViewMode';
+import { GeoJsonSource } from '@/viz/sources';
+import { DataViewMode, DataViewData, HistogramDataViewData } from './DataViewMode';
 import { CartoDataViewError, dataViewErrorTypes } from '../DataViewError';
 import { CategoryElement } from '../category/CategoryImpl';
 
 export class DataViewLocal extends DataViewMode {
-  constructor(dataSource: Layer, column: string) {
+  private useViewport = true;
+
+  constructor(dataSource: Layer, column: string, useViewport = true) {
     super(dataSource, column);
 
+    this.useViewport = useViewport;
     this.bindEvents();
   }
 
@@ -49,12 +53,77 @@ export class DataViewLocal extends DataViewMode {
     };
   }
 
+  public async histogram(
+    binsNumber: number,
+    start: number | undefined,
+    end: number | undefined
+  ): Promise<HistogramDataViewData> {
+    const features = (await this.getSourceData([this.column])) as Record<string, number>[];
+    const sortedFeatures = features.map(feature => feature[this.column]).sort((a, b) => a - b);
+
+    const startValue = start ?? Math.min(...sortedFeatures);
+    const endValue = end ?? Math.max(...sortedFeatures);
+    let nulls = 0;
+
+    const binsDistance = (endValue - startValue) / binsNumber;
+    const bins = Array(binsNumber)
+      .fill(binsNumber)
+      .map((_, currentIndex) => ({
+        bin: currentIndex,
+        start: startValue + currentIndex * binsDistance,
+        end: startValue + currentIndex * binsDistance + binsDistance,
+        value: 0,
+        values: [] as number[]
+      }));
+
+    sortedFeatures.forEach(feature => {
+      const featureValue = feature;
+
+      if (!featureValue) {
+        nulls += 1;
+        return;
+      }
+
+      const binContainer = bins.find(bin => bin.start <= featureValue && bin.end > featureValue);
+
+      if (!binContainer) {
+        return;
+      }
+
+      binContainer.value += 1;
+      binContainer.values.push(featureValue);
+    });
+
+    const transformedBins = bins.map(binContainer => {
+      return {
+        bin: binContainer.bin,
+        start: binContainer.start,
+        end: binContainer.end,
+        value: binContainer.value,
+        min: aggregate(binContainer.values, AggregationType.MIN),
+        max: aggregate(binContainer.values, AggregationType.MAX),
+        avg: aggregate(binContainer.values, AggregationType.AVG),
+        normalized: binContainer.values.length / features.length
+      };
+    });
+
+    return {
+      bins: transformedBins,
+      nulls,
+      totalAmount: features.length
+    };
+  }
+
   private getSourceData(columns: string[] = []) {
     if (!columns.includes(this.column)) {
       columns.push(this.column);
     }
 
-    return (this.dataSource as Layer).getViewportFeatures(columns);
+    if (this.useViewport) {
+      return (this.dataSource as Layer).getViewportFeatures(columns);
+    }
+
+    return ((this.dataSource as Layer).source as GeoJsonSource).getFeatures(columns);
   }
 
   private async groupBy(operationColumn: string, operation: AggregationType) {

@@ -51,14 +51,14 @@
     </div>
 
     <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.js"></script>
-    <script src="https://unpkg.com/deck.gl@8.2.0-beta.1/dist.min.js"></script>
+    <script src="https://unpkg.com/deck.gl@8.2.0/dist.min.js"></script>
     <!-- TODO: Set up a proper API_KEY for Google Maps -->
     <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=visualization&v=3.39"></script>
     <script src="/dist/umd/index.min.js"></script>
 
     <script>
       function initialize() {
-        carto.setDefaultCredentials({ username: 'public' });
+        carto.auth.setDefaultCredentials({ username: 'public' });
 
         const deckMap = carto.viz.createGoogleMap();
         // All these variations are also allowed:

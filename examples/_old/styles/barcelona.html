@@ -30,14 +30,14 @@
 
     <!-- Map libraries-->
     <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.js"></script>
-    <script src="https://unpkg.com/deck.gl@8.2.0-beta.1/dist.min.js"></script>
+    <script src="https://unpkg.com/deck.gl@8.2.0/dist.min.js"></script>
 
     <!-- CARTO Web SDK -->
     <script src="/dist/umd/index.min.js"></script>
 
     <script>
       async function initialize() {
-        carto.setDefaultCredentials({
+        carto.auth.setDefaultCredentials({
           username: 'jbotella',
           apiKey: '3afea237c5d77ca8f7f8f9972a3bd47144ab4b38'
         });

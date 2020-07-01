@@ -140,7 +140,7 @@
     </div>
 
     <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.js"></script>
-    <script src="https://unpkg.com/deck.gl@8.2.0-beta.1/dist.min.js"></script>
+    <script src="https://unpkg.com/deck.gl@8.2.0/dist.min.js"></script>
     <script src="https://libs.cartocdn.com/airship-components/v2.3/airship.js"></script>
 
     <script src="/dist/umd/index.min.js"></script>
@@ -166,7 +166,7 @@
       let formulaLocal;
 
       async function initialize() {
-        carto.setDefaultCredentials({ username: 'public' });
+        carto.auth.setDefaultCredentials({ username: 'public' });
         const deckMap = carto.viz.createMap();
 
         const countriesLayer = new carto.viz.Layer('world_commerce');

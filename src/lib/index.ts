@@ -1,5 +1,5 @@
 // Auth
-import { Credentials, setDefaultCredentials } from './core/Credentials';
+import { Credentials, setDefaultCredentials } from './auth';
 
 // Sources
 import { DOSource, CARTOSource, GeoJsonSource } from './viz/sources';
@@ -23,18 +23,25 @@ import {
 } from './viz/style';
 
 // Dataviews
-import { Category, Formula } from './dataviews';
+import { Category, Formula, HistogramDataView } from './dataviews';
 
 // Widgets
-import { Category as CategoryWidget, Formula as FormulaWidget } from './widgets';
+import { Category as CategoryWidget, Formula as FormulaWidget, HistogramWidget } from './widgets';
 
 /*
  * --- Public API ---
  */
 
 // carto
-// const auth = [ Credentials, setDefaultCredentials ];
-export { Credentials, setDefaultCredentials };
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+export const version = WEBSDK_VERSION;
+
+// carto.auth
+export const auth = {
+  Credentials,
+  setDefaultCredentials
+};
 
 // carto.viz
 const sources = { DOSource, CARTOSource, GeoJsonSource };
@@ -60,11 +67,13 @@ export const viz = {
 // carto.dataview
 export const dataview = {
   Category,
-  Formula
+  Formula,
+  Histogram: HistogramDataView
 };
 
 // carto.widget
 export const widget = {
   Category: CategoryWidget,
-  Formula: FormulaWidget
+  Formula: FormulaWidget,
+  Histogram: HistogramWidget
 };

@@ -1,6 +1,6 @@
 import { AggregationType } from '@/data/operations/aggregation/aggregation';
 import { uuidv4 } from '@/core/utils/uuid';
-import { Credentials } from '../core/Credentials';
+import { Credentials } from '../auth';
 import { Client, MapDataviewsOptions } from './Client';
 
 export class MapsDataviews {
@@ -42,6 +42,20 @@ export class MapsDataviews {
     const formulaResponse = this._mapClient.dataview(layergroup, dataviewName, { bbox });
 
     return (formulaResponse as unknown) as FormulaResponse;
+  }
+
+  public async histogram(params: HistogramParameters) {
+    const { column, bins, start, end, bbox } = params;
+    const dataviewName = this.getDataviewName();
+
+    const layergroup = await this._createMapWithDataviews(dataviewName, 'histogram', {
+      bins,
+      start,
+      end,
+      column
+    });
+
+    return this._mapClient.dataview(layergroup, dataviewName, { column, bins, start, end, bbox });
   }
 
   private _createMapWithDataviews(
@@ -124,6 +138,33 @@ interface FormulaParameters {
 
   /**
    * Bbox of the data
+   */
+  bbox?: number[];
+}
+
+interface HistogramParameters {
+  /**
+   * The column name to get the data
+   */
+  column: string;
+
+  /**
+   * Number of bins to aggregate the data range into
+   */
+  bins: number;
+
+  /**
+   * Lower limit of the data range, if not present, the lower limit of the actual data will be used.
+   */
+  start?: number;
+
+  /**
+   * Upper limit of the data range, if not present, the upper limit of the actual data will be used.
+   */
+  end?: number;
+
+  /**
+   * Bounding box to filter data
    */
   bbox?: number[];
 }

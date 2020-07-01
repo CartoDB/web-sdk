@@ -5,11 +5,12 @@ import { CartoPopupError, popupErrorTypes } from '../errors/popup-error';
 /**
  * Default options for the Popup
  */
-const defaultOptions = {
+const defaultOptions: PopupOptions = {
   closeButton: true,
   containerClassName: 'carto-popup',
   contentClassName: 'as-body',
-  closeButtonClassName: 'as-btn'
+  closeButtonClassName: 'as-btn',
+  position: 'top-right'
 };
 
 /**
@@ -134,6 +135,14 @@ export class Popup {
   }
 
   /**
+   * Set popup position
+   */
+  public setPosition(position: 'top-center' | 'top-left' | 'top-right' | 'bottom-center' | 'bottom-left' | 'bottom-right') {
+    this._options.position = position;
+    this._render();
+  }
+
+  /**
    * Creates a function to handler popup.
    *
    * @param elements popup elements to generate popup
@@ -186,6 +195,7 @@ export class Popup {
       closeButton.className = this._options.closeButtonClassName;
       closeButton.addEventListener('click', this.close.bind(this));
       closeButton.innerHTML = `<i class="as-icon as-icon-close as-color--primary"></i>`;
+      closeButton.style.cssText = 'float: right; margin-top: -10px; margin-right: -10px;';
       containerElem.appendChild(closeButton);
     }
 
@@ -199,9 +209,27 @@ export class Popup {
   private _adjustPopupPosition(pixels: number[]) {
     const HOOK_HEIGHT = 12;
     const containerHeight = this._container.offsetHeight;
+    const containerWidth = this._container.offsetWidth;
     const [x, y] = pixels;
-    this._container.style.left = `${x}px`;
-    this._container.style.top = `${y - containerHeight - HOOK_HEIGHT}px`;
+
+    const [yPosition, xPosition] = this._options.position.split('-');
+
+    let left = x;
+
+    if (xPosition === 'center') {
+      left = x - containerWidth / 2;
+    } else if (xPosition === 'left') {
+      left = x - containerWidth;
+    }
+
+    let top = y - containerHeight - HOOK_HEIGHT;
+
+    if (yPosition === 'bottom') {
+      top = y + containerHeight + HOOK_HEIGHT;
+    }
+
+    this._container.style.left = `${left}px`;
+    this._container.style.top = `${top}px`;
   }
 }
 
@@ -302,6 +330,11 @@ interface PopupOptions {
    * Class name for the close button.
    */
   closeButtonClassName: string;
+
+  /**
+   * Position of the popup around the mouse
+   */
+  position: 'top-center' | 'top-left' | 'top-right' | 'bottom-center' | 'bottom-left' | 'bottom-right';
 }
 
 // function pixels2coordinates(pixels: number[], deckInstance?: Deck) {

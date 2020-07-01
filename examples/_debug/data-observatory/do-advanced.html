@@ -40,7 +40,7 @@
 
     <!-- Map libraries-->
     <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.js"></script>
-    <script src="https://unpkg.com/deck.gl@8.2.0-beta.1/dist.min.js"></script>
+    <script src="https://unpkg.com/deck.gl@8.2.0/dist.min.js"></script>
 
     <!-- CARTO Deck.gl's Tile Layer -->
     <script src="/dist/umd/index.min.js"></script>
@@ -160,7 +160,7 @@
         const username = findGetParameter('username');
         const geography = geographies[0];
 
-        carto.setDefaultCredentials({ username: username, apiKey: apiKey });
+        carto.auth.setDefaultCredentials({ username: username, apiKey: apiKey });
         map = carto.viz.createMap({
           view: {
             longitude: -102.630157,

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GeoJSON viewport features</title>
+
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.css"
+    />
+
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://libs.cartocdn.com/airship-style/v2.3/airship.css"
+    />
+
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+      }
+
+      #map {
+        width: 100vw;
+        height: 100vh;
+      }
+    </style>
+  </head>
+
+  <body class="as-app-body as-app">
+    <div class="as-content">
+      <main class="as-main">
+        <div class="as-map-area">
+          <!-- map -->
+          <div id="map"></div>
+
+          <!-- panel -->
+          <div class="as-panel as-panel--top as-panel--right as-bg--ui-01">
+            <div class="as-panel__element as-p--16 as-body">
+              <h1 class="as-title">Viewport features</h1>
+              <h4 class="as-subheader as-mb--12">
+                Get the visible features, updated on every viewport change.
+              </h4>
+              <div id="result" class="as-subheader"></div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.js"></script>
+    <script src="https://unpkg.com/deck.gl@8.2.0/dist.min.js"></script>
+    <script src="/dist/umd/index.min.js"></script>
+
+    <script>
+      async function initialize() {
+        const deckMap = carto.viz.createMap();
+
+        const data = await fetch('https://public.carto.com/api/v2/sql?api_key=default_public&q=select* from ne_50m_admin_0_countries&format=geojson').then(response => response.json());
+        const countriesLayer = new carto.viz.Layer(data);
+
+        // vieportLoad will be triggered after every viewport change (zoom, pan...)
+        countriesLayer.on('viewportLoad', async () => {
+          const features = await countriesLayer.getViewportFeatures();
+
+          // clear the panel
+          const $result = document.getElementById('result');
+          $result.innerHTML = '';
+
+          // total number of features
+          $result.append(`Total: ${features.length} countries`);
+
+          // Details from just a subset of <=8 features, to avoid a long list
+          const maxNumber = Math.min(features.length, 8);
+          var list = document.createElement('ul');
+          for (let i = 0; i < maxNumber; i++) {
+            const feature = features[i];
+            var li = document.createElement('li');
+            // check https://public.carto.com/tables/ne_50m_admin_0_countries/public for available fields
+	          li.textContent = feature.iso_a3;
+	          list.appendChild(li);
+          };
+
+          if (features.length > maxNumber) {
+            var li = document.createElement('li');
+	          li.textContent = '... and more';
+	          list.appendChild(li);
+          }
+
+          $result.append(list);
+        });
+
+        countriesLayer.addTo(deckMap);
+      }
+
+      initialize();
+    </script>
+  </body>
+</html>

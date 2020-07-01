@@ -1,15 +1,21 @@
 import { CartoMapStyle } from './CartoMapStyle';
 import { CartoBaseMapError } from '../errors/basemap-error';
 
+interface DeckViewState {
+  bearing?: number;
+  latitude?: number;
+  longitude?: number;
+  pitch?: number;
+  zoom?: number;
+}
+
+interface IWithViewState {
+  viewState: DeckViewState;
+}
+
 interface DeckGLMapOptions {
   basemap?: string;
-  view?: {
-    bearing?: number;
-    latitude?: number;
-    longitude?: number;
-    pitch?: number;
-    zoom?: number;
-  };
+  view?: DeckViewState;
   container?: HTMLElement | string;
 }
 
@@ -28,6 +34,7 @@ const DEFAULT_OPTIONS: DeckGLMapOptions = {
 /**
  * A helper function to create a CARTO basemap on a 'map' DOM element, rendered using *Mapbox GL JS*
  *
+ *
  * Examples:
  * ```javascript
  *    // Several options to create the map are allowed
@@ -36,6 +43,12 @@ const DEFAULT_OPTIONS: DeckGLMapOptions = {
  *    const deckMap = carto.viz.createMap({ basemap: 'voyager', view: { zoom: 4 } });
  *    const deckMap = carto.viz.createMap({ basemap: 'positron', view: { zoom: 4, longitude: 3, latitude: 40, pitch: 45, bearing: 30 }, container: 'map' });
  * ```
+ *
+ * This method creates a stateless map, which later on can be easily updated externally, with code like
+ * ```javascript
+ *    deckMap.setProps({ viewState: { newLongitude, newLatitude, newZoom } });
+ * ```
+ *
  * @export
  * @param {DeckGLMapOptions} mapOptions
  * @returns
@@ -55,9 +68,12 @@ export function createMap(options: DeckGLMapOptions = DEFAULT_OPTIONS) {
 
   const deckMap = new (window.deck.DeckGL as any)({
     mapStyle: CartoMapStyle[chosenOptions.basemap.toUpperCase() as keyof typeof CartoMapStyle],
-    initialViewState: chosenOptions.view,
     container: chosenOptions.container,
-    controller: true
+    controller: true,
+    viewState: chosenOptions.view,
+    onViewStateChange: ({ viewState }: IWithViewState) => {
+      deckMap.setProps({ viewState });
+    }
   });
 
   return deckMap;
