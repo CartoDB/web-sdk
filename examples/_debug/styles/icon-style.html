@@ -30,11 +30,33 @@
 
     <!-- Map libraries-->
     <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.js"></script>
-    <script src="https://unpkg.com/deck.gl@8.2.0-beta.1/dist.min.js"></script>
+    <script src="https://unpkg.com/deck.gl@8.2.0/dist.min.js"></script>
 
     <script src="/dist/umd/index.min.js"></script>
 
     <script>
+      function getIconStyle() {
+        return carto.viz.iconStyle({
+          getIcon: () => ({
+            url: 'https://avatars2.githubusercontent.com/u/421145?s=60&v=4',
+            height: 60,
+            width: 60
+          })
+        });
+      }
+
+      function getIconStyleWithIconAtlas() {
+        const ICON_MAPPING = {
+          marker: { x: 0, y: 0, width: 128, height: 128, mask: true }
+        };
+
+        return carto.viz.iconStyle({
+          iconAtlas: 'https://raw.githubusercontent.com/visgl/deck.gl-data/master/website/icon-atlas.png',
+          iconMapping: ICON_MAPPING,
+          getIcon: d => 'marker',
+        });
+      }
+
       async function initializePoints() {
         carto.auth.setDefaultCredentials({ username: 'cartoframes' });
 
@@ -47,17 +69,14 @@
           }
         });
 
-        const style = carto.viz.iconStyle({
-          getIcon: () => ({
-            url: 'https://avatars2.githubusercontent.com/u/421145?s=60&v=4',
-            height: 60,
-            width: 60
-          })
-        });
+        // const style = getIconStyle()
+        const style = getIconStyleWithIconAtlas()
 
+        // geoJSON
         // const data = await fetch('https://cartoframes.carto.com/api/v2/sql?api_key=default_public&q=select* from sf_nbhd_crime&format=geojson').then(response => response.json())
         // const layer = new carto.viz.Layer(data, style);
 
+        // CARTO source
         const layer = new carto.viz.Layer('sf_nbhd_crime', style);
 
         layer.addTo(deckMap);
