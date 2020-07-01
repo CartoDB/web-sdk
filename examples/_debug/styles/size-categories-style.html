@@ -47,7 +47,7 @@
           }
         });
 
-        const style = carto.viz.sizeCategoriesStyle('incident_day_of_week');
+        const style = carto.viz.style.sizeCategories('incident_day_of_week');
         const layer = new carto.viz.Layer('sf_incidents', style);
         layer.addTo(deckMap);
       }
@@ -64,7 +64,7 @@
           }
         });
 
-        const style = carto.viz.sizeCategoriesStyle('type');
+        const style = carto.viz.style.sizeCategories('type');
 
         const source = new carto.viz.source.Dataset('roads', {
           mapOptions: {

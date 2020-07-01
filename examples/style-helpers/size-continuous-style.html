@@ -47,7 +47,7 @@
           }
         });
 
-        const style = carto.viz.sizeContinuousStyle('total_pop');
+        const style = carto.viz.style.sizeContinuous('total_pop');
         const tempLayer = new carto.viz.Layer('ca_measures', style);
         tempLayer.addTo(deckMap);
       }

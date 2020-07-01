@@ -50,7 +50,7 @@
           }
         });
 
-        const style = carto.viz.sizeContinuousStyle('harbortype');
+        const style = carto.viz.style.sizeContinuous('harbortype');
         const layer = new carto.viz.Layer(data, style);
         layer.addTo(deckMap);
       }
