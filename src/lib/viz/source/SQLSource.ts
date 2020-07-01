@@ -59,7 +59,7 @@ export class SQLSource extends Source {
   protected _fields: StatFields;
 
   constructor(sql: string, options: SourceOptions = {}) {
-    const { mapOptions = {}, credentials = defaultCredentials } = options;
+    const { mapOptions = defaultMapOptions, credentials = defaultCredentials } = options;
 
     // set layer id
     const id = `CARTO-SQL-${uuidv4()}`;
@@ -71,16 +71,8 @@ export class SQLSource extends Source {
     // Set object properties
     this._value = sql;
     this._credentials = credentials;
-    const sourceOpts = { sql };
     this._fields = { sample: new Set(), aggregation: new Set() };
-
-    // Set Map Config
-    this._mapConfig = {
-      // hack: deep copy
-      ...JSON.parse(JSON.stringify(defaultMapOptions)),
-      ...mapOptions,
-      ...sourceOpts
-    };
+    this._mapConfig = this.buildMapConfig(mapOptions);
   }
 
   /**
@@ -135,8 +127,7 @@ export class SQLSource extends Source {
       console.warn('Source reinitialized');
     }
 
-    this.saveFields(fields);
-    this.buildMapConfig();
+    this.updateMapConfig(fields);
 
     const mapsClient = new Client(this._credentials);
     const mapInstance: MapInstance = await mapsClient.instantiateMapFrom(this._mapConfig);
@@ -149,12 +140,30 @@ export class SQLSource extends Source {
     return this.isInitialized;
   }
 
-  private buildMapConfig() {
-    this.buildMapConfigMetadata();
-    this.buildMapConfigAggregation();
+  private buildMapConfig(mapOptions: MapOptions) {
+    const defaultMapOptionsCopy = JSON.parse(JSON.stringify(defaultMapOptions));
+
+    return {
+      ...defaultMapOptionsCopy,
+      ...mapOptions,
+      metadata: {
+        ...defaultMapOptionsCopy.metadata,
+        ...mapOptions.metadata
+      },
+      aggregation: {
+        ...defaultMapOptionsCopy.aggregation,
+        ...mapOptions.aggregation
+      }
+    };
   }
 
-  private buildMapConfigMetadata() {
+  private updateMapConfig(fields: StatFields) {
+    this.saveFields(fields);
+    this.updateMapConfigMetadata();
+    this.updateMapConfigAggregation();
+  }
+
+  private updateMapConfigMetadata() {
     if (this._mapConfig.metadata === undefined) {
       throw new SourceError('Map Config has not metadata field');
     }
@@ -169,7 +178,7 @@ export class SQLSource extends Source {
     this._mapConfig.metadata = Object.assign(metadata, this._mapConfig.metadata);
   }
 
-  private buildMapConfigAggregation() {
+  private updateMapConfigAggregation() {
     const dimensions: Record<string, { column: string }> = {};
     this._fields.aggregation.forEach(field => {
       dimensions[field] = { column: field };
