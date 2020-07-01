@@ -1,5 +1,5 @@
 import { Deck } from '@deck.gl/core';
-import { DatasetSource } from '@/viz/source';
+import { DatasetSource } from '@/viz';
 import { colorCategoriesStyle } from '../../style';
 import * as mapsResponse from '../data-mocks/maps.category.json';
 import { CartoStylingError } from '../../errors/styling-error';

@@ -1,5 +1,6 @@
 import { Deck } from '@deck.gl/core';
-import { NumericFieldStats, DatasetSource } from '@/viz/source';
+import { DatasetSource } from '@/viz';
+import { NumericFieldStats } from '@/viz/source';
 import { basicStyle, defaultStyles } from '../../style';
 import { hexToRgb } from '../../style/helpers/utils';
 

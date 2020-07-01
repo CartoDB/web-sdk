@@ -1,5 +1,5 @@
 import { Deck } from '@deck.gl/core';
-import { DatasetSource } from '@/viz/source';
+import { DatasetSource } from '@/viz';
 import { sizeBinsStyle, defaultStyles } from '../../style';
 import * as mapsResponse from '../data-mocks/maps.number.json';
 import { ClassificationMethod } from '../../utils/Classifier';

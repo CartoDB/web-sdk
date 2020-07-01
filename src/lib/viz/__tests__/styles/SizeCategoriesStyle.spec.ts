@@ -1,5 +1,5 @@
 import { Deck } from '@deck.gl/core';
-import { DatasetSource } from '@/viz/source';
+import { DatasetSource } from '@/viz';
 import * as mapsResponse from '../data-mocks/maps.category.json';
 import { sizeCategoriesStyle } from '../../style';
 import { defaultStyles } from '../../style/default-styles';

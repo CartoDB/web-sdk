@@ -28,10 +28,10 @@ import {
 } from './viz/style';
 
 // Dataviews
-import { CategoryDataView, FormulaDataView } from './viz/dataview';
+import { CategoryDataView, FormulaDataView, HistogramDataView } from './viz/dataview';
 
 // Widgets
-import { CategoryWidget, FormulaWidget } from './viz/widget';
+import { CategoryWidget, FormulaWidget, HistogramWidget } from './viz/widget';
 
 /*
  * --- Public API ---
@@ -73,13 +73,15 @@ const styles = {
 // dataview
 const dataview = {
   Category: CategoryDataView,
-  Formula: FormulaDataView
+  Formula: FormulaDataView,
+  Histogram: HistogramDataView
 };
 
 // widget
 const widget = {
   Category: CategoryWidget,
-  Formula: FormulaWidget
+  Formula: FormulaWidget,
+  Histogram: HistogramWidget
 };
 
 export const viz = {

@@ -1,6 +1,5 @@
 import { WithEvents } from '@/core/mixins/WithEvents';
-import { Layer } from '@/viz';
-import { Source } from '@/viz/source';
+import { Layer, Source } from '@/viz';
 import { Filter } from '@/viz/filters/types';
 import { AggregationType } from '@/data/operations/aggregation/aggregation';
 import { DataViewImpl } from './DataViewImpl';
@@ -18,8 +17,7 @@ export abstract class DataViewWrapper extends WithEvents {
    */
   protected setOptionScope: { timeoutId?: number } = {};
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  constructor(dataSource: Layer | Source, column: string, options: any) {
+  constructor(dataSource: Layer | Source, column: string, options: Record<string, unknown> = {}) {
     super();
 
     this.buildImpl(dataSource, column, {
