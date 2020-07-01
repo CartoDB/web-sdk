@@ -2,7 +2,7 @@ import { HistogramDataView } from '@/viz/dataview/histogram/HistogramDataView';
 import { HistogramDataViewData, BinData } from '@/viz/dataview/mode/DataViewMode';
 import { Widget } from '../widget';
 
-export class Histogram extends Widget {
+export class HistogramWidget extends Widget {
   private options: HistogramWidgetOptions = {};
 
   constructor(

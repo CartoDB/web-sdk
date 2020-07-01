@@ -1,8 +1,8 @@
-import { CategoryDataView } from '@/viz/dataview/category/CategoryDataView';
+import { CategoryDataView } from '@/viz/dataview';
 import { DataViewData } from '@/viz/dataview/mode/DataViewMode';
 import { Widget } from '../widget';
 
-export class Category extends Widget {
+export class CategoryWidget extends Widget {
   private options: CategoryWidgetOptions = {};
 
   constructor(

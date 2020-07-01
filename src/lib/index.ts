@@ -31,7 +31,7 @@ import {
 import { CategoryDataView, FormulaDataView, HistogramDataView } from './viz/dataview';
 
 // Widgets
-import { Category as CategoryWidget, Formula as FormulaWidget, HistogramWidget } from './widgets';
+import { CategoryWidget, FormulaWidget, HistogramWidget } from './viz/widget';
 
 /*
  * --- Public API ---
@@ -77,17 +77,18 @@ const dataview = {
   Histogram: HistogramDataView
 };
 
-export const viz = {
-  source,
-  dataview,
-  ...basemaps,
-  ...styles,
-  ...basics
-};
-
-// carto.widget
-export const widget = {
+// widget
+const widget = {
   Category: CategoryWidget,
   Formula: FormulaWidget,
   Histogram: HistogramWidget
+};
+
+export const viz = {
+  source,
+  dataview,
+  widget,
+  ...basemaps,
+  ...styles,
+  ...basics
 };
