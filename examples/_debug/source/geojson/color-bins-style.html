@@ -50,7 +50,7 @@
           }
         });
 
-        const style = carto.viz.colorBinsStyle('gdp_md_est');
+        const style = carto.viz.style.colorBins('gdp_md_est');
         const layer = new carto.viz.Layer(data, style);
         layer.addTo(deckMap);
       }

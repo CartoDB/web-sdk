@@ -115,14 +115,14 @@
           }
         });
 
-        const pointsStyle = new carto.viz.sizeBinsStyle('pop_2015', {
+        const pointsStyle = new carto.viz.style.sizeBins('pop_2015', {
           sizeRange: [1, 50]
         });
         points = new carto.viz.Layer('world_population_2015', pointsStyle, {
           hoverStyle: 'default',
           clickStyle: 'default'
         });
-        const linesStyle = new carto.viz.sizeBinsStyle('classcode', {
+        const linesStyle = new carto.viz.style.sizeBins('classcode', {
           sizeRange: [2, 7]
         });
         lines = new carto.viz.Layer('sf_stclines', linesStyle, {

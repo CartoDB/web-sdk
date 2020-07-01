@@ -55,7 +55,7 @@
           }
         });
 
-        const layerStyle = carto.viz.colorCategoriesStyle('room_type', {
+        const layerStyle = carto.viz.style.colorCategories('room_type', {
           categories: ['Entire home/apt', 'Private room', 'Shared room'],
 
           // palette accepts an array of HEX color strings,
@@ -68,7 +68,7 @@
       }
 
       function updateStyle() {
-        const newStyle = carto.viz.colorCategoriesStyle('room_type', {
+        const newStyle = carto.viz.style.colorCategories('room_type', {
           categories: ['Entire home/apt', 'Private room', 'Shared room'],
           palette: 'prism' // https://carto.com/carto-colors/
         });
