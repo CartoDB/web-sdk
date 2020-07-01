@@ -36,7 +36,7 @@
 
     <script>
       function getIconStyle() {
-        return carto.viz.iconStyle({
+        return carto.viz.style.icon({
           getIcon: () => ({
             url: 'https://avatars2.githubusercontent.com/u/421145?s=60&v=4',
             height: 60,
@@ -50,7 +50,7 @@
           marker: { x: 0, y: 0, width: 128, height: 128, mask: true }
         };
 
-        return carto.viz.iconStyle({
+        return carto.viz.style.icon({
           iconAtlas: 'https://raw.githubusercontent.com/visgl/deck.gl-data/master/website/icon-atlas.png',
           iconMapping: ICON_MAPPING,
           getIcon: d => 'marker',
