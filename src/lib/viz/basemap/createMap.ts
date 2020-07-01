@@ -68,16 +68,21 @@ export function createMap(options: DeckGLMapOptions = DEFAULT_OPTIONS) {
     onContextLoad: options.onContextLoad
   };
 
-  const deckMap = new (window.deck.DeckGL as any)({
+  const deckOptions = {
     mapStyle: CartoMapStyle[chosenOptions.basemap.toUpperCase() as keyof typeof CartoMapStyle],
     container: chosenOptions.container,
     controller: true,
     viewState: chosenOptions.view,
     onViewStateChange: ({ viewState }: IWithViewState) => {
       deckMap.setProps({ viewState });
-    },
-    onLoad: chosenOptions.onContextLoad
-  });
+    }
+  };
+
+  if (chosenOptions.onContextLoad) {
+    (deckOptions as any).onLoad = chosenOptions.onContextLoad;
+  }
+
+  const deckMap = new (window.deck.DeckGL as any)(deckOptions);
 
   return deckMap;
 }
