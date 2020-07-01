@@ -1,6 +1,6 @@
 import { Deck } from '@deck.gl/core';
 import { scale as chromaScale } from 'chroma-js';
-import { DatasetSource } from '@/viz/source';
+import { DatasetSource } from '@/viz';
 import { colorContinuousStyle } from '../../style';
 import * as mapsResponse from '../data-mocks/maps.number.json';
 import { hexToRgb } from '../../style/helpers/utils';

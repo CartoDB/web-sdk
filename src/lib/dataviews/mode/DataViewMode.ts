@@ -1,5 +1,4 @@
-import { Layer } from '@/viz';
-import { Source } from '@/viz/source';
+import { Layer, Source } from '@/viz';
 import { WithEvents } from '@/core/mixins/WithEvents';
 import { Filter } from '@/viz/filters/types';
 import { AggregationType } from '@/data/operations/aggregation/aggregation';

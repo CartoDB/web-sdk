@@ -1,7 +1,6 @@
 import { MapsDataviews as DataviewsApi } from '@/maps/MapsDataviews';
 import { defaultCredentials } from '@/auth';
-import { Layer } from '@/viz';
-import { Source, SQLSource, DatasetSource } from '@/viz/source';
+import { Layer, Source, SQLSource, DatasetSource } from '@/viz';
 import { Filter, SpatialFilters, BuiltInFilters } from '@/viz/filters/types';
 import { FiltersCollection } from '@/viz/filters/FiltersCollection';
 import { RemoteFilterApplicator } from '@/viz/filters/RemoteFilterApplicator';

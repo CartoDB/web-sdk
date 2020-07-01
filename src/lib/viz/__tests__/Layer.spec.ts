@@ -1,5 +1,6 @@
 import { log, Deck } from '@deck.gl/core';
-import { NumericFieldStats, DatasetSource } from '@/viz/source';
+import { DatasetSource } from '@/viz';
+import { NumericFieldStats } from '@/viz/source';
 import { colorBinsStyle } from '@/viz/style/helpers/color-bins-style';
 import { Layer } from '../layer/Layer';
 import { getStyles, Style } from '../style';

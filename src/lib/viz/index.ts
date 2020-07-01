@@ -1,5 +1,6 @@
 export { Popup } from './popups/Popup';
 export { Layer } from './layer/Layer';
+export { Source, GeoJSONSource, SQLSource, DatasetSource } from './source';
 
 // Style helpers
 export {
