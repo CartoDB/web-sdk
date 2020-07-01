@@ -1,5 +1,5 @@
-import { HistogramDataView } from '@/dataviews/histogram/Histogram';
-import { HistogramDataViewData, BinData } from '@/dataviews/mode/DataViewMode';
+import { HistogramDataView } from '@/viz/dataview/histogram/HistogramDataView';
+import { HistogramDataViewData, BinData } from '@/viz/dataview/mode/DataViewMode';
 import { Widget } from '../widget';
 
 export class Histogram extends Widget {

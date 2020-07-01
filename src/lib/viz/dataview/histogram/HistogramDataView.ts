@@ -6,7 +6,7 @@ import { DataViewCalculation, HistogramDataViewOptions } from '../mode/DataViewM
 import { DataViewLocal } from '../mode/DataViewLocal';
 import { DataViewRemote } from '../mode/DataViewRemote';
 import { DataViewWrapper } from '../DataViewWrapper';
-import { HistogramImpl } from './HistogramImpl';
+import { HistogramDataViewImpl } from './HistogramDataViewImpl';
 
 export class HistogramDataView extends DataViewWrapper {
   protected buildImpl(
@@ -21,7 +21,7 @@ export class HistogramDataView extends DataViewWrapper {
       createDataView[DataViewCalculation.REMOTE_FILTERED];
     const dataView = dataViewCreationFn(dataSource, column);
 
-    this.dataviewImpl = new HistogramImpl(dataView, options);
+    this.dataviewImpl = new HistogramDataViewImpl(dataView, options);
   }
 }
 

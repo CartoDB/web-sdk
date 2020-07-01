@@ -1,5 +1,5 @@
-import { Layer } from '../../viz/layer/Layer';
-import { HistogramDataView } from './Histogram';
+import { Layer } from '@/viz';
+import { HistogramDataView } from './HistogramDataView';
 import { DataViewCalculation } from '../mode/DataViewMode';
 import { CartoDataViewError, dataViewErrorTypes } from '../DataViewError';
 
