@@ -1,9 +1,9 @@
 import { Texture2D } from '@luma.gl/core';
 import { IconLayer } from '@deck.gl/layers';
 import { Feature, Point, MultiPoint } from 'geojson';
+import { GeometryType } from '@/viz/source';
 import { StyledLayer } from '../layer-style';
 import { Style, BasicOptionsStyle, getStyles } from '..';
-import { GeometryType } from '../../sources/Source';
 import { CartoStylingError, stylingErrorTypes } from '../../errors/styling-error';
 
 export interface Icon {
