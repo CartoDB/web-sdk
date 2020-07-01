@@ -88,7 +88,7 @@ describe('DatasetSource', () => {
     });
 
     it('should have default mapConfig', async () => {
-      const source = new CARTOSource(DEFAULT_DATASET);
+      const source = new DatasetSource(DEFAULT_DATASET);
       await source.init({ sample: new Set(), aggregation: new Set() });
 
       const expectedmapConfig = {
@@ -97,7 +97,6 @@ describe('DatasetSource', () => {
         bufferSize: {
           mvt: 10
         },
-        dataset: DEFAULT_DATASET,
         metadata: {
           geometryType: true,
           columnStats: {
@@ -143,7 +142,7 @@ describe('DatasetSource', () => {
         }
       };
 
-      const source = new CARTOSource(DEFAULT_DATASET, { mapOptions });
+      const source = new DatasetSource(DEFAULT_DATASET, { mapOptions });
       await source.init({ sample: new Set(), aggregation: new Set() });
 
       const expectedmapConfig = {
@@ -152,7 +151,6 @@ describe('DatasetSource', () => {
         bufferSize: {
           mvt: 30
         },
-        dataset: DEFAULT_DATASET,
         metadata: {
           geometryType: true,
           columnStats: {
