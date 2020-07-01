@@ -1,6 +1,6 @@
 import { WithEvents } from '@/core/mixins/WithEvents';
 import { Filter } from '@/viz/filters/types';
-import { DataViewMode, DataViewData } from './mode/DataViewMode';
+import { DataViewMode, DataViewData, HistogramDataViewData } from './mode/DataViewMode';
 import { AggregationType } from '../../data/operations/aggregation/aggregation';
 import { CartoDataViewError, dataViewErrorTypes } from './DataViewError';
 
@@ -45,7 +45,7 @@ export abstract class DataViewImpl<T extends DataViewMode> extends WithEvents {
     events.forEach((e: string) => this.dataView.on(e, (args: any[]) => this.emit(e, args)));
   }
 
-  public abstract async getData(): Promise<Partial<DataViewData>>;
+  public abstract async getData(): Promise<Partial<DataViewData> | HistogramDataViewData>;
 }
 
 function validateParameters(operation: AggregationType, column: string) {

@@ -1,5 +1,5 @@
 import { Deck } from '@deck.gl/core';
-import { DatasetSource } from '@/viz/source';
+import { DatasetSource } from '@/viz';
 import { sizeContinuousStyle } from '../../style';
 import { getDefaultSizeRange } from '../../style/helpers/size-continuous-style';
 import * as mapsResponse from '../data-mocks/maps.number.json';

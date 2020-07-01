@@ -1,5 +1,4 @@
-import { Layer } from '@/viz';
-import { Source } from '@/viz/source';
+import { Layer, Source } from '@/viz';
 import { BuiltInFilters } from '@/viz/filters/types';
 import { uuidv4 } from '@/core/utils/uuid';
 import { DataViewCalculation } from '../mode/DataViewMode';

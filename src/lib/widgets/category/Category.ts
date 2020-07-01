@@ -1,4 +1,5 @@
 import { CategoryDataView } from '@/viz/dataview/category/CategoryDataView';
+import { DataViewData } from '@/viz/dataview/mode/DataViewMode';
 import { Widget } from '../widget';
 
 export class Category extends Widget {
@@ -44,7 +45,7 @@ export class Category extends Widget {
   protected async updateData() {
     const data = await this.dataView.getData();
     const categoryWidget = this.element as HTMLAsCategoryWidgetElement;
-    categoryWidget.categories = data.categories;
+    categoryWidget.categories = (data as Partial<DataViewData>).categories;
   }
 }
 
