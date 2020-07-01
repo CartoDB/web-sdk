@@ -72,7 +72,7 @@ export class SQLSource extends Source {
     this._value = sql;
     this._credentials = credentials;
     this._fields = { sample: new Set(), aggregation: new Set() };
-    this._mapConfig = buildMapConfig(mapOptions);
+    this._mapConfig = this.buildMapConfig(mapOptions);
   }
 
   /**
@@ -140,6 +140,24 @@ export class SQLSource extends Source {
     return this.isInitialized;
   }
 
+  private buildMapConfig(mapOptions: MapOptions) {
+    const defaultMapOptionsCopy = JSON.parse(JSON.stringify(defaultMapOptions));
+
+    return {
+      ...defaultMapOptionsCopy,
+      ...mapOptions,
+      metadata: {
+        ...defaultMapOptionsCopy.metadata,
+        ...mapOptions.metadata
+      },
+      aggregation: {
+        ...defaultMapOptionsCopy.aggregation,
+        ...mapOptions.aggregation
+      },
+      sql: this._value
+    };
+  }
+
   private updateMapConfig(fields: StatFields) {
     this.saveFields(fields);
     this.updateMapConfigMetadata();
@@ -178,23 +196,6 @@ export class SQLSource extends Source {
     this._fields.sample = new Set([...fields.sample]);
     this._fields.aggregation = new Set([...fields.aggregation]);
   }
-}
-
-function buildMapConfig(mapOptions: MapOptions) {
-  const defaultMapOptionsCopy = JSON.parse(JSON.stringify(defaultMapOptions));
-
-  return {
-    ...defaultMapOptionsCopy,
-    ...mapOptions,
-    metadata: {
-      ...defaultMapOptionsCopy.metadata,
-      ...mapOptions.metadata
-    },
-    aggregation: {
-      ...defaultMapOptionsCopy.aggregation,
-      ...mapOptions.aggregation
-    }
-  };
 }
 
 function getUrlsFrom(mapInstance: MapInstance): string | string[] {

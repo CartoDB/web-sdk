@@ -5,11 +5,9 @@ import { SQLSource, SourceOptions } from './SQLSource';
  * * */
 export class DatasetSource extends SQLSource {
   constructor(dataset: string, options: SourceOptions = {}) {
-    super('', options);
+    super(`SELECT * FROM ${dataset}`, options);
 
     this.id = `CARTO-${dataset}`;
     this.sourceType = 'DatasetSource';
-
-    this._value = dataset;
   }
 }
