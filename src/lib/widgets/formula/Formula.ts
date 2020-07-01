@@ -1,4 +1,5 @@
 import { Formula as FormulaDataView } from '@/dataviews/formula/Formula';
+import { DataViewData } from '@/dataviews/mode/DataViewMode';
 import { Widget } from '../widget';
 
 export class Formula extends Widget {
@@ -33,7 +34,7 @@ export class Formula extends Widget {
   protected async updateData() {
     const data = await this.dataView.getData();
     const formulaWidget = this.element as HTMLAsFormulaWidgetElement;
-    formulaWidget.value = data.result;
+    formulaWidget.value = (data as Partial<DataViewData>).result;
   }
 }
 
