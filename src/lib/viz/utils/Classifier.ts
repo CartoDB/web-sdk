@@ -1,5 +1,5 @@
+import { Stats } from '@/viz/source';
 import { CartoStylingError, stylingErrorTypes } from '../errors/styling-error';
-import { Stats } from '../sources/Source';
 
 export type ClassificationMethod = 'quantiles' | 'stdev' | 'equal';
 

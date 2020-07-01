@@ -1,5 +1,5 @@
+import { GeometryType } from '@/viz/source';
 import { hexToRgb } from './helpers/utils';
-import { GeometryType } from '../sources/Source';
 import { defaultStyles } from './default-styles';
 import { colorValidation } from './validators';
 import { CartoStylingError, stylingErrorTypes } from '../errors/styling-error';

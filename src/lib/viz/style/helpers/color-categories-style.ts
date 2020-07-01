@@ -1,8 +1,8 @@
+import { CategoryFieldStats, Category, GeometryType } from '@/viz/source';
 import { convertArrayToObjectWithValues } from '../../utils/object';
 import { getColors, getUpdateTriggers, hexToRgb } from './utils';
 import { CartoStylingError, stylingErrorTypes } from '../../errors/styling-error';
 import { StyledLayer } from '../layer-style';
-import { CategoryFieldStats, Category, GeometryType } from '../../sources/Source';
 import { getStyleValue, getStyles, BasicOptionsStyle, Style } from '..';
 import { colorValidation } from '../validators';
 
