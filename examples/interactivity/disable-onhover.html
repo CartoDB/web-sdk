@@ -93,7 +93,7 @@
           }
         });
 
-        const sizeBinStyle = new carto.viz.sizeBinsStyle('pop_2015', {
+        const sizeBinStyle = new carto.viz.style.sizeBins('pop_2015', {
           sizeRange: [1, 50]
         });
         const populationLayer = new carto.viz.Layer('world_population_2015', sizeBinStyle);

@@ -47,7 +47,7 @@
           }
         });
 
-        const style = carto.viz.colorCategoriesStyle('category');
+        const style = carto.viz.style.colorCategories('category');
         const layer = new carto.viz.Layer('sf_nbhd_crime', style);
         layer.addTo(deckMap);
       }
@@ -64,7 +64,7 @@
           }
         });
 
-        const style = carto.viz.colorCategoriesStyle('type');
+        const style = carto.viz.style.colorCategories('type');
         const layer = new carto.viz.Layer('roads', style);
         layer.addTo(deckMap);
       }
@@ -81,7 +81,7 @@
           }
         });
 
-        const style = carto.viz.colorCategoriesStyle('landuse_type');
+        const style = carto.viz.style.colorCategories('landuse_type');
         const layer = new carto.viz.Layer('wburg_parcels', style);
         layer.addTo(deckMap);
       }
@@ -98,7 +98,7 @@
           }
         });
 
-        const style = carto.viz.colorCategoriesStyle('region', {
+        const style = carto.viz.style.colorCategories('region', {
           // color: '#0000FF',
           // size: 5
         });

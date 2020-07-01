@@ -47,7 +47,7 @@
           }
         });
 
-        const roomTypeStyle = carto.viz.colorCategoriesStyle('room_type');
+        const roomTypeStyle = carto.viz.style.colorCategories('room_type');
         const airbnbLayer = new carto.viz.Layer('listings_madrid', roomTypeStyle);
         airbnbLayer.addTo(deckMap);
       }
