@@ -5,10 +5,10 @@ import { DataViewLocal } from '../mode/DataViewLocal';
 import { DataViewRemote } from '../mode/DataViewRemote';
 import { DataViewCalculation } from '../mode/DataViewMode';
 import { DataViewWrapper, OPTION_CHANGED_DELAY } from '../DataViewWrapper';
-import { CategoryOptions, CategoryImpl } from './CategoryImpl';
+import { CategoryOptions, CategoryDataViewImpl } from './CategoryDataViewImpl';
 import { debounce, isGeoJSONSource } from '../utils';
 
-export class Category extends DataViewWrapper {
+export class CategoryDataView extends DataViewWrapper {
   protected buildImpl(dataSource: Layer | Source, column: string, options: CategoryOptions) {
     let dataView;
     const { mode } = options;
@@ -45,27 +45,27 @@ export class Category extends DataViewWrapper {
       }
     }
 
-    this.dataviewImpl = new CategoryImpl(dataView, options);
+    this.dataviewImpl = new CategoryDataViewImpl(dataView, options);
   }
 
   public get operationColumn() {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return (this.dataviewImpl as CategoryImpl<any>).operationColumn;
+    return (this.dataviewImpl as CategoryDataViewImpl<any>).operationColumn;
   }
   public set operationColumn(operationColumn: string) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (this.dataviewImpl as CategoryImpl<any>).operationColumn = operationColumn;
+    (this.dataviewImpl as CategoryDataViewImpl<any>).operationColumn = operationColumn;
     debounce(() => this.emit('dataUpdate'), OPTION_CHANGED_DELAY, this.setOptionScope)();
   }
 
   public get limit() {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return (this.dataviewImpl as CategoryImpl<any>).limit;
+    return (this.dataviewImpl as CategoryDataViewImpl<any>).limit;
   }
 
   public set limit(limit: number | undefined) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (this.dataviewImpl as CategoryImpl<any>).limit = limit;
+    (this.dataviewImpl as CategoryDataViewImpl<any>).limit = limit;
     debounce(() => this.emit('dataUpdate'), OPTION_CHANGED_DELAY, this.setOptionScope)();
   }
 }

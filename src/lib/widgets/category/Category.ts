@@ -1,5 +1,5 @@
-import { Category as CategoryDataView } from '@/dataviews/category/Category';
-import { DataViewData } from '@/dataviews/mode/DataViewMode';
+import { CategoryDataView } from '@/viz/dataview/category/CategoryDataView';
+import { DataViewData } from '@/viz/dataview/mode/DataViewMode';
 import { Widget } from '../widget';
 
 export class Category extends Widget {

@@ -137,7 +137,15 @@ export class Popup {
   /**
    * Set popup position
    */
-  public setPosition(position: 'top-center' | 'top-left' | 'top-right' | 'bottom-center' | 'bottom-left' | 'bottom-right') {
+  public setPosition(
+    position:
+      | 'top-center'
+      | 'top-left'
+      | 'top-right'
+      | 'bottom-center'
+      | 'bottom-left'
+      | 'bottom-right'
+  ) {
     this._options.position = position;
     this._render();
   }
@@ -334,7 +342,13 @@ interface PopupOptions {
   /**
    * Position of the popup around the mouse
    */
-  position: 'top-center' | 'top-left' | 'top-right' | 'bottom-center' | 'bottom-left' | 'bottom-right';
+  position:
+    | 'top-center'
+    | 'top-left'
+    | 'top-right'
+    | 'bottom-center'
+    | 'bottom-left'
+    | 'bottom-right';
 }
 
 // function pixels2coordinates(pixels: number[], deckInstance?: Deck) {

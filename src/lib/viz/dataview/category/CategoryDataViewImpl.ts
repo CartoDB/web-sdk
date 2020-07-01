@@ -1,9 +1,9 @@
-import { AggregationType } from '../../data/operations/aggregation/aggregation';
+import { AggregationType } from '../../../data/operations/aggregation/aggregation';
 import { DataViewMode, DataViewCalculation, DataViewData } from '../mode/DataViewMode';
 import { DataViewImpl } from '../DataViewImpl';
 import { CartoDataViewError, dataViewErrorTypes } from '../DataViewError';
 
-export class CategoryImpl<T extends DataViewMode> extends DataViewImpl<T> {
+export class CategoryDataViewImpl<T extends DataViewMode> extends DataViewImpl<T> {
   public operationColumn: string;
   public limit?: number;
 

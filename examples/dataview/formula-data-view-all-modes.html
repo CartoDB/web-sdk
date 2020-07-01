@@ -172,15 +172,15 @@
         const countriesLayer = new carto.viz.Layer('world_commerce');
         await countriesLayer.addTo(deckMap);
 
-        formulaRemote = new carto.dataview.Formula(countriesLayer.source, 'gdp', {
+        formulaRemote = new carto.viz.dataview.Formula(countriesLayer.source, 'gdp', {
           operation: 'sum',
           mode: 'remote'
         });
-        formulaRemoteFiltered = new carto.dataview.Formula(countriesLayer, 'gdp', {
+        formulaRemoteFiltered = new carto.viz.dataview.Formula(countriesLayer, 'gdp', {
           operation: 'sum',
           mode: 'remote-filtered'
         });
-        formulaLocal = new carto.dataview.Formula(countriesLayer, 'gdp', {
+        formulaLocal = new carto.viz.dataview.Formula(countriesLayer, 'gdp', {
           operation: 'sum',
           mode: 'local'
         });

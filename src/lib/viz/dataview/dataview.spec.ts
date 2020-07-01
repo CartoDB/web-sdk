@@ -1,4 +1,4 @@
-import { Layer } from '../viz/layer/Layer';
+import { Layer } from '../layer/Layer';
 import { DataViewLocal } from './mode/DataViewLocal';
 import { CartoDataViewError, dataViewErrorTypes } from './DataViewError';
 

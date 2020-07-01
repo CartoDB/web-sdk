@@ -1,5 +1,5 @@
-import { Formula as FormulaDataView } from '@/dataviews/formula/Formula';
-import { DataViewData } from '@/dataviews/mode/DataViewMode';
+import { FormulaDataView } from '@/viz/dataview/formula/FormulaDataView';
+import { DataViewData } from '@/viz/dataview/mode/DataViewMode';
 import { Widget } from '../widget';
 
 export class Formula extends Widget {

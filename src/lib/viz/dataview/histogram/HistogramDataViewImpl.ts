@@ -1,14 +1,14 @@
 import { isVariableDefined } from '@/core/utils/variables';
+import { AggregationType } from '@/data/operations/aggregation/aggregation';
 import {
   DataViewMode,
   HistogramDataViewOptions,
   HistogramDataViewData
 } from '../mode/DataViewMode';
 import { DataViewImpl } from '../DataViewImpl';
-import { AggregationType } from '../../data/operations/aggregation/aggregation';
 import { CartoDataViewError, dataViewErrorTypes } from '../DataViewError';
 
-export class HistogramImpl<T extends DataViewMode> extends DataViewImpl<T> {
+export class HistogramDataViewImpl<T extends DataViewMode> extends DataViewImpl<T> {
   options: HistogramDataViewOptions;
 
   constructor(dataView: T, options: HistogramDataViewOptions) {
