@@ -174,15 +174,15 @@
         const countriesLayer = new carto.viz.Layer(geojson);
         await countriesLayer.addTo(deckMap);
 
-        formulaRemote = new carto.dataview.Formula(countriesLayer, 'gdp_md_est', {
+        formulaRemote = new carto.viz.dataview.Formula(countriesLayer, 'gdp_md_est', {
           operation: 'sum',
           mode: 'remote'
         });
-        formulaRemoteFiltered = new carto.dataview.Formula(countriesLayer, 'gdp_md_est', {
+        formulaRemoteFiltered = new carto.viz.dataview.Formula(countriesLayer, 'gdp_md_est', {
           operation: 'sum',
           mode: 'remote-filtered'
         });
-        formulaLocal = new carto.dataview.Formula(countriesLayer, 'gdp_md_est', {
+        formulaLocal = new carto.viz.dataview.Formula(countriesLayer, 'gdp_md_est', {
           operation: 'sum',
           mode: 'local'
         });

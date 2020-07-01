@@ -105,25 +105,25 @@
       const countriesLayer = new carto.viz.Layer('ne_50m_admin_0_countries');
       await countriesLayer.addTo(deckMap);
 
-      categoryRemote = new carto.dataview.Category(
+      categoryRemote = new carto.viz.dataview.Category(
         countriesLayer,
         'continent',
         { operation: 'sum', operationColumn: 'pop_est', mode: 'remote' }
       );
-      categoryRemoteFiltered = new carto.dataview.Category(
+      categoryRemoteFiltered = new carto.viz.dataview.Category(
         countriesLayer,
         'continent',
         { operation: 'sum', operationColumn: 'pop_est', mode: 'remote-filtered' }
       );
-      categoryLocal = new carto.dataview.Category(
+      categoryLocal = new carto.viz.dataview.Category(
         countriesLayer,
         'continent',
         { operation: 'sum', operationColumn: 'pop_est', mode: 'local' }
       );
 
-      new carto.widget.Category('#category-widget-remote', categoryRemote);
-      new carto.widget.Category('#category-widget-remote-filtered', categoryRemoteFiltered);
-      new carto.widget.Category('#category-widget-local', categoryLocal);
+      new carto.viz.widget.Category('#category-widget-remote', categoryRemote);
+      new carto.viz.widget.Category('#category-widget-remote-filtered', categoryRemoteFiltered);
+      new carto.viz.widget.Category('#category-widget-local', categoryLocal);
 
       // bind events
       categoryRemote.on('dataUpdate', async () => {

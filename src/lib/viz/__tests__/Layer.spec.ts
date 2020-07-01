@@ -1,7 +1,7 @@
 import { log, Deck } from '@deck.gl/core';
-import { CARTOSource } from '@/viz/sources';
+import { DatasetSource } from '@/viz';
+import { NumericFieldStats } from '@/viz/source';
 import { colorBinsStyle } from '@/viz/style/helpers/color-bins-style';
-import { NumericFieldStats } from '@/viz/sources/Source';
 import { Layer } from '../layer/Layer';
 import { getStyles, Style } from '../style';
 
@@ -127,7 +127,7 @@ describe('Layer', () => {
     });
   });
 
-  describe('Source init calls (instantiation in CARTOSource)', () => {
+  describe('Source init calls (instantiation in Source)', () => {
     const mockSourceInit = jest.fn().mockImplementation();
     const mockSourceGetProps = jest.fn().mockImplementation();
     const mockSourceGetMetadata = jest.fn().mockImplementation(() => {
@@ -152,9 +152,9 @@ describe('Layer', () => {
 
       deckInstanceMock = (deck as unknown) as Deck;
 
-      CARTOSource.prototype.init = mockSourceInit;
-      CARTOSource.prototype.getProps = mockSourceGetProps;
-      CARTOSource.prototype.getMetadata = mockSourceGetMetadata;
+      DatasetSource.prototype.init = mockSourceInit;
+      DatasetSource.prototype.getProps = mockSourceGetProps;
+      DatasetSource.prototype.getMetadata = mockSourceGetMetadata;
       Layer.prototype.getStyle = jest.fn().mockImplementation(() => {
         return new Style({});
       });
@@ -167,14 +167,14 @@ describe('Layer', () => {
     });
 
     it('should trigger a first Source init when adding the layer', async () => {
-      const source = new CARTOSource(DEFAULT_DATASET);
+      const source = new DatasetSource(DEFAULT_DATASET);
       const layer = new Layer(source);
       await layer.addTo(deckInstanceMock);
       expect(mockSourceInit).toHaveBeenCalledTimes(1);
     });
 
     it('should trigger a second Source init when modifying styles requires it', async () => {
-      const source = new CARTOSource(DEFAULT_DATASET);
+      const source = new DatasetSource(DEFAULT_DATASET);
       const layer = new Layer(source);
       await layer.addTo(deckInstanceMock);
       expect(mockSourceInit).toHaveBeenCalledTimes(1);
@@ -185,7 +185,7 @@ describe('Layer', () => {
     });
 
     it('should trigger Source init just once when setting a layer and source is not added to the map yet', async () => {
-      const source = new CARTOSource(DEFAULT_DATASET);
+      const source = new DatasetSource(DEFAULT_DATASET);
       const layer = new Layer(source);
 
       const styleWithNewColumn = colorBinsStyle('attributeName');
@@ -197,7 +197,7 @@ describe('Layer', () => {
     });
 
     it('should trigger a second Source init when modifying popups requires it', async () => {
-      const source = new CARTOSource(DEFAULT_DATASET);
+      const source = new DatasetSource(DEFAULT_DATASET);
       const layer = new Layer(source);
       await layer.addTo(deckInstanceMock);
       expect(mockSourceInit).toHaveBeenCalledTimes(1);
@@ -214,7 +214,7 @@ describe('Layer', () => {
     });
 
     it('should trigger Source init just once when setting a popup and source is not added to the map yet', async () => {
-      const source = new CARTOSource(DEFAULT_DATASET);
+      const source = new DatasetSource(DEFAULT_DATASET);
       const layer = new Layer(source);
 
       await layer.setPopupClick(['fake_column']);

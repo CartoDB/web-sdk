@@ -1,5 +1,5 @@
 import { Deck } from '@deck.gl/core';
-import { Source } from '../sources';
+import { Source } from '@/viz';
 
 export interface StyledLayer {
   getMapInstance(): Deck;

@@ -2,7 +2,12 @@
 import { Credentials, setDefaultCredentials } from './auth';
 
 // Sources
-import { DOSource, CARTOSource, GeoJsonSource } from './viz/sources';
+import {
+  // DOSource,
+  GeoJSONSource,
+  SQLSource,
+  DatasetSource
+} from './viz/source';
 
 // Basemaps
 import { createMap, createGoogleMap } from './viz/basemap';
@@ -23,10 +28,10 @@ import {
 } from './viz/style';
 
 // Dataviews
-import { Category, Formula } from './dataviews';
+import { CategoryDataView, FormulaDataView, HistogramDataView } from './viz/dataview';
 
 // Widgets
-import { Category as CategoryWidget, Formula as FormulaWidget } from './widgets';
+import { CategoryWidget, FormulaWidget, HistogramWidget } from './viz/widget';
 
 /*
  * --- Public API ---
@@ -44,7 +49,15 @@ export const auth = {
 };
 
 // carto.viz
-const sources = { DOSource, CARTOSource, GeoJsonSource };
+
+// source
+const source = {
+  // DO: DOSource,
+  GeoJSON: GeoJSONSource,
+  SQL: SQLSource,
+  Dataset: DatasetSource
+};
+
 const basemaps = { createMap, createGoogleMap };
 const basics = { Layer, Popup };
 const styles = {
@@ -57,21 +70,25 @@ const styles = {
   sizeContinuousStyle
 };
 
+// dataview
+const dataview = {
+  Category: CategoryDataView,
+  Formula: FormulaDataView,
+  Histogram: HistogramDataView
+};
+
+// widget
+const widget = {
+  Category: CategoryWidget,
+  Formula: FormulaWidget,
+  Histogram: HistogramWidget
+};
+
 export const viz = {
-  ...sources,
+  source,
+  dataview,
+  widget,
   ...basemaps,
   ...styles,
   ...basics
-};
-
-// carto.dataview
-export const dataview = {
-  Category,
-  Formula
-};
-
-// carto.widget
-export const widget = {
-  Category: CategoryWidget,
-  Formula: FormulaWidget
 };

@@ -1,5 +1,5 @@
+import { NumericFieldStats, GeometryType } from '@/viz/source';
 import { StyledLayer } from '../layer-style';
-import { NumericFieldStats, GeometryType } from '../../sources/Source';
 import { range } from './math-utils';
 import { CartoStylingError, stylingErrorTypes } from '../../errors/styling-error';
 import { Style, BasicOptionsStyle, getStyles, getStyleValue } from '../index';
