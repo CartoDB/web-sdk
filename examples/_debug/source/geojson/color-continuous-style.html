@@ -50,7 +50,7 @@
           }
         });
 
-        const style = carto.viz.colorContinuousStyle('long_min');
+        const style = carto.viz.style.colorContinuous('long_min');
         const layer = new carto.viz.Layer(data, style);
         layer.addTo(deckMap);
       }

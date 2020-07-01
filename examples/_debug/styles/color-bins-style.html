@@ -47,7 +47,7 @@
           }
         });
 
-        const style = carto.viz.colorBinsStyle('availability_365', {
+        const style = carto.viz.style.colorBins('availability_365', {
           bins: 5,
           method: 'quantiles'
           // breaks: [],
@@ -69,7 +69,7 @@
           }
         });
 
-        const style = carto.viz.colorBinsStyle('length_km');
+        const style = carto.viz.style.colorBins('length_km');
         const layer = new carto.viz.Layer('roads', style);
         layer.addTo(deckMap);
       }
@@ -86,7 +86,7 @@
           }
         });
 
-        const style = carto.viz.colorBinsStyle('pop_sq_km', {
+        const style = carto.viz.style.colorBins('pop_sq_km', {
           // color: '#0000FF',
           // size: 5
         });

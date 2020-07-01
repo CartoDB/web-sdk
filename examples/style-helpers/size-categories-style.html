@@ -47,7 +47,7 @@
           }
         });
 
-        const roomTypeStyle = carto.viz.sizeCategoriesStyle('type');
+        const roomTypeStyle = carto.viz.style.sizeCategories('type');
         const airbnbLayer = new carto.viz.Layer('roads', roomTypeStyle);
         airbnbLayer.addTo(deckMap);
       }
