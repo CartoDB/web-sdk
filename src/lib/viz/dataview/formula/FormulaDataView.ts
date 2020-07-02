@@ -5,7 +5,7 @@ import { DataViewCalculation } from '../mode/DataViewMode';
 import { AggregationType } from '../../../data/operations/aggregation/aggregation';
 import { DataViewLocal } from '../mode/DataViewLocal';
 import { DataViewRemote } from '../mode/DataViewRemote';
-import { DataViewWrapper } from '../DataViewWrapper';
+import { DataViewWrapper, getCredentialsFrom } from '../DataViewWrapper';
 import { FormulaDataViewImpl } from './FormulaDataViewImpl';
 import { isGeoJSONSource } from '../utils';
 
@@ -27,7 +27,8 @@ export class FormulaDataView extends DataViewWrapper {
           break;
         }
 
-        dataView = new DataViewRemote(dataSource as Source, column);
+        const credentials = getCredentialsFrom(dataSource);
+        dataView = new DataViewRemote(dataSource as Source, column, credentials);
         break;
       }
 
@@ -40,7 +41,8 @@ export class FormulaDataView extends DataViewWrapper {
           break;
         }
 
-        dataView = new DataViewRemote(dataSource as Layer, column);
+        const credentials = getCredentialsFrom(dataSource);
+        dataView = new DataViewRemote(dataSource as Layer, column, credentials);
         dataView.addFilter(`VIEWPORT_FILTER_${uuidv4()}`, BuiltInFilters.VIEWPORT);
         break;
       }
