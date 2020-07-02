@@ -93,8 +93,8 @@ export class DataViewRemote extends DataViewMode {
 
   public async histogram(
     binsNumber: number,
-    start = 0,
-    end = 1000
+    start: number,
+    end: number
   ): Promise<HistogramDataViewData> {
     const applicator = this.filtersCollection.getApplicatorInstance();
     const bbox = (applicator as RemoteFilterApplicator).getBbox();
