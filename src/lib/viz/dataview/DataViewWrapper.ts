@@ -1,10 +1,12 @@
 import { WithEvents } from '@/core/mixins/WithEvents';
 import { Layer, Source } from '@/viz';
+import { Credentials } from '@/auth';
 import { Filter } from '@/viz/filters/types';
 import { AggregationType } from '@/data/operations/aggregation/aggregation';
 import { DataViewImpl } from './DataViewImpl';
 import { DataViewMode, DataViewCalculation } from './mode/DataViewMode';
 import { debounce } from './utils';
+import { SQLSource, DatasetSource, DOSource } from '../source';
 
 export const OPTION_CHANGED_DELAY = 100;
 
@@ -77,4 +79,24 @@ export abstract class DataViewWrapper extends WithEvents {
     column: string,
     options: { mode?: DataViewCalculation }
   ): void;
+}
+
+export function getCredentialsFrom(dataSource: Layer | Source): Credentials | undefined {
+  let source = dataSource;
+
+  if (source instanceof Layer) {
+    source = source.source;
+  }
+
+  let credentials;
+
+  if (
+    source instanceof SQLSource ||
+    source instanceof DatasetSource ||
+    source instanceof DOSource
+  ) {
+    credentials = (source as SQLSource | DatasetSource | DOSource).credentials;
+  }
+
+  return credentials;
 }

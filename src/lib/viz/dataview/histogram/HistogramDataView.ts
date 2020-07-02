@@ -5,7 +5,7 @@ import { isGeoJSONSource } from '../utils';
 import { DataViewCalculation, HistogramDataViewOptions } from '../mode/DataViewMode';
 import { DataViewLocal } from '../mode/DataViewLocal';
 import { DataViewRemote } from '../mode/DataViewRemote';
-import { DataViewWrapper } from '../DataViewWrapper';
+import { DataViewWrapper, getCredentialsFrom } from '../DataViewWrapper';
 import { HistogramDataViewImpl } from './HistogramDataViewImpl';
 
 export class HistogramDataView extends DataViewWrapper {
@@ -36,7 +36,8 @@ const createDataView = {
       return new DataViewLocal(dataSource as Layer, column, useViewport);
     }
 
-    return new DataViewRemote(dataSource as Source, column);
+    const credentials = getCredentialsFrom(dataSource);
+    return new DataViewRemote(dataSource as Source, column, credentials);
   },
 
   [DataViewCalculation.REMOTE_FILTERED](dataSource: Layer | Source, column: string) {
@@ -44,7 +45,8 @@ const createDataView = {
       return new DataViewLocal(dataSource as Layer, column);
     }
 
-    const dataView = new DataViewRemote(dataSource as Layer, column);
+    const credentials = getCredentialsFrom(dataSource);
+    const dataView = new DataViewRemote(dataSource as Layer, column, credentials);
     dataView.addFilter(`VIEWPORT_FILTER_${uuidv4()}`, BuiltInFilters.VIEWPORT);
     return dataView;
   }
