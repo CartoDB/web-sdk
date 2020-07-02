@@ -25,7 +25,18 @@ export const defaultMapOptions: MapOptions = {
     mvt: 10
   },
   metadata: {
-    geometryType: true
+    geometryType: true,
+    columnStats: {
+      topCategories: 32768,
+      includeNulls: true
+    },
+    dimensions: true
+  },
+  aggregation: {
+    columns: {},
+    placement: 'centroid',
+    resolution: 1,
+    threshold: 1
   }
 };
 
@@ -48,7 +59,7 @@ export class SQLSource extends Source {
   protected _fields: StatFields;
 
   constructor(sql: string, options: SourceOptions = {}) {
-    const { mapOptions = {}, credentials = defaultCredentials } = options;
+    const { mapOptions = defaultMapOptions, credentials = defaultCredentials } = options;
 
     // set layer id
     const id = `CARTO-SQL-${uuidv4()}`;
@@ -60,16 +71,8 @@ export class SQLSource extends Source {
     // Set object properties
     this._value = sql;
     this._credentials = credentials;
-    const sourceOpts = { sql };
     this._fields = { sample: new Set(), aggregation: new Set() };
-
-    // Set Map Config
-    this._mapConfig = {
-      // hack: deep copy
-      ...JSON.parse(JSON.stringify(defaultMapOptions)),
-      ...mapOptions,
-      ...sourceOpts
-    };
+    this._mapConfig = this.buildMapConfig(mapOptions);
   }
 
   /**
@@ -124,8 +127,7 @@ export class SQLSource extends Source {
       console.warn('Source reinitialized');
     }
 
-    this._saveFields(fields);
-    this._initConfigForStats();
+    this.updateMapConfig(fields);
 
     const mapsClient = new Client(this._credentials);
     const mapInstance: MapInstance = await mapsClient.instantiateMapFrom(this._mapConfig);
@@ -138,39 +140,59 @@ export class SQLSource extends Source {
     return this.isInitialized;
   }
 
-  private _initConfigForStats() {
+  private buildMapConfig(mapOptions: MapOptions) {
+    const defaultMapOptionsCopy = JSON.parse(JSON.stringify(defaultMapOptions));
+
+    return {
+      ...defaultMapOptionsCopy,
+      ...mapOptions,
+      metadata: {
+        ...defaultMapOptionsCopy.metadata,
+        ...mapOptions.metadata
+      },
+      aggregation: {
+        ...defaultMapOptionsCopy.aggregation,
+        ...mapOptions.aggregation
+      },
+      sql: this._value
+    };
+  }
+
+  private updateMapConfig(fields: StatFields) {
+    this.saveFields(fields);
+    this.updateMapConfigMetadata();
+    this.updateMapConfigAggregation();
+  }
+
+  private updateMapConfigMetadata() {
     if (this._mapConfig.metadata === undefined) {
       throw new SourceError('Map Config has not metadata field');
     }
 
-    // Modify mapConfig to add the field stats
-    this._mapConfig.metadata.columnStats = {
-      topCategories: 32768,
-      includeNulls: true
+    const metadata = {
+      sample: {
+        num_rows: 1000,
+        include_columns: [...this._fields.sample]
+      }
     };
 
-    this._mapConfig.metadata.dimensions = true;
+    this._mapConfig.metadata = Object.assign(metadata, this._mapConfig.metadata);
+  }
 
-    this._mapConfig.metadata.sample = {
-      num_rows: 1000,
-      include_columns: [...this._fields.sample]
-    };
-
+  private updateMapConfigAggregation() {
     const dimensions: Record<string, { column: string }> = {};
     this._fields.aggregation.forEach(field => {
       dimensions[field] = { column: field };
     });
 
-    this._mapConfig.aggregation = {
-      columns: {},
-      dimensions,
-      placement: 'centroid',
-      resolution: 1,
-      threshold: 1
+    const aggregation = {
+      dimensions
     };
+
+    this._mapConfig.aggregation = Object.assign(aggregation, this._mapConfig.aggregation);
   }
 
-  private _saveFields(fields: StatFields) {
+  private saveFields(fields: StatFields) {
     this._fields.sample = new Set([...fields.sample]);
     this._fields.aggregation = new Set([...fields.aggregation]);
   }
