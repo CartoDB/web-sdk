@@ -122,7 +122,7 @@ describe('DatasetSource', () => {
       expect(instantiateMapFromMock.mock.calls[0][0]).toMatchObject(expectedmapConfig);
     });
 
-    it('should not overwrite mapConfig with custom paramters', async () => {
+    it('should overwrite default mapConfig with custom paramters', async () => {
       const mapOptions = {
         vectorExtent: 2048,
         vectorSimplifyExtent: 512,
