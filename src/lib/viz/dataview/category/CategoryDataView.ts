@@ -4,7 +4,7 @@ import { uuidv4 } from '@/core/utils/uuid';
 import { DataViewLocal } from '../mode/DataViewLocal';
 import { DataViewRemote } from '../mode/DataViewRemote';
 import { DataViewCalculation } from '../mode/DataViewMode';
-import { DataViewWrapper, OPTION_CHANGED_DELAY } from '../DataViewWrapper';
+import { DataViewWrapper, OPTION_CHANGED_DELAY, getCredentialsFrom } from '../DataViewWrapper';
 import { CategoryOptions, CategoryDataViewImpl } from './CategoryDataViewImpl';
 import { debounce, isGeoJSONSource } from '../utils';
 
@@ -26,7 +26,8 @@ export class CategoryDataView extends DataViewWrapper {
           break;
         }
 
-        dataView = new DataViewRemote(dataSource, column);
+        const credentials = getCredentialsFrom(dataSource);
+        dataView = new DataViewRemote(dataSource, column, credentials);
         break;
       }
 
@@ -39,7 +40,8 @@ export class CategoryDataView extends DataViewWrapper {
           break;
         }
 
-        dataView = new DataViewRemote(dataSource, column);
+        const credentials = getCredentialsFrom(dataSource);
+        dataView = new DataViewRemote(dataSource, column, credentials);
         dataView.addFilter(`VIEWPORT_FILTER_${uuidv4()}`, BuiltInFilters.VIEWPORT);
         break;
       }
