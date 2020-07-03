@@ -154,6 +154,10 @@ export class DOSource extends Source {
     return parseFetchJSON(r);
   }
 
+  public get credentials() {
+    return this._credentials;
+  }
+
   public async init(): Promise<boolean> {
     // Get geography from metadata
     const variable = await this._getVariable(this._variable);
