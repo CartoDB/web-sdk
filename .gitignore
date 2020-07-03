@@ -3,6 +3,7 @@
 .vscode
 coverage/
 dist/
-docs/
+docs/public
+docs/api
 node_modules/
 secrets.json

@@ -55,7 +55,7 @@
         const countriesLayer = new carto.viz.Layer('ne_50m_admin_0_countries');
         await countriesLayer.addTo(deckMap);
 
-        const dataview = new carto.dataview.Category(countriesLayer, 'continent', {
+        const dataview = new carto.viz.dataview.Category(countriesLayer, 'continent', {
           operation: 'count',
           operationColumn: 'pop_est',
           mode: 'local'

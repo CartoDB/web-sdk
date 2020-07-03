@@ -47,7 +47,7 @@
           }
         });
 
-        const style = carto.viz.sizeBinsStyle('sale_price', {
+        const style = carto.viz.style.sizeBins('sale_price', {
           // bins: 3
         });
         const layer = new carto.viz.Layer('clev_sales', style);
@@ -66,7 +66,7 @@
           }
         });
 
-        const style = carto.viz.sizeBinsStyle('length_km', {
+        const style = carto.viz.style.sizeBins('length_km', {
           bins: 3,
           sizeRange: [1, 5]
         });
