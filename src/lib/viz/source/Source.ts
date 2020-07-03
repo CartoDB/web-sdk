@@ -51,16 +51,17 @@ export interface StatFields {
 export abstract class Source extends WithEvents {
   // ID of the source. It's mandatory for the source but not for the user.
   public id: string;
-
   public isInitialized: boolean;
-
   public sourceType: SourceType | unknown;
+  protected fields: StatFields;
 
   constructor(id: string) {
     super();
 
     this.id = id;
     this.isInitialized = false;
+    this.sourceType = 'Source';
+    this.fields = { sample: new Set(), aggregation: new Set() };
   }
 
   abstract async init(fields?: StatFields): Promise<boolean>;
@@ -77,6 +78,24 @@ export abstract class Source extends WithEvents {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars, class-methods-use-this
   async removeFilter(_filterId: string) {
     throw new Error(`Method not implemented`);
+  }
+
+  protected shouldInitialize(fields: StatFields) {
+    if (shouldInitialize(this.isInitialized, fields, this.fields)) {
+      if (this.isInitialized) {
+        // eslint-disable-next-line no-console
+        console.warn(`Reinitializing ${this.sourceType}`);
+      }
+
+      return true;
+    }
+
+    return false;
+  }
+
+  protected saveFields(fields: StatFields) {
+    this.fields.sample = new Set([...fields.sample]);
+    this.fields.aggregation = new Set([...fields.aggregation]);
   }
 }
 

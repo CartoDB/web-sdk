@@ -9,8 +9,7 @@ import {
   NumericFieldStats,
   CategoryFieldStats,
   GeometryType,
-  StatFields,
-  shouldInitialize
+  StatFields
 } from './Source';
 
 import { sourceErrorTypes, SourceError } from '../errors/source-error';
@@ -29,7 +28,6 @@ export class GeoJSONSource extends Source {
   private _props?: GeoJSONSourceProps;
   private _numericFieldValues: Record<string, number[]>;
   private _categoryFieldValues: Record<string, string[]>;
-  private _fields: StatFields;
 
   constructor(geojson: GeoJSON) {
     const id = `geojson-${uuidv4()}`;
@@ -39,7 +37,6 @@ export class GeoJSONSource extends Source {
     this._geojson = geojson;
     this._numericFieldValues = {};
     this._categoryFieldValues = {};
-    this._fields = { sample: new Set(), aggregation: new Set() };
   }
 
   public getProps(): GeoJSONSourceProps {
@@ -69,13 +66,8 @@ export class GeoJSONSource extends Source {
   }
 
   public async init(fields: StatFields): Promise<boolean> {
-    if (!shouldInitialize(this.isInitialized, fields, this._fields)) {
+    if (!this.shouldInitialize(fields)) {
       return true;
-    }
-
-    if (this.isInitialized) {
-      // eslint-disable-next-line no-console
-      console.warn('GeoJSONSource reinitialized');
     }
 
     this._props = { type: 'GeoJSONLayer', data: this._geojson };
@@ -88,7 +80,7 @@ export class GeoJSONSource extends Source {
   private _buildMetadata(fields: StatFields) {
     const geometryType = getGeomType(this._geojson);
 
-    this._saveFields(fields);
+    this.saveFields(fields);
     const stats = this._getStats();
 
     return { geometryType, stats };
@@ -97,7 +89,7 @@ export class GeoJSONSource extends Source {
   private _getStats(): (NumericFieldStats | CategoryFieldStats)[] {
     let stats: (NumericFieldStats | CategoryFieldStats)[] = [];
 
-    const fields = [...new Set([...this._fields.sample, ...this._fields.aggregation])];
+    const fields = [...new Set([...this.fields.sample, ...this.fields.aggregation])];
 
     if (!fields.length) {
       return stats;
@@ -226,11 +218,6 @@ export class GeoJSONSource extends Source {
     }
 
     return categoryStats;
-  }
-
-  private _saveFields(fields: StatFields) {
-    this._fields.sample = new Set([...fields.sample]);
-    this._fields.aggregation = new Set([...fields.aggregation]);
   }
 }
 
