@@ -7,8 +7,7 @@ import {
   SourceMetadata,
   NumericFieldStats,
   CategoryFieldStats,
-  StatFields,
-  shouldInitialize
+  StatFields
 } from './Source';
 import { parseGeometryType } from '../style/helpers/utils';
 import { sourceErrorTypes, SourceError } from '../errors/source-error';
@@ -30,10 +29,15 @@ export const defaultMapOptions: MapOptions = {
       topCategories: 32768,
       includeNulls: true
     },
-    dimensions: true
+    dimensions: true,
+    sample: {
+      num_rows: 1000,
+      include_columns: []
+    }
   },
   aggregation: {
     columns: {},
+    dimensions: {},
     placement: 'centroid',
     resolution: 1,
     threshold: 1
@@ -56,7 +60,6 @@ export class SQLSource extends Source {
   protected _props?: SQLSourceProps;
   protected _mapConfig: MapOptions;
   protected _metadata?: SourceMetadata;
-  protected _fields: StatFields;
 
   constructor(sql: string, options: SourceOptions = {}) {
     const { mapOptions = defaultMapOptions, credentials = defaultCredentials } = options;
@@ -71,7 +74,6 @@ export class SQLSource extends Source {
     // Set object properties
     this._value = sql;
     this._credentials = credentials;
-    this._fields = { sample: new Set(), aggregation: new Set() };
     this._mapConfig = this.buildMapConfig(mapOptions);
   }
 
@@ -119,12 +121,8 @@ export class SQLSource extends Source {
    * @param fields
    */
   public async init(fields: StatFields): Promise<boolean> {
-    if (!shouldInitialize(this.isInitialized, fields, this._fields)) {
+    if (!this.shouldInitialize(fields)) {
       return true;
-    }
-
-    if (this.isInitialized) {
-      console.warn('Source reinitialized');
     }
 
     this.updateMapConfig(fields);
@@ -134,7 +132,7 @@ export class SQLSource extends Source {
 
     const urlTemplate = getUrlsFrom(mapInstance);
     this._props = { type: 'TileLayer', data: urlTemplate }; // TODO refactor / include in metadata ?
-    this._metadata = extractMetadataFrom(mapInstance, fields);
+    this._metadata = this.extractMetadataFrom(mapInstance);
 
     this.isInitialized = true;
     return this.isInitialized;
@@ -165,36 +163,47 @@ export class SQLSource extends Source {
   }
 
   private updateMapConfigMetadata() {
-    if (this._mapConfig.metadata === undefined) {
+    if (!this._mapConfig.metadata) {
       throw new SourceError('Map Config has not metadata field');
     }
 
-    const metadata = {
-      sample: {
+    if (!this._mapConfig.metadata.sample) {
+      this._mapConfig.metadata.sample = {
         num_rows: 1000,
-        include_columns: [...this._fields.sample]
-      }
-    };
+        include_columns: []
+      };
+    }
 
-    this._mapConfig.metadata = Object.assign(metadata, this._mapConfig.metadata);
+    this._mapConfig.metadata.sample.include_columns.push(...this.fields.sample);
   }
 
   private updateMapConfigAggregation() {
-    const dimensions: Record<string, { column: string }> = {};
-    this._fields.aggregation.forEach(field => {
-      dimensions[field] = { column: field };
-    });
+    if (this.fields.aggregation.size) {
+      if (!this._mapConfig.aggregation) {
+        throw new SourceError('Map Config has not aggregation field');
+      }
 
-    const aggregation = {
-      dimensions
-    };
+      if (!this._mapConfig.aggregation.dimensions) {
+        this._mapConfig.aggregation.dimensions = {};
+      }
 
-    this._mapConfig.aggregation = Object.assign(aggregation, this._mapConfig.aggregation);
+      const { dimensions } = this._mapConfig.aggregation;
+      this.fields.aggregation.forEach(field => {
+        dimensions[field] = { column: field };
+      });
+
+      this._mapConfig.aggregation.dimensions = { ...dimensions };
+    }
   }
 
-  private saveFields(fields: StatFields) {
-    this._fields.sample = new Set([...fields.sample]);
-    this._fields.aggregation = new Set([...fields.aggregation]);
+  private extractMetadataFrom(mapInstance: MapInstance) {
+    const { stats } = mapInstance.metadata.layers[0].meta;
+    const geometryType = parseGeometryType(stats.geometryType);
+    const fieldStats = getCompleteFieldStats(stats, this.fields);
+
+    const metadata = { geometryType, stats: fieldStats };
+
+    return metadata;
   }
 }
 
@@ -212,16 +221,7 @@ function getUrlsFrom(mapInstance: MapInstance): string | string[] {
   return urlTemplate;
 }
 
-function extractMetadataFrom(mapInstance: MapInstance, fields?: StatFields) {
-  const { stats } = mapInstance.metadata.layers[0].meta;
-  const geometryType = parseGeometryType(stats.geometryType);
-  const fieldStats = getCompleteFieldStats(stats, fields);
-
-  const metadata = { geometryType, stats: fieldStats };
-
-  return metadata;
-}
-
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function getCompleteFieldStats(stats: any, fields?: StatFields) {
   if (!fields) return [];
 
@@ -243,6 +243,7 @@ function getCompleteFieldStats(stats: any, fields?: StatFields) {
           fieldStats.push({
             name: column,
             ...stats.columns[column],
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             sample: stats.sample.map((x: any) => x[column])
           });
           break;
