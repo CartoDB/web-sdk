@@ -20,11 +20,11 @@ export class HistogramDataViewImpl<T extends DataViewMode> extends DataViewImpl<
     this.options = options;
   }
 
-  public async getData(): Promise<HistogramDataViewData> {
+  public async getData(filterId?: string): Promise<HistogramDataViewData> {
     const { bins = 10, start, end } = this.options;
 
     try {
-      return await this.dataView.histogram(bins, start, end);
+      return await this.dataView.histogram(bins, start, end, { filterId });
     } catch (error) {
       this.emit('error', error);
       throw error;

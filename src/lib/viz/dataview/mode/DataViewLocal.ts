@@ -16,13 +16,16 @@ export class DataViewLocal extends DataViewMode {
     this.bindEvents();
   }
 
-  public async aggregation(aggregationParams: {
-    aggregation: AggregationType;
-    operationColumn: string;
-    limit?: number;
-  }): Promise<Partial<DataViewData>> {
+  public async aggregation(
+    aggregationParams: {
+      aggregation: AggregationType;
+      operationColumn: string;
+      limit?: number;
+    },
+    options: { filterId?: string }
+  ): Promise<Partial<DataViewData>> {
     const { aggregation, operationColumn, limit } = aggregationParams;
-    const { categories, nullCount } = await this.groupBy(operationColumn, aggregation);
+    const { categories, nullCount } = await this.groupBy(operationColumn, aggregation, options);
     const categoryValues = categories.map(category => category.value);
 
     return {
@@ -55,9 +58,10 @@ export class DataViewLocal extends DataViewMode {
   public async histogram(
     binsNumber: number,
     start: number | undefined,
-    end: number | undefined
+    end: number | undefined,
+    options: { filterId: string }
   ): Promise<HistogramDataViewData> {
-    const features = (await this.getSourceData([this.column])) as Record<string, number>[];
+    const features = (await this.getSourceData([this.column], options)) as Record<string, number>[];
     const sortedFeatures = features.map(feature => feature[this.column]).sort((a, b) => a - b);
 
     const startValue = start ?? Math.min(...sortedFeatures);
@@ -113,13 +117,14 @@ export class DataViewLocal extends DataViewMode {
     };
   }
 
-  private getSourceData(columns: string[] = []) {
+  private getSourceData(columns: string[] = [], options: { filterId?: string } = {}) {
     if (!columns.includes(this.column)) {
       columns.push(this.column);
     }
 
     if (this.useViewport) {
-      return (this.dataSource as Layer).getViewportFeatures(columns);
+      const filterOptions = options.filterId ? [options.filterId] : [];
+      return (this.dataSource as Layer).getViewportFilteredFeatures(filterOptions);
     }
 
     // is GeoJSON Layer
@@ -131,8 +136,12 @@ export class DataViewLocal extends DataViewMode {
     return (this.dataSource as GeoJSONSource).getFeatures(columns);
   }
 
-  private async groupBy(operationColumn: string, operation: AggregationType) {
-    const sourceData = await this.getSourceData([operationColumn || this.column]);
+  private async groupBy(
+    operationColumn: string,
+    operation: AggregationType,
+    options: { filterId?: string }
+  ) {
+    const sourceData = await this.getSourceData([operationColumn || this.column], options);
     const { groups, nullCount } = groupValuesByColumn(
       sourceData,
       operationColumn || this.column,
@@ -148,15 +157,13 @@ export class DataViewLocal extends DataViewMode {
   private bindEvents() {
     this.registerAvailableEvents(['dataUpdate', 'error']);
 
-    if (this.dataSource instanceof Layer) {
-      this.dataSource.on('viewportLoad', () => {
-        this.onDataUpdate();
-      });
-    }
-  }
+    this.dataSource.on('viewportLoad', () => {
+      this.onDataUpdate();
+    });
 
-  private onDataUpdate() {
-    this.emit('dataUpdate');
+    this.dataSource.on('filterChange', () => {
+      this.onDataUpdate();
+    });
   }
 }
 

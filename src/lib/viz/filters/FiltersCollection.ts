@@ -9,6 +9,10 @@ export class FiltersCollection<T, K extends FilterApplicator<T>> {
     this.FilterApplicatorClass = FilterApplicatorClass;
   }
 
+  hasFilters() {
+    return Boolean(this.collection.size);
+  }
+
   addFilter(filterId: string, filterDefinition: T) {
     this.collection.set(filterId, filterDefinition);
   }
@@ -17,8 +21,8 @@ export class FiltersCollection<T, K extends FilterApplicator<T>> {
     this.collection.delete(filterId);
   }
 
-  getApplicatorInstance() {
-    const filters = this._mergeFilters();
+  getApplicatorInstance(excludedFilters: string[] = []) {
+    const filters = this._mergeFilters(excludedFilters);
     return new this.FilterApplicatorClass(filters);
   }
 
@@ -32,7 +36,24 @@ export class FiltersCollection<T, K extends FilterApplicator<T>> {
     return JSON.stringify(Array.from(this.collection.values()));
   }
 
-  protected _mergeFilters(): T {
-    return deepmerge.all(Array.from(this.collection.values())) as T;
+  protected _mergeFilters(excludedFilters: string[]): T {
+    const mergeOptions: deepmerge.Options = {
+      arrayMerge
+    };
+
+    const filters = new Map(this.collection);
+    excludedFilters.forEach(filter => filters.delete(filter));
+
+    return deepmerge.all(Array.from(this.collection.values()), mergeOptions) as T;
   }
+}
+
+function arrayMerge(target: number[] | string[] = [], source: number[] | string[]) {
+  const isNumericFilter = Number.isFinite(source[0]);
+
+  if (isNumericFilter) {
+    return [...target, source];
+  }
+
+  return [...target, ...source];
 }

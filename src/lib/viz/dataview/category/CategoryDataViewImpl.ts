@@ -18,15 +18,18 @@ export class CategoryDataViewImpl<T extends DataViewMode> extends DataViewImpl<T
     this.limit = limit;
   }
 
-  public async getData(): Promise<Partial<DataViewData>> {
+  public async getData(filterId?: string): Promise<Partial<DataViewData>> {
     let aggregationResponse;
 
     try {
-      aggregationResponse = await this.dataView.aggregation({
-        aggregation: this.operation,
-        operationColumn: this.operationColumn,
-        limit: this.limit
-      });
+      aggregationResponse = await this.dataView.aggregation(
+        {
+          aggregation: this.operation,
+          operationColumn: this.operationColumn,
+          limit: this.limit
+        },
+        { filterId }
+      );
     } catch (error) {
       this.emit('error', [error]);
       throw error;
