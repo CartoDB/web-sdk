@@ -57,9 +57,14 @@ const filterFunctions: Record<FilterType, Function> = {
     return filterValues.includes(featureValue);
   },
 
-  [FilterType.WITHIN](filterValues: string[], featureValue: string) {
-    const [lowerBound, upperBound] = filterValues;
+  [FilterType.WITHIN](filterValues: number[] | number[][], featureValue: number) {
+    const checkRange = function checkRange(range: number[]) {
+      const [lowerBound, upperBound] = range;
+      return featureValue >= lowerBound && featureValue < upperBound;
+    };
 
-    return featureValue >= lowerBound && featureValue < upperBound;
+    return Array.isArray(filterValues[0])
+      ? (filterValues as number[][]).every(checkRange)
+      : checkRange(filterValues as number[]);
   }
 };

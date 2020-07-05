@@ -45,7 +45,9 @@ export abstract class DataViewImpl<T extends DataViewMode> extends WithEvents {
     events.forEach((e: string) => this.dataView.on(e, (args: any[]) => this.emit(e, args)));
   }
 
-  public abstract async getData(): Promise<Partial<DataViewData> | HistogramDataViewData>;
+  public abstract async getData(
+    filterId?: string
+  ): Promise<Partial<DataViewData> | HistogramDataViewData>;
 }
 
 function validateParameters(operation: AggregationType, column: string) {

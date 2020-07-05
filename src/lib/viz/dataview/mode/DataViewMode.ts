@@ -25,18 +25,22 @@ export abstract class DataViewMode extends WithEvents {
     this.dataSource.removeFilter(filterId);
   }
 
-  public abstract async aggregation(aggregationParams: {
-    aggregation: AggregationType;
-    operationColumn: string;
-    limit?: number;
-  }): Promise<Partial<DataViewData>>;
+  public abstract async aggregation(
+    aggregationParams: {
+      aggregation: AggregationType;
+      operationColumn: string;
+      limit?: number;
+    },
+    options: { filterId?: string }
+  ): Promise<Partial<DataViewData>>;
 
   public abstract async formula(operation: AggregationType): Promise<Partial<DataViewData>>;
 
   public abstract async histogram(
     binsNumber: number,
     start: number | undefined,
-    end: number | undefined
+    end: number | undefined,
+    options: { filterId?: string }
   ): Promise<HistogramDataViewData>;
 }
 

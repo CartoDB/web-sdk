@@ -31,8 +31,8 @@ export abstract class DataViewWrapper extends WithEvents {
     this.bindEvents();
   }
 
-  public getData() {
-    return this.dataviewImpl.getData();
+  public getData(filterId?: string) {
+    return this.dataviewImpl.getData(filterId);
   }
 
   public addFilter(filterId: string, filter: Filter) {

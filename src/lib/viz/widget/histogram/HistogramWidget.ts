@@ -39,7 +39,7 @@ export class HistogramWidget extends Widget {
   }
 
   protected async updateData() {
-    const data = await this.dataView.getData();
+    const data = await this.dataView.getData(this.widgetUUID);
     const histogramWidget = this.element as HTMLAsHistogramWidgetElement;
     histogramWidget.data = (data as HistogramDataViewData).bins;
   }
