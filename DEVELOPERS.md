@@ -17,16 +17,16 @@ To test the project
     npm run test
 ```
 
-And, to get the examples up and running in a local web server:
+And to get the examples up and running in a local web server:
 ```bash
     npm run serve
 ```
 and you then can navigate to the `examples` folder in watch mode
 
 
-# 2. Workflow and Releases
+# 2. Workflow and releases
 
-The library is deployed to a CDN, for direct conpsumtion from the browser, and at the NPM registry (as `@carto/web-sdk` package), and it follows [Semantic Versioning](http://semver.org/spec/v2.0.0.html). This is the common workflow.
+The library is deployed to a CDN, for direct conpsumtion from the browser, and to the NPM registry (as `@carto/web-sdk` package), and it follows [Semantic Versioning](http://semver.org/spec/v2.0.0.html). This is the common workflow.
 
 
 ## 2.1. Workflow
@@ -37,60 +37,72 @@ We try to follow this convention when naming branches:
 - Features: `feature/<description>` (i.e: feature/new-histogram-mode)
 - Fixes: `fix/<description>`  (i.e: fix/icon-in-firefox)
 - Hotfix: `hotfix/<description>` (i.e: hotfix/fix-style)
-- Release (minor & major): `release/<version>` (i.e: release/v1.2.5). Notice the pattern is `vM.m.p`, and it might contain a pre-release suffix, like `vM.m.p-alpha.0`.
+- Release: `release/<version>` (i.e: release/v1.2.5). Notice the pattern is `vM.m.p`, and it might contain a pre-release suffix, like `vM.m.p-alpha.0`.
 
-And these procedures:
+Origin of the branches:
 - _Features_ and _Fixes_ are created from `develop`, so common PRs must be against `develop` (and that's the way it is configured by default in Github).
-- _Hotfix_ are created from `master`. They contain small changes that imply a *patch* release. So a hotfix PR should be opened against `master`.
+- _Hotfixes_ are created from `master`. They contain small changes that imply a *patch* release. So a hotfix PR should be opened against `master`.
 - _Release_ branches must be created from `develop` branch.
 
-Use cases:
-1. When releasing a common version
-    - create a `release` branch from `develop` (eg. `release/v1.0.0`)
-    - launch the release process (which includes the version bump and npm publication). For example, from a previous `v0.0.1`, you will set the bump to the desired `v1.0.0`
-    - merge the `release` branch to `master`
-    - merge `master` back to `develop`, because it always have to be updated with `master`.
-2. When a hotfix PR is merged into `master` for a patch release, also we must merge `master` back into `develop`.
+Steps for a release:
+1. create a new branch, either from `develop` (if it's a common release, eg. `release/v1.0.0`) or from `master` (if it is a hotfix, like `hotfix/legend-1`).
+2. pass all the checks on it (build, test, lint, doc...).
+3. update the `CHANGELOG`, adding the current date, expected version and its notes, and then a new *Unreleased* section. Commit it to the branch.
+4. set up the upstream branch (eg. `git push --set-upstream origin release/v1.0.0`).
+4. launch the release process (which includes the version bump aand the npm & cdn publication) and specify the desired version, eg. `v1.0.0`. See section 2.3 to know more details about this step.
+5. after a succesful release, merge the `release` or `hotfix` branch to `master`
+6. merge `master` back to `develop`, because it always have to be updated with `master`.
 
-> Note: The next sections, about releases, are for internal use at CARTO and they require the proper permissions (with a `secrets.json`).
+> Note: The next sections, about releases, are just for internal use at CARTO and they require the proper permissions (with a `secrets.json`).
 
 
-## 2.1. Development releases to CDN
+## 2.2. Development releases to CDN
 
-The CDN is used for official releases, but also for "work in progress" versions.
+The CDN is used for official releases, but also for "work in progress" versions. For any official release to npm, the CDN publication will be launched automatically after it (see the 2.3 section for more details).
 
-During **development**, it might be interesting to deploy some arbitrary branch to the CDN for testing (for example to check its documentation in the Developer Center), and you can get that by running:
+But during development, it can be also interesting to deploy some arbitrary branch to the CDN for testing (just to the cdn, not to the npm), for example to check its documentation in the Developer Center. And you can get that by running this from the desired branch:
 
 ```bash
-    npm run publish:cdn-branch
+    npm run cdn-publish:branch
 ```
-If you're not sure, you can test it before with `npm run publish:cdn-branch -- --dry-run`. If your branch is named `my-branch`, you will get a deployment like `https://libs.cartocdn.com/web-sdk/branches/my-branch/index.min.js`.
+If you're not sure, you can test it before with `npm run cdn-publish:branch -- --dry-run`, and it will just emulate the procedure, giving some feedback in your console. If your branch is named `my-branch`, you will get a deployment like `https://libs.cartocdn.com/web-sdk/branches/my-branch/index.min.js`.
 
 > Note: Beware of valid branch names (eg. `feature/ch1/xyz` will be sanitized to `featurech1xyz`).
 
 
-## 2.1. Publication to NPM
+## 2.3. Publication to NPM
 
 The library is available at NPM registry as [@carto/web-sdk](https://www.npmjs.com/package/@carto/web-sdk).
 
-The procedure for a release uses `release-it` npm tool. That command will take care of the whole process: npm credentials check, type of release selection (major, minor, patch), bump version (it can be ommitted), tag creation in github and npm publication.
+The procedure for a release uses internally `release-it`. That tool will take care of several relevant steps: npm credentials check, type of release selection (major, minor, patch), bump version (it can be ommitted), tag creation in github and npm publication.
 
-It can be invoked as
+And for the proper CDN deployment, there is also a `cdn-publish:release` script but you don't need to call it explicitly, it will be included in this invokation for a whole release (NPM + CDN) with:
+
 ```bash
-    npm run make-release
+    npm run make-new-release
 ```
-and an interactive CLI will require confirmation / inputs on the desired parameters.
+and an interactive CLI will require inputs & confirmation on the desired parameters.
 
-In case of a prerelease, the naming should be `version-alpha.x` or `version-beta.x` (for example `1.0.0-alpha.2` or `1.1.0-beta.1`).
+In case of a prerelease, the naming must be `version-alpha.x` or `version-beta.x` (for example `1.0.0-alpha.0` or `1.1.0-beta.2`).
 
-You can first try the publication without hitting the real npm registry using `npm run make-release -- --dry-run` mode (note that this creates a commit, tag and push to github though).
+You can try first the publication procedure without hitting the real npm registry using `npm run make-new-release -- --dry-run` mode (note that this would still create a commit, tag and push to github though, if you follow the standard path and push Y to all the options).
 
-Once the publication has finished, you can check its status at npm with:
+**NPM**
+Once the publication has finished, you can check the project status at npm with:
 ```bash
     npm view @carto/web-sdk
 ```
 
-The release script also launches the proper CDN deployment, so with any published release you will have also the corresponding files deployed to *cartocdn*.
+**CDN**
+The release script also launches the proper CDN deployment, so with any published release you will have also the corresponding files deployed to *cartocdn*. 
+
+If a release is, for example `v2.1.0`, it will be deployed to:
+- `https://libs.cartocdn.com/web-sdk/v2/index.min.js`
+- `https://libs.cartocdn.com/web-sdk/v2.1/index.min.js`
+- `https://libs.cartocdn.com/web-sdk/v2.1.0/index.min.js`
+
+> Note, this triple deployment does not apply if using a pre-release (eg `4.2.0-alpha.0` just gets deployed to `https://libs.cartocdn.com/web-sdk/4.2.0-alpha/index.min.js`)
+
 
 > After the publication, remember to manually merged the `release|fix` branch to `master`, and then `master` back to `develop`.
 
