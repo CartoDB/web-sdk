@@ -124,7 +124,7 @@ export class DataViewLocal extends DataViewMode {
 
     if (this.useViewport) {
       const filterOptions = options.filterId ? [options.filterId] : [];
-      return (this.dataSource as Layer).getViewportFilteredFeatures(filterOptions);
+      return (this.dataSource as Layer).getViewportFeatures(filterOptions);
     }
 
     // is GeoJSON Layer

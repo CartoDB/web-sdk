@@ -1,6 +1,7 @@
 import { Deck } from '@deck.gl/core';
 import { format as d3Format } from 'd3-format';
 import { CartoPopupError, popupErrorTypes } from '../errors/popup-error';
+import { getMapContainer } from '../utils/map-utils';
 
 /**
  * Default options for the Popup
@@ -45,15 +46,7 @@ export class Popup {
   public addTo(deckInstance: Deck) {
     this._deckInstance = deckInstance;
 
-    // TODO(jbotella): Fix Deck.gl types
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { canvas } = deckInstance.props as any;
-
-    const canvasElem = typeof canvas === 'string' ? document.getElementById(canvas) : canvas;
-
-    if (canvasElem && canvasElem.parentElement) {
-      this._parentElement = canvasElem.parentElement;
-    }
+    this._parentElement = getMapContainer(deckInstance);
 
     const { onAfterRender } = this._deckInstance.props;
     this._deckInstance.setProps({
@@ -193,7 +186,7 @@ export class Popup {
 
   private _createContainerElem() {
     const containerElem = document.createElement('as-infowindow');
-    containerElem.setAttribute('style', 'position: absolute; z-index: 1; pointer-events: none');
+    containerElem.style.cssText = 'position: absolute; z-index: 1; pointer-events: none';
 
     if (this._options.closeButton) {
       // enable pointer events

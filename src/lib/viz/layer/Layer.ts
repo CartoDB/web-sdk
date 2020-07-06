@@ -259,7 +259,7 @@ export class Layer extends WithEvents implements StyledLayer {
     return this._deckLayer;
   }
 
-  public getViewportFeatures(properties: string[] = []) {
+  public async getViewportFeatures(excludedFilters: string[] = []) {
     if (!this._viewportFeaturesGenerator.isReady()) {
       throw new CartoError({
         type: 'Layer',
@@ -268,7 +268,14 @@ export class Layer extends WithEvents implements StyledLayer {
       });
     }
 
-    return this._viewportFeaturesGenerator.getFeatures(properties);
+    let features = await this._viewportFeaturesGenerator.getFeatures();
+    const filters = this.filtersCollection.getApplicatorInstance(excludedFilters);
+
+    if (this.filtersCollection.hasFilters()) {
+      features = features.filter(feature => filters.applicator(feature));
+    }
+
+    return features;
   }
 
   public async getViewportFilteredFeatures(excludedFilters: string[] = []) {
