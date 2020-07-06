@@ -42,6 +42,10 @@ export abstract class DataViewMode extends WithEvents {
     end: number | undefined,
     options: { filterId?: string }
   ): Promise<HistogramDataViewData>;
+
+  public onDataUpdate() {
+    this.emit('dataUpdate');
+  }
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
