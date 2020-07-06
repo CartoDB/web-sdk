@@ -58,7 +58,7 @@ function cdnReleaseUrlsFor (version) {
         if (prerelease[0]) { // alpha, beta, rc
             cdnPaths.push(base + prerelease[0]);
         }
-        if (prerelease[1]) { // number
+        if (prerelease[1] !== null && prerelease !== undefined) { // number
             cdnPaths.push(base + prerelease[0] + '.' + prerelease[1]);
         }
     } else {
