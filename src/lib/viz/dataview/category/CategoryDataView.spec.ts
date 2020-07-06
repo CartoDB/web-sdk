@@ -71,7 +71,9 @@ describe('DataView', () => {
       ];
 
       const layer = new Layer('fake_source');
-      spyOn(layer, 'getViewportFeatures').and.returnValue(Promise.resolve(sourceDataToGroup));
+      spyOn(layer, 'getViewportFilteredFeatures').and.returnValue(
+        Promise.resolve(sourceDataToGroup)
+      );
 
       const dataView = new CategoryDataView(layer, 'country', {
         operation: AggregationType.AVG,
@@ -103,7 +105,9 @@ describe('DataView', () => {
       ];
 
       const layer = new Layer('fake_source');
-      spyOn(layer, 'getViewportFeatures').and.returnValue(Promise.resolve(sourceDataToGroup));
+      spyOn(layer, 'getViewportFilteredFeatures').and.returnValue(
+        Promise.resolve(sourceDataToGroup)
+      );
 
       const dataView = new CategoryDataView(layer, 'country', {
         operation: AggregationType.COUNT,
