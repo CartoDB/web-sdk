@@ -14,7 +14,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 ### Fixed
 - 
 
-## [1.0.0-alpha.0] 2020-07-XX
-### Added
+## [1.0.0-alpha.0] 2020-07-06
+- First release
 
 
