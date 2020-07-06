@@ -25,6 +25,7 @@
     "prewatch": "rimraf dist/",
     "prerelease": "npm run build && npm run test",
     "release": "npx release-it && ./scripts/publish-release.sh",
+    "release:dry-run": "npx release-it --dry-run && ./scripts/publish-release.sh --dry-run",
     "release:cdn": "npm run build && ./scripts/publish-release.sh",
     "release:cdn:branch": "npm run build && ./scripts/publish-branch-cdn.sh",
     "serve": "live-server --port=6001 --watch=dist/umd",
