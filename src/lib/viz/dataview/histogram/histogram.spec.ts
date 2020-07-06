@@ -3,7 +3,7 @@ import { HistogramDataView } from './HistogramDataView';
 import { DataViewCalculation } from '../mode/DataViewMode';
 import { CartoDataViewError, dataViewErrorTypes } from '../DataViewError';
 
-describe('DataView', () => {
+describe('Histogram DataView', () => {
   describe('Instance Creation', () => {
     it('should create new DataView instance', () => {
       expect(() => new HistogramDataView(new Layer('fake_source'), 'fake_column')).not.toThrow();

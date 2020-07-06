@@ -64,6 +64,7 @@ export class Layer extends WithEvents implements StyledLayer {
 
     this.registerAvailableEvents([
       'viewportLoad',
+      'filterChange',
       InteractivityEventType.CLICK.toString(),
       InteractivityEventType.HOVER.toString()
     ]);
@@ -258,7 +259,7 @@ export class Layer extends WithEvents implements StyledLayer {
     return this._deckLayer;
   }
 
-  public getViewportFeatures(properties: string[] = []) {
+  public async getViewportFeatures(excludedFilters: string[] = []) {
     if (!this._viewportFeaturesGenerator.isReady()) {
       throw new CartoError({
         type: 'Layer',
@@ -267,13 +268,19 @@ export class Layer extends WithEvents implements StyledLayer {
       });
     }
 
-    return this._viewportFeaturesGenerator.getFeatures(properties);
+    let features = await this._viewportFeaturesGenerator.getFeatures();
+    const filters = this.filtersCollection.getApplicatorInstance(excludedFilters);
+
+    if (this.filtersCollection.hasFilters()) {
+      features = features.filter(feature => filters.applicator(feature));
+    }
+
+    return features;
   }
 
   private _getLayerProperties() {
     const props = this._source.getProps();
     const styleProps = this.getStyle().getLayerProps(this);
-
     const filters = this.filtersCollection.getApplicatorInstance();
 
     const events = {
@@ -420,6 +427,7 @@ export class Layer extends WithEvents implements StyledLayer {
 
   addFilter(filterId: string, filter: ColumnFilters) {
     this.filtersCollection.addFilter(filterId, filter);
+    this.emit('filterChange');
 
     if (this._deckLayer) {
       return this.replaceDeckGLLayer();
@@ -430,6 +438,7 @@ export class Layer extends WithEvents implements StyledLayer {
 
   removeFilter(filterId: string) {
     this.filtersCollection.removeFilter(filterId);
+    this.emit('filterChange');
 
     if (this._deckLayer) {
       return this.replaceDeckGLLayer();
