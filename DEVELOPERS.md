@@ -63,9 +63,9 @@ The CDN is used for official releases, but also for "work in progress" versions.
 But during development, it can be also interesting to deploy some arbitrary branch to the CDN for testing (just to the cdn, not to the npm), for example to check its documentation in the Developer Center. And you can get that by running this from the desired branch:
 
 ```bash
-    npm run cdn-publish:branch
+    npm run release:cdn:branch
 ```
-If you're not sure, you can test it before with `npm run cdn-publish:branch -- --dry-run`, and it will just emulate the procedure, giving some feedback in your console. If your branch is named `my-branch`, you will get a deployment like `https://libs.cartocdn.com/web-sdk/branches/my-branch/index.min.js`.
+If you're not sure, you can test it before with `npm run release:cdn:branch -- --dry-run`, and it will just emulate the procedure, giving some feedback in your console. If your branch is named `my-branch`, you will get a deployment like `https://libs.cartocdn.com/web-sdk/branches/my-branch/index.min.js`.
 
 > Note: Beware of valid branch names (eg. `feature/ch1/xyz` will be sanitized to `featurech1xyz`).
 
@@ -76,16 +76,16 @@ The library is available at NPM registry as [@carto/web-sdk](https://www.npmjs.c
 
 The procedure for a release uses internally `release-it`. That tool will take care of several relevant steps: npm credentials check, type of release selection (major, minor, patch), bump version (it can be ommitted), tag creation in github and npm publication.
 
-And for the proper CDN deployment, there is also a `cdn-publish:release` script but you don't need to call it explicitly, it will be included in this invokation for a whole release (NPM + CDN) with:
+And for the proper CDN deployment, there is also a `release:cdn` script but you don't need to call it explicitly, it will be included in this invokation for a whole release (NPM + CDN) with:
 
 ```bash
-    npm run make-new-release
+    npm run release
 ```
 and an interactive CLI will require inputs & confirmation on the desired parameters.
 
 In case of a prerelease, the naming must be `version-alpha.x` or `version-beta.x` (for example `1.0.0-alpha.0` or `1.1.0-beta.2`).
 
-You can try first the publication procedure without hitting the real npm registry using `npm run make-new-release -- --dry-run` mode (note that this would still create a commit, tag and push to github though, if you follow the standard path and push Y to all the options).
+You can try first the publication procedure without hitting the real npm registry using `npm run release:dry-run` mode (note that this would still create a commit, tag and push to github though, if you follow the standard path and push Y to all the options).
 
 **NPM**
 Once the publication has finished, you can check the project status at npm with:
@@ -101,7 +101,9 @@ If a release is, for example `v2.1.0`, it will be deployed to:
 - `https://libs.cartocdn.com/web-sdk/v2.1/index.min.js`
 - `https://libs.cartocdn.com/web-sdk/v2.1.0/index.min.js`
 
-> Note, this triple deployment does not apply if using a pre-release (eg `4.2.0-alpha.0` just gets deployed to `https://libs.cartocdn.com/web-sdk/4.2.0-alpha/index.min.js`)
+> Note, this triple deployment does not apply if using a pre-release (eg `4.2.0-alpha.0`). In that case it gets deployed to: 
+- `https://libs.cartocdn.com/web-sdk/4.2.0-alpha/index.min.js`
+- `https://libs.cartocdn.com/web-sdk/4.2.0-alpha.0/index.min.js`
 
 
 > After the publication, remember to manually merged the `release|fix` branch to `master`, and then `master` back to `develop`.
