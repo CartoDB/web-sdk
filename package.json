@@ -1,10 +1,17 @@
 {
-  "name": "web-sdk",
+  "name": "@carto/web-sdk",
   "version": "0.0.1",
   "description": "CARTO Web SDK",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/CartoDB/web-sdk.git"
+  },
   "keywords": [],
   "author": "",
   "license": "BSD-3-Clause",
+  "files": [
+    "dist"
+  ],
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
   "directories": {
