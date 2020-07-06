@@ -61,6 +61,7 @@ export abstract class Source extends WithEvents {
 
     this.id = id;
     this.isInitialized = false;
+    this.registerAvailableEvents(['filterChange']);
   }
 
   abstract async init(fields?: StatFields): Promise<boolean>;

@@ -12,6 +12,10 @@ export class MapsDataviews {
     this._mapClient = new Client(credentials);
   }
 
+  public setSource(source: string) {
+    this._source = source;
+  }
+
   public async aggregation(params: Partial<MapDataviewsOptions>): Promise<AggregationResponse> {
     const { column, aggregation, aggregationColumn, categories, bbox } = params;
     const dataviewName = this.getDataviewName();

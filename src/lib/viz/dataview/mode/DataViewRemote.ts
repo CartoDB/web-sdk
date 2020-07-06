@@ -1,7 +1,7 @@
 import { MapsDataviews as DataviewsApi } from '@/maps/MapsDataviews';
 import { defaultCredentials } from '@/auth';
 import { Layer, Source, SQLSource, DatasetSource } from '@/viz';
-import { Filter, SpatialFilters, BuiltInFilters } from '@/viz/filters/types';
+import { Filter, SpatialFilters, BuiltInFilters, ColumnFilters } from '@/viz/filters/types';
 import { FiltersCollection } from '@/viz/filters/FiltersCollection';
 import { RemoteFilterApplicator } from '@/viz/filters/RemoteFilterApplicator';
 import { AggregationType } from '@/data/operations/aggregation/aggregation';
@@ -10,6 +10,7 @@ import { CartoDataViewError, dataViewErrorTypes } from '../DataViewError';
 
 export class DataViewRemote extends DataViewMode {
   protected dataviewsApi: DataviewsApi;
+  protected sqlSource: SQLSource | DatasetSource;
 
   private filtersCollection = new FiltersCollection<SpatialFilters, RemoteFilterApplicator>(
     RemoteFilterApplicator
@@ -18,19 +19,35 @@ export class DataViewRemote extends DataViewMode {
   constructor(dataSource: Layer | Source, column: string, credentials = defaultCredentials) {
     super(dataSource, column);
 
-    const dataset = getDatasetName(dataSource);
-    this.dataviewsApi = new DataviewsApi(dataset, credentials);
+    const dataset = getSource(dataSource);
+    this.sqlSource = dataset;
+    this.dataviewsApi = new DataviewsApi(dataset.value, credentials);
 
-    this.registerAvailableEvents(['dataUpdate', 'error']);
+    this.bindEvents();
   }
 
-  public async aggregation(aggregationParams: {
-    aggregation: AggregationType;
-    operationColumn: string;
-    limit?: number;
-  }) {
+  private bindEvents() {
+    this.registerAvailableEvents(['dataUpdate', 'error']);
+
+    this.sqlSource.on('filterChange', () => {
+      this.onDataUpdate();
+    });
+  }
+
+  public async aggregation(
+    aggregationParams: {
+      aggregation: AggregationType;
+      operationColumn: string;
+      limit?: number;
+    },
+    options: { filterId?: string }
+  ) {
+    // Spatial Filters
     const applicator = this.filtersCollection.getApplicatorInstance();
     const bbox = (applicator as RemoteFilterApplicator).getBbox();
+
+    this.updateDataViewSource(options);
+
     const { aggregation, limit, operationColumn } = aggregationParams;
 
     const aggregationResponse = await this.dataviewsApi.aggregation({
@@ -71,6 +88,9 @@ export class DataViewRemote extends DataViewMode {
   public async formula(operation: AggregationType) {
     const applicator = this.filtersCollection.getApplicatorInstance();
     const bbox = (applicator as RemoteFilterApplicator).getBbox();
+
+    this.dataviewsApi.setSource(this.sqlSource.getSQLWithFilters());
+
     const formulaResponse = await this.dataviewsApi.formula({
       column: this.column,
       operation,
@@ -94,10 +114,14 @@ export class DataViewRemote extends DataViewMode {
   public async histogram(
     binsNumber: number,
     start: number,
-    end: number
+    end: number,
+    options: { filterId?: string }
   ): Promise<HistogramDataViewData> {
     const applicator = this.filtersCollection.getApplicatorInstance();
     const bbox = (applicator as RemoteFilterApplicator).getBbox();
+
+    // Column Filters
+    this.updateDataViewSource(options);
 
     const aggregationResponse = await this.dataviewsApi.histogram({
       bins: binsNumber,
@@ -138,12 +162,19 @@ export class DataViewRemote extends DataViewMode {
     };
   }
 
-  public addFilter(filterId: string, filter: Filter | BuiltInFilters) {
+  public addFilter(filterId: string, filter: Filter | BuiltInFilters | ColumnFilters) {
     if (filter === BuiltInFilters.VIEWPORT) {
       this.createViewportSpatialFilter(filterId);
-    } else {
-      this.dataSource.addFilter(filterId, { [this.column]: filter });
+      return;
     }
+
+    super.addFilter(filterId, filter as ColumnFilters);
+    this.sqlSource.addFilter(filterId, { [this.column]: filter });
+  }
+
+  public removeFilter(filterId: string) {
+    super.removeFilter(filterId);
+    this.sqlSource.removeFilter(filterId);
   }
 
   private createViewportSpatialFilter(filterId: string) {
@@ -169,18 +200,21 @@ export class DataViewRemote extends DataViewMode {
       }
     });
   }
+
+  public updateDataViewSource(options: { filterId?: string }) {
+    const filterOptions = options.filterId ? [options.filterId] : [];
+
+    const sql = this.sqlSource.getSQLWithFilters(filterOptions);
+    this.dataviewsApi.setSource(sql);
+  }
 }
 
-function getDatasetName(dataSource: Layer | Source) {
-  let source;
-
+function getSource(dataSource: Layer | Source) {
   if (dataSource instanceof Source) {
     // TODO what about the other sources?
-    source = dataSource as SQLSource | DatasetSource;
-  } else {
-    const layer = dataSource as Layer;
-    source = layer.source as SQLSource | DatasetSource;
+    return dataSource as SQLSource | DatasetSource;
   }
 
-  return source.value;
+  const layer = dataSource as Layer;
+  return layer.source as SQLSource | DatasetSource;
 }
