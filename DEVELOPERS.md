@@ -26,7 +26,7 @@ and you then can navigate to the `examples` folder in watch mode
 
 # 2. Workflow and releases
 
-The library is deployed to a CDN, for direct conpsumtion from the browser, and to the NPM registry (as `@carto/web-sdk` package), and it follows [Semantic Versioning](http://semver.org/spec/v2.0.0.html). This is the common workflow.
+The library is deployed to a CDN, for direct consumption from the browser, and to the NPM registry (as `@carto/web-sdk` package), and it follows [Semantic Versioning](http://semver.org/spec/v2.0.0.html). This is the common workflow.
 
 
 ## 2.1. Workflow
