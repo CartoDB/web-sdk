@@ -47,7 +47,7 @@ describe('FormulaDataView', () => {
         { id: '8', pop: 90 }
       ];
 
-      spyOn(layer, 'getViewportFeatures').and.returnValue(Promise.resolve(sourceData));
+      spyOn(layer, 'getViewportFilteredFeatures').and.returnValue(Promise.resolve(sourceData));
 
       const dataView = new FormulaDataView(layer, 'pop', {
         operation: AggregationType.AVG,
@@ -72,7 +72,7 @@ describe('FormulaDataView', () => {
         { id: '5', pop: '31.2' }
       ];
 
-      spyOn(layer, 'getViewportFeatures').and.returnValue(Promise.resolve(sourceData));
+      spyOn(layer, 'getViewportFilteredFeatures').and.returnValue(Promise.resolve(sourceData));
 
       const dataView = new FormulaDataView(layer, 'pop', {
         operation: AggregationType.SUM,
