@@ -23,7 +23,9 @@
     "build:umd": "webpack --config webpack.config.js",
     "build:watch": "webpack --config webpack.config.js --watch ",
     "prewatch": "rimraf dist/",
-    "publish:branch-cdn": "npm run build && ./scripts/publish-branch-cdn.sh",
+    "cdn-publish:branch": "npm run build && ./scripts/publish-branch-cdn.sh",
+    "cdn-publish:release": "npm run build && ./scripts/publish-new-release.sh",
+    "make-new-release": "npm run build && npm run test && npx release-it && ./scripts/publish-new-release.sh",
     "serve": "live-server --port=6001 --watch=dist/umd",
     "test": "jest --config jest.config.js ./src --coverage",
     "test:watch": "jest --watch ./src"
@@ -66,6 +68,7 @@
     "lodash.camelcase": "^4.3.0",
     "npm": "^6.14.5",
     "prettier": "2.0.5",
+    "release-it": "^13.6.4",
     "rimraf": "^3.0.0",
     "sanitize-filename": "^1.6.3",
     "source-map-loader": "^0.2.4",
@@ -92,10 +95,10 @@
     "cartocolor": "^4.0.2",
     "chroma-js": "^2.1.0",
     "d3-format": "^1.4.4",
+    "deepmerge": "^4.2.2",
     "live-server": "^1.2.1",
     "mitt": "^1.2.0",
-    "pbf": "3.2.1",
-    "deepmerge": "^4.2.2"
+    "pbf": "3.2.1"
   },
   "publishConfig": {
     "access": "public"
