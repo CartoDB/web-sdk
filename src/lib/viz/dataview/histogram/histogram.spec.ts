@@ -82,9 +82,7 @@ describe('Histogram DataView', () => {
       ];
 
       const layer = new Layer('fake_source');
-      spyOn(layer, 'getViewportFilteredFeatures').and.returnValue(
-        Promise.resolve(sourceDataToGroup)
-      );
+      spyOn(layer, 'getViewportFeatures').and.returnValue(Promise.resolve(sourceDataToGroup));
 
       const dataView = new HistogramDataView(layer, 'popEst', {
         bins: 2,
@@ -129,9 +127,7 @@ describe('Histogram DataView', () => {
       ];
 
       const layer = new Layer('fake_source');
-      spyOn(layer, 'getViewportFilteredFeatures').and.returnValue(
-        Promise.resolve(sourceDataToGroup)
-      );
+      spyOn(layer, 'getViewportFeatures').and.returnValue(Promise.resolve(sourceDataToGroup));
 
       const dataView = new HistogramDataView(layer, 'popEst', {
         bins: 2,

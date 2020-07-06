@@ -259,19 +259,7 @@ export class Layer extends WithEvents implements StyledLayer {
     return this._deckLayer;
   }
 
-  public getViewportFeatures(properties: string[] = []) {
-    if (!this._viewportFeaturesGenerator.isReady()) {
-      throw new CartoError({
-        type: 'Layer',
-        message:
-          'Cannot retrieve viewport features because this layer has not been added to a map yet'
-      });
-    }
-
-    return this._viewportFeaturesGenerator.getFeatures(properties);
-  }
-
-  public async getViewportFilteredFeatures(excludedFilters: string[] = []) {
+  public async getViewportFeatures(excludedFilters: string[] = []) {
     if (!this._viewportFeaturesGenerator.isReady()) {
       throw new CartoError({
         type: 'Layer',
