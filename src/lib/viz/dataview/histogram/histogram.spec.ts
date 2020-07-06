@@ -3,7 +3,7 @@ import { HistogramDataView } from './HistogramDataView';
 import { DataViewCalculation } from '../mode/DataViewMode';
 import { CartoDataViewError, dataViewErrorTypes } from '../DataViewError';
 
-describe('DataView', () => {
+describe('Histogram DataView', () => {
   describe('Instance Creation', () => {
     it('should create new DataView instance', () => {
       expect(() => new HistogramDataView(new Layer('fake_source'), 'fake_column')).not.toThrow();
@@ -82,7 +82,9 @@ describe('DataView', () => {
       ];
 
       const layer = new Layer('fake_source');
-      spyOn(layer, 'getViewportFeatures').and.returnValue(Promise.resolve(sourceDataToGroup));
+      spyOn(layer, 'getViewportFilteredFeatures').and.returnValue(
+        Promise.resolve(sourceDataToGroup)
+      );
 
       const dataView = new HistogramDataView(layer, 'popEst', {
         bins: 2,
@@ -127,7 +129,9 @@ describe('DataView', () => {
       ];
 
       const layer = new Layer('fake_source');
-      spyOn(layer, 'getViewportFeatures').and.returnValue(Promise.resolve(sourceDataToGroup));
+      spyOn(layer, 'getViewportFilteredFeatures').and.returnValue(
+        Promise.resolve(sourceDataToGroup)
+      );
 
       const dataView = new HistogramDataView(layer, 'popEst', {
         bins: 2,
