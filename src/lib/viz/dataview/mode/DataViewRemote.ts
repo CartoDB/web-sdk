@@ -211,7 +211,7 @@ export class DataViewRemote extends DataViewMode {
 
 function getSource(dataSource: Layer | Source) {
   if (dataSource instanceof Source) {
-    // TODO what about the other sources?
+    // TODO what about the other sources? Check DOSource and its instantiation process
     return dataSource as SQLSource | DatasetSource;
   }
 
