@@ -10,6 +10,8 @@ export function getMapContainer(deckInstance: unknown) {
 }
 
 export function getCanvas(deckInstance: unknown) {
+  // TODO(jbotella): Fix Deck.gl types
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { canvas } = (deckInstance as any).props;
   const canvasElem =
     typeof canvas === 'string' ? document.getElementById(canvas) : (canvas as HTMLElement);
