@@ -1,5 +1,3 @@
-// import { DataFilterExtension } from '@deck.gl/extensions';
-// import { GeoJsonProperties } from 'geojson';
 import { CartoError } from '@/core/errors/CartoError';
 import { ColumnFilters, FilterTypes } from './types';
 import { FilterApplicator } from './FilterApplicator';
