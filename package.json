@@ -23,9 +23,10 @@
     "build:umd": "webpack --config webpack.config.js",
     "build:watch": "webpack --config webpack.config.js --watch ",
     "prewatch": "rimraf dist/",
-    "cdn-publish:branch": "npm run build && ./scripts/publish-branch-cdn.sh",
-    "cdn-publish:release": "npm run build && ./scripts/publish-new-release.sh",
-    "make-new-release": "npm run build && npm run test && npx release-it && ./scripts/publish-new-release.sh",
+    "prerelease": "npm run build && npm run test",
+    "release": "npx release-it && ./scripts/publish-release.sh",
+    "release:cdn": "npm run build && ./scripts/publish-release.sh",
+    "release:cdn:branch": "npm run build && ./scripts/publish-branch-cdn.sh",
     "serve": "live-server --port=6001 --watch=dist/umd",
     "test": "jest --config jest.config.js ./src --coverage",
     "test:watch": "jest --watch ./src"
