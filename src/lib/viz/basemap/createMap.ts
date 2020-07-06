@@ -1,5 +1,6 @@
 import { CartoMapStyle } from './CartoMapStyle';
 import { CartoBaseMapError } from '../errors/basemap-error';
+import { getMapContainer } from '../utils/map-utils';
 
 interface DeckViewState {
   bearing?: number;
@@ -75,6 +76,14 @@ export function createMap(options: DeckGLMapOptions = DEFAULT_OPTIONS) {
       deckMap.setProps({ viewState });
     }
   });
+
+  // add the overflow:hidden rule in order to prevent scroll-bar appearing
+  // when popups reach the viewport boundary
+  const mapContainer = getMapContainer(deckMap);
+
+  if (mapContainer) {
+    mapContainer.style.overflow = 'hidden';
+  }
 
   return deckMap;
 }
