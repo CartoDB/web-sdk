@@ -97,6 +97,10 @@ export abstract class Source extends WithEvents {
     this.fields.sample = new Set([...fields.sample]);
     this.fields.aggregation = new Set([...fields.aggregation]);
   }
+
+  public get currentFields() {
+    return this.fields;
+  }
 }
 
 function getNewFields(newFields: StatFields, currentFields: StatFields): StatFields {
