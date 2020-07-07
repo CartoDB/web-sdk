@@ -12,18 +12,40 @@
         },
         {
           "title": "Set source",
-          "file": "basic/set-source.html"
+          "file": "basic/setSource.html"
         },
         {
           "title": "Set style",
-          "file": "basic/set-style.html"
+          "file": "basic/setSyle.html"
         },
         {
           "title": "Several layers",
-          "file": "basic/several-layers.html"
+          "file": "basic/severalLayers.html"
+        }       
+      ]
+    },
+    {
+      "title": "Deck.gl",
+      "samples": [
+        {
+          "title": "deck.gl map",
+          "file": "deckgl/deckMap.html"
         },
         {
-          "title": "Viewport features",
+          "title": "deck.gl layers",
+          "file": "deckgl/deckLayers.html"
+        },
+        {
+          "title": "deck.gl styles",
+          "file": "deckgl/deckStyles.html"
+        }
+      ]
+    },
+    {
+      "title": "WIP",
+      "samples": [
+        {
+          "title": "xViewport features",
           "file": "basic/viewport-features.html"
         }
       ]
