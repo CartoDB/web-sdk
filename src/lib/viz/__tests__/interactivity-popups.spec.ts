@@ -51,8 +51,7 @@ describe('interaction popup', () => {
     },
     {
       attr: 'pop',
-      title: 'Population D3',
-      format: '~s' // D3 format see https://github.com/d3/d3-format
+      title: 'Population D3'
     },
     {
       attr: 'pop',
@@ -69,13 +68,13 @@ describe('interaction popup', () => {
       expect(setContentMockClick).toHaveBeenCalledWith(`<p class="as-body">pop</p>
               <p class="as-subheader as-font--medium">10435000</p>`);
     });
-    it('should show a popup when a feature is clicked with a custom title, D3 format and custom format function', async () => {
+    it('should show a popup when a feature is clicked with a custom title, no format and custom format function', async () => {
       await layer.setPopupClick(CUSTOM_PARAM);
 
       layer.emit(InteractivityEventType.CLICK, [[FEATURE], FAKE_COORDS]);
       expect(setContentMockClick).toHaveBeenCalledWith(`<p class="as-body"></p>
               <p class="as-subheader as-font--medium">15</p><p class="as-body">Population D3</p>
-              <p class="as-subheader as-font--medium">10.435M</p><p class="as-body">Population Custom</p>
+              <p class="as-subheader as-font--medium">10435000</p><p class="as-body">Population Custom</p>
               <p class="as-subheader as-font--medium">10435K habitants</p>`);
     });
     it('should do nothing if no parameter is provided', async () => {
@@ -99,7 +98,7 @@ describe('interaction popup', () => {
 
       expect(setContentMockClick).toHaveBeenCalledWith(`<p class="as-body"></p>
               <p class="as-subheader as-font--medium">15</p><p class="as-body">Population D3</p>
-              <p class="as-subheader as-font--medium">10.435M</p><p class="as-body">Population Custom</p>
+              <p class="as-subheader as-font--medium">10435000</p><p class="as-body">Population Custom</p>
               <p class="as-subheader as-font--medium">10435K habitants</p>`);
       expect(setContentMockClick).toHaveBeenCalledTimes(1);
     });
@@ -112,7 +111,7 @@ describe('interaction popup', () => {
 
       expect(setContentMockClick).toHaveBeenCalledWith(`<p class="as-body"></p>
               <p class="as-subheader as-font--medium">15</p><p class="as-body">Population D3</p>
-              <p class="as-subheader as-font--medium">10.435M</p><p class="as-body">Population Custom</p>
+              <p class="as-subheader as-font--medium">10435000</p><p class="as-body">Population Custom</p>
               <p class="as-subheader as-font--medium">10435K habitants</p>`);
       expect(setContentMockClick).toHaveBeenCalledTimes(1);
     });
@@ -131,7 +130,7 @@ describe('interaction popup', () => {
       layer.emit(InteractivityEventType.HOVER, [[FEATURE], FAKE_COORDS]);
       expect(setContentMockHover).toHaveBeenCalledWith(`<p class="as-body"></p>
               <p class="as-subheader as-font--medium">15</p><p class="as-body">Population D3</p>
-              <p class="as-subheader as-font--medium">10.435M</p><p class="as-body">Population Custom</p>
+              <p class="as-subheader as-font--medium">10435000</p><p class="as-body">Population Custom</p>
               <p class="as-subheader as-font--medium">10435K habitants</p>`);
     });
     it('should do nothing if no parameter is provided', async () => {
@@ -155,7 +154,7 @@ describe('interaction popup', () => {
 
       expect(setContentMockHover).toHaveBeenCalledWith(`<p class="as-body"></p>
               <p class="as-subheader as-font--medium">15</p><p class="as-body">Population D3</p>
-              <p class="as-subheader as-font--medium">10.435M</p><p class="as-body">Population Custom</p>
+              <p class="as-subheader as-font--medium">10435000</p><p class="as-body">Population Custom</p>
               <p class="as-subheader as-font--medium">10435K habitants</p>`);
       expect(setContentMockHover).toHaveBeenCalledTimes(1);
     });
@@ -168,7 +167,7 @@ describe('interaction popup', () => {
 
       expect(setContentMockHover).toHaveBeenCalledWith(`<p class="as-body"></p>
               <p class="as-subheader as-font--medium">15</p><p class="as-body">Population D3</p>
-              <p class="as-subheader as-font--medium">10.435M</p><p class="as-body">Population Custom</p>
+              <p class="as-subheader as-font--medium">10435000</p><p class="as-body">Population Custom</p>
               <p class="as-subheader as-font--medium">10435K habitants</p>`);
       expect(setContentMockHover).toHaveBeenCalledTimes(1);
     });
