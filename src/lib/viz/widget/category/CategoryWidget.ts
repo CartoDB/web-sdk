@@ -1,8 +1,8 @@
 import { CategoryDataView } from '@/viz/dataview';
-import { DataViewData } from '@/viz/dataview/mode/DataViewMode';
+import { CategoryDataViewData } from '@/viz/dataview/category/CategoryDataViewImpl';
 import { Widget } from '../widget';
 
-export class CategoryWidget extends Widget {
+export class CategoryWidget extends Widget<CategoryDataViewData> {
   private options: CategoryWidgetOptions = {};
 
   constructor(
@@ -45,7 +45,7 @@ export class CategoryWidget extends Widget {
   protected async updateData() {
     const data = await this.dataView.getData(this.widgetUUID);
     const categoryWidget = this.element as HTMLAsCategoryWidgetElement;
-    categoryWidget.categories = (data as Partial<DataViewData>).categories;
+    categoryWidget.categories = data.categories;
   }
 }
 

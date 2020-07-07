@@ -5,11 +5,11 @@ import { DataViewCalculation } from '../mode/DataViewMode';
 import { AggregationType } from '../../../data/operations/aggregation/aggregation';
 import { DataViewLocal } from '../mode/DataViewLocal';
 import { DataViewRemote } from '../mode/DataViewRemote';
-import { DataViewWrapper, getCredentialsFrom } from '../DataViewWrapper';
-import { FormulaDataViewImpl } from './FormulaDataViewImpl';
+import { DataView, getCredentialsFrom, DataViewOptions } from '../DataView';
+import { FormulaDataViewImpl, FormulaDataViewData } from './FormulaDataViewImpl';
 import { isGeoJSONSource } from '../utils';
 
-export class FormulaDataView extends DataViewWrapper {
+export class FormulaDataView extends DataView<FormulaDataViewData> {
   protected buildImpl(dataSource: Layer | Source, column: string, options: FormulaDataViewOptions) {
     let dataView;
     const { mode } = options;
@@ -52,7 +52,7 @@ export class FormulaDataView extends DataViewWrapper {
   }
 }
 
-interface FormulaDataViewOptions {
+interface FormulaDataViewOptions extends DataViewOptions {
   operation: AggregationType;
   mode?: DataViewCalculation;
 }
