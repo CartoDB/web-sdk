@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>deck.gl map and a CARTO layer</title>
+    <title>deck.gl map</title>
 
     <link
       rel="stylesheet"
@@ -43,7 +43,7 @@
               <h1 class="as-title">deck.gl map</h1>
               <h4 class="as-subheader as-mb--12">
                 If you already have a deckgl map, you can simply add a CARTO Layer on it 
-                (if not, you can create one directly or using our basemap helpers)
+                (if not, you can create one directly or using our basemap helpers). This example uses <em>deck.DeckGL scripting API </em>
               </h4>
           </div>
         </div>
@@ -73,6 +73,7 @@
             layers: []
           });
 
+        // once there is a map reference, just using it on addTo(map) is enough.
         const countries = new carto.viz.Layer('world_ports');
         countries.addTo(deckMap);
       }
