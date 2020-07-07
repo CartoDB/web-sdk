@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Change the source of a Layer</title>
+    <title>Set source</title>
 
     <link
       rel="stylesheet"
@@ -42,9 +42,10 @@
             <div class="as-panel__element as-p--16 as-body">
               <h1 class="as-title">Set source</h1>
               <h4 class="as-subheader as-mb--12">
-                Set a new source to a CARTO Layer, using a SQL query
+                Set a new source to a CARTO Layer, using a SQL query and <em>carto.layer.setSource</em>
               </h4>
               <div>
+                <!-- Clicking the button will replace the original source -->
                 <button class="as-btn as-btn--primary" onclick="updateSource()">Update Source</button>
               </div>
           </div>
@@ -57,20 +58,34 @@
     <script src="/dist/umd/index.min.js"></script>
 
     <script>
+      /* 
+        countries layer is referenced in an external variable, so it can be later accessed from 
+        updateSource code
+      */
       let countries;
 
       async function initialize() {
         carto.auth.setDefaultCredentials({ username: 'public' });
         const deckMap = carto.viz.createMap();
+
+        /*
+          A common layer, connected to a CARTO Dataset
+        */
         countries = new carto.viz.Layer('ne_50m_admin_0_countries');
         countries.addTo(deckMap);
       }
 
       initialize();
 
+
       function updateSource() {
-        // See the dataset at https://public.carto.com/tables/ne_50m_admin_0_countries/
+        /* 
+          Replace the original source (the whole dataset) with a subset of it, expressed as a SQL query
+        */
         countries.setSource(`SELECT * FROM ne_50m_admin_0_countries WHERE continent='North America'`);
+        /* 
+          You can see the dataset and its columns at https://public.carto.com/tables/ne_50m_admin_0_countries/
+        */
       }
     </script>
   </body>
