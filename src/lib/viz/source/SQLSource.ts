@@ -174,7 +174,11 @@ export class SQLSource extends Source {
       };
     }
 
-    this._mapConfig.metadata.sample.include_columns.push(...this.fields.sample);
+    const includeColumns = new Set([
+      ...this._mapConfig.metadata.sample.include_columns,
+      ...this.fields.sample
+    ]);
+    this._mapConfig.metadata.sample.include_columns = [...includeColumns];
   }
 
   private updateMapConfigAggregation() {
@@ -199,11 +203,53 @@ export class SQLSource extends Source {
   private extractMetadataFrom(mapInstance: MapInstance) {
     const { stats } = mapInstance.metadata.layers[0].meta;
     const geometryType = parseGeometryType(stats.geometryType);
-    const fieldStats = getCompleteFieldStats(stats, this.fields);
+    const fieldStats = this.getCompleteFieldStats(stats, this.fields);
 
     const metadata = { geometryType, stats: fieldStats };
 
     return metadata;
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private getCompleteFieldStats(stats: any, fields?: StatFields) {
+    if (!fields) return [];
+
+    const fieldStats: (NumericFieldStats | CategoryFieldStats)[] = [];
+    const columns = new Set([...fields.sample, ...fields.aggregation]);
+
+    if (columns) {
+      columns.forEach(column => {
+        const columnStats = stats.columns[column];
+
+        if (!columnStats) {
+          throw new SourceError(`Column '${column}' does not exist in '${this._value}'`);
+        }
+
+        switch (columnStats.type) {
+          case 'string':
+            fieldStats.push({
+              name: column,
+              categories: columnStats.categories
+            });
+            break;
+          case 'number':
+            fieldStats.push({
+              name: column,
+              ...stats.columns[column],
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              sample: stats.sample.map((x: any) => x[column])
+            });
+            break;
+          default:
+            throw new SourceError(
+              'Unsupported type for stats',
+              sourceErrorTypes.UNSUPPORTED_STATS_TYPE
+            );
+        }
+      });
+    }
+
+    return fieldStats;
   }
 }
 
@@ -219,42 +265,4 @@ function getUrlsFrom(mapInstance: MapInstance): string | string[] {
   }
 
   return urlTemplate;
-}
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function getCompleteFieldStats(stats: any, fields?: StatFields) {
-  if (!fields) return [];
-
-  const fieldStats: (NumericFieldStats | CategoryFieldStats)[] = [];
-  const columns = new Set([...fields.sample, ...fields.aggregation]);
-
-  if (columns) {
-    columns.forEach(column => {
-      const columnStats = stats.columns[column];
-
-      switch (columnStats.type) {
-        case 'string':
-          fieldStats.push({
-            name: column,
-            categories: columnStats.categories
-          });
-          break;
-        case 'number':
-          fieldStats.push({
-            name: column,
-            ...stats.columns[column],
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            sample: stats.sample.map((x: any) => x[column])
-          });
-          break;
-        default:
-          throw new SourceError(
-            'Unsupported type for stats',
-            sourceErrorTypes.UNSUPPORTED_STATS_TYPE
-          );
-      }
-    });
-  }
-
-  return fieldStats;
 }
