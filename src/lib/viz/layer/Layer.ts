@@ -237,11 +237,9 @@ export class Layer extends WithEvents implements StyledLayer {
   /**
    * Method to create the Deck.gl layer
    */
-  public async _createDeckGLLayer(forceInit = false) {
+  public async _createDeckGLLayer() {
     // The first step is to initialize the source to get the geometryType and the stats
-    if (!this._source.isInitialized || forceInit) {
-      await this._source.init(this._fields);
-    }
+    await this._source.init(this._fields);
 
     const layerProperties = await this._getLayerProperties();
 
@@ -333,7 +331,7 @@ export class Layer extends WithEvents implements StyledLayer {
       );
 
       const updatedLayers = [...otherDeckLayers];
-      const newLayer = await this._createDeckGLLayer(true);
+      const newLayer = await this._createDeckGLLayer();
       updatedLayers.splice(originalPosition, 0, newLayer);
 
       this._deckInstance.setProps({
