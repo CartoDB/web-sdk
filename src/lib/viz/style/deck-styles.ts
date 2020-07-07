@@ -48,7 +48,9 @@ function polygonStyles(opts: any) {
     lineWidthScale: getStyleValue('strokeWidthScale', 'Polygon', opts),
     lineWidthMinPixels: getStyleValue('strokeWidthMin', 'Polygon', opts),
     lineWidthMaxPixels: getStyleValue('strokeWidthMax', 'Polygon', opts),
-    lineWidthUnits: 'pixels'
+    lineWidthUnits: 'pixels',
+    maxZoom: getStyleValue('maxZoom', 'Polygon', opts),
+    minZoom: getStyleValue('minZoom', 'Polygon', opts)
   };
   /* eslint-disable no-param-reassign */
   return Object.keys(styles).filter((k: string) => styles[k] !== undefined && styles[k] !== null).reduce((total: any, k: string) => {
