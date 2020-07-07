@@ -297,13 +297,16 @@ export interface PopupElement {
   /**
    * Title for this element.
    */
-  title?: string;
+  title?: string | null;
 
   /**
    * d3 format for the value of this attribute.
    */
-  format?: string;
+  format?: string | FormatFunction;
 }
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type FormatFunction = (value: any) => any;
 
 /**
  * Popup options
