@@ -127,6 +127,10 @@ export class Popup {
     this._isOpened = false;
   }
 
+  public isOpen(): boolean {
+    return this._isOpened
+  }
+
   /**
    * Set popup position
    */
