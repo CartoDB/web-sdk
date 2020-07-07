@@ -51,9 +51,7 @@ export class Popup {
     const { onAfterRender } = this._deckInstance.props;
     this._deckInstance.setProps({
       onAfterRender: (...args: any) => {
-        if (this._isOpen) {
-          this._render();
-        }
+        this._render();
 
         if (onAfterRender) {
           onAfterRender(args);
@@ -61,9 +59,7 @@ export class Popup {
       }
     });
 
-    if (this._isOpen) {
-      this._render();
-    }
+    this._render();
   }
 
   /**
@@ -119,7 +115,6 @@ export class Popup {
     }
 
     this._isOpen = true;
-    this._render();
   }
 
   /**
@@ -134,7 +129,7 @@ export class Popup {
   }
 
   public get isOpen(): boolean {
-    return this._isOpen
+    return this._isOpen;
   }
 
   /**
@@ -150,10 +145,7 @@ export class Popup {
       | 'bottom-right'
   ) {
     this._options.position = position;
-
-    if (this._isOpen) {
-      this._render();
-    }
+    this._render();
   }
 
   /**
