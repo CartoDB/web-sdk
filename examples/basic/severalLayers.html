@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Add several CARTO Layers</title>
+    <title>Add several layers</title>
 
     <link
       rel="stylesheet"
@@ -42,7 +42,7 @@
             <div class="as-panel__element as-p--16 as-body">
               <h1 class="as-title">Add several layers</h1>
               <h4 class="as-subheader as-mb--12">
-                Add several CARTO layers to your map
+                Add several CARTO layers to your map, using just multiple <em>carto.viz.Layer.addTo</em> calls
               </h4>
           </div>
         </div>
@@ -57,6 +57,9 @@
       async function initialize() {
         carto.auth.setDefaultCredentials({ username: 'public' });
 
+        /*
+          A createMap, setting up a custom initial viewport
+        */
         const deckMap = carto.viz.createMap({
           view: {
             longitude: -116.846099,
@@ -68,9 +71,8 @@
         /*
           if order of the layers is relevant, add `await` to the `addTo` sentences and the next
           layer will be added on top of the previous. For example, here we ensure states are
-          at the bottom, but we don't care about boundaries or ports relative ordering
+          at the bottom, but we don't care about boundaries or ports relative ordering.
         */
-
         const states = new carto.viz.Layer('ne_50m_admin_1_states_1');
         await states.addTo(deckMap);
 
@@ -79,6 +81,12 @@
 
         const ports = new carto.viz.Layer('world_ports');
         ports.addTo(deckMap);
+
+        /*
+          A note on async/await. Modern JS code tries to use async/await pattern to better manage Promises
+          and in general asynchronous code (vs the 'callback hell'). If you are not used to id, have
+          a look at https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Asynchronous/Async_await
+        */
       }
 
       initialize();
