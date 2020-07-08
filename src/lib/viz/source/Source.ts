@@ -43,17 +43,12 @@ export interface SourceProps {
   type: 'TileLayer' | 'GeoJSONLayer';
 }
 
-export interface StatFields {
-  sample: Set<string>;
-  aggregation: Set<string>;
-}
-
 export abstract class Source extends WithEvents {
   // ID of the source. It's mandatory for the source but not for the user.
   public id: string;
   public shouldInit: boolean;
   public sourceType: SourceType | unknown;
-  protected fields: StatFields;
+  protected fields: Set<string>;
 
   constructor(id: string) {
     super();
@@ -61,7 +56,7 @@ export abstract class Source extends WithEvents {
     this.id = id;
     this.shouldInit = true;
     this.sourceType = 'Source';
-    this.fields = { sample: new Set(), aggregation: new Set() };
+    this.fields = new Set();
   }
 
   abstract async init(): Promise<boolean>;
@@ -80,17 +75,12 @@ export abstract class Source extends WithEvents {
     throw new Error(`Method not implemented`);
   }
 
-  protected async addField(sampleField: string, aggregationField: string) {
-    const sampleSize = this.fields.sample.size;
-    const aggregationSize = this.fields.aggregation.size;
+  async addField(field: string) {
+    const { size } = this.fields;
 
-    this.fields.sample.add(sampleField);
-    this.fields.sample.add(aggregationField);
+    this.fields.add(field);
 
-    if (
-      !this.shouldInit &&
-      (sampleSize < this.fields.sample.size || aggregationSize < this.fields.aggregation.size)
-    ) {
+    if (!this.shouldInit && size < this.fields.size) {
       this.shouldInit = true;
       await this.init();
     }

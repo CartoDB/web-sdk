@@ -181,7 +181,7 @@ export class DOSource extends Source {
   }
 
   public getProps(): DOSourceLayerProps {
-    if (!this.isInitialized || this._model === undefined) {
+    if (this.shouldInit || this._model === undefined) {
       throw new SourceError('getProps requires init call', sourceErrorTypes.INIT_SKIPPED);
     }
 
@@ -201,7 +201,7 @@ export class DOSource extends Source {
   }
 
   getMetadata(): SourceMetadata {
-    if (!this.isInitialized) {
+    if (this.shouldInit) {
       throw new SourceError('GetMetadata requires init call', sourceErrorTypes.INIT_SKIPPED);
     }
 

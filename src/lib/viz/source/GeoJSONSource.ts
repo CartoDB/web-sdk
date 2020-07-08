@@ -86,31 +86,29 @@ export class GeoJSONSource extends Source {
   private _getStats(): (NumericFieldStats | CategoryFieldStats)[] {
     let stats: (NumericFieldStats | CategoryFieldStats)[] = [];
 
-    const fields = [...new Set([...this.fields.sample, ...this.fields.aggregation])];
-
-    if (!fields.length) {
+    if (!this.fields.size) {
       return stats;
     }
 
     const features = getFeatures(this._geojson);
 
     if (features.length) {
-      this._extractFeaturesValues(features, fields);
+      this._extractFeaturesValues(features);
       stats = this._calculateStats();
     }
 
-    validateFieldNamesInStats(fields, stats);
+    validateFieldNamesInStats(this.fields, stats);
 
     return stats;
   }
 
-  private _extractFeaturesValues(features: Feature[], fields: string[]) {
+  private _extractFeaturesValues(features: Feature[]) {
     features.forEach(feature => {
       const { properties } = feature;
 
       // values
       if (properties) {
-        fields.forEach(propName => {
+        this.fields.forEach(propName => {
           this._saveFeatureValue(propName, properties[propName]);
         });
       }
@@ -268,14 +266,14 @@ function createSample(values: number[]) {
 }
 
 export function validateFieldNamesInStats(
-  fields: string[],
+  fields: Set<string>,
   stats: (NumericFieldStats | CategoryFieldStats)[]
 ) {
-  const existingStatsFields = stats.filter(s => fields.includes(s.name)).map(s => s.name);
+  const existingStatsFields = stats.filter(s => fields.has(s.name)).map(s => s.name);
 
   // some fields do not have data in the geoJSON
-  if (existingStatsFields.length !== fields.length) {
-    const noDataFields = fields.filter(f => !existingStatsFields.includes(f));
+  if (existingStatsFields.length !== fields.size) {
+    const noDataFields = [...fields].filter(f => !existingStatsFields.includes(f));
 
     throw new SourceError(
       `Field/s '${noDataFields.join(', ')}' do/es not exist in geoJSON properties`

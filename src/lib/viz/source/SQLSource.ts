@@ -16,6 +16,8 @@ export interface SourceOptions {
   mapOptions?: MapOptions;
 }
 
+const DEFAULT_ID_PROPERTY = 'cartodb_id';
+
 export const defaultMapOptions: MapOptions = {
   vectorExtent: 2048,
   vectorSimplifyExtent: 2048,
@@ -173,13 +175,13 @@ export class SQLSource extends Source {
 
     const includeColumns = new Set([
       ...this._mapConfig.metadata.sample.include_columns,
-      ...this.fields.sample
+      ...this.fields
     ]);
     this._mapConfig.metadata.sample.include_columns = [...includeColumns];
   }
 
   private updateMapConfigAggregation() {
-    if (this.fields.aggregation.size) {
+    if (this.fields.size) {
       if (!this._mapConfig.aggregation) {
         throw new SourceError('Map Config has not aggregation field');
       }
@@ -189,8 +191,10 @@ export class SQLSource extends Source {
       }
 
       const { dimensions } = this._mapConfig.aggregation;
-      this.fields.aggregation.forEach(field => {
-        dimensions[field] = { column: field };
+      this.fields.forEach(field => {
+        if (field !== DEFAULT_ID_PROPERTY) {
+          dimensions[field] = { column: field };
+        }
       });
 
       this._mapConfig.aggregation.dimensions = { ...dimensions };
@@ -209,42 +213,41 @@ export class SQLSource extends Source {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private getCompleteFieldStats(stats: any) {
-    if (!this.fields) return [];
+    if (!this.fields.size) {
+      return [];
+    }
 
     const fieldStats: (NumericFieldStats | CategoryFieldStats)[] = [];
-    const columns = new Set([...this.fields.sample, ...this.fields.aggregation]);
 
-    if (columns) {
-      columns.forEach(column => {
-        const columnStats = stats.columns[column];
+    this.fields.forEach(column => {
+      const columnStats = stats.columns[column];
 
-        if (!columnStats) {
-          throw new SourceError(`Column '${column}' does not exist in '${this._value}'`);
-        }
+      if (!columnStats) {
+        throw new SourceError(`Column '${column}' does not exist in '${this._value}'`);
+      }
 
-        switch (columnStats.type) {
-          case 'string':
-            fieldStats.push({
-              name: column,
-              categories: columnStats.categories
-            });
-            break;
-          case 'number':
-            fieldStats.push({
-              name: column,
-              ...stats.columns[column],
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              sample: stats.sample.map((x: any) => x[column])
-            });
-            break;
-          default:
-            throw new SourceError(
-              'Unsupported type for stats',
-              sourceErrorTypes.UNSUPPORTED_STATS_TYPE
-            );
-        }
-      });
-    }
+      switch (columnStats.type) {
+        case 'string':
+          fieldStats.push({
+            name: column,
+            categories: columnStats.categories
+          });
+          break;
+        case 'number':
+          fieldStats.push({
+            name: column,
+            ...stats.columns[column],
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            sample: stats.sample.map((x: any) => x[column])
+          });
+          break;
+        default:
+          throw new SourceError(
+            'Unsupported type for stats',
+            sourceErrorTypes.UNSUPPORTED_STATS_TYPE
+          );
+      }
+    });
 
     return fieldStats;
   }
