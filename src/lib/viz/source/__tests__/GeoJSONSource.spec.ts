@@ -142,13 +142,10 @@ describe('SourceMetadata', () => {
   };
 
   it('should build props and metadata properly with basic example', async () => {
-    const fields = {
-      sample: new Set(['number', 'cat']),
-      aggregation: new Set(['number'])
-    };
-
     const source = new GeoJSONSource(geojson);
-    await source.init(fields);
+    await source.addField('number');
+    await source.addField('cat');
+    await source.init();
 
     const props = source.getProps();
     expect(props).toEqual({ type: 'GeoJSONLayer', data: geojson });
@@ -178,20 +175,11 @@ describe('SourceMetadata', () => {
 
   it('should rebuild props and metadata properly after calling init again with different fields', async () => {
     const source = new GeoJSONSource(geojson);
+    await source.addField('number');
+    await source.init();
 
-    const fields1 = {
-      sample: new Set(['number']),
-      aggregation: new Set(['number'])
-    };
-
-    await source.init(fields1);
-
-    const fields2 = {
-      sample: new Set(['number', 'cat']),
-      aggregation: new Set(['number'])
-    };
-
-    await source.init(fields2);
+    await source.addField('cat');
+    await source.init();
 
     const props = source.getProps();
     expect(props).toEqual({ type: 'GeoJSONLayer', data: geojson });
@@ -220,31 +208,23 @@ describe('SourceMetadata', () => {
   });
 
   it('should fail if fields does not exist in geoJSON', async () => {
-    const fields = {
-      sample: new Set(['number', 'cat']),
-      aggregation: new Set(['number'])
-    };
-
     const emptyGeojson: FeatureCollection = {
       type: 'FeatureCollection',
       features: []
     };
 
     const source = new GeoJSONSource(emptyGeojson);
+    await source.addField('number');
+    await source.addField('cat');
 
     expect(async () => {
-      await source.init(fields);
+      await source.init();
     }).rejects.toEqual(
       new SourceError("Field/s 'number, cat' do/es not exist in geoJSON properties")
     );
   });
 
   it('should fail if a field does not exist in geoJSON', async () => {
-    const fields = {
-      sample: new Set(['number', 'cat']),
-      aggregation: new Set(['number'])
-    };
-
     const geojsonWithoutNumberField: FeatureCollection = {
       type: 'FeatureCollection',
       features: [
@@ -276,9 +256,11 @@ describe('SourceMetadata', () => {
     };
 
     const source = new GeoJSONSource(geojsonWithoutNumberField);
+    await source.addField('number');
+    await source.addField('cat');
 
     expect(async () => {
-      await source.init(fields);
+      await source.init();
     }).rejects.toEqual(new SourceError("Field/s 'number' do/es not exist in geoJSON properties"));
   });
 });

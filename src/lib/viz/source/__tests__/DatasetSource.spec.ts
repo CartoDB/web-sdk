@@ -52,7 +52,7 @@ describe('DatasetSource', () => {
       const source = new DatasetSource(DEFAULT_DATASET);
 
       expect(async () => {
-        await source.init({ sample: new Set(), aggregation: new Set() });
+        await source.init();
       }).rejects.toEqual(new Error('Error fake'));
     });
   });
@@ -99,7 +99,7 @@ describe('DatasetSource', () => {
 
     it('should have default mapConfig', async () => {
       const source = new DatasetSource(DEFAULT_DATASET);
-      await source.init({ sample: new Set(), aggregation: new Set() });
+      await source.init();
 
       const expectedmapConfig = {
         vectorExtent: 2048,
@@ -154,7 +154,7 @@ describe('DatasetSource', () => {
       };
 
       const source = new DatasetSource(DEFAULT_DATASET, { mapOptions });
-      await source.init({ sample: new Set(), aggregation: new Set() });
+      await source.init();
 
       const expectedmapConfig = {
         vectorExtent: 2048,
@@ -218,7 +218,8 @@ describe('DatasetSource', () => {
       };
 
       const source = new DatasetSource(DEFAULT_DATASET, { mapOptions });
-      await source.init({ sample: new Set(['column2']), aggregation: new Set(['column2']) });
+      source.addField('column2');
+      await source.init();
 
       const expectedmapConfig = {
         vectorExtent: 2048,
