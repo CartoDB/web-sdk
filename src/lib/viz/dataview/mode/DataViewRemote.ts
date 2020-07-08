@@ -10,7 +10,6 @@ import { CartoDataViewError, dataViewErrorTypes } from '../DataViewError';
 
 export class DataViewRemote extends DataViewMode {
   protected dataviewsApi: DataviewsApi;
-  protected remoteSourceInitialized: boolean;
 
   private filtersCollection = new FiltersCollection<SpatialFilters, RemoteFilterApplicator>(
     RemoteFilterApplicator
@@ -21,7 +20,6 @@ export class DataViewRemote extends DataViewMode {
 
     const dataset = getDatasetName(dataSource);
     this.dataviewsApi = new DataviewsApi(dataset, credentials);
-    this.remoteSourceInitialized = false;
 
     this.registerAvailableEvents(['dataUpdate', 'error']);
   }
@@ -31,8 +29,6 @@ export class DataViewRemote extends DataViewMode {
     operationColumn: string;
     limit?: number;
   }) {
-    await this.initializeRemoteSource();
-
     const applicator = this.filtersCollection.getApplicatorInstance();
     const bbox = (applicator as RemoteFilterApplicator).getBbox();
     const { aggregation, limit, operationColumn } = aggregationParams;
@@ -73,8 +69,6 @@ export class DataViewRemote extends DataViewMode {
   }
 
   public async formula(operation: AggregationType) {
-    await this.initializeRemoteSource();
-
     const applicator = this.filtersCollection.getApplicatorInstance();
     const bbox = (applicator as RemoteFilterApplicator).getBbox();
     const formulaResponse = await this.dataviewsApi.formula({
@@ -102,8 +96,6 @@ export class DataViewRemote extends DataViewMode {
     start: number,
     end: number
   ): Promise<HistogramDataViewData> {
-    await this.initializeRemoteSource();
-
     const applicator = this.filtersCollection.getApplicatorInstance();
     const bbox = (applicator as RemoteFilterApplicator).getBbox();
 
@@ -176,16 +168,6 @@ export class DataViewRemote extends DataViewMode {
         this.emit('dataUpdate');
       }
     });
-  }
-
-  private async initializeRemoteSource() {
-    if (!this.remoteSourceInitialized) {
-      const source: Source =
-        this.dataSource instanceof Layer ? this.dataSource.source : this.dataSource;
-      const fields = source.currentFields;
-      fields.aggregation.add(this.column);
-      await source.init(fields);
-    }
   }
 }
 
