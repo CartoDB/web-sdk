@@ -1,7 +1,7 @@
 import { WithEvents } from '@/core/mixins/WithEvents';
 import { Layer, Source } from '@/viz';
 import { Credentials } from '@/auth';
-import { Filter } from '@/viz/filters/types';
+import { Filter, ColumnFilters, SpatialFilters } from '@/viz/filters/types';
 import { AggregationType } from '@/data/operations/aggregation/aggregation';
 import { DataViewImpl } from './DataViewImpl';
 import { DataViewCalculation } from './mode/DataViewMode';
@@ -48,6 +48,14 @@ export abstract class DataView<T> extends WithEvents {
 
   public removeFilter(filterId: string) {
     this.dataviewImpl.removeFilter(filterId);
+  }
+
+  public setFilters(filters: ColumnFilters) {
+    this.dataviewImpl.setFilters(filters);
+  }
+
+  public setSpatialFilter(spatialFilter: SpatialFilters) {
+    this.dataviewImpl.setSpatialFilters(spatialFilter);
   }
 
   public get column() {
@@ -109,5 +117,6 @@ export function getCredentialsFrom(dataSource: Layer | Source): Credentials | un
 }
 
 export interface DataViewOptions {
-  filter?: Filter;
+  filters?: ColumnFilters;
+  spatialFilter?: SpatialFilters | { viewport: boolean };
 }

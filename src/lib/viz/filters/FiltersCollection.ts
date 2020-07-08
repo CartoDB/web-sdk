@@ -21,6 +21,10 @@ export class FiltersCollection<T, K extends FilterApplicator<T>> {
     this.collection.delete(filterId);
   }
 
+  clear() {
+    this.collection.clear();
+  }
+
   getApplicatorInstance(excludedFilters: string[] = []) {
     const filters = this._mergeFilters(excludedFilters);
     return new this.FilterApplicatorClass(filters);

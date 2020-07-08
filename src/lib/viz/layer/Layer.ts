@@ -19,7 +19,7 @@ import { LayerInteractivity, InteractivityEventType } from './LayerInteractivity
 import { LayerOptions } from './LayerOptions';
 import { FiltersCollection } from '../filters/FiltersCollection';
 import { FunctionFilterApplicator } from '../filters/FunctionFilterApplicator';
-import { ColumnFilters } from '../filters/types';
+import { ColumnFilters, SpatialFilters } from '../filters/types';
 import { basicStyle } from '../style/helpers/basic-style';
 
 const DEFAULT_ID_PROPERTY = 'cartodb_id';
@@ -50,6 +50,10 @@ export class Layer extends WithEvents implements StyledLayer {
   private filtersCollection = new FiltersCollection<ColumnFilters, FunctionFilterApplicator>(
     FunctionFilterApplicator
   );
+  private spatialFiltersCollection = new FiltersCollection<
+    SpatialFilters,
+    FunctionFilterApplicator
+  >(FunctionFilterApplicator);
   private callToViewportLoad = false;
 
   constructor(
@@ -438,6 +442,30 @@ export class Layer extends WithEvents implements StyledLayer {
 
   removeFilter(filterId: string) {
     this.filtersCollection.removeFilter(filterId);
+    this.emit('filterChange');
+
+    if (this._deckLayer) {
+      return this.replaceDeckGLLayer();
+    }
+
+    return Promise.resolve();
+  }
+
+  public setFilters(filters: ColumnFilters) {
+    this.filtersCollection.clear();
+    this.filtersCollection.addFilter(uuidv4(), filters);
+    this.emit('filterChange');
+
+    if (this._deckLayer) {
+      return this.replaceDeckGLLayer();
+    }
+
+    return Promise.resolve();
+  }
+
+  public setSpatialFilter(spatialFilter: SpatialFilters) {
+    this.spatialFiltersCollection.clear();
+    this.spatialFiltersCollection.addFilter(uuidv4(), spatialFilter);
     this.emit('filterChange');
 
     if (this._deckLayer) {
