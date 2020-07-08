@@ -294,6 +294,11 @@ export interface PopupElement {
    * Title for this element.
    */
   title?: string | null;
+
+  /**
+   * Format function
+   */
+  format?: (value: any) => any | null;
 }
 
 /**
