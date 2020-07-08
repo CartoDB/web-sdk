@@ -25,14 +25,14 @@ export class Popup {
   private _deckInstance: Deck | undefined;
   private _container: HTMLElement;
   private _parentElement: HTMLElement | undefined;
-  private _isOpened: boolean;
+  private _isOpen: boolean;
 
   constructor(options: Partial<PopupOptions> = defaultOptions) {
     this._options = {
       ...defaultOptions,
       ...options
     };
-    this._isOpened = false;
+    this._isOpen = false;
     this._container = this._createContainerElem();
   }
 
@@ -58,6 +58,7 @@ export class Popup {
         }
       }
     });
+
     this._render();
   }
 
@@ -73,7 +74,7 @@ export class Popup {
 
     this._coordinates = coordinates;
 
-    if (this._deckInstance) {
+    if (this._deckInstance && this._isOpen) {
       this._render();
     }
   }
@@ -109,22 +110,26 @@ export class Popup {
    * Open this popup.
    */
   public open() {
-    if (this._parentElement && !this._isOpened) {
+    if (this._parentElement && !this._isOpen) {
       this._parentElement.appendChild(this._container);
     }
 
-    this._isOpened = true;
+    this._isOpen = true;
   }
 
   /**
    * Closes this popup.
    */
   public close() {
-    if (this._parentElement && this._isOpened) {
+    if (this._parentElement && this._isOpen) {
       this._parentElement.removeChild(this._container);
     }
 
-    this._isOpened = false;
+    this._isOpen = false;
+  }
+
+  public get isOpen(): boolean {
+    return this._isOpen;
   }
 
   /**
@@ -297,13 +302,16 @@ export interface PopupElement {
   /**
    * Title for this element.
    */
-  title?: string;
+  title?: string | null;
 
   /**
    * d3 format for the value of this attribute.
    */
-  format?: string;
+  format?: string | FormatFunction;
 }
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type FormatFunction = (value: any) => any;
 
 /**
  * Popup options
