@@ -71,7 +71,6 @@ export class Layer extends WithEvents implements StyledLayer {
     };
 
     this._interactivity = this._buildInteractivity(options);
-    this._addStyleFields();
   }
 
   getMapInstance(): Deck {
@@ -105,7 +104,6 @@ export class Layer extends WithEvents implements StyledLayer {
    */
   public async setStyle(style: Style) {
     this._style = buildStyle(style);
-    this._addStyleFields();
 
     if (this._deckLayer) {
       await this.replaceDeckGLLayer();
@@ -233,6 +231,8 @@ export class Layer extends WithEvents implements StyledLayer {
    * Method to create the Deck.gl layer
    */
   public async _createDeckGLLayer() {
+    await this._addStyleFields();
+
     // The first step is to initialize the source to get the geometryType and the stats
     await this._source.init();
 
@@ -355,12 +355,12 @@ export class Layer extends WithEvents implements StyledLayer {
    * user clicks on one or more features of the layer.
    */
   public async setPopupClick(elements: PopupElement[] | string[] | null = []) {
-    this._addPopupFields(elements);
+    await this._addPopupFields(elements);
     await this._interactivity.setPopupClick(elements);
   }
 
   public async setPopupHover(elements: PopupElement[] | string[] | null = []) {
-    this._addPopupFields(elements);
+    await this._addPopupFields(elements);
     await this._interactivity.setPopupHover(elements);
   }
 
