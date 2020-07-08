@@ -176,8 +176,8 @@ export class DOSource extends Source {
     this._metadata = { geometryType, stats };
 
     this._model = { dataset, variable, geography };
-    this.isInitialized = true;
-    return this.isInitialized;
+    this.shouldInit = false;
+    return true;
   }
 
   public getProps(): DOSourceLayerProps {

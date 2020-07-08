@@ -8,8 +8,7 @@ import {
   SourceMetadata,
   NumericFieldStats,
   CategoryFieldStats,
-  GeometryType,
-  StatFields
+  GeometryType
 } from './Source';
 
 import { sourceErrorTypes, SourceError } from '../errors/source-error';
@@ -40,7 +39,7 @@ export class GeoJSONSource extends Source {
   }
 
   public getProps(): GeoJSONSourceProps {
-    if (!this.isInitialized || !this._props) {
+    if (this.shouldInit || !this._props) {
       throw new SourceError('getProps requires init call', sourceErrorTypes.INIT_SKIPPED);
     }
 
@@ -48,7 +47,7 @@ export class GeoJSONSource extends Source {
   }
 
   public getMetadata(): SourceMetadata {
-    if (!this.isInitialized || !this._metadata) {
+    if (this.shouldInit || !this._metadata) {
       throw new SourceError('GetMetadata requires init call', sourceErrorTypes.INIT_SKIPPED);
     }
 
@@ -65,22 +64,20 @@ export class GeoJSONSource extends Source {
       .flat();
   }
 
-  public async init(fields: StatFields): Promise<boolean> {
-    if (!this.shouldInitialize(fields)) {
+  public async init(): Promise<boolean> {
+    if (!this.shouldInit) {
       return true;
     }
 
     this._props = { type: 'GeoJSONLayer', data: this._geojson };
-    this._metadata = this._buildMetadata(fields);
+    this._metadata = this._buildMetadata();
 
-    this.isInitialized = true;
+    this.shouldInit = false;
     return true;
   }
 
-  private _buildMetadata(fields: StatFields) {
+  private _buildMetadata() {
     const geometryType = getGeomType(this._geojson);
-
-    this.saveFields(fields);
     const stats = this._getStats();
 
     return { geometryType, stats };

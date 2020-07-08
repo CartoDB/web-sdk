@@ -6,8 +6,7 @@ import {
   SourceProps,
   SourceMetadata,
   NumericFieldStats,
-  CategoryFieldStats,
-  StatFields
+  CategoryFieldStats
 } from './Source';
 import { parseGeometryType } from '../style/helpers/utils';
 import { sourceErrorTypes, SourceError } from '../errors/source-error';
@@ -83,7 +82,7 @@ export class SQLSource extends Source {
    *   - geometryType
    */
   public getProps(): SQLSourceProps {
-    if (!this.isInitialized) {
+    if (this.shouldInit) {
       throw new SourceError('getProps requires init call', sourceErrorTypes.INIT_SKIPPED);
     }
 
@@ -105,7 +104,7 @@ export class SQLSource extends Source {
   public getMetadata(): SourceMetadata {
     // initialize the stats to 0
 
-    if (!this.isInitialized) {
+    if (this.shouldInit) {
       throw new SourceError('GetMetadata requires init call', sourceErrorTypes.INIT_SKIPPED);
     }
 
@@ -118,14 +117,13 @@ export class SQLSource extends Source {
 
   /**
    * Instantiate the map, getting proper stats for input fields
-   * @param fields
    */
-  public async init(fields: StatFields): Promise<boolean> {
-    if (!this.shouldInitialize(fields)) {
+  public async init(): Promise<boolean> {
+    if (!this.shouldInit) {
       return true;
     }
 
-    this.updateMapConfig(fields);
+    this.updateMapConfig();
 
     const mapsClient = new Client(this._credentials);
     const mapInstance: MapInstance = await mapsClient.instantiateMapFrom(this._mapConfig);
@@ -134,8 +132,8 @@ export class SQLSource extends Source {
     this._props = { type: 'TileLayer', data: urlTemplate }; // TODO refactor / include in metadata ?
     this._metadata = this.extractMetadataFrom(mapInstance);
 
-    this.isInitialized = true;
-    return this.isInitialized;
+    this.shouldInit = false;
+    return true;
   }
 
   private buildMapConfig(mapOptions: MapOptions) {
@@ -156,8 +154,7 @@ export class SQLSource extends Source {
     };
   }
 
-  private updateMapConfig(fields: StatFields) {
-    this.saveFields(fields);
+  private updateMapConfig() {
     this.updateMapConfigMetadata();
     this.updateMapConfigAggregation();
   }
@@ -203,7 +200,7 @@ export class SQLSource extends Source {
   private extractMetadataFrom(mapInstance: MapInstance) {
     const { stats } = mapInstance.metadata.layers[0].meta;
     const geometryType = parseGeometryType(stats.geometryType);
-    const fieldStats = this.getCompleteFieldStats(stats, this.fields);
+    const fieldStats = this.getCompleteFieldStats(stats);
 
     const metadata = { geometryType, stats: fieldStats };
 
@@ -211,11 +208,11 @@ export class SQLSource extends Source {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private getCompleteFieldStats(stats: any, fields?: StatFields) {
-    if (!fields) return [];
+  private getCompleteFieldStats(stats: any) {
+    if (!this.fields) return [];
 
     const fieldStats: (NumericFieldStats | CategoryFieldStats)[] = [];
-    const columns = new Set([...fields.sample, ...fields.aggregation]);
+    const columns = new Set([...this.fields.sample, ...this.fields.aggregation]);
 
     if (columns) {
       columns.forEach(column => {

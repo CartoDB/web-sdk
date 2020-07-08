@@ -51,7 +51,7 @@ export interface StatFields {
 export abstract class Source extends WithEvents {
   // ID of the source. It's mandatory for the source but not for the user.
   public id: string;
-  public isInitialized: boolean;
+  public shouldInit: boolean;
   public sourceType: SourceType | unknown;
   protected fields: StatFields;
 
@@ -59,12 +59,12 @@ export abstract class Source extends WithEvents {
     super();
 
     this.id = id;
-    this.isInitialized = false;
+    this.shouldInit = true;
     this.sourceType = 'Source';
     this.fields = { sample: new Set(), aggregation: new Set() };
   }
 
-  abstract async init(fields?: StatFields): Promise<boolean>;
+  abstract async init(): Promise<boolean>;
 
   abstract getProps(): SourceProps;
 
@@ -80,51 +80,19 @@ export abstract class Source extends WithEvents {
     throw new Error(`Method not implemented`);
   }
 
-  protected shouldInitialize(fields: StatFields) {
-    if (shouldInitialize(this.isInitialized, fields, this.fields)) {
-      if (this.isInitialized) {
-        // eslint-disable-next-line no-console
-        console.warn(`Reinitializing ${this.sourceType}`);
-      }
+  protected async addField(sampleField: string, aggregationField: string) {
+    const sampleSize = this.fields.sample.size;
+    const aggregationSize = this.fields.aggregation.size;
 
-      return true;
+    this.fields.sample.add(sampleField);
+    this.fields.sample.add(aggregationField);
+
+    if (
+      !this.shouldInit &&
+      (sampleSize < this.fields.sample.size || aggregationSize < this.fields.aggregation.size)
+    ) {
+      this.shouldInit = true;
+      await this.init();
     }
-
-    return false;
   }
-
-  protected saveFields(fields: StatFields) {
-    this.fields.sample = new Set([...fields.sample]);
-    this.fields.aggregation = new Set([...fields.aggregation]);
-  }
-
-  public get currentFields() {
-    return this.fields;
-  }
-}
-
-function getNewFields(newFields: StatFields, currentFields: StatFields): StatFields {
-  const newSampleFields = new Set([...newFields.sample].filter(f => !currentFields.sample.has(f)));
-
-  const newAggregationFields = new Set(
-    [...newFields.aggregation].filter(f => !currentFields.aggregation.has(f))
-  );
-
-  return {
-    sample: newSampleFields,
-    aggregation: newAggregationFields
-  };
-}
-
-export function shouldInitialize(
-  isInitialized: boolean,
-  newFields: StatFields,
-  currentFields: StatFields
-): boolean {
-  if (!isInitialized) {
-    return true;
-  }
-
-  const difference = getNewFields(newFields, currentFields);
-  return difference.sample.size > 0 || difference.aggregation.size > 0;
 }
