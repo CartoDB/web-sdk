@@ -140,32 +140,16 @@ export class Layer extends WithEvents implements StyledLayer {
    * Add the current layer to a Deck instance
    * @param deckInstance instance to add the layer to
    */
-  public async addTo(deckInstance: Deck, opts: { beforeLayerId?: string, afterLayerId?: string } = {}) {
+  public async addTo(
+    deckInstance: Deck,
+    opts: { beforeLayerId?: string; afterLayerId?: string } = {}
+  ) {
     const createdDeckGLLayer = await this._createDeckGLLayer();
 
-    const { beforeLayerId, afterLayerId } = opts;
     // collection may have changed during instantiation...
     const layers = [...deckInstance.props.layers];
 
-    if (beforeLayerId && afterLayerId) {
-      console.error('Cannot use beforeLayerId and afterLayerId at the same time. beforeLayerId will be used.');
-    }
-
-    if (beforeLayerId || afterLayerId) {
-      const beforeAfterLayerIdx = layers.findIndex(l => l.id === beforeLayerId || afterLayerId);
-
-      if (beforeAfterLayerIdx !== -1) {
-        if (beforeLayerId) {
-          layers.splice(beforeAfterLayerIdx, 0, createdDeckGLLayer);
-        } else if (afterLayerId) {
-          layers.splice(beforeAfterLayerIdx + 1, 0, createdDeckGLLayer);
-        }
-      } else {
-        layers.push(createdDeckGLLayer);
-      }
-    } else {
-      layers.push(createdDeckGLLayer);
-    }
+    addInTheRightPosition(createdDeckGLLayer, layers, opts);
 
     const hasGeoJsonLayer = layers.some(layer => layer instanceof GeoJsonLayer);
 
@@ -534,4 +518,35 @@ function ensureRelatedStyleProps(layerProps: any) {
   }
 
   return layerPropsValidated;
+}
+
+function addInTheRightPosition(
+  deckglLayer: any,
+  layers: any[],
+  opts: { beforeLayerId?: string; afterLayerId?: string } = {}
+) {
+  const { beforeLayerId, afterLayerId } = opts;
+
+  if (beforeLayerId && afterLayerId) {
+    throw new CartoLayerError(
+      'Cannot use beforeLayerId and afterLayerId at the same time',
+      layerErrorTypes.DEFAULT
+    );
+  }
+
+  if (beforeLayerId || afterLayerId) {
+    const beforeAfterLayerIdx = layers.findIndex(l => l.id === beforeLayerId || afterLayerId);
+
+    if (beforeAfterLayerIdx !== -1) {
+      if (beforeLayerId) {
+        layers.splice(beforeAfterLayerIdx, 0, deckglLayer);
+      } else if (afterLayerId) {
+        layers.splice(beforeAfterLayerIdx + 1, 0, deckglLayer);
+      }
+    } else {
+      layers.push(deckglLayer);
+    }
+  } else {
+    layers.push(deckglLayer);
+  }
 }
