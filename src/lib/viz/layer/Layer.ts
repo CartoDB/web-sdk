@@ -137,8 +137,30 @@ export class Layer extends WithEvents implements StyledLayer {
   }
 
   /**
-   * Add the current layer to a Deck instance
-   * @param deckInstance instance to add the layer to
+   * Add the current layer to a Deck map instance.
+   * By default the layer will be the last positioned (on top).
+   * To achieve a custom ordering, `beforeLayerId` or `afterLayerId` options can be used (and then the
+   * referenced layer must have an `id`)
+   *
+   * Example:
+   * ```javascript
+   *    const layer1 = new Layer('dataset', {}, { id: 'layer1' });
+   *    await layer1.addTo(deckMap);
+   *
+   *    const layer2 = new Layer('dataset2', {}, { id: 'layer2' });
+   *    await layer2.addTo(deckMap, { beforeLayerId: 'layer1' });
+   *
+   * // at this point, the order would be 'layer2' < 'layer1' and not the opposite
+   * ```
+   *
+   * **NOTE**
+   * This is an `async` method, which means it has to perform some asynchronous operations to prepare
+   * the layer for rendering. So if you want to ensure it has been effectively added (for example to
+   * add more layers or to use it in a `DataView` then you must use `await` for it to finish.
+   *
+   * @param {Deck} instance of the map to add the layer to
+   * @param {{ beforeLayerId?: string; afterLayerId?: string }} [opts={}] options to control relative layer position
+   * @memberof Layer
    */
   public async addTo(
     deckInstance: Deck,
