@@ -4,7 +4,6 @@ export { DOSource } from './DOSource';
 export { GeoJSONSource } from './GeoJSONSource';
 export {
   Stats,
-  StatFields,
   GeometryType,
   CategoryFieldStats,
   Category,

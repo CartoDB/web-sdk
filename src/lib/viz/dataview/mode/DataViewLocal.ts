@@ -117,12 +117,14 @@ export class DataViewLocal extends DataViewMode {
     };
   }
 
-  private getSourceData(columns: string[] = [], options: { filterId?: string } = {}) {
+  private async getSourceData(columns: string[] = [], options: { filterId?: string } = {}) {
     if (!columns.includes(this.column)) {
       columns.push(this.column);
     }
 
     if (this.useViewport) {
+      await (this.dataSource as Layer).addSourceField(this.column);
+
       const filterOptions = options.filterId ? [options.filterId] : [];
       return (this.dataSource as Layer).getViewportFeatures(filterOptions);
     }
