@@ -50,19 +50,14 @@ export class Popup {
     const { onAfterRender } = this._deckInstance.props;
     this._deckInstance.setProps({
       onAfterRender: (...args: any) => {
-        if (this._isOpen) {
-          this._render();
-        }
+        this._render();
 
         if (onAfterRender) {
           onAfterRender(args);
         }
       }
     });
-
-    if (this._isOpen) {
-      this._render();
-    }
+    this._render();
   }
 
   /**
@@ -77,7 +72,7 @@ export class Popup {
 
     this._coordinates = coordinates;
 
-    if (this._deckInstance && this._isOpen) {
+    if (this._deckInstance) {
       this._render();
     }
   }
@@ -149,10 +144,7 @@ export class Popup {
       | 'bottom-right'
   ) {
     this._options.position = position;
-
-    if (this._isOpen) {
-      this._render();
-    }
+    this._render();
   }
 
   /**
@@ -186,7 +178,7 @@ export class Popup {
   }
 
   private _render() {
-    if (this._coordinates && this.getContent().trim().length > 0 && this._deckInstance) {
+    if (this._isOpen && this._coordinates && this.getContent().trim().length > 0 && this._deckInstance) {
       const pixels = coordinates2pixels(this._coordinates, this._deckInstance);
 
       if (pixels) {
