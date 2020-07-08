@@ -264,13 +264,15 @@ function generatePopupContent(elements: any, features: Record<string, any>[]): s
 
           let elementValue = feature.properties[attr];
 
-          if (format && typeof format === 'function') {
-            elementValue = format(elementValue);
-          } else if (format && typeof format !== 'function') {
-            throw new CartoPopupError(
-              `Invalid popup format: '${format}' is not a funtion`,
-              popupErrorTypes.FORMAT_INVALID
-            );
+          if (format) {
+            if (typeof format === 'function') {
+              elementValue = format(elementValue);
+            } else {
+              throw new CartoPopupError(
+                `Invalid popup format: '${format}' is not a funtion`,
+                popupErrorTypes.FORMAT_INVALID
+              );
+            }
           }
 
           return `<p class="as-body">${title}</p>
