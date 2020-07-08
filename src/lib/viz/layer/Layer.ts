@@ -441,21 +441,25 @@ export class Layer extends WithEvents implements StyledLayer {
   }
 
   async addSourceField(field: string) {
-    this._source.addField(field);
+    await this._source.addField(field);
   }
 
-  private _addStyleFields() {
+  private async _addStyleFields() {
     if (this._style && this._style.field) {
-      this.addSourceField(this._style.field);
+      await this.addSourceField(this._style.field);
     }
   }
 
-  private _addPopupFields(elements: PopupElement[] | string[] | null = []) {
+  private async _addPopupFields(elements: PopupElement[] | string[] | null = []) {
     if (elements) {
+      const addfieldsPromises: Promise<void>[] = [];
+
       elements.forEach((e: PopupElement | string) => {
         const field = typeof e === 'string' ? e : e.attr;
-        this.addSourceField(field);
+        addfieldsPromises.push(this.addSourceField(field));
       });
+
+      await Promise.all(addfieldsPromises);
     }
   }
 }
