@@ -162,10 +162,7 @@ export class Layer extends WithEvents implements StyledLayer {
    * @param {{ beforeLayerId?: string; afterLayerId?: string }} [opts={}] options to control relative layer position
    * @memberof Layer
    */
-  public async addTo(
-    deckInstance: Deck,
-    opts: { beforeLayerId?: string; afterLayerId?: string } = {}
-  ) {
+  public async addTo(deckInstance: Deck, opts: LayerPosition = {}) {
     const createdDeckGLLayer = await this._createDeckGLLayer();
 
     // collection may have changed during instantiation...
@@ -542,11 +539,7 @@ function ensureRelatedStyleProps(layerProps: any) {
   return layerPropsValidated;
 }
 
-function addInTheRightPosition(
-  deckglLayer: any,
-  layers: any[],
-  opts: { beforeLayerId?: string; afterLayerId?: string } = {}
-) {
+function addInTheRightPosition(deckglLayer: any, layers: any[], opts: LayerPosition = {}) {
   const { beforeLayerId, afterLayerId } = opts;
 
   if (beforeLayerId && afterLayerId) {
@@ -571,4 +564,9 @@ function addInTheRightPosition(
   } else {
     layers.push(deckglLayer);
   }
+}
+
+interface LayerPosition {
+  beforeLayerId?: string;
+  afterLayerId?: string;
 }
