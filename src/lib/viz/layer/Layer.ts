@@ -8,7 +8,6 @@ import { GeoJSON } from 'geojson';
 import { uuidv4 } from '@/core/utils/uuid';
 import { WithEvents } from '@/core/mixins/WithEvents';
 import { DatasetSource, SQLSource, GeoJSONSource, Source } from '@/viz';
-import { StatFields } from '@/viz/source';
 import { DOLayer } from '../deck/DOLayer';
 import { getStyles, StyleProperties, Style } from '../style';
 import { ViewportFeaturesGenerator } from '../interactivity/viewport-features/ViewportFeaturesGenerator';
@@ -21,8 +20,6 @@ import { FiltersCollection } from '../filters/FiltersCollection';
 import { FunctionFilterApplicator } from '../filters/FunctionFilterApplicator';
 import { ColumnFilters } from '../filters/types';
 import { basicStyle } from '../style/helpers/basic-style';
-
-const DEFAULT_ID_PROPERTY = 'cartodb_id';
 
 export class Layer extends WithEvents implements StyledLayer {
   private _source: Source;
@@ -45,7 +42,6 @@ export class Layer extends WithEvents implements StyledLayer {
 
   // pickable events count
   private _pickableEventsCount = 0;
-  private _fields: StatFields;
 
   private filtersCollection = new FiltersCollection<ColumnFilters, FunctionFilterApplicator>(
     FunctionFilterApplicator
@@ -75,7 +71,6 @@ export class Layer extends WithEvents implements StyledLayer {
     };
 
     this._interactivity = this._buildInteractivity(options);
-    this._fields = { sample: new Set(), aggregation: new Set() };
     this._addStyleFields();
   }
 
@@ -239,7 +234,7 @@ export class Layer extends WithEvents implements StyledLayer {
    */
   public async _createDeckGLLayer() {
     // The first step is to initialize the source to get the geometryType and the stats
-    await this._source.init(this._fields);
+    await this._source.init();
 
     const layerProperties = await this._getLayerProperties();
 
@@ -445,25 +440,21 @@ export class Layer extends WithEvents implements StyledLayer {
     return Promise.resolve();
   }
 
+  async addSourceField(field: string) {
+    this._source.addField(field);
+  }
+
   private _addStyleFields() {
     if (this._style && this._style.field) {
-      const { field } = this._style;
-      this._fields.sample.add(field);
-
-      if (field !== DEFAULT_ID_PROPERTY) {
-        this._fields.aggregation.add(field);
-      }
+      this.addSourceField(this._style.field);
     }
   }
 
   private _addPopupFields(elements: PopupElement[] | string[] | null = []) {
     if (elements) {
       elements.forEach((e: PopupElement | string) => {
-        const column = typeof e === 'string' ? e : e.attr;
-
-        if (column !== DEFAULT_ID_PROPERTY) {
-          this._fields.aggregation.add(column);
-        }
+        const field = typeof e === 'string' ? e : e.attr;
+        this.addSourceField(field);
       });
     }
   }
