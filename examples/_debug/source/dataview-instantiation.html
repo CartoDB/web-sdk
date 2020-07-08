@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Category widget</title>
+
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.css"
+    />
+
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://libs.cartocdn.com/airship-style/v2.3/airship.css"
+    />
+
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+      }
+
+      #map {
+        width: 100vw;
+        height: 100vh;
+      }
+
+      #panel {
+        width: 300px;
+      }
+      #panel .as-box {
+        width: 250px;
+      }
+    </style>
+  </head>
+
+  <body class="as-app-body as-app">
+    <div class="as-content">
+      <main class="as-main">
+        <div class="as-map-area">
+          <!-- map -->
+          <div id="map"></div>
+
+          <!-- panel -->
+          <div id="panel" class="as-panel as-panel--top as-panel--right as-bg--ui-01">
+            <div class="as-panel__element as-p--16 as-body">
+              <div class="as-container as-container--scrollable">
+                <section class="as-box">
+                  <h1 class="as-title">Category widget</h1>
+                  <h4 class="as-subheader as-mb--12">
+                    Create a widget, aggregating values per category, for those features currently
+                    visible. It includes a filtering feature out of the box
+                  </h4>
+                </section>
+                <section class="as-box">
+                  <as-category-widget
+                    heading="Countries"
+                    description="Number of countries by continent"
+                  >
+                  </as-category-widget>
+                </section>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.js"></script>
+    <script src="https://unpkg.com/deck.gl@8.2.0/dist.min.js"></script>
+    <script src="https://libs.cartocdn.com/airship-components/v2.3/airship.js"></script>
+    <script src="/dist/umd/index.min.js"></script>
+
+    <script>
+      const widgetElement = document.querySelector('as-category-widget');
+
+      async function initialize() {
+        carto.auth.setDefaultCredentials({ username: 'cartoframes' });
+
+        const deckMap = carto.viz.createMap();
+
+        const countriesLayer = new carto.viz.Layer('seattle_collisions');
+        await countriesLayer.addTo(deckMap);
+
+        // A data-view to count
+        const dataview = new carto.viz.dataview.Category(countriesLayer, 'collisiontype', {
+          operation: 'count',
+          mode:'local'
+        });
+
+        new carto.viz.widget.Category('as-category-widget', dataview);
+      }
+
+      initialize();
+    </script>
+  </body>
+</html>
