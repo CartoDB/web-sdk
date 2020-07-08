@@ -269,7 +269,7 @@ function generatePopupContent(elements: any, features: Record<string, any>[]): s
               elementValue = format(elementValue);
             } else {
               throw new CartoPopupError(
-                `Invalid popup format: '${format}' is not a funtion`,
+                `Invalid popup format: '${format}' is not a function`,
                 popupErrorTypes.FORMAT_INVALID
               );
             }
