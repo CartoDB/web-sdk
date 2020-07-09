@@ -122,18 +122,19 @@ export class DataViewLocal extends DataViewMode {
       columns.push(this.column);
     }
 
+    const filterOptions = options.filterId ? [options.filterId] : [];
+
     if (this.useViewport) {
-      const filterOptions = options.filterId ? [options.filterId] : [];
       return (this.dataSource as Layer).getViewportFeatures(filterOptions);
     }
 
     // is GeoJSON Layer
     if (this.dataSource instanceof Layer) {
-      return (this.dataSource.source as GeoJSONSource).getFeatures(columns);
+      return (this.dataSource.source as GeoJSONSource).getFeatures(filterOptions);
     }
 
     // is GeoJSON Source
-    return (this.dataSource as GeoJSONSource).getFeatures(columns);
+    return (this.dataSource as GeoJSONSource).getFeatures(filterOptions);
   }
 
   private async groupBy(
