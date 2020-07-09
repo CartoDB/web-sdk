@@ -44,7 +44,7 @@ export class FiltersCollection<T, K extends FilterApplicator<T>> {
     const filters = new Map(this.collection);
     excludedFilters.forEach(filter => filters.delete(filter));
 
-    return deepmerge.all(Array.from(this.collection.values()), mergeOptions) as T;
+    return deepmerge.all(Array.from(filters.values()), mergeOptions) as T;
   }
 }
 
