@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Helper for simple google basemap using Google Maps JS API</title>
+    <title>Google Maps basemap</title>
 
     <link
       rel="stylesheet"
@@ -40,9 +40,9 @@
           <!-- panel -->
           <div class="as-panel as-panel--top as-panel--right as-bg--ui-01">
             <div class="as-panel__element as-p--16 as-body">
-              <h1 class="as-title">CARTO basemap</h1>
+              <h1 class="as-title">Google Maps basemap</h1>
               <h4 class="as-subheader as-mb--12">
-                An easy way to create a CARTO basemap, using DeckGL and Mapbox GL under the hood
+                An easy way to create a Google Maps basemap and adding a CARTO Layer on top of it.
               </h4>
             </div>
           </div>
@@ -52,14 +52,16 @@
 
     <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.js"></script>
     <script src="https://unpkg.com/deck.gl@8.2.0/dist.min.js"></script>
-    <!-- TODO: Set up a proper API_KEY for Google Maps -->
-    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=visualization&v=3.39"></script>
+    <!-- TODO: Set up a proper API_KEY for Google Maps (this one is only valid for carto.com site) -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDvHtBZM79O5uGTBT1ZOWOKW2_FVMstHNs&libraries=visualization&v=weekly"></script>
+
     <script src="/dist/umd/index.min.js"></script>
 
     <script>
       function initialize() {
         carto.auth.setDefaultCredentials({ username: 'public' });
 
+        // by default you get a full world google maps basemap, centered at (0, 0) coordinates
         const deckMap = carto.viz.createGoogleMap();
         // All these variations are also allowed:
         //   const deckMap = carto.viz.createGoogleMap({ mapOptions: { mapTypeId: 'satellite' } });

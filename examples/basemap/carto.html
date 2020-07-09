@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Helper for simple carto basemap using Mapbox GL JS</title>
+    <title>CARTO Basemap</title>
 
     <link
       rel="stylesheet"
@@ -58,9 +58,10 @@
       function initialize() {
         carto.auth.setDefaultCredentials({ username: 'public' });
 
+        // by default you get a full world positron basemap, centered at (0, 0) coordinates
         const deckMap = carto.viz.createMap();
-        // All these variations are also allowed:
-        //   const deckMap = carto.viz.createMap({ basemap: 'positron'});
+        // ... but all these variations are also allowed
+        //   const deckMap = carto.viz.createMap({ basemap: 'voyager'});
         //   const deckMap = carto.viz.createMap({ basemap: 'darkmatter', view: { zoom: 4 } });
         //   const deckMap = carto.viz.createMap({ basemap: 'positron', view: { zoom: 4, longitude: 3, latitude: 40, pitch: 45, bearing: 30 }, container: 'map' });
 
