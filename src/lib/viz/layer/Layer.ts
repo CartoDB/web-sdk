@@ -156,7 +156,7 @@ export class Layer extends WithEvents implements StyledLayer {
    * @memberof Layer
    */
   public async addTo(deckInstance: Deck, opts: LayerPosition = {}) {
-    const createdDeckGLLayer = await this._createDeckGLLayer();
+    const createdDeckGLLayer = await this.createDeckGLLayer();
 
     // collection may have changed during instantiation...
     const layers = [...deckInstance.props.layers];
@@ -254,7 +254,7 @@ export class Layer extends WithEvents implements StyledLayer {
   /**
    * Method to create the Deck.gl layer
    */
-  public async _createDeckGLLayer() {
+  private async createDeckGLLayer() {
     this._addStyleFields();
 
     // The first step is to initialize the source to get the geometryType and the stats
@@ -350,7 +350,7 @@ export class Layer extends WithEvents implements StyledLayer {
       );
 
       const updatedLayers = [...otherDeckLayers];
-      const newLayer = await this._createDeckGLLayer();
+      const newLayer = await this.createDeckGLLayer();
       updatedLayers.splice(originalPosition, 0, newLayer);
 
       this._deckInstance.setProps({
@@ -363,7 +363,7 @@ export class Layer extends WithEvents implements StyledLayer {
 
   public async getDeckGLLayer() {
     if (this._deckLayer === undefined) {
-      this._deckLayer = await this._createDeckGLLayer();
+      this._deckLayer = await this.createDeckGLLayer();
     }
 
     return this._deckLayer;
