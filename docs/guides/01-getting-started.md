@@ -16,9 +16,9 @@ After completing this guide, you will have your first Web SDK map!
 
 ### Basic setup
 
-The most straight-forward way to use the Web SDK is to include the required files from our CDN as seen in the code below. The Web SDK is based on the powerful deck.gl library. In addition to the Web SDK Javascript file, you need to add:
+The most straight-forward way to use the Web SDK is to include the required files from our CDN as seen in the code below. The Web SDK is based on the powerful deck.gl library. In addition to the Web SDK JavaScript file, you need to add:
 
-* deck.gl Javascript file
+* deck.gl JavaScript file
 * Mapbox GL JavaScript and CSS files
 
 ```html
@@ -37,7 +37,8 @@ The most straight-forward way to use the Web SDK is to include the required file
 **deck.gl and Mapbox GL**: The Web SDK is compatible with specific deck.gl and Mapbox GL versions. We recommend using the same versions that we use in the [examples](/developers/web-sdk/examples/). 
 
 **Note:**
-**Developers**: if you have experience with `npm` and a build system in your project (_webpack_, _rollup_...), you can install the Web SDK with `npm install @carto/web-sdk`. You can import it with `import carto from '@carto/web-sdk'` and then you will have access to an already babelified version of the library, ready to be used.
+**Developers**: if you have experience with `npm` and a build system (_webpack_, _rollup_...), you can install the Web SDK in your project with `npm install @carto/web-sdk` and import it with `import carto from '@carto/web-sdk'`.
+
 
 #### Add map container
 
@@ -47,7 +48,7 @@ Next, you need to create a `div` where the map will be drawn:
 <div id="map"></div>
 ```
 
-Style the map `div` and `body` to ensure the map displays properly:
+Style the map `div` and `body` to ensure the map displays at full width:
 
 ```css
 body {
@@ -62,12 +63,12 @@ body {
 
 #### Add basemap and set properties
 
-Once you have a `div` for your map, you can use the createMap (ToDO Add link to reference) helper. If no parameters are specified, it will create a map with the following defaults:
+Once you have a `div` for your map, you can use the `carto.viz.createMap` (ToDO Add link to reference) helper. If no parameters are specified, it will create a map with the following defaults:
 
 * Placed within a container with id="map"
 * Using CARTO Positron basemap
 * Centered on (0,0) coordinates
-* Using zoom level 1. 
+* Using zoom level 1 (whole world)
  
 Please go to the API reference to see the full list of parameters that you can specify.
 
@@ -93,7 +94,7 @@ At this point you will have a basic map with _Positron_ as the basemap, that ope
 
 In order to render data from CARTO you need to have a CARTO account and then get the necessary [credentials](/developers/fundamentals/authorization/).
 
-The first thing you need to do is [authenticate the client](/developers/carto-vl/reference/#cartosetdefaultauth) with your `username` and `apiKey`. For guides and examples, we use the public CARTO account so you can try out the library:
+The first thing you need to do is authenticate the client with [`carto.auth.setDefaultCredentials`](ToDo: add link to API reference), using your own `username` and `apiKey`. For guides and examples, we use the `public` CARTO account so you can try out the library:
 
 ```js
 carto.auth.setDefaultCredentials({ username: 'public' });
@@ -101,7 +102,7 @@ carto.auth.setDefaultCredentials({ username: 'public' });
 
 ### Create map layer
 
-Now you can add a map layer from the public account. In the example below, we are adding a countries layer from [Natural Earth](https://www.naturalearthdata.com/), using the [`Layer`](ToDo: add link to API reference) object.
+Now you can add a map layer from the public account. In the example below, we are adding a countries layer from [Natural Earth](https://www.naturalearthdata.com/), using the [`carto.viz.Layer`](ToDo: add link to API reference) object.
 
 ```js
 const countriesLayer = new carto.viz.Layer('ne_50m_admin_0_countries');
@@ -109,7 +110,7 @@ const countriesLayer = new carto.viz.Layer('ne_50m_admin_0_countries');
 
 ### Add map layer
 
-Finally you need to use the [`addTo`](ToDO: add link to API reference) method to add the layer to the map.
+Finally you need to use the [`carto.viz.Layer.addTo`](ToDO: add link to API reference) method to add the layer to the map.
 
 ```js
 countriesLayer.addTo(deckMap);
