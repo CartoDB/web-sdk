@@ -1,8 +1,8 @@
 import { FormulaDataView } from '@/viz/dataview';
-import { DataViewData } from '@/viz/dataview/mode/DataViewMode';
+import { FormulaDataViewData } from '@/viz/dataview/formula/FormulaDataViewImpl';
 import { Widget } from '../widget';
 
-export class FormulaWidget extends Widget {
+export class FormulaWidget extends Widget<FormulaDataViewData> {
   private options: FormulaWidgetOptions = {};
 
   constructor(
@@ -34,7 +34,7 @@ export class FormulaWidget extends Widget {
   protected async updateData() {
     const data = await this.dataView.getData();
     const formulaWidget = this.element as HTMLAsFormulaWidgetElement;
-    formulaWidget.value = (data as Partial<DataViewData>).result;
+    formulaWidget.value = data.result;
   }
 }
 

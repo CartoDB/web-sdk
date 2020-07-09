@@ -4,11 +4,15 @@ import { uuidv4 } from '@/core/utils/uuid';
 import { DataViewLocal } from '../mode/DataViewLocal';
 import { DataViewRemote } from '../mode/DataViewRemote';
 import { DataViewCalculation } from '../mode/DataViewMode';
-import { DataViewWrapper, OPTION_CHANGED_DELAY, getCredentialsFrom } from '../DataViewWrapper';
-import { CategoryOptions, CategoryDataViewImpl } from './CategoryDataViewImpl';
+import { DataView, OPTION_CHANGED_DELAY, getCredentialsFrom } from '../DataView';
+import {
+  CategoryOptions,
+  CategoryDataViewImpl,
+  CategoryDataViewData
+} from './CategoryDataViewImpl';
 import { debounce, isGeoJSONSource } from '../utils';
 
-export class CategoryDataView extends DataViewWrapper {
+export class CategoryDataView extends DataView<CategoryDataViewData> {
   protected buildImpl(dataSource: Layer | Source, column: string, options: CategoryOptions) {
     let dataView;
     const { mode } = options;
@@ -51,23 +55,20 @@ export class CategoryDataView extends DataViewWrapper {
   }
 
   public get operationColumn() {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return (this.dataviewImpl as CategoryDataViewImpl<any>).operationColumn;
+    return (this.dataviewImpl as CategoryDataViewImpl).operationColumn;
   }
+
   public set operationColumn(operationColumn: string) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (this.dataviewImpl as CategoryDataViewImpl<any>).operationColumn = operationColumn;
+    (this.dataviewImpl as CategoryDataViewImpl).operationColumn = operationColumn;
     debounce(() => this.emit('dataUpdate'), OPTION_CHANGED_DELAY, this.setOptionScope)();
   }
 
   public get limit() {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return (this.dataviewImpl as CategoryDataViewImpl<any>).limit;
+    return (this.dataviewImpl as CategoryDataViewImpl).limit;
   }
 
   public set limit(limit: number | undefined) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (this.dataviewImpl as CategoryDataViewImpl<any>).limit = limit;
+    (this.dataviewImpl as CategoryDataViewImpl).limit = limit;
     debounce(() => this.emit('dataUpdate'), OPTION_CHANGED_DELAY, this.setOptionScope)();
   }
 }
