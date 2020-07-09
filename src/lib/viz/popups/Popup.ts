@@ -1,5 +1,4 @@
 import { Deck } from '@deck.gl/core';
-import { format as d3Format } from 'd3-format';
 import { CartoPopupError, popupErrorTypes } from '../errors/popup-error';
 import { getMapContainer } from '../utils/map-utils';
 
@@ -265,21 +264,15 @@ function generatePopupContent(elements: any, features: Record<string, any>[]): s
 
           let elementValue = feature.properties[attr];
 
-          if (format && typeof format === 'function') {
-            elementValue = format(elementValue);
-          } else if (format && typeof format === 'string') {
-            let formatter;
-
-            try {
-              formatter = d3Format(format);
-            } catch (err) {
+          if (format) {
+            if (typeof format === 'function') {
+              elementValue = format(elementValue);
+            } else {
               throw new CartoPopupError(
-                `The format '${format}' is not a recognized D3 format`,
+                `Invalid popup format: '${format}' is not a function`,
                 popupErrorTypes.FORMAT_INVALID
               );
             }
-
-            elementValue = formatter(elementValue);
           }
 
           return `<p class="as-body">${title}</p>
@@ -305,13 +298,10 @@ export interface PopupElement {
   title?: string | null;
 
   /**
-   * d3 format for the value of this attribute.
+   * Format function
    */
-  format?: string | FormatFunction;
+  format?: (value: any) => any | null;
 }
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type FormatFunction = (value: any) => any;
 
 /**
  * Popup options
@@ -351,17 +341,6 @@ interface PopupOptions {
     | 'bottom-left'
     | 'bottom-right';
 }
-
-// function pixels2coordinates(pixels: number[], deckInstance?: Deck) {
-//   let coordinates;
-
-//   if (deckInstance) {
-//     const viewport = deckInstance.getViewports(undefined)[0];
-//     coordinates = viewport.unproject(pixels);
-//   }
-
-//   return coordinates;
-// }
 
 function coordinates2pixels(coordinates: number[], deckInstance?: Deck) {
   let pixels;
