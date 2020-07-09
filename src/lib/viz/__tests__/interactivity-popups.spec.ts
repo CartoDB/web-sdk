@@ -1,131 +1,176 @@
 import { Layer } from '../layer/Layer';
+import { InteractivityEventType, LayerInteractivity } from '../layer/LayerInteractivity';
+import { Popup } from '../popups/Popup';
+
+const FAKE_COORDS = [0, 0];
+const FEATURE = { type: 'feature', properties: { cartodb_id: '15', pop: 10435000 } };
+
+let layer: Layer;
+let setContentMockClick: jasmine.Spy;
+let setContentMockHover: jasmine.Spy;
+
+beforeEach(() => {
+  layer = new Layer('fake_source');
+
+  const sourceData = [
+    FEATURE,
+    { type: 'feature', properties: { cartodb_id: '3', pop: 30 } },
+    { type: 'feature', properties: { cartodb_id: '4', pop: 40 } },
+    { type: 'feature', properties: { cartodb_id: '5', pop: null } },
+    { type: 'feature', properties: { cartodb_id: '6', pop: undefined } },
+    { type: 'feature', properties: { cartodb_id: '7', pop: 50 } },
+    { type: 'feature', properties: { cartodb_id: '8', pop: 90 } }
+  ];
+
+  spyOn(layer, 'getViewportFeatures').and.returnValue(Promise.resolve(sourceData));
+
+  const popupClick = new Popup();
+  setContentMockClick = spyOn(popupClick, 'setContent');
+  const popupHover = new Popup();
+  setContentMockHover = spyOn(popupHover, 'setContent');
+
+  const interactivity = new LayerInteractivity({
+    layer,
+    layerGetStyleFn: layer.getStyle.bind(layer),
+    layerSetStyleFn: layer.setStyle.bind(layer),
+    layerEmitFn: layer.emit.bind(layer),
+    layerOnFn: layer.on.bind(layer),
+    layerOffFn: layer.off.bind(layer)
+  });
+  Object.defineProperty(layer, '_interactivity', { value: interactivity });
+  Object.defineProperty(interactivity, '_clickPopup', { value: popupClick });
+  Object.defineProperty(interactivity, '_hoverPopup', { value: popupHover });
+});
 
 describe('interaction popup', () => {
+  const DEFAULT_TITLE = ['pop'];
   const CUSTOM_PARAM = [
     {
+      attr: 'cartodb_id',
+      title: null // hide the title of this field
+    },
+    {
       attr: 'pop',
-      title: 'Population',
-      format: '2d'
+      title: 'Population D3',
+      format: '~s' // D3 format see https://github.com/d3/d3-format
+    },
+    {
+      attr: 'pop',
+      title: 'Population Custom',
+      format: (value: number) => value.toString().replace(/000$/, 'K habitants')
     }
   ];
-  const POP_PARAM = ['pop'];
 
   describe('setPopupClick', () => {
-    it.skip('should show a popup when a feature is clicked with a custom title and format', () => {
-      const airbnbLayer = new Layer('listings_madrid');
-      airbnbLayer.setPopupClick(CUSTOM_PARAM);
+    it('should show a popup when a feature is clicked with default title', async () => {
+      await layer.setPopupClick(DEFAULT_TITLE);
 
-      // expect(() =>
-      //   sizeCategoriesStyle('attributeName', {
-      //     categories: [CATEGORY_1, CATEGORY_2],
-      //     sizes: [2, 10]
-      //   })
-      // ).not.toThrow();
+      layer.emit(InteractivityEventType.CLICK, [[FEATURE], FAKE_COORDS]);
+      expect(setContentMockClick).toHaveBeenCalledWith(`<p class="as-body">pop</p>
+              <p class="as-subheader as-font--medium">10435000</p>`);
     });
-    it.skip('should show a popup when a feature is clicked with default title and format', () => {
-      const airbnbLayer = new Layer('listings_madrid');
-      airbnbLayer.setPopupClick(POP_PARAM);
+    it('should show a popup when a feature is clicked with a custom title, D3 format and custom format function', async () => {
+      await layer.setPopupClick(CUSTOM_PARAM);
 
-      // TODO
+      layer.emit(InteractivityEventType.CLICK, [[FEATURE], FAKE_COORDS]);
+      expect(setContentMockClick).toHaveBeenCalledWith(`<p class="as-body"></p>
+              <p class="as-subheader as-font--medium">15</p><p class="as-body">Population D3</p>
+              <p class="as-subheader as-font--medium">10.435M</p><p class="as-body">Population Custom</p>
+              <p class="as-subheader as-font--medium">10435K habitants</p>`);
     });
-    it.skip('should do nothing if no parameter is provided', () => {
-      const airbnbLayer = new Layer('listings_madrid');
-      airbnbLayer.setPopupClick();
+    it('should do nothing if no parameter is provided', async () => {
+      await layer.setPopupClick();
 
-      // TODO
+      layer.emit(InteractivityEventType.CLICK, [[FEATURE], FAKE_COORDS]);
+      expect(setContentMockClick).toHaveBeenCalledTimes(0);
     });
-    it.skip('should do nothing if the parameter provided is null', () => {
-      const airbnbLayer = new Layer('listings_madrid');
-      airbnbLayer.setPopupClick(null);
+    it('should do nothing if the parameter provided is null', async () => {
+      await layer.setPopupClick(null);
 
-      // TODO
+      layer.emit(InteractivityEventType.CLICK, [[FEATURE], FAKE_COORDS]);
+      expect(setContentMockClick).toHaveBeenCalledTimes(0);
     });
-    it.skip('should stop showing a popup with a custom title and format after call the method with no parameters', () => {
-      const airbnbLayer = new Layer('listings_madrid');
-      airbnbLayer.setPopupClick(CUSTOM_PARAM);
-      airbnbLayer.setPopupClick();
+    it('should stop showing a popup with a custom title and format after call the method with no parameters', async () => {
+      await layer.setPopupClick(CUSTOM_PARAM);
+      layer.emit(InteractivityEventType.CLICK, [[FEATURE], FAKE_COORDS]);
 
-      // TODO
+      await layer.setPopupClick();
+      layer.emit(InteractivityEventType.CLICK, [[FEATURE], FAKE_COORDS]);
+
+      expect(setContentMockClick).toHaveBeenCalledWith(`<p class="as-body"></p>
+              <p class="as-subheader as-font--medium">15</p><p class="as-body">Population D3</p>
+              <p class="as-subheader as-font--medium">10.435M</p><p class="as-body">Population Custom</p>
+              <p class="as-subheader as-font--medium">10435K habitants</p>`);
+      expect(setContentMockClick).toHaveBeenCalledTimes(1);
     });
-    it.skip('should stop showing a popup with default title and format after call the method with no parameters', () => {
-      const airbnbLayer = new Layer('listings_madrid');
-      airbnbLayer.setPopupClick(POP_PARAM);
-      airbnbLayer.setPopupClick();
+    it('should stop showing a popup with a custom title and format after call the method with null', async () => {
+      await layer.setPopupClick(CUSTOM_PARAM);
+      layer.emit(InteractivityEventType.CLICK, [[FEATURE], FAKE_COORDS]);
 
-      // TODO
-    });
-    it.skip('should stop showing a popup with a custom title and format after call the method with null', () => {
-      const airbnbLayer = new Layer('listings_madrid');
-      airbnbLayer.setPopupClick(CUSTOM_PARAM);
-      airbnbLayer.setPopupClick(null);
+      await layer.setPopupClick(null);
+      layer.emit(InteractivityEventType.CLICK, [[FEATURE], FAKE_COORDS]);
 
-      // TODO
-    });
-    it.skip('should stop showing a popup with default title and format after call the method with null', () => {
-      const airbnbLayer = new Layer('listings_madrid');
-      airbnbLayer.setPopupClick(POP_PARAM);
-      airbnbLayer.setPopupClick(null);
-
-      // TODO
+      expect(setContentMockClick).toHaveBeenCalledWith(`<p class="as-body"></p>
+              <p class="as-subheader as-font--medium">15</p><p class="as-body">Population D3</p>
+              <p class="as-subheader as-font--medium">10.435M</p><p class="as-body">Population Custom</p>
+              <p class="as-subheader as-font--medium">10435K habitants</p>`);
+      expect(setContentMockClick).toHaveBeenCalledTimes(1);
     });
   });
   describe('setPopupHover', () => {
-    it.skip('should show a popup when a feature is clicked with a custom title and format', () => {
-      const airbnbLayer = new Layer('listings_madrid');
-      airbnbLayer.setPopupHover(CUSTOM_PARAM);
+    it('should show a popup when a feature is hovered with default title', async () => {
+      await layer.setPopupHover(DEFAULT_TITLE);
 
-      // expect(() =>
-      //   sizeCategoriesStyle('attributeName', {
-      //     categories: [CATEGORY_1, CATEGORY_2],
-      //     sizes: [2, 10]
-      //   })
-      // ).not.toThrow();
+      layer.emit(InteractivityEventType.HOVER, [[FEATURE], FAKE_COORDS]);
+      expect(setContentMockHover).toHaveBeenCalledWith(`<p class="as-body">pop</p>
+              <p class="as-subheader as-font--medium">10435000</p>`);
     });
-    it.skip('should show a popup when a feature is clicked with default title and format', () => {
-      const airbnbLayer = new Layer('listings_madrid');
-      airbnbLayer.setPopupHover(POP_PARAM);
+    it('should show a popup when a feature is hovered with a custom title, D3 format and custom format function', async () => {
+      await layer.setPopupHover(CUSTOM_PARAM);
 
-      // TODO
+      layer.emit(InteractivityEventType.HOVER, [[FEATURE], FAKE_COORDS]);
+      expect(setContentMockHover).toHaveBeenCalledWith(`<p class="as-body"></p>
+              <p class="as-subheader as-font--medium">15</p><p class="as-body">Population D3</p>
+              <p class="as-subheader as-font--medium">10.435M</p><p class="as-body">Population Custom</p>
+              <p class="as-subheader as-font--medium">10435K habitants</p>`);
     });
-    it.skip('should do nothing if no parameter is provided', () => {
-      const airbnbLayer = new Layer('listings_madrid');
-      airbnbLayer.setPopupHover();
+    it('should do nothing if no parameter is provided', async () => {
+      await layer.setPopupHover();
 
-      // TODO
+      layer.emit(InteractivityEventType.HOVER, [[FEATURE], FAKE_COORDS]);
+      expect(setContentMockHover).toHaveBeenCalledTimes(0);
     });
-    it.skip('should do nothing if the parameter provided is null', () => {
-      const airbnbLayer = new Layer('listings_madrid');
-      airbnbLayer.setPopupHover(null);
+    it('should do nothing if the parameter provided is null', async () => {
+      await layer.setPopupHover(null);
 
-      // TODO
+      layer.emit(InteractivityEventType.HOVER, [[FEATURE], FAKE_COORDS]);
+      expect(setContentMockHover).toHaveBeenCalledTimes(0);
     });
-    it.skip('should stop showing a popup with a custom title and format after call the method with no parameters', () => {
-      const airbnbLayer = new Layer('listings_madrid');
-      airbnbLayer.setPopupHover(CUSTOM_PARAM);
-      airbnbLayer.setPopupHover();
+    it('should stop showing a popup with a custom title and format after call the method with no parameters', async () => {
+      await layer.setPopupHover(CUSTOM_PARAM);
+      layer.emit(InteractivityEventType.HOVER, [[FEATURE], FAKE_COORDS]);
 
-      // TODO
+      await layer.setPopupHover();
+      layer.emit(InteractivityEventType.HOVER, [[FEATURE], FAKE_COORDS]);
+
+      expect(setContentMockHover).toHaveBeenCalledWith(`<p class="as-body"></p>
+              <p class="as-subheader as-font--medium">15</p><p class="as-body">Population D3</p>
+              <p class="as-subheader as-font--medium">10.435M</p><p class="as-body">Population Custom</p>
+              <p class="as-subheader as-font--medium">10435K habitants</p>`);
+      expect(setContentMockHover).toHaveBeenCalledTimes(1);
     });
-    it.skip('should stop showing a popup with default title and format after call the method with no parameters', () => {
-      const airbnbLayer = new Layer('listings_madrid');
-      airbnbLayer.setPopupHover(POP_PARAM);
-      airbnbLayer.setPopupHover();
+    it('should stop showing a popup with a custom title and format after call the method with null', async () => {
+      await layer.setPopupHover(CUSTOM_PARAM);
+      layer.emit(InteractivityEventType.HOVER, [[FEATURE], FAKE_COORDS]);
 
-      // TODO
-    });
-    it.skip('should stop showing a popup with a custom title and format after call the method with null', () => {
-      const airbnbLayer = new Layer('listings_madrid');
-      airbnbLayer.setPopupHover(CUSTOM_PARAM);
-      airbnbLayer.setPopupHover(null);
+      await layer.setPopupHover(null);
+      layer.emit(InteractivityEventType.HOVER, [[FEATURE], FAKE_COORDS]);
 
-      // TODO
-    });
-    it.skip('should stop showing a popup with default title and format after call the method with null', () => {
-      const airbnbLayer = new Layer('listings_madrid');
-      airbnbLayer.setPopupHover(POP_PARAM);
-      airbnbLayer.setPopupHover(null);
-
-      // TODO
+      expect(setContentMockHover).toHaveBeenCalledWith(`<p class="as-body"></p>
+              <p class="as-subheader as-font--medium">15</p><p class="as-body">Population D3</p>
+              <p class="as-subheader as-font--medium">10.435M</p><p class="as-body">Population Custom</p>
+              <p class="as-subheader as-font--medium">10435K habitants</p>`);
+      expect(setContentMockHover).toHaveBeenCalledTimes(1);
     });
   });
 });
