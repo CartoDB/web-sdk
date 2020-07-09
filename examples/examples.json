@@ -42,6 +42,19 @@
       ]
     },
     {
+      "title": "Basemap",
+      "samples": [
+        {
+          "title": "CARTO",
+          "file": "basemap/carto.html"
+        },
+        {
+          "title": "Google Maps",
+          "file": "basemap/gmap.html"
+        }
+      ]
+    },
+    {
       "title": "WIP",
       "samples": [
         {
