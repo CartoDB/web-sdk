@@ -1,14 +1,14 @@
 import { CartoError } from '@/core/errors/CartoError';
 import { uuidv4 } from '@/core/utils/uuid';
-import { DataViewWrapper } from '@/viz/dataview/DataViewWrapper';
+import { DataView } from '@/viz/dataview/DataView';
 import { queryDOMElement } from '@/core/utils/dom';
 
-export abstract class Widget {
+export abstract class Widget<T> {
   protected element: HTMLElement;
-  protected dataView: DataViewWrapper;
+  protected dataView: DataView<T>;
   protected widgetUUID: string = uuidv4();
 
-  constructor(element: string | HTMLElement, dataView: DataViewWrapper) {
+  constructor(element: string | HTMLElement, dataView: DataView<T>) {
     const domElement = queryDOMElement(element);
     validateParameters(domElement, dataView);
 
@@ -30,7 +30,7 @@ export abstract class Widget {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function validateParameters(element: HTMLElement | null, dataView: DataViewWrapper) {
+function validateParameters(element: HTMLElement | null, dataView: DataView<unknown>) {
   if (!element) {
     throw new CartoError({
       type: '[Widget]',
@@ -38,7 +38,7 @@ function validateParameters(element: HTMLElement | null, dataView: DataViewWrapp
     });
   }
 
-  if (!(dataView instanceof DataViewWrapper)) {
+  if (!(dataView instanceof DataView)) {
     throw new CartoError({
       type: '[Widget]',
       message: 'DataView passed to Category Widget is not valid'

@@ -90,6 +90,36 @@ describe('Layer', () => {
         expect(deckInstanceMock.props.layers[0].id).toBe('layer1');
         expect(deckInstanceMock.props.layers[1].id).toBe('layer2');
       });
+
+      it('should allow adding before a layer', async () => {
+        const layer1 = new Layer(DEFAULT_DATASET, {}, { id: 'layer1' });
+        await layer1.addTo(deckInstanceMock);
+
+        const layer2 = new Layer(DEFAULT_DATASET, {}, { id: 'layer2' });
+        await layer2.addTo(deckInstanceMock, { beforeLayerId: 'layer1' });
+
+        await layer1.replaceDeckGLLayer();
+        expect(deckInstanceMock.props.layers.length).toBe(2);
+        expect(deckInstanceMock.props.layers[0].id).toBe('layer2');
+        expect(deckInstanceMock.props.layers[1].id).toBe('layer1');
+      });
+
+      it('should allow adding after a layer', async () => {
+        const layer1 = new Layer(DEFAULT_DATASET, {}, { id: 'layer1' });
+        await layer1.addTo(deckInstanceMock);
+
+        const layer2 = new Layer(DEFAULT_DATASET, {}, { id: 'layer2' });
+        await layer2.addTo(deckInstanceMock, { beforeLayerId: 'layer1' });
+
+        const layer3 = new Layer(DEFAULT_DATASET, {}, { id: 'layer3' });
+        await layer3.addTo(deckInstanceMock, { afterLayerId: 'layer2' });
+
+        await layer1.replaceDeckGLLayer();
+        expect(deckInstanceMock.props.layers.length).toBe(3);
+        expect(deckInstanceMock.props.layers[0].id).toBe('layer2');
+        expect(deckInstanceMock.props.layers[1].id).toBe('layer3');
+        expect(deckInstanceMock.props.layers[2].id).toBe('layer1');
+      });
     });
   });
 
