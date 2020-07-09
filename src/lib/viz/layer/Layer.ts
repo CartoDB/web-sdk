@@ -440,26 +440,23 @@ export class Layer extends WithEvents implements StyledLayer {
     return Promise.resolve();
   }
 
-  async addSourceField(field: string) {
-    await this._source.addField(field);
+  addSourceField(field: string) {
+    this._source.addField(field);
+    return this.replaceDeckGLLayer();
   }
 
-  private async _addStyleFields() {
+  private _addStyleFields() {
     if (this._style && this._style.field) {
-      await this.addSourceField(this._style.field);
+      this._source.addField(this._style.field);
     }
   }
 
-  private async _addPopupFields(elements: PopupElement[] | string[] | null = []) {
+  private _addPopupFields(elements: PopupElement[] | string[] | null = []) {
     if (elements) {
-      const addfieldsPromises: Promise<void>[] = [];
-
       elements.forEach((e: PopupElement | string) => {
         const field = typeof e === 'string' ? e : e.attr;
-        addfieldsPromises.push(this.addSourceField(field));
+        this._source.addField(field);
       });
-
-      await Promise.all(addfieldsPromises);
     }
   }
 }
