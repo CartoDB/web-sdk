@@ -46,7 +46,7 @@ export interface SourceProps {
 export abstract class Source extends WithEvents {
   // ID of the source. It's mandatory for the source but not for the user.
   public id: string;
-  public shouldInit: boolean;
+  public needsInitialization: boolean;
   public sourceType: SourceType | unknown;
   protected fields: Set<string>;
 
@@ -54,7 +54,7 @@ export abstract class Source extends WithEvents {
     super();
 
     this.id = id;
-    this.shouldInit = true;
+    this.needsInitialization = true;
     this.sourceType = 'Source';
     this.fields = new Set();
   }
@@ -75,14 +75,13 @@ export abstract class Source extends WithEvents {
     throw new Error(`Method not implemented`);
   }
 
-  async addField(field: string) {
+  addField(field: string) {
     const { size } = this.fields;
 
     this.fields.add(field);
 
-    if (!this.shouldInit && size < this.fields.size) {
-      this.shouldInit = true;
-      await this.init();
+    if (size < this.fields.size) {
+      this.needsInitialization = true;
     }
   }
 }

@@ -39,7 +39,7 @@ export class GeoJSONSource extends Source {
   }
 
   public getProps(): GeoJSONSourceProps {
-    if (this.shouldInit || !this._props) {
+    if (this.needsInitialization || !this._props) {
       throw new SourceError('getProps requires init call', sourceErrorTypes.INIT_SKIPPED);
     }
 
@@ -47,7 +47,7 @@ export class GeoJSONSource extends Source {
   }
 
   public getMetadata(): SourceMetadata {
-    if (this.shouldInit || !this._metadata) {
+    if (this.needsInitialization || !this._metadata) {
       throw new SourceError('GetMetadata requires init call', sourceErrorTypes.INIT_SKIPPED);
     }
 
@@ -65,14 +65,14 @@ export class GeoJSONSource extends Source {
   }
 
   public async init(): Promise<boolean> {
-    if (!this.shouldInit) {
+    if (!this.needsInitialization) {
       return true;
     }
 
     this._props = { type: 'GeoJSONLayer', data: this._geojson };
     this._metadata = this._buildMetadata();
 
-    this.shouldInit = false;
+    this.needsInitialization = false;
     return true;
   }
 

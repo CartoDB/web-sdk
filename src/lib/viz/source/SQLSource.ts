@@ -84,7 +84,7 @@ export class SQLSource extends Source {
    *   - geometryType
    */
   public getProps(): SQLSourceProps {
-    if (this.shouldInit) {
+    if (this.needsInitialization) {
       throw new SourceError('getProps requires init call', sourceErrorTypes.INIT_SKIPPED);
     }
 
@@ -106,7 +106,7 @@ export class SQLSource extends Source {
   public getMetadata(): SourceMetadata {
     // initialize the stats to 0
 
-    if (this.shouldInit) {
+    if (this.needsInitialization) {
       throw new SourceError('GetMetadata requires init call', sourceErrorTypes.INIT_SKIPPED);
     }
 
@@ -121,20 +121,19 @@ export class SQLSource extends Source {
    * Instantiate the map, getting proper stats for input fields
    */
   public async init(): Promise<boolean> {
-    if (!this.shouldInit) {
+    if (!this.needsInitialization) {
       return true;
     }
 
-    this.updateMapConfig();
+    this.needsInitialization = false;
 
     const mapsClient = new Client(this._credentials);
-    const mapInstance: MapInstance = await mapsClient.instantiateMapFrom(this._mapConfig);
+    const mapInstance: MapInstance = await mapsClient.instantiateMapFrom(this.getMapConfig());
 
     const urlTemplate = getUrlsFrom(mapInstance);
     this._props = { type: 'TileLayer', data: urlTemplate }; // TODO refactor / include in metadata ?
     this._metadata = this.extractMetadataFrom(mapInstance);
 
-    this.shouldInit = false;
     return true;
   }
 
@@ -156,9 +155,10 @@ export class SQLSource extends Source {
     };
   }
 
-  private updateMapConfig() {
+  private getMapConfig() {
     this.updateMapConfigMetadata();
     this.updateMapConfigAggregation();
+    return this._mapConfig;
   }
 
   private updateMapConfigMetadata() {

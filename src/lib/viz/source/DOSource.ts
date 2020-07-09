@@ -176,12 +176,12 @@ export class DOSource extends Source {
     this._metadata = { geometryType, stats };
 
     this._model = { dataset, variable, geography };
-    this.shouldInit = false;
+    this.needsInitialization = false;
     return true;
   }
 
   public getProps(): DOSourceLayerProps {
-    if (this.shouldInit || this._model === undefined) {
+    if (this.needsInitialization || this._model === undefined) {
       throw new SourceError('getProps requires init call', sourceErrorTypes.INIT_SKIPPED);
     }
 
@@ -201,7 +201,7 @@ export class DOSource extends Source {
   }
 
   getMetadata(): SourceMetadata {
-    if (this.shouldInit) {
+    if (this.needsInitialization) {
       throw new SourceError('GetMetadata requires init call', sourceErrorTypes.INIT_SKIPPED);
     }
 
