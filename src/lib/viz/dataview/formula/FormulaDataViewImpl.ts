@@ -29,7 +29,7 @@ export class FormulaDataViewImpl extends DataViewImpl<FormulaDataViewData> {
     }
   }
 
-  public async getRemoteData(): Promise<FormulaDataViewData> {
+  public async getRemoteData(options: { filterId: string }): Promise<FormulaDataViewData> {
     const dataviewRemote = this.dataView as DataViewRemote;
 
     try {
@@ -40,6 +40,8 @@ export class FormulaDataViewImpl extends DataViewImpl<FormulaDataViewData> {
         operation: this.operation,
         bbox
       });
+
+      dataviewRemote.updateDataViewSource(options);
 
       if (
         dataviewsApiResponse.errors_with_context &&
