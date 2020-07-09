@@ -1,5 +1,4 @@
 import { Deck } from '@deck.gl/core';
-import { format as d3Format } from 'd3-format';
 import { CartoPopupError, popupErrorTypes } from '../errors/popup-error';
 import { getMapContainer } from '../utils/map-utils';
 
@@ -25,14 +24,14 @@ export class Popup {
   private _deckInstance: Deck | undefined;
   private _container: HTMLElement;
   private _parentElement: HTMLElement | undefined;
-  private _isOpened: boolean;
+  private _isOpen: boolean;
 
   constructor(options: Partial<PopupOptions> = defaultOptions) {
     this._options = {
       ...defaultOptions,
       ...options
     };
-    this._isOpened = false;
+    this._isOpen = false;
     this._container = this._createContainerElem();
   }
 
@@ -58,6 +57,7 @@ export class Popup {
         }
       }
     });
+
     this._render();
   }
 
@@ -73,7 +73,7 @@ export class Popup {
 
     this._coordinates = coordinates;
 
-    if (this._deckInstance) {
+    if (this._deckInstance && this._isOpen) {
       this._render();
     }
   }
@@ -109,22 +109,26 @@ export class Popup {
    * Open this popup.
    */
   public open() {
-    if (this._parentElement && !this._isOpened) {
+    if (this._parentElement && !this._isOpen) {
       this._parentElement.appendChild(this._container);
     }
 
-    this._isOpened = true;
+    this._isOpen = true;
   }
 
   /**
    * Closes this popup.
    */
   public close() {
-    if (this._parentElement && this._isOpened) {
+    if (this._parentElement && this._isOpen) {
       this._parentElement.removeChild(this._container);
     }
 
-    this._isOpened = false;
+    this._isOpen = false;
+  }
+
+  public get isOpen(): boolean {
+    return this._isOpen;
   }
 
   /**
@@ -260,21 +264,15 @@ function generatePopupContent(elements: any, features: Record<string, any>[]): s
 
           let elementValue = feature.properties[attr];
 
-          if (format && typeof format === 'function') {
-            elementValue = format(elementValue);
-          } else if (format && typeof format === 'string') {
-            let formatter;
-
-            try {
-              formatter = d3Format(format);
-            } catch (err) {
+          if (format) {
+            if (typeof format === 'function') {
+              elementValue = format(elementValue);
+            } else {
               throw new CartoPopupError(
-                `The format '${format}' is not a recognized D3 format`,
+                `Invalid popup format: '${format}' is not a function`,
                 popupErrorTypes.FORMAT_INVALID
               );
             }
-
-            elementValue = formatter(elementValue);
           }
 
           return `<p class="as-body">${title}</p>
@@ -297,12 +295,12 @@ export interface PopupElement {
   /**
    * Title for this element.
    */
-  title?: string;
+  title?: string | null;
 
   /**
-   * d3 format for the value of this attribute.
+   * Format function
    */
-  format?: string;
+  format?: (value: any) => any | null;
 }
 
 /**
@@ -343,17 +341,6 @@ interface PopupOptions {
     | 'bottom-left'
     | 'bottom-right';
 }
-
-// function pixels2coordinates(pixels: number[], deckInstance?: Deck) {
-//   let coordinates;
-
-//   if (deckInstance) {
-//     const viewport = deckInstance.getViewports(undefined)[0];
-//     coordinates = viewport.unproject(pixels);
-//   }
-
-//   return coordinates;
-// }
 
 function coordinates2pixels(coordinates: number[], deckInstance?: Deck) {
   let pixels;
