@@ -51,13 +51,11 @@
       </div>
     </div>
 
-    <!-- Map libraries-->
     <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.js"></script>
     <script src="https://unpkg.com/deck.gl@8.2.0/dist.min.js"></script>
-    <!-- Airship -->
     <script src="https://libs.cartocdn.com/airship-components/v2.3/airship.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-format/1.3.0/d3-format.min.js"></script>
 
-    <!-- CARTO Deck.gl's Tile Layer -->
     <script src="/dist/umd/index.min.js"></script>
 
     <script>
@@ -85,7 +83,7 @@
           {
             attr: 'pop_2015',
             title: 'Population',
-            format: '~s' // D3 format. See https://github.com/d3/d3-format for examples
+            format: d3.format('~s') // D3 format. See https://github.com/d3/d3-format for examples
           }
         ]);
         await populationLayer.addTo(deckMap);
