@@ -30,13 +30,15 @@ export abstract class DataView<T> extends WithEvents {
     this.bindEvents();
   }
 
-  public getData(filterId?: string): Promise<T> {
+  public getData(options: { excludedFilters?: string[] } = {}): Promise<T> {
     let data;
 
+    const { excludedFilters = [] } = options;
+
     if (this.mode === DataViewCalculation.LOCAL) {
-      data = this.dataviewImpl.getLocalData(filterId);
+      data = this.dataviewImpl.getLocalData({ excludedFilters });
     } else {
-      data = this.dataviewImpl.getRemoteData();
+      data = this.dataviewImpl.getRemoteData({ excludedFilters });
     }
 
     return data;

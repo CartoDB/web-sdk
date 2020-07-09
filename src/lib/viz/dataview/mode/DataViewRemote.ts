@@ -80,10 +80,8 @@ export class DataViewRemote extends DataViewMode {
     });
   }
 
-  public updateDataViewSource(options: { filterId: string }) {
-    const filterOptions = options.filterId ? [options.filterId] : [];
-
-    const sql = this._remoteSource.getSQLWithFilters(filterOptions);
+  public updateDataViewSource(options: { excludedFilters: string[] }) {
+    const sql = this._remoteSource.getSQLWithFilters(options.excludedFilters);
     this.dataviewsApi.setSource(sql);
   }
 }

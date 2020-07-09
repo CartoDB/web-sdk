@@ -21,7 +21,7 @@ export class CategoryDataViewImpl extends DataViewImpl<CategoryDataViewData> {
     this.limit = limit;
   }
 
-  public async getLocalData(options: { filterId?: string }): Promise<CategoryDataViewData> {
+  public async getLocalData(options: { excludedFilters: string[] }): Promise<CategoryDataViewData> {
     const dataviewLocal = this.dataView as DataViewLocal;
 
     try {
@@ -47,7 +47,9 @@ export class CategoryDataViewImpl extends DataViewImpl<CategoryDataViewData> {
     }
   }
 
-  public async getRemoteData(options: { filterId: string }): Promise<CategoryDataViewData> {
+  public async getRemoteData(options: {
+    excludedFilters: string[];
+  }): Promise<CategoryDataViewData> {
     const dataviewRemote = this.dataView as DataViewRemote;
 
     try {

@@ -14,14 +14,15 @@ export class DataViewLocal extends DataViewMode {
     this.bindEvents();
   }
 
-  public getSourceData(columns: string[] = [], options: { filterId?: string } = {}) {
+  public getSourceData(columns: string[] = [], options: { excludedFilters?: string[] } = {}) {
     if (!columns.includes(this.column)) {
       columns.push(this.column);
     }
 
+    const { excludedFilters = [] } = options;
+
     if (this.useViewport) {
-      const filterOptions = options.filterId ? [options.filterId] : [];
-      return (this.dataSource as Layer).getViewportFeatures(filterOptions);
+      return (this.dataSource as Layer).getViewportFeatures(excludedFilters);
     }
 
     // is GeoJSON Layer
@@ -36,7 +37,7 @@ export class DataViewLocal extends DataViewMode {
   public async groupBy(
     operationColumn: string,
     operation: AggregationType,
-    options: { filterId?: string }
+    options: { excludedFilters: string[] }
   ) {
     const sourceData = await this.getSourceData([operationColumn || this.column], options);
     const { groups, nullCount } = groupValuesByColumn(

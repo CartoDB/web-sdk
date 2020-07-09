@@ -18,7 +18,9 @@ export class HistogramDataViewImpl extends DataViewImpl<HistogramDataViewData> {
     this.options = options;
   }
 
-  public async getLocalData(options: { filterId: string }): Promise<HistogramDataViewData> {
+  public async getLocalData(options: {
+    excludedFilters: string[];
+  }): Promise<HistogramDataViewData> {
     const dataviewLocal = this.dataView as DataViewLocal;
     const { bins = 10, start, end } = this.options;
 
@@ -88,7 +90,9 @@ export class HistogramDataViewImpl extends DataViewImpl<HistogramDataViewData> {
     }
   }
 
-  public async getRemoteData(options: { filterId: string }): Promise<HistogramDataViewData> {
+  public async getRemoteData(options: {
+    excludedFilters: string[];
+  }): Promise<HistogramDataViewData> {
     const dataviewRemote = this.dataView as DataViewRemote;
     const { bins = 10, start, end } = this.options;
 

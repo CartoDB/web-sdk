@@ -29,7 +29,7 @@ export class FormulaDataViewImpl extends DataViewImpl<FormulaDataViewData> {
     }
   }
 
-  public async getRemoteData(options: { filterId: string }): Promise<FormulaDataViewData> {
+  public async getRemoteData(options: { excludedFilters: string[] }): Promise<FormulaDataViewData> {
     const dataviewRemote = this.dataView as DataViewRemote;
 
     try {
