@@ -1,8 +1,8 @@
 import { HistogramDataView } from '@/viz/dataview/histogram/HistogramDataView';
-import { HistogramDataViewData, BinData } from '@/viz/dataview/mode/DataViewMode';
+import { HistogramDataViewData, BinData } from '@/viz/dataview/histogram/HistogramDataViewImpl';
 import { Widget } from '../widget';
 
-export class HistogramWidget extends Widget {
+export class HistogramWidget extends Widget<HistogramDataViewData> {
   private options: HistogramWidgetOptions = {};
 
   constructor(
@@ -39,9 +39,9 @@ export class HistogramWidget extends Widget {
   }
 
   protected async updateData() {
-    const data = await this.dataView.getData(this.widgetUUID);
+    const data = await this.dataView.getData({ excludedFilters: [this.widgetUUID] });
     const histogramWidget = this.element as HTMLAsHistogramWidgetElement;
-    histogramWidget.data = (data as HistogramDataViewData).bins;
+    histogramWidget.data = data.bins;
   }
 }
 

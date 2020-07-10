@@ -4,14 +4,15 @@ import { Credentials } from '@/auth';
 import { Filter } from '@/viz/filters/types';
 import { AggregationType } from '@/data/operations/aggregation/aggregation';
 import { DataViewImpl } from './DataViewImpl';
-import { DataViewMode, DataViewCalculation } from './mode/DataViewMode';
+import { DataViewCalculation } from './mode/DataViewMode';
 import { debounce } from './utils';
 import { SQLSource, DatasetSource, DOSource } from '../source';
 
 export const OPTION_CHANGED_DELAY = 100;
 
-export abstract class DataViewWrapper extends WithEvents {
-  protected dataviewImpl!: DataViewImpl<DataViewMode>;
+export abstract class DataView<T> extends WithEvents {
+  private mode: DataViewCalculation;
+  protected dataviewImpl!: DataViewImpl<T>;
 
   /**
    * Debounce scope to prevent multiple calls
@@ -22,17 +23,25 @@ export abstract class DataViewWrapper extends WithEvents {
   constructor(dataSource: Layer | Source, column: string, options: Record<string, unknown> = {}) {
     super();
 
-    this.buildImpl(dataSource, column, {
-      mode: DataViewCalculation.REMOTE,
-      ...options
-    });
+    this.mode = (options.mode as DataViewCalculation) || DataViewCalculation.REMOTE;
+    this.buildImpl(dataSource, column, options);
 
     // bind events with the mode
     this.bindEvents();
   }
 
-  public getData(filterId?: string) {
-    return this.dataviewImpl.getData(filterId);
+  public getData(options: { excludedFilters?: string[] } = {}): Promise<T> {
+    let data;
+
+    const { excludedFilters = [] } = options;
+
+    if (this.mode === DataViewCalculation.LOCAL) {
+      data = this.dataviewImpl.getLocalData({ excludedFilters });
+    } else {
+      data = this.dataviewImpl.getRemoteData({ excludedFilters });
+    }
+
+    return data;
   }
 
   public addFilter(filterId: string, filter: Filter) {
@@ -99,4 +108,8 @@ export function getCredentialsFrom(dataSource: Layer | Source): Credentials | un
   }
 
   return credentials;
+}
+
+export interface DataViewOptions {
+  filter?: Filter;
 }

@@ -2,13 +2,17 @@ import { Layer, Source } from '@/viz';
 import { BuiltInFilters } from '@/viz/filters/types';
 import { uuidv4 } from '@/core/utils/uuid';
 import { isGeoJSONSource } from '../utils';
-import { DataViewCalculation, HistogramDataViewOptions } from '../mode/DataViewMode';
+import { DataViewCalculation } from '../mode/DataViewMode';
 import { DataViewLocal } from '../mode/DataViewLocal';
 import { DataViewRemote } from '../mode/DataViewRemote';
-import { DataViewWrapper, getCredentialsFrom } from '../DataViewWrapper';
-import { HistogramDataViewImpl } from './HistogramDataViewImpl';
+import { DataView, getCredentialsFrom } from '../DataView';
+import {
+  HistogramDataViewImpl,
+  HistogramDataViewOptions,
+  HistogramDataViewData
+} from './HistogramDataViewImpl';
 
-export class HistogramDataView extends DataViewWrapper {
+export class HistogramDataView extends DataView<HistogramDataViewData> {
   protected buildImpl(
     dataSource: Layer | Source,
     column: string,

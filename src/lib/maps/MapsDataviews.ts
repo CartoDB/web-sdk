@@ -58,6 +58,10 @@ export class MapsDataviews {
     return this._mapClient.dataview(layergroup, dataviewName, { column, bins, start, end, bbox });
   }
 
+  public setSource(source: string) {
+    this._source = source;
+  }
+
   private _createMapWithDataviews(
     dataviewName: string,
     type: string,
