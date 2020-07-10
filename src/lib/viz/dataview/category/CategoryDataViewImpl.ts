@@ -1,13 +1,16 @@
-import { AggregationType } from '../../../data/operations/aggregation/aggregation';
-import { DataViewMode, DataViewCalculation, DataViewData } from '../mode/DataViewMode';
+import { AggregationType, aggregate } from '../../../data/operations/aggregation/aggregation';
+import { DataViewMode, DataViewCalculation } from '../mode/DataViewMode';
 import { DataViewImpl } from '../DataViewImpl';
 import { CartoDataViewError, dataViewErrorTypes } from '../DataViewError';
+import { DataViewLocal, CategoryElement } from '../mode/DataViewLocal';
+import { DataViewRemote } from '../mode/DataViewRemote';
+import { DataViewOptions } from '../DataView';
 
-export class CategoryDataViewImpl<T extends DataViewMode> extends DataViewImpl<T> {
+export class CategoryDataViewImpl extends DataViewImpl<CategoryDataViewData> {
   public operationColumn: string;
   public limit?: number;
 
-  constructor(dataView: T, options: CategoryOptions) {
+  constructor(dataView: DataViewMode, options: CategoryOptions) {
     super(dataView, options);
 
     const { operationColumn, limit } = options || {};
@@ -18,24 +21,76 @@ export class CategoryDataViewImpl<T extends DataViewMode> extends DataViewImpl<T
     this.limit = limit;
   }
 
-  public async getData(filterId?: string): Promise<Partial<DataViewData>> {
-    let aggregationResponse;
+  public async getLocalData(filterId?: string): Promise<CategoryDataViewData> {
+    const dataviewLocal = this.dataView as DataViewLocal;
 
     try {
-      aggregationResponse = await this.dataView.aggregation(
-        {
-          aggregation: this.operation,
-          operationColumn: this.operationColumn,
-          limit: this.limit
-        },
+      const { categories, nullCount } = await dataviewLocal.groupBy(
+        this.operationColumn,
+        this.operation,
         { filterId }
       );
+      const categoryValues = categories.map(category => category.value);
+      return {
+        categories: Number.isInteger(this.limit as number)
+          ? categories.splice(0, this.limit)
+          : categories,
+        count: categories.length,
+        operation: this.operation,
+        max: aggregate(categoryValues, AggregationType.MAX),
+        min: aggregate(categoryValues, AggregationType.MIN),
+        nullCount
+      };
     } catch (error) {
       this.emit('error', [error]);
       throw error;
     }
+  }
 
-    return aggregationResponse;
+  public async getRemoteData(): Promise<CategoryDataViewData> {
+    const dataviewRemote = this.dataView as DataViewRemote;
+
+    try {
+      const filterApplicator = dataviewRemote.getFilterApplicator();
+      const bbox = filterApplicator.getBbox();
+
+      const dataviewsApiResponse = await dataviewRemote.dataviewsApi.aggregation({
+        column: this.column,
+        aggregation: this.operation,
+        aggregationColumn: this.operationColumn,
+        categories: this.limit,
+        bbox
+      });
+
+      if (
+        dataviewsApiResponse.errors_with_context &&
+        dataviewsApiResponse.errors_with_context.length > 0
+      ) {
+        const { message, type } = dataviewsApiResponse.errors_with_context[0];
+        throw new CartoDataViewError(`${type}: ${message}`, dataViewErrorTypes.MAPS_API);
+      }
+
+      const { categories, count, max, min, nulls } = dataviewsApiResponse;
+
+      const adaptedCategories = categories.map(({ category, value }) => {
+        return {
+          name: category,
+          value
+        };
+      });
+
+      return {
+        categories: adaptedCategories,
+        count,
+        max,
+        min,
+        nullCount: nulls,
+        operation: this.operation
+      };
+    } catch (error) {
+      this.emit('error', [error]);
+      throw error;
+    }
   }
 }
 
@@ -48,7 +103,19 @@ function validateParameters(operation: AggregationType, operationColumn: string)
   }
 }
 
-export interface CategoryOptions {
+export interface CategoryDataViewData {
+  categories: {
+    name: string;
+    value: number;
+  }[];
+  count: number;
+  operation: AggregationType;
+  max: number;
+  min: number;
+  nullCount: number;
+}
+
+export interface CategoryOptions extends DataViewOptions {
   limit?: number;
   operation: AggregationType;
   operationColumn: string;
@@ -62,9 +129,4 @@ export interface CategoryData {
   min: number;
   nullCount: number;
   operation: AggregationType;
-}
-
-export interface CategoryElement {
-  name: string;
-  value: number;
 }
