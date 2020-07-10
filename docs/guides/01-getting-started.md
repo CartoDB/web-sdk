@@ -7,7 +7,7 @@ After completing this guide, you will have your first Web SDK map!
 <div class="example-map">
     <iframe
         id="getting-started-final-result"
-        src="/developers/web-sdk/examples/maps/guides/getting-started/step-2.html"
+        src="/developers/web-sdk/examples/maps/guides/getting-started/step-3.html"
         width="100%"
         height="500"
         frameBorder="0">
