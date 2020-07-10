@@ -178,7 +178,12 @@ export class Popup {
   }
 
   private _render() {
-    if (this._isOpen && this._coordinates && this.getContent().trim().length > 0 && this._deckInstance) {
+    if (
+      this._isOpen &&
+      this._coordinates &&
+      this.getContent().trim().length > 0 &&
+      this._deckInstance
+    ) {
       const pixels = coordinates2pixels(this._coordinates, this._deckInstance);
 
       if (pixels) {

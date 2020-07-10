@@ -71,12 +71,12 @@ export abstract class Source extends WithEvents {
   abstract getMetadata(): SourceMetadata;
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars, class-methods-use-this
-  async addFilter(_filterId: string, _filter: ColumnFilters) {
+  addFilter(_filterId: string, _filter: ColumnFilters) {
     throw new Error(`Method not implemented`);
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars, class-methods-use-this
-  async removeFilter(_filterId: string) {
+  removeFilter(_filterId: string) {
     throw new Error(`Method not implemented`);
   }
 }

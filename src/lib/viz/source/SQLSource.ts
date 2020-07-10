@@ -210,12 +210,12 @@ export class SQLSource extends Source {
     this._fields.aggregation = new Set([...fields.aggregation]);
   }
 
-  async addFilter(filterId: string, filter: ColumnFilters) {
+  addFilter(filterId: string, filter: ColumnFilters) {
     this.columnFiltersCollection.addFilter(filterId, filter);
     this.emit('filterChange');
   }
 
-  async removeFilter(filterId: string) {
+  removeFilter(filterId: string) {
     this.columnFiltersCollection.removeFilter(filterId);
     this.emit('filterChange');
   }

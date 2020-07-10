@@ -27,11 +27,11 @@ export class DataViewLocal extends DataViewMode {
 
     // is GeoJSON Layer
     if (this.dataSource instanceof Layer) {
-      return (this.dataSource.source as GeoJSONSource).getFeatures(columns);
+      return (this.dataSource.source as GeoJSONSource).getFeatures(excludedFilters);
     }
 
     // is GeoJSON Source
-    return (this.dataSource as GeoJSONSource).getFeatures(columns);
+    return (this.dataSource as GeoJSONSource).getFeatures(excludedFilters);
   }
 
   public async groupBy(
