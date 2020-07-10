@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Getting Started Guide - Step 1</title>
+
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.css' rel='stylesheet' />
+  
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+      }
+
+      #map {
+        width: 100vw;
+        height: 100vh;
+      }
+    </style>
+
+  </head>
+
+  <body>
+    
+    <div id="map"></div>
+
+    <!-- Include deck.gl from unpkg CDN -->
+    <script src="https://unpkg.com/deck.gl@8.2.0/dist.min.js"></script>
+
+    <!-- Include Mapbox GL from the Mabpox CDN -->
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.js'></script>
+
+    <!-- Include Web SDK from the CARTO CDN -->
+    <script src="https://libs.cartocdn.com/web-sdk/%VERSION%/index.min.js"></script>
+  
+    <script>
+        const deckMap = carto.viz.createMap();
+    </script>
+  
+  </body>
+
+</html>

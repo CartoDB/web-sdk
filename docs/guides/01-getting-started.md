@@ -1,15 +1,13 @@
 ## Getting started
 
-== TODO == JUST A DUMMY COPY from CARTO-VL. Pending to add contents
+In this guide, you will learn the basics of visualizing data with the Web SDK on top of a world [basemap](https://carto.com/help/glossary/#basemap). There are no previous requirements to complete this guide, but a basic knowledge of HTML, CSS and JavaScript would be helpful.
 
-In this guide, you will learn the basics of visualizing data with CARTO VL on top of a world [basemap](https://carto.com/help/glossary/#basemap). There are no previous requirements to complete this guide, but a basic knowledge of HTML, CSS and JavaScript would be helpful.
-
-After completing this guide, you will have your first CARTO VL map!
+After completing this guide, you will have your first Web SDK map!
 
 <div class="example-map">
     <iframe
         id="getting-started-final-result"
-        src="/developers/carto-vl/examples/maps/guides/getting-started/step-2.html"
+        src="/developers/web-sdk/examples/maps/guides/getting-started/step-3.html"
         width="100%"
         height="500"
         frameBorder="0">
@@ -18,24 +16,29 @@ After completing this guide, you will have your first CARTO VL map!
 
 ### Basic setup
 
-The most straight-forward way to use CARTO VL is to include the required files from our CDN as seen in the code below. You will also need to add Mapbox GL JavaScript and CSS files.
+The most straight-forward way to use the Web SDK is to include the required files from our CDN as seen in the code below. The Web SDK is based on the powerful deck.gl library. In addition to the Web SDK JavaScript file, you need to add:
+
+* deck.gl JavaScript file
+* Mapbox GL JavaScript and CSS files
 
 ```html
-<head>
-  <!-- Include CARTO VL JS from the CARTO CDN-->
-  <script src="https://libs.cartocdn.com/carto-vl/%VERSION%/carto-vl.min.js"></script>
+    <!-- Include deck.gl from unpkg CDN -->
+    <script src="https://unpkg.com/deck.gl@8.2.0/dist.min.js"></script>
 
-  <!-- Include Mapbox GL from the Mapbox CDN-->
-  <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.0.0/mapbox-gl.js"></script>
-  <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.0.0/mapbox-gl.css" rel="stylesheet" />
-</head>
+    <!-- Include Mapbox GL from the Mabpox CDN -->
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.js'></script>
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.css' rel='stylesheet' />
+
+    <!-- Include Web SDK from the CARTO CDN -->
+    <script src="https://libs.cartocdn.com/web-sdk/%VERSION%/index.min.js"></script>
 ```
 
 **Note:**
-**Mapbox GL**: CARTO VL is not compatible with every version. We recommend using the same version that we use in the [examples](/developers/carto-vl/examples/). However, every version from **`v0.50.0`** should work. Historically, we provided patched MGL bundles, but this is no longer required.
+**deck.gl and Mapbox GL**: The Web SDK is compatible with specific deck.gl and Mapbox GL versions. We recommend using the same versions that we use in the [examples](/developers/web-sdk/examples/). 
 
 **Note:**
-**Developers**: if you have experience with `npm` and a build system in your project (_webpack_, _rollup_...), you can install CARTO VL library with `npm install @carto/carto-vl`. You can import it with `import carto from '@carto/carto-vl'` and then you will have access to an already babelified version of the library, ready to be used.
+**Developers**: if you have experience with `npm` and a build system (_webpack_, _rollup_...), you can install the Web SDK in your project with `npm install @carto/web-sdk` and import it with `import carto from '@carto/web-sdk'`.
+
 
 #### Add map container
 
@@ -45,120 +48,102 @@ Next, you need to create a `div` where the map will be drawn:
 <div id="map"></div>
 ```
 
-Style the map `div` to ensure the map displays properly:
+Style the map `div` and `body` to ensure the map displays at full width:
 
 ```css
+body {
+  margin: 0;
+  padding: 0;
+}
 #map {
-  position: absolute;
-  height: 100%;
-  width: 100%;
+  width: 100vw;
+  height: 100vh;
 }
 ```
 
 #### Add basemap and set properties
 
-Once you have a `div` for your map, you have to use the [`mapboxgl.Map`](https://www.mapbox.com/mapbox-gl-js/api/#map) constructor to create a new map with the following parameters:
+Once you have a `div` for your map, you can use the `carto.viz.createMap` (ToDO Add link to reference) helper. If no parameters are specified, it will create a map with the following defaults:
 
-- **`container`**: [element ID](https://developer.mozilla.org/en-US/docs/Web/API/Element/id) to indicate where the map is going to be placed
-- **`style`**: sets the basemap style to use
-- **`center`**: sets the opening center coordinates of the map (longitude, latitude)
-- **`zoom`**: sets the default zoom level of the map
+* Placed within a container with id="map"
+* Using CARTO Positron basemap
+* Centered on (0,0) coordinates
+* Using zoom level 1 (whole world)
+ 
+Please go to the API reference to see the full list of parameters that you can specify.
 
 ```js
-const map = new mapboxgl.Map({
-  container: 'map',
-  style: carto.basemaps.voyager,
-  center: [0, 30],
-  zoom: 2
-});
+const deckMap = carto.viz.createMap();
 ```
 
-For the basemap `style` parameter, you can add either [Mapbox custom styles](https://www.mapbox.com/mapbox-gl-js/style-spec/) or one of the three predefined styles offered by CARTO:
-
-- **Voyager**: `carto.basemaps.voyager` (see style details at [voyager-gl-style](https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json))
-- **Positron**: `carto.basemaps.positron` ([positron-gl-style](https://basemaps.cartocdn.com/gl/positron-gl-style/style.json))
-- **Dark Matter**: `carto.basemaps.darkmatter` ([dark-matter-gl-style](https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json))
-
-At this point you will have a basic map with _Voyager_ as the base, that opens at zoom level 2 and centered on the world:
+At this point you will have a basic map with _Positron_ as the basemap, that opens at zoom level 1 and centered on (0,0):
 
 <div class="example-map">
     <iframe
         id="getting-started-step-1"
-        src="/developers/carto-vl/examples/maps/guides/getting-started/step-1.html"
+        src="/developers/web-sdk/examples/maps/guides/getting-started/step-1.html"
         width="100%"
         height="500"
         style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
 </div>
-> View this step [here](/developers/carto-vl/examples/maps/guides/getting-started/step-1.html)
+> View this step [here](/developers/web-sdk/examples/maps/guides/getting-started/step-1.html)
 
-### Define user
+### Define credentials
 
-In order to render data from CARTO you need to create a CARTO account and then get the necessary [credentials](/developers/fundamentals/authorization/).
+In order to render data from CARTO you need to have a CARTO account and then get the necessary [credentials](/developers/fundamentals/authorization/).
 
-The first thing you need to do is [authenticate the client](/developers/carto-vl/reference/#cartosetdefaultauth) with your `username` and `apiKey`. For guides and examples, we provide a public CARTO account that you can use to try out the library:
-
-```js
-carto.setDefaultAuth({
-  username: 'cartovl',
-  apiKey: 'default_public'
-});
-```
-
-### Create source
-
-The next step is to define the [`source`](/developers/carto-vl/guides/add-data-sources) from your account to be displayed on the map. In the example below, the `source` is a dataset named `populated_places` with all the most populated places around the world from [Natural Earth](https://www.naturalearthdata.com/).
+The first thing you need to do is authenticate the client with [`carto.auth.setDefaultCredentials`](ToDo: add link to API reference), using your own `username` and `apiKey`. For guides and examples, we use the `public` CARTO account so you can try out the library:
 
 ```js
-const source = new carto.source.Dataset('populated_places');
-```
-
-### Create Viz object
-
-A [`Viz object`](/developers/carto-vl/reference/#cartoviz) is one of the core elements of CARTO VL. It defines how the data will be styled and displayed on your map.
-
-Create an empty `Viz` object that uses the default CARTO VL styling:
-
-```js
-const viz = new carto.Viz();
+carto.auth.setDefaultCredentials({ username: 'public' });
 ```
 
 ### Create map layer
 
-Now that you have created a `source` and a `Viz object`, you need to create a new [`layer`](/developers/carto-vl/reference/#cartolayer) that can be added to the map.
+Now you can add a map layer from the public account. In the example below, we are adding a countries layer from [Natural Earth](https://www.naturalearthdata.com/), using the [`carto.viz.Layer`](ToDo: add link to API reference) object.
 
 ```js
-const layer = new carto.Layer('layer', source, viz);
+const countriesLayer = new carto.viz.Layer('ne_50m_admin_0_countries');
 ```
 
 ### Add map layer
 
-Once you have created the `layer`, you need to use the [`addTo`](/developers/carto-vl/reference/#cartolayeraddto) method to add it to the map.
+Finally you need to use the [`carto.viz.Layer.addTo`](ToDO: add link to API reference) method to add the layer to the map.
 
 ```js
-layer.addTo(map);
+countriesLayer.addTo(deckMap);
 ```
+<div class="example-map">
+    <iframe
+        id="getting-started-step-1"
+        src="/developers/web-sdk/examples/maps/guides/getting-started/step-2.html"
+        width="100%"
+        height="500"
+        style="margin: 20px auto !important"
+        frameBorder="0">
+    </iframe>
+</div>
+> View this step [here](/developers/web-sdk/examples/maps/guides/getting-started/step-2.html)
 
-### Defining a custom style for the Viz object
+### Defining a custom style for the layer
 
-Instead of using the `Viz` object you created in a previous step, with the default values, we can set custom values for the `color` and `size` of the points on your map:
+In the previous step we have not specified any styling properties and the layer has been added to the map with a default style. When creating the `Layer` object, we have the option of specifying a `style` parameter. We can take advantage of predefined style helpers to specify the styling properties in a very simple way. In this guide we are going to use the `colorCategories` style helper that accepts a property name and assigns a different color to each value of the property:
 
 ```js
-const viz = new carto.Viz(`
-    color: purple
-    width: 5
-`);
+const countriesLayer = new carto.viz.Layer('ne_50m_admin_0_countries',
+                                           carto.viz.style.colorCategories('continent'));
 ```
 
-For more information about styling, check out the guide [Style with Expressions](/developers/carto-vl/guides/style-with-expressions/).
+For more information about styling, check out the guide [Using style helpers](/developers/web-sdk/guides/using-style-helpers/).
 
 ### All together
 
 <div class="example-map">
     <iframe
-        id="getting-started-step-2"
-        src="/developers/carto-vl/examples/maps/guides/getting-started/step-2.html"
+        id="getting-started-step-3"
+        src="/developers/web-sdk/examples/maps/guides/getting-started/step-3.html"
         width="100%"
         height="500"
         style="margin: 20px auto !important"
@@ -166,53 +151,55 @@ For more information about styling, check out the guide [Style with Expressions]
     </iframe>
 </div>
 
-> You can explore the final step [here](/developers/carto-vl/examples/maps/guides/getting-started/step-2.html)
+> You can explore the final step [here](/developers/web-sdk/examples/maps/guides/getting-started/step-3.html)
 
 ```html
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
+
     <meta charset="utf-8" />
-    <script src="https://libs.cartocdn.com/carto-vl/%VERSION%/carto-vl.min.js"></script>
-    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.0.0/mapbox-gl.js"></script>
-    <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.0.0/mapbox-gl.css" rel="stylesheet" />
-    <link rel="stylesheet" type="text/css" href="../../style.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Getting Started Guide - Step 3</title>
+
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.css' rel='stylesheet' />
+  
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+      }
+
+      #map {
+        width: 100vw;
+        height: 100vh;
+      }
+    </style>
+
   </head>
+
   <body>
-    <!-- Add map container -->
+
     <div id="map"></div>
+
+    <!-- Include deck.gl from unpkg CDN -->
+    <script src="https://unpkg.com/deck.gl@8.2.0/dist.min.js"></script>
+
+    <!-- Include Mapbox GL from the Mabpox CDN -->
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.js'></script>
+
+    <!-- Include Web SDK from the CARTO CDN -->
+    <script src="https://libs.cartocdn.com/web-sdk/v1.0.0-alpha/index.min.js"></script>
+
     <script>
-      // Add basemap and set properties
-      const map = new mapboxgl.Map({
-        container: 'map',
-        style: carto.basemaps.voyager,
-        center: [0, 30],
-        zoom: 2
-      });
-
-      //** CARTO VL functionality begins here **//
-
-      // Define user
-      carto.setDefaultAuth({
-        username: 'cartovl',
-        apiKey: 'default_public'
-      });
-
-      // Define source
-      const source = new carto.source.Dataset('populated_places');
-
-      // Define Viz object and custom style
-      const viz = new carto.Viz(`
-            color: purple
-            width: 5
-        `);
-
-      // Define map layer
-      const layer = new carto.Layer('layer', source, viz);
-
-      // Add map layer
-      layer.addTo(map);
+        carto.auth.setDefaultCredentials({ username: 'public' });
+        const deckMap = carto.viz.createMap();
+        const countriesLayer = new carto.viz.Layer('ne_50m_admin_0_countries',
+                                                   carto.viz.style.colorCategories('continent'));
+        countriesLayer.addTo(deckMap);
     </script>
+  
   </body>
+
 </html>
 ```
