@@ -91,6 +91,16 @@ export class GeoJSONSource extends Source {
     return true;
   }
 
+  addFilter(filterId: string, filter: ColumnFilters) {
+    this.filtersCollection.addFilter(filterId, filter);
+    this.emit('filterChange');
+  }
+
+  removeFilter(filterId: string) {
+    this.filtersCollection.removeFilter(filterId);
+    this.emit('filterChange');
+  }
+
   private _buildMetadata(fields: StatFields) {
     const geometryType = getGeomType(this._geojson);
 
