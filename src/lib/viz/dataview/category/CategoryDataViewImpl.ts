@@ -21,14 +21,14 @@ export class CategoryDataViewImpl extends DataViewImpl<CategoryDataViewData> {
     this.limit = limit;
   }
 
-  public async getLocalData(filterId?: string): Promise<CategoryDataViewData> {
+  public async getLocalData(options: { excludedFilters: string[] }): Promise<CategoryDataViewData> {
     const dataviewLocal = this.dataView as DataViewLocal;
 
     try {
       const { categories, nullCount } = await dataviewLocal.groupBy(
         this.operationColumn,
         this.operation,
-        { filterId }
+        options
       );
       const categoryValues = categories.map(category => category.value);
       return {
@@ -47,12 +47,16 @@ export class CategoryDataViewImpl extends DataViewImpl<CategoryDataViewData> {
     }
   }
 
-  public async getRemoteData(): Promise<CategoryDataViewData> {
+  public async getRemoteData(options: {
+    excludedFilters: string[];
+  }): Promise<CategoryDataViewData> {
     const dataviewRemote = this.dataView as DataViewRemote;
 
     try {
       const filterApplicator = dataviewRemote.getFilterApplicator();
       const bbox = filterApplicator.getBbox();
+
+      dataviewRemote.updateDataViewSource(options);
 
       const dataviewsApiResponse = await dataviewRemote.dataviewsApi.aggregation({
         column: this.column,
