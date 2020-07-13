@@ -1,6 +1,4 @@
 import { Layer, Source } from '@/viz';
-import { BuiltInFilters } from '@/viz/filters/types';
-import { uuidv4 } from '@/core/utils/uuid';
 import { DataViewLocal } from '../mode/DataViewLocal';
 import { DataViewRemote } from '../mode/DataViewRemote';
 import { DataViewCalculation } from '../mode/DataViewMode';
@@ -11,44 +9,32 @@ import {
   CategoryDataViewData
 } from './CategoryDataViewImpl';
 import { debounce, isGeoJSONSource } from '../utils';
+import { CartoDataViewError, dataViewErrorTypes } from '../DataViewError';
 
 export class CategoryDataView extends DataView<CategoryDataViewData> {
   protected buildImpl(dataSource: Layer | Source, column: string, options: CategoryOptions) {
     let dataView;
-    const { mode } = options;
+    const geoJSONSource = isGeoJSONSource(dataSource);
 
-    switch (mode) {
-      case DataViewCalculation.LOCAL: {
-        dataView = new DataViewLocal(dataSource as Layer, column);
-        break;
-      }
+    if (this.mode === DataViewCalculation.FAST || geoJSONSource) {
+      const useViewport = !(this.mode === DataViewCalculation.PRECISE && geoJSONSource);
+      dataView = new DataViewLocal(dataSource as Layer, column, useViewport);
+    } else if (this.mode === DataViewCalculation.PRECISE) {
+      const credentials = getCredentialsFrom(dataSource);
+      dataView = new DataViewRemote(dataSource, column, credentials);
+    } else {
+      throw new CartoDataViewError(
+        `mode ${this.mode} unknown. Availables: '${DataViewCalculation.FAST}' and '${DataViewCalculation.PRECISE}'.`,
+        dataViewErrorTypes.PROPERTY_INVALID
+      );
+    }
 
-      case DataViewCalculation.REMOTE: {
-        if (isGeoJSONSource(dataSource)) {
-          const useViewport = false;
-          dataView = new DataViewLocal(dataSource as Layer, column, useViewport);
-          break;
-        }
+    if (options.filters) {
+      dataView.setFilters(options.filters);
+    }
 
-        const credentials = getCredentialsFrom(dataSource);
-        dataView = new DataViewRemote(dataSource, column, credentials);
-        break;
-      }
-
-      case DataViewCalculation.REMOTE_FILTERED:
-
-      // eslint-disable-next-line no-fallthrough
-      default: {
-        if (isGeoJSONSource(dataSource)) {
-          dataView = new DataViewLocal(dataSource as Layer, column);
-          break;
-        }
-
-        const credentials = getCredentialsFrom(dataSource);
-        dataView = new DataViewRemote(dataSource, column, credentials);
-        dataView.addFilter(`VIEWPORT_FILTER_${uuidv4()}`, BuiltInFilters.VIEWPORT);
-        break;
-      }
+    if (options.spatialFilter) {
+      dataView.setSpatialFilter(options.spatialFilter);
     }
 
     this.dataviewImpl = new CategoryDataViewImpl(dataView, options);

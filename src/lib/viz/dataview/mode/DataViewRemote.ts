@@ -1,10 +1,11 @@
 import { MapsDataviews as DataviewsApi } from '@/maps/MapsDataviews';
 import { defaultCredentials } from '@/auth';
 import { Layer, Source, SQLSource, DatasetSource } from '@/viz';
-import { Filter, SpatialFilters, BuiltInFilters } from '@/viz/filters/types';
+import { Filter, SpatialFilters, ColumnFilters } from '@/viz/filters/types';
 import { FiltersCollection } from '@/viz/filters/FiltersCollection';
 import { RemoteFilterApplicator } from '@/viz/filters/RemoteFilterApplicator';
-import { DataViewMode, DataViewCalculation } from './DataViewMode';
+import { uuidv4 } from '@/core/utils/uuid';
+import { DataViewMode } from './DataViewMode';
 import { CartoDataViewError, dataViewErrorTypes } from '../DataViewError';
 
 export class DataViewRemote extends DataViewMode {
@@ -31,18 +32,24 @@ export class DataViewRemote extends DataViewMode {
     return this.filtersCollection.getApplicatorInstance() as RemoteFilterApplicator;
   }
 
-  public addFilter(filterId: string, filter: Filter | BuiltInFilters) {
-    if (filter === BuiltInFilters.VIEWPORT) {
-      this.createViewportSpatialFilter(filterId);
-    } else {
-      this.dataSource.addFilter(filterId, { [this.column]: filter });
+  public addFilter(filterId: string, filter: Filter) {
+    this.dataSource.addFilter(filterId, { [this.column]: filter });
+  }
+
+  public setFilters(filters: ColumnFilters) {
+    this.dataSource.setFilters(filters);
+  }
+
+  public setSpatialFilter(spatialFilter: SpatialFilters) {
+    if (spatialFilter === 'viewport') {
+      this.createViewportSpatialFilter(uuidv4());
     }
   }
 
   private createViewportSpatialFilter(filterId: string) {
     if (this.dataSource instanceof Source) {
       throw new CartoDataViewError(
-        `The ${DataViewCalculation.REMOTE_FILTERED.toString()} mode needs a Layer but a Source was provided`,
+        `To filter by viewport a Layer is needed but a Source was provided`,
         dataViewErrorTypes.PROPERTY_INVALID
       );
     }
@@ -57,7 +64,7 @@ export class DataViewRemote extends DataViewMode {
 
         const bbox = [nw[0], se[1], se[0], nw[1]];
         this.filtersCollection.removeFilter(filterId);
-        this.filtersCollection.addFilter(filterId, { within: bbox });
+        this.filtersCollection.addFilter(filterId, { bbox });
         this.emit('dataUpdate');
       }
     });

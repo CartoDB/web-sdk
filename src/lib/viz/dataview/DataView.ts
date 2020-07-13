@@ -5,14 +5,16 @@ import { Filter, ColumnFilters, SpatialFilters } from '@/viz/filters/types';
 import { AggregationType } from '@/data/operations/aggregation/aggregation';
 import { DataViewImpl } from './DataViewImpl';
 import { DataViewCalculation } from './mode/DataViewMode';
-import { debounce } from './utils';
+import { debounce, isGeoJSONSource } from './utils';
 import { SQLSource, DatasetSource, DOSource } from '../source';
+import { CartoDataViewError, dataViewErrorTypes } from './DataViewError';
 
 export const OPTION_CHANGED_DELAY = 100;
 
 export abstract class DataView<T> extends WithEvents {
-  private mode: DataViewCalculation;
+  protected mode: DataViewCalculation;
   protected dataviewImpl!: DataViewImpl<T>;
+  protected dataSource: Layer | Source;
 
   /**
    * Debounce scope to prevent multiple calls
@@ -23,7 +25,13 @@ export abstract class DataView<T> extends WithEvents {
   constructor(dataSource: Layer | Source, column: string, options: Record<string, unknown> = {}) {
     super();
 
-    this.mode = (options.mode as DataViewCalculation) || DataViewCalculation.REMOTE;
+    this.dataSource = dataSource;
+    this.mode = (options.mode as DataViewCalculation) || DataViewCalculation.PRECISE;
+
+    if (!options.mode && options.spatialFilter === 'viewport') {
+      this.mode = DataViewCalculation.FAST;
+    }
+
     this.buildImpl(dataSource, column, options);
 
     // bind events with the mode
@@ -33,10 +41,16 @@ export abstract class DataView<T> extends WithEvents {
   public getData(filterId?: string): Promise<T> {
     let data;
 
-    if (this.mode === DataViewCalculation.LOCAL) {
+    // GeoJSON has the features in local
+    if (this.mode === DataViewCalculation.FAST || isGeoJSONSource(this.dataSource)) {
       data = this.dataviewImpl.getLocalData(filterId);
-    } else {
+    } else if (this.mode === DataViewCalculation.PRECISE) {
       data = this.dataviewImpl.getRemoteData();
+    } else {
+      throw new CartoDataViewError(
+        `mode ${this.mode} unknown. Availables: '${DataViewCalculation.FAST}' and '${DataViewCalculation.PRECISE}'.`,
+        dataViewErrorTypes.PROPERTY_INVALID
+      );
     }
 
     return data;
@@ -55,7 +69,7 @@ export abstract class DataView<T> extends WithEvents {
   }
 
   public setSpatialFilter(spatialFilter: SpatialFilters) {
-    this.dataviewImpl.setSpatialFilters(spatialFilter);
+    this.dataviewImpl.setSpatialFilter(spatialFilter);
   }
 
   public get column() {
@@ -118,5 +132,5 @@ export function getCredentialsFrom(dataSource: Layer | Source): Credentials | un
 
 export interface DataViewOptions {
   filters?: ColumnFilters;
-  spatialFilter?: SpatialFilters | { viewport: boolean };
+  spatialFilter?: SpatialFilters;
 }

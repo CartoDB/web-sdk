@@ -86,7 +86,7 @@ describe('Histogram DataView', () => {
 
       const dataView = new HistogramDataView(layer, 'popEst', {
         bins: 2,
-        mode: DataViewCalculation.LOCAL
+        mode: DataViewCalculation.FAST
       });
 
       expect(await dataView.getData()).toMatchObject({
@@ -133,7 +133,7 @@ describe('Histogram DataView', () => {
         bins: 2,
         start: 20,
         end: 50,
-        mode: DataViewCalculation.LOCAL
+        mode: DataViewCalculation.FAST
       });
 
       expect(await dataView.getData()).toMatchObject({

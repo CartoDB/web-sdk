@@ -44,7 +44,7 @@ export abstract class DataViewImpl<T> extends WithEvents {
   }
 
   public setSpatialFilter(spatialFilter: SpatialFilters) {
-    this.dataView.setSpatialFilters(spatialFilter);
+    this.dataView.setSpatialFilter(spatialFilter);
   }
 
   private bindEvents() {

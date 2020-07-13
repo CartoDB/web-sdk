@@ -24,13 +24,9 @@ export abstract class DataViewMode extends WithEvents {
     this.dataSource.removeFilter(filterId);
   }
 
-  public setFilters(filters: ColumnFilters) {
-    this.dataSource.setFilters(filters);
-  }
+  public abstract setFilters(filters: ColumnFilters): void;
 
-  public setSpatialFilter(spatialFilter: SpatialFilters) {
-    this.dataSource.setSpatialFilters(spatialFilter);
-  }
+  public abstract setSpatialFilter(spatialFilter: SpatialFilters): void;
 
   public onDataUpdate() {
     this.emit('dataUpdate');
@@ -55,6 +51,6 @@ function validateParameters(source: any, column: string) {
 }
 
 export enum DataViewCalculation {
-  REMOTE = 'remote',
-  LOCAL = 'local'
+  PRECISE = 'precise',
+  FAST = 'fast'
 }

@@ -11,7 +11,7 @@ describe('FormulaDataView', () => {
         () =>
           new FormulaDataView(new Layer('fake_source'), 'fake_column', {
             operation: AggregationType.AVG,
-            mode: DataViewCalculation.LOCAL
+            mode: DataViewCalculation.FAST
           })
       ).not.toThrow();
     });
@@ -21,7 +21,7 @@ describe('FormulaDataView', () => {
         () =>
           new FormulaDataView(new Layer('fake_source'), 'fake_column', {
             operation: undefined as never,
-            mode: DataViewCalculation.LOCAL
+            mode: DataViewCalculation.FAST
           })
       ).toThrow(
         new CartoDataViewError(
@@ -51,7 +51,7 @@ describe('FormulaDataView', () => {
 
       const dataView = new FormulaDataView(layer, 'pop', {
         operation: AggregationType.AVG,
-        mode: DataViewCalculation.LOCAL
+        mode: DataViewCalculation.FAST
       });
 
       expect(await dataView.getData()).toMatchObject({
@@ -76,7 +76,7 @@ describe('FormulaDataView', () => {
 
       const dataView = new FormulaDataView(layer, 'pop', {
         operation: AggregationType.SUM,
-        mode: DataViewCalculation.LOCAL
+        mode: DataViewCalculation.FAST
       });
 
       try {

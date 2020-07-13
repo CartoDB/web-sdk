@@ -78,6 +78,11 @@ export abstract class Source extends WithEvents {
   async removeFilter(_filterId: string) {
     throw new Error(`Method not implemented`);
   }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars, class-methods-use-this
+  async setFilters(_filters: ColumnFilters) {
+    throw new Error(`Method not implemented`);
+  }
 }
 
 function getNewFields(newFields: StatFields, currentFields: StatFields): StatFields {

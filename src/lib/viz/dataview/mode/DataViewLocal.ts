@@ -2,6 +2,7 @@ import { Layer, GeoJSONSource } from '@/viz';
 import { AggregationType, aggregate } from '@/data/operations/aggregation/aggregation';
 import { groupValuesByColumn } from '@/data/operations/grouping';
 import { castToNumberOrUndefined } from '@/core/utils/number';
+import { ColumnFilters, SpatialFilters } from '@/viz/filters/types';
 import { DataViewMode } from './DataViewMode';
 
 export class DataViewLocal extends DataViewMode {
@@ -49,6 +50,17 @@ export class DataViewLocal extends DataViewMode {
       .sort(categoryOrder());
 
     return { nullCount, categories };
+  }
+
+  public setFilters(filters: ColumnFilters) {
+    if (this.dataSource instanceof Layer) {
+      this.dataSource.setFilters(filters);
+    }
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars, class-methods-use-this
+  public setSpatialFilter(_spatialFilter: SpatialFilters) {
+    return undefined;
   }
 
   private bindEvents() {

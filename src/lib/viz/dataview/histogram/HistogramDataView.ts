@@ -1,6 +1,4 @@
 import { Layer, Source } from '@/viz';
-import { BuiltInFilters } from '@/viz/filters/types';
-import { uuidv4 } from '@/core/utils/uuid';
 import { isGeoJSONSource } from '../utils';
 import { DataViewCalculation } from '../mode/DataViewMode';
 import { DataViewLocal } from '../mode/DataViewLocal';
@@ -11,6 +9,7 @@ import {
   HistogramDataViewOptions,
   HistogramDataViewData
 } from './HistogramDataViewImpl';
+import { CartoDataViewError, dataViewErrorTypes } from '../DataViewError';
 
 export class HistogramDataView extends DataView<HistogramDataViewData> {
   protected buildImpl(
@@ -18,40 +17,30 @@ export class HistogramDataView extends DataView<HistogramDataViewData> {
     column: string,
     options: HistogramDataViewOptions = { bins: 10 }
   ) {
-    const { mode } = options;
+    let dataView;
+    const geoJSONSource = isGeoJSONSource(dataSource);
 
-    const dataViewCreationFn =
-      createDataView[mode as DataViewCalculation] ||
-      createDataView[DataViewCalculation.REMOTE_FILTERED];
-    const dataView = dataViewCreationFn(dataSource, column);
+    if (this.mode === DataViewCalculation.FAST || geoJSONSource) {
+      const useViewport = !(this.mode === DataViewCalculation.PRECISE && geoJSONSource);
+      dataView = new DataViewLocal(dataSource as Layer, column, useViewport);
+    } else if (this.mode === DataViewCalculation.PRECISE) {
+      const credentials = getCredentialsFrom(dataSource);
+      dataView = new DataViewRemote(dataSource as Layer, column, credentials);
+    } else {
+      throw new CartoDataViewError(
+        `mode ${this.mode} unknown. Availables: '${DataViewCalculation.FAST}' and '${DataViewCalculation.PRECISE}'.`,
+        dataViewErrorTypes.PROPERTY_INVALID
+      );
+    }
+
+    if (options.filters) {
+      dataView.setFilters(options.filters);
+    }
+
+    if (options.spatialFilter) {
+      dataView.setSpatialFilter(options.spatialFilter);
+    }
 
     this.dataviewImpl = new HistogramDataViewImpl(dataView, options);
   }
 }
-
-const createDataView = {
-  [DataViewCalculation.LOCAL](dataSource: Layer | Source, column: string) {
-    return new DataViewLocal(dataSource as Layer, column);
-  },
-
-  [DataViewCalculation.REMOTE](dataSource: Layer | Source, column: string) {
-    if (isGeoJSONSource(dataSource)) {
-      const useViewport = false;
-      return new DataViewLocal(dataSource as Layer, column, useViewport);
-    }
-
-    const credentials = getCredentialsFrom(dataSource);
-    return new DataViewRemote(dataSource as Source, column, credentials);
-  },
-
-  [DataViewCalculation.REMOTE_FILTERED](dataSource: Layer | Source, column: string) {
-    if (isGeoJSONSource(dataSource)) {
-      return new DataViewLocal(dataSource as Layer, column);
-    }
-
-    const credentials = getCredentialsFrom(dataSource);
-    const dataView = new DataViewRemote(dataSource as Layer, column, credentials);
-    dataView.addFilter(`VIEWPORT_FILTER_${uuidv4()}`, BuiltInFilters.VIEWPORT);
-    return dataView;
-  }
-};
