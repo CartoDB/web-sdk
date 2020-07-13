@@ -14,7 +14,7 @@ export class DataViewLocal extends DataViewMode {
     this.bindEvents();
   }
 
-  public getSourceData(columns: string[] = [], options: { excludedFilters?: string[] } = {}) {
+  public async getSourceData(columns: string[] = [], options: { excludedFilters?: string[] } = {}) {
     if (!columns.includes(this.column)) {
       columns.push(this.column);
     }
@@ -22,6 +22,7 @@ export class DataViewLocal extends DataViewMode {
     const { excludedFilters = [] } = options;
 
     if (this.useViewport) {
+      await (this.dataSource as Layer).addSourceField(this.column);
       return (this.dataSource as Layer).getViewportFeatures(excludedFilters);
     }
 

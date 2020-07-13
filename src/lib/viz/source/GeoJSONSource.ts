@@ -11,9 +11,7 @@ import {
   SourceMetadata,
   NumericFieldStats,
   CategoryFieldStats,
-  GeometryType,
-  StatFields,
-  shouldInitialize
+  GeometryType
 } from './Source';
 
 import { sourceErrorTypes, SourceError } from '../errors/source-error';
@@ -32,7 +30,6 @@ export class GeoJSONSource extends Source {
   private _props?: GeoJSONSourceProps;
   private _numericFieldValues: Record<string, number[]>;
   private _categoryFieldValues: Record<string, string[]>;
-  private _fields: StatFields;
 
   private filtersCollection = new FiltersCollection<ColumnFilters, FunctionFilterApplicator>(
     FunctionFilterApplicator
@@ -45,11 +42,10 @@ export class GeoJSONSource extends Source {
     this._geojson = geojson;
     this._numericFieldValues = {};
     this._categoryFieldValues = {};
-    this._fields = { sample: new Set(), aggregation: new Set() };
   }
 
   public getProps(): GeoJSONSourceProps {
-    if (!this.isInitialized || !this._props) {
+    if (this.needsInitialization || !this._props) {
       throw new SourceError('getProps requires init call', sourceErrorTypes.INIT_SKIPPED);
     }
 
@@ -57,7 +53,7 @@ export class GeoJSONSource extends Source {
   }
 
   public getMetadata(): SourceMetadata {
-    if (!this.isInitialized || !this._metadata) {
+    if (this.needsInitialization || !this._metadata) {
       throw new SourceError('GetMetadata requires init call', sourceErrorTypes.INIT_SKIPPED);
     }
 
@@ -74,20 +70,15 @@ export class GeoJSONSource extends Source {
       .flat();
   }
 
-  public async init(fields: StatFields): Promise<boolean> {
-    if (!shouldInitialize(this.isInitialized, fields, this._fields)) {
+  public async init(): Promise<boolean> {
+    if (!this.needsInitialization) {
       return true;
     }
 
-    if (this.isInitialized) {
-      // eslint-disable-next-line no-console
-      console.warn('GeoJSONSource reinitialized');
-    }
-
     this._props = { type: 'GeoJSONLayer', data: this._geojson };
-    this._metadata = this._buildMetadata(fields);
+    this._metadata = this._buildMetadata();
 
-    this.isInitialized = true;
+    this.needsInitialization = false;
     return true;
   }
 
@@ -101,10 +92,8 @@ export class GeoJSONSource extends Source {
     this.emit('filterChange');
   }
 
-  private _buildMetadata(fields: StatFields) {
+  private _buildMetadata() {
     const geometryType = getGeomType(this._geojson);
-
-    this._saveFields(fields);
     const stats = this._getStats();
 
     return { geometryType, stats };
@@ -113,31 +102,29 @@ export class GeoJSONSource extends Source {
   private _getStats(): (NumericFieldStats | CategoryFieldStats)[] {
     let stats: (NumericFieldStats | CategoryFieldStats)[] = [];
 
-    const fields = [...new Set([...this._fields.sample, ...this._fields.aggregation])];
-
-    if (!fields.length) {
+    if (!this.fields.size) {
       return stats;
     }
 
     const features = getFeatures(this._geojson);
 
     if (features.length) {
-      this._extractFeaturesValues(features, fields);
+      this._extractFeaturesValues(features);
       stats = this._calculateStats();
     }
 
-    validateFieldNamesInStats(fields, stats);
+    validateFieldNamesInStats(this.fields, stats);
 
     return stats;
   }
 
-  private _extractFeaturesValues(features: Feature[], fields: string[]) {
+  private _extractFeaturesValues(features: Feature[]) {
     features.forEach(feature => {
       const { properties } = feature;
 
       // values
       if (properties) {
-        fields.forEach(propName => {
+        this.fields.forEach(propName => {
           this._saveFeatureValue(propName, properties[propName]);
         });
       }
@@ -243,11 +230,6 @@ export class GeoJSONSource extends Source {
 
     return categoryStats;
   }
-
-  private _saveFields(fields: StatFields) {
-    this._fields.sample = new Set([...fields.sample]);
-    this._fields.aggregation = new Set([...fields.aggregation]);
-  }
 }
 
 export function getGeomType(geojson: GeoJSON): GeometryType {
@@ -300,14 +282,14 @@ function createSample(values: number[]) {
 }
 
 export function validateFieldNamesInStats(
-  fields: string[],
+  fields: Set<string>,
   stats: (NumericFieldStats | CategoryFieldStats)[]
 ) {
-  const existingStatsFields = stats.filter(s => fields.includes(s.name)).map(s => s.name);
+  const existingStatsFields = stats.filter(s => fields.has(s.name)).map(s => s.name);
 
   // some fields do not have data in the geoJSON
-  if (existingStatsFields.length !== fields.length) {
-    const noDataFields = fields.filter(f => !existingStatsFields.includes(f));
+  if (existingStatsFields.length !== fields.size) {
+    const noDataFields = [...fields].filter(f => !existingStatsFields.includes(f));
 
     throw new SourceError(
       `Field/s '${noDataFields.join(', ')}' do/es not exist in geoJSON properties`
