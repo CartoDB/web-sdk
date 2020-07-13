@@ -32,7 +32,7 @@ On the other hand, if you are facing a newly introduced bug, you are welcome to 
 
 ### Updates frequency
 
-Although we tend to do a release every several weeks of work, we don't have a fixed schedule for new Web SDK releases. However, if we planned to release a specific feature, we might delay a release. Also, in the case of critical regressions, we will make a bug fix release before the next major/minor release happens.
+Although we tend to do a release every few weeks of work, we don't have a fixed schedule for new Web SDK releases. However, if we planned to release a specific feature, we might delay a release. Also, in the case of critical regressions, we will make a bug fix release before the next major/minor release happens.
 
 In case you need to use a new feature before it is released, [you can always build your own custom Web SDK bundle](https://github.com/CartoDB/web-sdk/blob/master/DEVELOPERS.md).
 
