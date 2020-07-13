@@ -1,6 +1,7 @@
 import { Credentials, defaultCredentials } from '@/auth';
 import { MapInstance, MapOptions, Client } from '@/maps/Client';
 import { uuidv4 } from '@/core/utils/uuid';
+import { SQLFilterApplicator } from '@/viz/filters/SQLFilterApplicator';
 import {
   Source,
   SourceProps,
@@ -10,6 +11,8 @@ import {
 } from './Source';
 import { parseGeometryType } from '../style/helpers/utils';
 import { sourceErrorTypes, SourceError } from '../errors/source-error';
+import { FiltersCollection } from '../filters/FiltersCollection';
+import { ColumnFilters } from '../filters/types';
 
 export interface SourceOptions {
   credentials?: Credentials;
@@ -62,20 +65,30 @@ export class SQLSource extends Source {
   protected _mapConfig: MapOptions;
   protected _metadata?: SourceMetadata;
 
+  private columnFiltersCollection = new FiltersCollection<ColumnFilters, SQLFilterApplicator>(
+    SQLFilterApplicator
+  );
+
   constructor(sql: string, options: SourceOptions = {}) {
-    const { mapOptions = defaultMapOptions, credentials = defaultCredentials } = options;
-
-    // set layer id
-    const id = `CARTO-SQL-${uuidv4()}`;
-
-    // call to super class
-    super(id);
+    super(`CARTO-SQL-${uuidv4()}`);
     this.sourceType = 'SQLSource';
 
     // Set object properties
+    const { mapOptions = defaultMapOptions, credentials = defaultCredentials } = options;
     this._value = sql;
     this._credentials = credentials;
     this._mapConfig = this.buildMapConfig(mapOptions);
+  }
+
+  public getSQLWithFilters(excludedFilters: string[] = []) {
+    if (!this.columnFiltersCollection.hasFilters()) {
+      return this._value;
+    }
+
+    const sqlApplicator = this.columnFiltersCollection.getApplicatorInstance(excludedFilters);
+    const sql = sqlApplicator.getSQL();
+    const whereClause = sql ? `WHERE ${sql}` : '';
+    return `SELECT * FROM (${this._value}) as originalQuery ${whereClause}`.trim();
   }
 
   /**
@@ -199,6 +212,16 @@ export class SQLSource extends Source {
 
       this._mapConfig.aggregation.dimensions = { ...dimensions };
     }
+  }
+
+  addFilter(filterId: string, filter: ColumnFilters) {
+    this.columnFiltersCollection.addFilter(filterId, filter);
+    this.emit('filterChange');
+  }
+
+  removeFilter(filterId: string) {
+    this.columnFiltersCollection.removeFilter(filterId);
+    this.emit('filterChange');
   }
 
   private extractMetadataFrom(mapInstance: MapInstance) {

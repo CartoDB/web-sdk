@@ -32,7 +32,7 @@ export class FormulaWidget extends Widget<FormulaDataViewData> {
   }
 
   protected async updateData() {
-    const data = await this.dataView.getData();
+    const data = await this.dataView.getData({ excludedFilters: [this.widgetUUID] });
     const formulaWidget = this.element as HTMLAsFormulaWidgetElement;
     formulaWidget.value = data.result;
   }

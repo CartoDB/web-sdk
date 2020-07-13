@@ -1,6 +1,9 @@
 import { GeoJSON, Feature, GeoJsonGeometryTypes } from 'geojson';
 import { uuidv4 } from '@/core/utils/uuid';
 import { aggregate, AggregationType } from '@/data/operations/aggregation/aggregation';
+import { FiltersCollection } from '../filters/FiltersCollection';
+import { FunctionFilterApplicator } from '../filters/FunctionFilterApplicator';
+import { ColumnFilters } from '../filters/types';
 
 import {
   Source,
@@ -28,9 +31,12 @@ export class GeoJSONSource extends Source {
   private _numericFieldValues: Record<string, number[]>;
   private _categoryFieldValues: Record<string, string[]>;
 
+  private filtersCollection = new FiltersCollection<ColumnFilters, FunctionFilterApplicator>(
+    FunctionFilterApplicator
+  );
+
   constructor(geojson: GeoJSON) {
-    const id = `geojson-${uuidv4()}`;
-    super(id);
+    super(`geojson-${uuidv4()}`);
     this.sourceType = 'GeoJSONSource';
 
     this._geojson = geojson;
@@ -54,13 +60,13 @@ export class GeoJSONSource extends Source {
     return this._metadata;
   }
 
-  public getFeatures(properties: string[] = []) {
+  public getFeatures(excludedFilters: string[] = []) {
     const features = getFeatures(this._geojson);
+    const filters = this.filtersCollection.getApplicatorInstance(excludedFilters);
 
     return features
-      .map(feature => {
-        return selectPropertiesFrom(feature.properties as Record<string, unknown>, properties);
-      })
+      .map(feature => selectPropertiesFrom(feature.properties as Record<string, unknown>, []))
+      .filter(feature => filters.applicator(feature))
       .flat();
   }
 
@@ -74,6 +80,16 @@ export class GeoJSONSource extends Source {
 
     this.needsInitialization = false;
     return true;
+  }
+
+  addFilter(filterId: string, filter: ColumnFilters) {
+    this.filtersCollection.addFilter(filterId, filter);
+    this.emit('filterChange');
+  }
+
+  removeFilter(filterId: string) {
+    this.filtersCollection.removeFilter(filterId);
+    this.emit('filterChange');
   }
 
   private _buildMetadata() {

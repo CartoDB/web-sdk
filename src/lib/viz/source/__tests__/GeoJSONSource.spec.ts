@@ -33,6 +33,39 @@ const featureCollection: FeatureCollection = {
   features: [feature, feature, feature]
 };
 
+const geojson: FeatureCollection = {
+  type: 'FeatureCollection',
+  features: [
+    {
+      type: 'Feature',
+      id: 1,
+      geometry,
+      properties: {
+        number: 10,
+        cat: 'cat1'
+      }
+    },
+    {
+      type: 'Feature',
+      id: 1,
+      geometry,
+      properties: {
+        number: 20,
+        cat: 'cat1'
+      }
+    },
+    {
+      type: 'Feature',
+      id: 1,
+      geometry,
+      properties: {
+        number: 70,
+        cat: 'cat2'
+      }
+    }
+  ]
+};
+
 describe('getGeomType', () => {
   it('should get geom type from FeatureCollection', () => {
     const geomType = getGeomType(featureCollection);
@@ -108,39 +141,6 @@ describe('getFeatures', () => {
 });
 
 describe('SourceMetadata', () => {
-  const geojson: FeatureCollection = {
-    type: 'FeatureCollection',
-    features: [
-      {
-        type: 'Feature',
-        id: 1,
-        geometry,
-        properties: {
-          number: 10,
-          cat: 'cat1'
-        }
-      },
-      {
-        type: 'Feature',
-        id: 1,
-        geometry,
-        properties: {
-          number: 20,
-          cat: 'cat1'
-        }
-      },
-      {
-        type: 'Feature',
-        id: 1,
-        geometry,
-        properties: {
-          number: 70,
-          cat: 'cat2'
-        }
-      }
-    ]
-  };
-
   it('should build props and metadata properly with basic example', async () => {
     const source = new GeoJSONSource(geojson);
     await source.addField('number');
@@ -262,5 +262,28 @@ describe('SourceMetadata', () => {
     expect(async () => {
       await source.init();
     }).rejects.toEqual(new SourceError("Field/s 'number' do/es not exist in geoJSON properties"));
+  });
+});
+
+describe('GeoJSON Source', () => {
+  describe('getFeatures', () => {
+    it('should return all features when no filters are added', () => {
+      const source = new GeoJSONSource(geojson);
+
+      expect(source.getFeatures()).toEqual([
+        { cat: 'cat1', number: 10 },
+        { cat: 'cat1', number: 20 },
+        { cat: 'cat2', number: 70 }
+      ]);
+    });
+
+    it('should return filtered features when filters are added', () => {
+      const source = new GeoJSONSource(geojson);
+      source.addFilter('testFilter', { cat: { in: ['cat1'] } });
+      expect(source.getFeatures()).toEqual([
+        { cat: 'cat1', number: 10 },
+        { cat: 'cat1', number: 20 }
+      ]);
+    });
   });
 });
