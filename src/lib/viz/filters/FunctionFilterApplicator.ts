@@ -60,7 +60,7 @@ const filterFunctions: Record<FilterType, Function> = {
   [FilterType.WITHIN](filterValues: number[] | number[][], featureValue: number) {
     const checkRange = function checkRange(range: number[]) {
       const [lowerBound, upperBound] = range;
-      return featureValue >= lowerBound && featureValue < upperBound;
+      return featureValue >= lowerBound && featureValue <= upperBound;
     };
 
     return Array.isArray(filterValues[0])

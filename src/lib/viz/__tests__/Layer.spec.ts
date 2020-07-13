@@ -232,12 +232,12 @@ describe('Layer', () => {
       await layer.addTo(deckInstanceMock);
       expect(mockSourceInit).toHaveBeenCalledTimes(1);
 
-      source.isInitialized = true;
+      source.needsInitialization = false;
 
       await layer.setPopupClick(['fake_column']);
       expect(mockSourceInit).toHaveBeenCalledTimes(2);
 
-      source.isInitialized = true;
+      source.needsInitialization = false;
 
       await layer.setPopupHover(['another_fake_column']);
       expect(mockSourceInit).toHaveBeenCalledTimes(3);

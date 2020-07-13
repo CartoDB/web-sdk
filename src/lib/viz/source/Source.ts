@@ -43,39 +43,36 @@ export interface SourceProps {
   type: 'TileLayer' | 'GeoJSONLayer';
 }
 
-export interface StatFields {
-  sample: Set<string>;
-  aggregation: Set<string>;
-}
-
 export abstract class Source extends WithEvents {
   // ID of the source. It's mandatory for the source but not for the user.
   public id: string;
-
-  public isInitialized: boolean;
-
+  public needsInitialization: boolean;
   public sourceType: SourceType | unknown;
+  protected fields: Set<string>;
 
   constructor(id: string) {
     super();
 
     this.id = id;
-    this.isInitialized = false;
+    this.needsInitialization = true;
+    this.sourceType = 'Source';
+    this.fields = new Set();
+    this.registerAvailableEvents(['filterChange']);
   }
 
-  abstract async init(fields?: StatFields): Promise<boolean>;
+  abstract async init(): Promise<boolean>;
 
   abstract getProps(): SourceProps;
 
   abstract getMetadata(): SourceMetadata;
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars, class-methods-use-this
-  async addFilter(_filterId: string, _filter: ColumnFilters) {
+  addFilter(_filterId: string, _filter: ColumnFilters) {
     throw new Error(`Method not implemented`);
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars, class-methods-use-this
-  async removeFilter(_filterId: string) {
+  removeFilter(_filterId: string) {
     throw new Error(`Method not implemented`);
   }
 
@@ -83,30 +80,14 @@ export abstract class Source extends WithEvents {
   async setFilters(_filters: ColumnFilters) {
     throw new Error(`Method not implemented`);
   }
-}
 
-function getNewFields(newFields: StatFields, currentFields: StatFields): StatFields {
-  const newSampleFields = new Set([...newFields.sample].filter(f => !currentFields.sample.has(f)));
+  addField(field: string) {
+    const { size } = this.fields;
 
-  const newAggregationFields = new Set(
-    [...newFields.aggregation].filter(f => !currentFields.aggregation.has(f))
-  );
+    this.fields.add(field);
 
-  return {
-    sample: newSampleFields,
-    aggregation: newAggregationFields
-  };
-}
-
-export function shouldInitialize(
-  isInitialized: boolean,
-  newFields: StatFields,
-  currentFields: StatFields
-): boolean {
-  if (!isInitialized) {
-    return true;
+    if (size < this.fields.size) {
+      this.needsInitialization = true;
+    }
   }
-
-  const difference = getNewFields(newFields, currentFields);
-  return difference.sample.size > 0 || difference.aggregation.size > 0;
 }

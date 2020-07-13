@@ -19,12 +19,14 @@ export class HistogramDataViewImpl extends DataViewImpl<HistogramDataViewData> {
     this.options = options;
   }
 
-  public async getLocalData(filterId?: string): Promise<HistogramDataViewData> {
+  public async getLocalData(options: {
+    excludedFilters: string[];
+  }): Promise<HistogramDataViewData> {
     const dataviewLocal = this.dataView as DataViewLocal;
     const { bins = 10, start, end } = this.options;
 
     try {
-      const features = (await dataviewLocal.getSourceData([this.column], { filterId })) as Record<
+      const features = (await dataviewLocal.getSourceData([this.column], options)) as Record<
         string,
         number
       >[];
@@ -89,13 +91,17 @@ export class HistogramDataViewImpl extends DataViewImpl<HistogramDataViewData> {
     }
   }
 
-  public async getRemoteData(): Promise<HistogramDataViewData> {
+  public async getRemoteData(options: {
+    excludedFilters: string[];
+  }): Promise<HistogramDataViewData> {
     const dataviewRemote = this.dataView as DataViewRemote;
     const { bins = 10, start, end } = this.options;
 
     try {
       const filterApplicator = dataviewRemote.getFilterApplicator();
       const bbox = filterApplicator.getBbox();
+
+      dataviewRemote.updateDataViewSource(options);
 
       const aggregationResponse = await dataviewRemote.dataviewsApi.histogram({
         bins,

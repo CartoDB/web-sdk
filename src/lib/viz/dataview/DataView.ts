@@ -38,14 +38,15 @@ export abstract class DataView<T> extends WithEvents {
     this.bindEvents();
   }
 
-  public getData(filterId?: string): Promise<T> {
+  public getData(options: { excludedFilters?: string[] } = {}): Promise<T> {
     let data;
+    const { excludedFilters = [] } = options;
 
     // GeoJSON has the features in local
     if (this.mode === DataViewCalculation.FAST || isGeoJSONSource(this.dataSource)) {
-      data = this.dataviewImpl.getLocalData(filterId);
+      data = this.dataviewImpl.getLocalData({ excludedFilters });
     } else if (this.mode === DataViewCalculation.PRECISE) {
-      data = this.dataviewImpl.getRemoteData();
+      data = this.dataviewImpl.getRemoteData({ excludedFilters });
     } else {
       throw new CartoDataViewError(
         `mode ${this.mode} unknown. Availables: '${DataViewCalculation.FAST}' and '${DataViewCalculation.PRECISE}'.`,

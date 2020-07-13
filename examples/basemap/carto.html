@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Helper for simple google basemap using Google Maps JS API</title>
+    <title>CARTO Basemap</title>
 
     <link
       rel="stylesheet"
@@ -14,7 +14,7 @@
     <link
       rel="stylesheet"
       type="text/css"
-      href="https://libs.cartocdn.com/airship-style/v2.3/airship.css"
+      href="https://libs.cartocdn.com/airship-style/v2.4/airship.min.css"
     />
 
     <style>
@@ -52,21 +52,20 @@
 
     <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.js"></script>
     <script src="https://unpkg.com/deck.gl@8.2.0/dist.min.js"></script>
-    <!-- TODO: Set up a proper API_KEY for Google Maps -->
-    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=visualization&v=3.39"></script>
     <script src="/dist/umd/index.min.js"></script>
 
     <script>
       function initialize() {
         carto.auth.setDefaultCredentials({ username: 'public' });
 
-        const deckMap = carto.viz.createGoogleMap();
-        // All these variations are also allowed:
-        //   const deckMap = carto.viz.createGoogleMap({ mapOptions: { mapTypeId: 'satellite' } });
-        //   const deckMap = carto.viz.createGoogleMap({ mapOptions: { mapTypeId: 'hybrid', zoom: 4 } });
-        //   const deckMap = carto.viz.createGoogleMap({ container: 'map', mapOptions: { mapTypeId: 'terrain', zoom: 4, center: { lng: 3, lat: 40 } } });
+        // by default you get a full world positron basemap, centered at (0, 0) coordinates
+        const deckMap = carto.viz.createMap();
+        // ... but all these variations are also allowed
+        //   const deckMap = carto.viz.createMap({ basemap: 'voyager'});
+        //   const deckMap = carto.viz.createMap({ basemap: 'darkmatter', view: { zoom: 4 } });
+        //   const deckMap = carto.viz.createMap({ basemap: 'positron', view: { zoom: 4, longitude: 3, latitude: 40, pitch: 45, bearing: 30 }, container: 'map' });
 
-        let ports = new carto.viz.Layer('world_ports');
+        const ports = new carto.viz.Layer('world_ports');
         ports.addTo(deckMap);
       }
 

@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Change the style of a layer</title>
+    <title>Set style</title>
 
     <link
       rel="stylesheet"
@@ -14,7 +14,7 @@
     <link
       rel="stylesheet"
       type="text/css"
-      href="https://libs.cartocdn.com/airship-style/v2.3/airship.css"
+      href="https://libs.cartocdn.com/airship-style/v2.4/airship.min.css"
     />
 
     <style>
@@ -42,9 +42,10 @@
             <div class="as-panel__element as-p--16 as-body">
               <h1 class="as-title">Set style</h1>
               <h4 class="as-subheader as-mb--12">
-                Set a new style to a Layer
+                Change the style of a layer, using <em>carto.viz.style.colorCategories</em> style helper and the <em>carto.viz.layer.setStyle</em> method
               </h4>
               <div>
+                <!-- Clicking the button will replace the original (default) style -->
                 <button class="as-btn as-btn--primary" onclick="updateStyle()">Update Style</button>
               </div>
           </div>
@@ -59,9 +60,17 @@
     <script>
       let countries;
 
-      async function initialize() {
+      function initialize() {
+        /*
+          A common setup: basemap + a CARTO Layer (from the 'public' user)
+        */
         carto.auth.setDefaultCredentials({ username: 'public' });
         const deckMap = carto.viz.createMap();
+
+        /*
+          Not using a style gets a layer with 'default styles' (in the case of
+          polygons, purple fill and light lines)
+        */
         countries = new carto.viz.Layer('ne_50m_admin_0_countries');
         countries.addTo(deckMap);
       }
@@ -69,7 +78,16 @@
       initialize();
 
       function updateStyle() {
-        const newStyle = carto.viz.style.colorCategories('continent');
+        /*
+          Web SDK allows a lot of customization on layer styles, thanks to several functions
+          or "style helpers", like colorCategories. There is also a way to set styles compatible
+          with the underlying deckgl (see examples on deckgl category)
+
+          This gets a choropleth map, in which the value of a string field is used as a category
+          and each category gets a color, automatically. Style helpers also accept further 
+          customization (for example on palettes).
+        */
+        const newStyle = carto.viz.style.colorCategories('continent');        
         countries.setStyle(newStyle);
       }
     </script>

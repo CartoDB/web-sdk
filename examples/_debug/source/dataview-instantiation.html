@@ -14,7 +14,7 @@
     <link
       rel="stylesheet"
       type="text/css"
-      href="https://libs.cartocdn.com/airship-style/v2.4/airship.min.css"
+      href="https://libs.cartocdn.com/airship-style/v2.3/airship.css"
     />
 
     <style>
@@ -71,33 +71,24 @@
 
     <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.js"></script>
     <script src="https://unpkg.com/deck.gl@8.2.0/dist.min.js"></script>
-    <script src="https://libs.cartocdn.com/airship-components/v2.4/airship.js"></script>
+    <script src="https://libs.cartocdn.com/airship-components/v2.3/airship.js"></script>
     <script src="/dist/umd/index.min.js"></script>
 
     <script>
       const widgetElement = document.querySelector('as-category-widget');
 
       async function initialize() {
-        const url =
-          'https://public.carto.com/api/v2/sql?api_key=default_public&q=select* from world_ports&format=geojson';
-        const geojsonData = await fetch(url).then(response => response.json());
+        carto.auth.setDefaultCredentials({ username: 'cartoframes' });
 
         const deckMap = carto.viz.createMap();
 
-        const basicStyle = carto.viz.style.basic({
-          color: '#0000FF',
-          size: 14,
-          strokeColor: '#0000FF44',
-          strokeWidth: 6
-        });
-
-        const layer = new carto.viz.Layer(geojsonData, basicStyle);
-        await layer.addTo(deckMap);
+        const countriesLayer = new carto.viz.Layer('seattle_collisions');
+        await countriesLayer.addTo(deckMap);
 
         // A data-view to count
-        const dataview = new carto.viz.dataview.Category(layer, 'harbortype', {
+        const dataview = new carto.viz.dataview.Category(countriesLayer, 'collisiontype', {
           operation: 'count',
-          mode: 'local'
+          mode:'local'
         });
 
         new carto.viz.widget.Category('as-category-widget', dataview);

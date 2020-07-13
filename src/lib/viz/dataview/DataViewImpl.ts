@@ -53,9 +53,9 @@ export abstract class DataViewImpl<T> extends WithEvents {
     events.forEach((e: string) => this.dataView.on(e, (args: any[]) => this.emit(e, args)));
   }
 
-  public abstract async getLocalData(filterId?: string): Promise<T>;
+  public abstract async getLocalData(options: { excludedFilters: string[] }): Promise<T>;
 
-  public abstract async getRemoteData(): Promise<T>;
+  public abstract async getRemoteData(options: { excludedFilters: string[] }): Promise<T>;
 }
 
 function validateParameters(operation: AggregationType, column: string) {

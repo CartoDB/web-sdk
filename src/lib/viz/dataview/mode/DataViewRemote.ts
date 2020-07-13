@@ -10,6 +10,7 @@ import { CartoDataViewError, dataViewErrorTypes } from '../DataViewError';
 
 export class DataViewRemote extends DataViewMode {
   private _dataviewsApi: DataviewsApi;
+  private _remoteSource: SQLSource | DatasetSource;
 
   private filtersCollection = new FiltersCollection<SpatialFilters, RemoteFilterApplicator>(
     RemoteFilterApplicator
@@ -18,10 +19,19 @@ export class DataViewRemote extends DataViewMode {
   constructor(dataSource: Layer | Source, column: string, credentials = defaultCredentials) {
     super(dataSource, column);
 
-    const dataset = getDatasetName(dataSource);
-    this._dataviewsApi = new DataviewsApi(dataset, credentials);
+    const remoteSource = getRemoteSource(dataSource);
+    this._remoteSource = remoteSource;
+    this._dataviewsApi = new DataviewsApi(remoteSource.value, credentials);
 
+    this.bindEvents();
+  }
+
+  private bindEvents() {
     this.registerAvailableEvents(['dataUpdate', 'error']);
+
+    this._remoteSource.on('filterChange', () => {
+      this.onDataUpdate();
+    });
   }
 
   public get dataviewsApi() {
@@ -33,7 +43,13 @@ export class DataViewRemote extends DataViewMode {
   }
 
   public addFilter(filterId: string, filter: Filter) {
-    this.dataSource.addFilter(filterId, { [this.column]: filter });
+    super.addFilter(filterId, filter as ColumnFilters);
+    this._remoteSource.addFilter(filterId, { [this.column]: filter });
+  }
+
+  public removeFilter(filterId: string) {
+    super.removeFilter(filterId);
+    this._remoteSource.removeFilter(filterId);
   }
 
   public setFilters(filters: ColumnFilters) {
@@ -69,18 +85,19 @@ export class DataViewRemote extends DataViewMode {
       }
     });
   }
+
+  public updateDataViewSource(options: { excludedFilters: string[] }) {
+    const sql = this._remoteSource.getSQLWithFilters(options.excludedFilters);
+    this.dataviewsApi.setSource(sql);
+  }
 }
 
-function getDatasetName(dataSource: Layer | Source) {
-  let source;
-
+function getRemoteSource(dataSource: Layer | Source) {
   if (dataSource instanceof Source) {
-    // TODO what about the other sources?
-    source = dataSource as SQLSource | DatasetSource;
-  } else {
-    const layer = dataSource as Layer;
-    source = layer.source as SQLSource | DatasetSource;
+    // TODO what about the other sources? Check DOSource and its instantiation process
+    return dataSource as SQLSource | DatasetSource;
   }
 
-  return source.value;
+  const layer = dataSource as Layer;
+  return layer.source as SQLSource | DatasetSource;
 }

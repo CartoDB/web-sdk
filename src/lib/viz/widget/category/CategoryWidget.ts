@@ -43,7 +43,7 @@ export class CategoryWidget extends Widget<CategoryDataViewData> {
   }
 
   protected async updateData() {
-    const data = await this.dataView.getData(this.widgetUUID);
+    const data = await this.dataView.getData({ excludedFilters: [this.widgetUUID] });
     const categoryWidget = this.element as HTMLAsCategoryWidgetElement;
     categoryWidget.categories = data.categories;
   }

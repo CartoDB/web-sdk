@@ -57,7 +57,6 @@ export class Popup {
         }
       }
     });
-
     this._render();
   }
 
@@ -73,7 +72,7 @@ export class Popup {
 
     this._coordinates = coordinates;
 
-    if (this._deckInstance && this._isOpen) {
+    if (this._deckInstance) {
       this._render();
     }
   }
@@ -114,6 +113,7 @@ export class Popup {
     }
 
     this._isOpen = true;
+    this._render();
   }
 
   /**
@@ -178,7 +178,12 @@ export class Popup {
   }
 
   private _render() {
-    if (this._coordinates && this.getContent().trim().length > 0 && this._deckInstance) {
+    if (
+      this._isOpen &&
+      this._coordinates &&
+      this.getContent().trim().length > 0 &&
+      this._deckInstance
+    ) {
       const pixels = coordinates2pixels(this._coordinates, this._deckInstance);
 
       if (pixels) {
