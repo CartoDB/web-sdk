@@ -36,6 +36,13 @@
 
     <script>
       function getIconStyle() {
+        return carto.viz.style.icon('https://avatars2.githubusercontent.com/u/421145?s=60&v=4', {
+          iconWidth: 60,
+          iconHeight: 60
+        });
+      }
+      
+      function getIconStyleOld() {
         return carto.viz.style.icon({
           getIcon: () => ({
             url: 'https://avatars2.githubusercontent.com/u/421145?s=60&v=4',
@@ -69,8 +76,8 @@
           }
         });
 
-        // const style = getIconStyle()
-        const style = getIconStyleWithIconAtlas()
+        const style = getIconStyle()
+        // const style = getIconStyleWithIconAtlas()
 
         // geoJSON
         // const data = await fetch('https://cartoframes.carto.com/api/v2/sql?api_key=default_public&q=select* from sf_nbhd_crime&format=geojson').then(response => response.json())

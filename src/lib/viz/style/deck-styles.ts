@@ -20,10 +20,7 @@ function pointStyles(opts: any) {
     stroked: true,
     getLineColor: hexToRgb(getStyleValue('strokeColor', 'Point', opts)),
     getLineWidth: getStyleValue('strokeWidth', 'Point', opts),
-    lineWidthUnits: 'pixels',
-
-    getSize: getStyleValue('size', 'Point', opts),
-    sizeUnits: 'pixels'
+    lineWidthUnits: 'pixels'
   };
 }
 

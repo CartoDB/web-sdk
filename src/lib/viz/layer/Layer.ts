@@ -261,6 +261,7 @@ export class Layer extends WithEvents implements StyledLayer {
     await this._source.init();
 
     const layerProperties = await this._getLayerProperties();
+    console.log(layerProperties)
 
     // Create the Deck.gl instance
     if (this._source.sourceType === 'SQLSource' || this._source.sourceType === 'DatasetSource') {

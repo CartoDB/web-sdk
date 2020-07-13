@@ -1,61 +1,96 @@
-import { Texture2D } from '@luma.gl/core';
 import { IconLayer } from '@deck.gl/layers';
 import { Feature, Point, MultiPoint } from 'geojson';
 import { GeometryType } from '@/viz/source';
 import { StyledLayer } from '../layer-style';
-import { Style, BasicOptionsStyle, getStyles } from '..';
+import { Style } from '..';
 import { CartoStylingError, stylingErrorTypes } from '../../errors/styling-error';
+import { IconLayerProps } from '@deck.gl/layers/icon-layer/icon-layer';
 
-export interface Icon {
-  x: number;
-  y: number;
+export interface IconOptionsStyle {
+  // icon width in pixels
+  iconWidth: number;
+  // icon height in pixels
+  iconHeight: number;
+  // horizontal position of icon anchor
+  anchorX: number;
+  // vertical position of icon anchor
+  anchorY: number;
+  // Icon size multiplier
+  sizeScale: number;  
+}
+
+interface GetIconProps {
+  url: string;
   width: number;
   height: number;
   anchorX?: number;
   anchorY?: number;
-  mask?: boolean;
 }
 
-export interface IconOptionsStyle extends Partial<BasicOptionsStyle> {
-  // Atlas image url or texture
-  iconAtlas: Texture2D | string;
-  // Icon names mapped to icon definitions
-  iconMapping: Record<string, Icon>;
-  // Icon size multiplier
+interface StyleOptions {
+  iconWidth: number;
+  iconHeight: number;
   sizeScale: number;
-  // Method called to retrieve the icon name of each object
-  // eslint-disable-next-line @typescript-eslint/ban-types
-  getIcon: Function;
-  // icon height in pixels
-  size: number;
+  sizeUnits: string;
+  anchorX?: number;
+  anchorY?: number;
 }
 
 function defaultOptions(options: Partial<IconOptionsStyle>) {
   return {
     sizeScale: 1,
-    size: 50,
+    sizeUnits: 'pixels',
+    iconWidth: 10,
+    iconHeight: 10,
     ...options
   };
 }
 
-export function iconStyle(options: Partial<IconOptionsStyle> = {}) {
-  const evalFN = (layer: StyledLayer) => {
+function getStyles(icon: string, options: StyleOptions) {
+  const getIconProps: GetIconProps = {
+    url: icon,
+    width: options.iconWidth,
+    height: options.iconHeight
+  };
+
+  if (options.anchorX) {
+    getIconProps.anchorX = options.anchorX;
+  }
+
+  if (options.anchorY) {
+    getIconProps.anchorY = options.anchorY;
+  }
+
+  return {
+    getIcon: () => getIconProps,
+    getSize: options.iconHeight,
+    sizeScale: options.sizeScale,
+    sizeUnits: options.sizeUnits
+  }
+}
+
+/**
+ * Show a custom image in your map at given coordinates.
+ * This only works with Point geometries
+ * @param icon icon image local path or URL 
+ * @param options Partial<IconOptionsStyle> options
+ */
+export function iconStyle(icon: string, options: Partial<IconOptionsStyle>) {
+  const evalFN = (layer: StyledLayer) =>  {
     const meta = layer.source.getMetadata();
     const iconOptions = defaultOptions(options);
 
     validateParameters(iconOptions, meta.geometryType);
 
-    const pointStyles = getStyles(meta.geometryType, iconOptions);
+    const styles = getStyles(icon, iconOptions);
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const renderSubLayers = (props: any) => new IconLayer(props);
+    const renderSubLayers = (props: any) => new IconLayer(props); 
 
     return {
       _isIconLayer: true,
       getPosition,
       renderSubLayers,
-      ...iconOptions,
-      ...pointStyles
+      ...styles
     };
   };
 
@@ -77,30 +112,25 @@ function validateParameters(options: Partial<IconOptionsStyle>, geometryType: Ge
     );
   }
 
-  if (options.iconMapping) {
-    // eslint-disable-next-line no-restricted-syntax
-    for (const [iconName, icon] of Object.entries(options.iconMapping)) {
-      if (icon.x < 0 || icon.y < 0) {
-        throw new CartoStylingError(
-          `x and y should be equal or greater than 0 (error in icon '${iconName}')`,
-          stylingErrorTypes.PROPERTY_MISMATCH
-        );
-      }
+  if (!options.iconWidth || options.iconWidth < 1 || !options.iconHeight || options.iconHeight < 1) {
+    throw new CartoStylingError(
+      'iconWidth and iconHeight should be greater than 0',
+      stylingErrorTypes.PROPERTY_MISMATCH
+    );
+  }
 
-      if (icon.width < 0 || icon.height < 0) {
-        throw new CartoStylingError(
-          `width and height should be equal or greater than 0 (error in icon '${iconName}')`,
-          stylingErrorTypes.PROPERTY_MISMATCH
-        );
-      }
-
-      if ((icon.anchorX && icon.anchorX < 0) || (icon.anchorY && icon.anchorY < 0)) {
-        throw new CartoStylingError(
-          `anchorX and anchorY should be equal or greater than 0 (error in icon '${iconName}')`,
-          stylingErrorTypes.PROPERTY_MISMATCH
-        );
-      }
-    }
+  if (options.anchorX && options.anchorX < 0) {
+    throw new CartoStylingError(
+      'anchorX should be equal or greater than 0',
+      stylingErrorTypes.PROPERTY_MISMATCH
+    );
+  }
+  
+  if (options.anchorY && options.anchorY < 0) {
+    throw new CartoStylingError(
+      'anchorY should be equal or greater than 0',
+      stylingErrorTypes.PROPERTY_MISMATCH
+    );
   }
 }
 

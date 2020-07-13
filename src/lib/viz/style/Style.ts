@@ -1,10 +1,12 @@
 import { GeoJsonLayerProps } from '@deck.gl/layers/geojson-layer/geojson-layer';
+import { IconLayerProps } from '@deck.gl/layers/icon-layer/icon-layer';
 import { CartoStylingError, stylingErrorTypes } from '../errors/styling-error';
 import { StyledLayer } from './layer-style';
 
 export type StyleProperties =
   | GeoJsonLayerProps<any>
-  | ((layerStyle: StyledLayer) => GeoJsonLayerProps<any>);
+  | ((layerStyle: StyledLayer) => GeoJsonLayerProps<any>)
+  | IconLayerProps<any>
 
 export class Style {
   private _styleProperties: StyleProperties;
