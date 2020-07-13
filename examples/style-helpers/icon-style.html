@@ -47,15 +47,20 @@
           }
         });
 
-        const style = carto.viz.style.icon('./carto.jpg', {
-          iconHeight: 30,
-          iconWidth: 30
-        });
+        const style = carto.viz.style.icon('./carto.jpg');
+
+        // using options
+        // const style = carto.viz.style.icon('./carto.jpg', {
+        //   iconHeight: 30,
+        //   iconWidth: 30,
+        //   anchorX: 10,
+        //   anchorY: 25
+        // });
 
         // CARTO source
         const layer = new carto.viz.Layer('sf_nbhd_crime', style);
 
-        // geoJSON
+        // GeoJSON source
         // const data = await fetch('https://cartoframes.carto.com/api/v2/sql?api_key=default_public&q=select* from sf_nbhd_crime&format=geojson').then(response => response.json())
         // const layer = new carto.viz.Layer(data, style);
 
