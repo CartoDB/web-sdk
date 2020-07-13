@@ -56,11 +56,11 @@
         </div>
         <div class="as-panel as-panel--vertical as-panel--top as-panel--left as-bg--ui-01">
           <div class="as-panel__element as-p--16 as-body" style="max-width: fit-content; padding-top: 0px;">
-            <as-category-widget id="category-widget-remote" class="as-p--16" heading="Cities (remote)">
+            <as-category-widget id="category-widget-remote" class="as-p--16" heading="Cities (global)">
             </as-category-widget>
-            <as-category-widget id="category-widget-remote-filtered" class="as-p--16" heading="Cities (remote-filtered)">
+            <as-category-widget id="category-widget-remote-filtered" class="as-p--16" heading="Cities (viewport precise mode)">
             </as-category-widget>
-            <as-category-widget id="category-widget-local" class="as-p--16" heading="Cities (local)">
+            <as-category-widget id="category-widget-local" class="as-p--16" heading="Cities (viewport fast mode)">
             </as-category-widget>
           </div>
         </div>
@@ -94,50 +94,50 @@
       );
     const errorContainer = document.getElementById('errorContainer');
 
-    let categoryRemote;
-    let categoryRemoteFiltered;
+    let categoryGlobal;
+    let categoryViewportPrecise;
     let categoryLocal;
 
     async function initialize() {
+      carto.auth.setDefaultCredentials({ username: 'public' });
       const deckMap = carto.viz.createMap();
 
-      const geojson = await fetch('https://public.carto.com/api/v2/sql?api_key=default_public&q=select* from ne_50m_admin_0_countries&format=geojson').then(response => response.json())
-      const countriesLayer = new carto.viz.Layer(geojson);
+      const countriesLayer = new carto.viz.Layer('ne_50m_admin_0_countries');
       await countriesLayer.addTo(deckMap);
 
-      categoryRemote = new carto.viz.dataview.Category(
+      categoryGlobal = new carto.viz.dataview.Category(
         countriesLayer,
         'continent',
-        { operation: 'sum', operationColumn: 'pop_est', mode: 'remote' }
+        { operation: 'sum', operationColumn: 'pop_est' }
       );
-      categoryRemoteFiltered = new carto.viz.dataview.Category(
+      categoryViewportPrecise = new carto.viz.dataview.Category(
         countriesLayer,
         'continent',
-        { operation: 'sum', operationColumn: 'pop_est', mode: 'remote-filtered' }
+        { operation: 'sum', operationColumn: 'pop_est', spatialFilter: 'viewport', mode: 'precise' }
       );
-      categoryLocal = new carto.viz.dataview.Category(
+      categoryViewportFast = new carto.viz.dataview.Category(
         countriesLayer,
         'continent',
-        { operation: 'sum', operationColumn: 'pop_est', mode: 'local' }
+        { operation: 'sum', operationColumn: 'pop_est', spatialFilter: 'viewport' }
       );
 
-      new carto.viz.widget.Category('#category-widget-remote', categoryRemote);
-      new carto.viz.widget.Category('#category-widget-remote-filtered', categoryRemoteFiltered);
-      new carto.viz.widget.Category('#category-widget-local', categoryLocal);
+      new carto.viz.widget.Category('#category-widget-remote', categoryGlobal);
+      new carto.viz.widget.Category('#category-widget-remote-filtered', categoryViewportPrecise);
+      new carto.viz.widget.Category('#category-widget-local', categoryViewportFast);
 
       // bind events
-      categoryRemote.on('dataUpdate', async () => {
+      categoryGlobal.on('dataUpdate', async () => {
         widgetRemoteElement.isLoading = 'false';
       });
-      categoryRemote.on('error', ([error]) => {
+      categoryGlobal.on('error', ([error]) => {
         errorContainer.innerHTML = error.message;
         widgetRemoteElement.isLoading = 'false';
       });
 
-      categoryRemoteFiltered.on('dataUpdate', async () => {
+      categoryViewportPrecise.on('dataUpdate', async () => {
         widgetRemoteFilteredElement.isLoading = 'false';
       });
-      categoryRemoteFiltered.on('error', ([error]) => {
+      categoryViewportPrecise.on('error', ([error]) => {
         errorContainer.innerHTML = error.message;
         widgetRemoteFilteredElement.isLoading = 'false';
       });
@@ -155,29 +155,29 @@
       widgetRemoteElement.isLoading = 'true';
       widgetRemoteFilteredElement.isLoading = 'true';
 
-      categoryLocal.column = column;
-      categoryLocal.operationColumn = operationColumn;
-      categoryLocal.operation = operation;
-      categoryLocal.limit = limit;
+      categoryViewportFast.column = column;
+      categoryViewportFast.operationColumn = operationColumn;
+      categoryViewportFast.operation = operation;
+      categoryViewportFast.limit = limit;
 
-      categoryRemote.column = column;
-      categoryRemote.operationColumn = operationColumn;
-      categoryRemote.operation = operation;
-      categoryRemote.limit = limit;
+      categoryGlobal.column = column;
+      categoryGlobal.operationColumn = operationColumn;
+      categoryGlobal.operation = operation;
+      categoryGlobal.limit = limit;
 
-      categoryRemoteFiltered.column = column;
-      categoryRemoteFiltered.operationColumn = operationColumn;
-      categoryRemoteFiltered.operation = operation;
-      categoryRemoteFiltered.limit = limit;
+      categoryViewportPrecise.column = column;
+      categoryViewportPrecise.operationColumn = operationColumn;
+      categoryViewportPrecise.operation = operation;
+      categoryViewportPrecise.limit = limit;
 
       if (operation === 'count') {
-        categoryLocal.operationColumn = undefined;
-        categoryRemote.operationColumn = undefined;
-        categoryRemoteFiltered.operationColumn = undefined;
+        categoryViewportFast.operationColumn = undefined;
+        categoryGlobal.operationColumn = undefined;
+        categoryViewportPrecise.operationColumn = undefined;
       } else {
-        categoryLocal.operationColumn = operationColumn;
-        categoryRemote.operationColumn = operationColumn;
-        categoryRemoteFiltered.operationColumn = operationColumn;
+        categoryViewportFast.operationColumn = operationColumn;
+        categoryGlobal.operationColumn = operationColumn;
+        categoryViewportPrecise.operationColumn = operationColumn;
       }
     }
 

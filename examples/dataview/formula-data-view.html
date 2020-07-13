@@ -69,7 +69,6 @@
 
     <script src="/dist/umd/index.min.js"></script>
 
-
     <script>
       // const widgetElement = document.querySelector('as-formula-widget');
       const widgetElement = document.querySelector('#formula');
@@ -84,7 +83,7 @@
 
         const dataview = new carto.viz.dataview.Formula(countriesLayer, 'gdp', {
           operation: 'sum',
-          mode: 'local'
+          spatialFilter: 'viewport'
         });
 
         dataview.on('dataUpdate', async () => {

@@ -146,7 +146,6 @@
 
     <script src="/dist/umd/index.min.js"></script>
 
-
     <script>
       const operationElem = document.querySelector('as-dropdown');
       operationElem.options = [
@@ -161,9 +160,9 @@
       const formulaLocalElement = document.getElementById('formula-local');
       const errorContainer = document.getElementById('errorContainer');
 
-      let formulaRemote;
-      let formulaRemoteFiltered;
-      let formulaLocal;
+      let formulaGlobal;
+      let formulaViewportPrecise;
+      let formulaViewportFast;
 
       async function initialize() {
         carto.auth.setDefaultCredentials({ username: 'public' });
@@ -172,47 +171,47 @@
         const countriesLayer = new carto.viz.Layer('world_commerce');
         await countriesLayer.addTo(deckMap);
 
-        formulaRemote = new carto.viz.dataview.Formula(countriesLayer.source, 'gdp', {
-          operation: 'sum',
-          mode: 'remote'
+        formulaGlobal = new carto.viz.dataview.Formula(countriesLayer.source, 'gdp', {
+          operation: 'sum'
         });
-        formulaRemoteFiltered = new carto.viz.dataview.Formula(countriesLayer, 'gdp', {
+        formulaViewportPrecise = new carto.viz.dataview.Formula(countriesLayer, 'gdp', {
           operation: 'sum',
-          mode: 'remote-filtered'
+          spatialFilter: 'viewport',
+          mode: 'precise'
         });
-        formulaLocal = new carto.viz.dataview.Formula(countriesLayer, 'gdp', {
+        formulaViewportFast = new carto.viz.dataview.Formula(countriesLayer, 'gdp', {
           operation: 'sum',
-          mode: 'local'
+          spatialFilter: 'viewport'
         });
 
         // intializes the widgets
-        const remoteData = await formulaRemote.getData();
+        const remoteData = await formulaGlobal.getData();
         formulaRemoteElement.innerHTML = d3.format('.4s')(remoteData.result);
-        const remoteFilteredData = await formulaRemoteFiltered.getData();
+        const remoteFilteredData = await formulaViewportPrecise.getData();
         formulaRemoteFilteredElement.innerHTML = d3.format('.4s')(remoteFilteredData.result);
-        const localData = await formulaLocal.getData();
+        const localData = await formulaViewportFast.getData();
         formulaLocalElement.innerHTML = d3.format('.4s')(localData.result);
 
         // bind events
-        formulaLocal.on('dataUpdate', async () => {
-          const data = await formulaLocal.getData();
+        formulaViewportFast.on('dataUpdate', async () => {
+          const data = await formulaViewportFast.getData();
           formulaLocalElement.innerHTML = d3.format('.4s')(data.result);
         });
 
-        formulaRemote.on('dataUpdate', async () => {
-          const data = await formulaRemote.getData();
+        formulaGlobal.on('dataUpdate', async () => {
+          const data = await formulaGlobal.getData();
           formulaRemoteElement.innerHTML = d3.format('.4s')(data.result);
         });
-        formulaRemote.on('error', ([error]) => {
+        formulaGlobal.on('error', ([error]) => {
           errorContainer.innerHTML = error.message;
         });
 
-        formulaRemoteFiltered.on('dataUpdate', async () => {
-          const data = await formulaRemoteFiltered.getData();
+        formulaViewportPrecise.on('dataUpdate', async () => {
+          const data = await formulaViewportPrecise.getData();
           formulaRemoteFilteredElement.innerHTML = d3.format('.4s')(data.result);
         });
 
-        formulaRemoteFiltered.on('error', ([error]) => {
+        formulaViewportPrecise.on('error', ([error]) => {
           errorContainer.innerHTML = error.message;
         });
       }
@@ -223,14 +222,14 @@
 
         errorContainer.innerHTML = '';
 
-        formulaRemote.column = column;
-        formulaRemote.operation = operation;
+        formulaGlobal.column = column;
+        formulaGlobal.operation = operation;
 
-        formulaRemoteFiltered.column = column;
-        formulaRemoteFiltered.operation = operation;
+        formulaViewportPrecise.column = column;
+        formulaViewportPrecise.operation = operation;
 
-        formulaLocal.column = column;
-        formulaLocal.operation = operation;
+        formulaViewportFast.column = column;
+        formulaViewportFast.operation = operation;
       }
 
       initialize();
