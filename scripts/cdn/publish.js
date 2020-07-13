@@ -191,6 +191,7 @@ async function publish (mode) {
         throw new Error('Not a valid publishing mode, use RELEASE or CURRENT_BRANCH');
     }
 
+    // TODO message not properly awaits uploads
     if (DRY_RUN) { // no effective upload
         console.log(`\t[DRY_RUN] Version fake upload!`);
     } else { // real CDN upload!

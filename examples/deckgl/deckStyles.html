@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>deck.gl styles on a CARTO layer</title>
+    <title>deck.gl styles</title>
 
     <link
       rel="stylesheet"
@@ -14,7 +14,7 @@
     <link
       rel="stylesheet"
       type="text/css"
-      href="https://libs.cartocdn.com/airship-style/v2.3/airship.css"
+      href="https://libs.cartocdn.com/airship-style/v2.4/airship.min.css"
     />
 
     <style>
@@ -42,7 +42,7 @@
             <div class="as-panel__element as-p--16 as-body">
               <h1 class="as-title">deck.gl styles</h1>
               <h4 class="as-subheader as-mb--12">
-                CARTOLayer is a deck.gl layer, so you can use common deck.gl styles for it
+                CARTOLayer is a deck.gl layer, so you can use common deck.gl style syntax for it. 
               </h4>
           </div>
         </div>
@@ -59,12 +59,21 @@
 
         const deckMap = carto.viz.createMap();
 
+        /*
+          For styling, you can use pure deck.gl styles, specified as values or functions.
+          The available properties are those included in GeoJsonLayer. 
+          See https://deck.gl/docs/api-reference/layers/geojson-layer
+          Colors are specified as [R, G, B, A] components, from 0 to 255
+        */
         const styles = {
-          getFillColor: [200, 109, 186, 200],
-          getLineWidth: 2,
+          getFillColor: [245, 22, 48, 200],
+          getLineWidth: 3,
           getLineColor: [255, 255, 255, 127]
         };
 
+        /*
+          Notice how deck.gl styles are simply passed to the layer
+        */
         const countriesLayer = new carto.viz.Layer('ne_50m_admin_0_countries', styles);
         countriesLayer.addTo(deckMap);
       }

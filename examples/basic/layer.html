@@ -3,20 +3,23 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Add a CARTO Layer</title>
+    <title>Add layer</title>
 
+    <!-- mapbox-gl css ia required by Mapbox GL JS library (which provides the basemaps tech) -->
     <link
       rel="stylesheet"
       type="text/css"
       href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.css"
     />
 
+    <!-- airship provides CARTO styles used, for example, in the panel -->
     <link
       rel="stylesheet"
       type="text/css"
-      href="https://libs.cartocdn.com/airship-style/v2.3/airship.css"
+      href="https://libs.cartocdn.com/airship-style/v2.4/airship.min.css"
     />
 
+    <!-- css styles to get a 'full-screen' map -->
     <style>
       body {
         margin: 0;
@@ -27,36 +30,65 @@
         width: 100vw;
         height: 100vh;
       }
+
+      strong {
+        color: 
+      }
     </style>
   </head>
 
+  <!-- 'as- classes come from Airship, and they provide help for the layout and basic styles -->
   <body class="as-app-body as-app">
     <div class="as-content">
       <main class="as-main">
         <div class="as-map-area">
-          <!-- map -->
+          <!-- map component will be instantiated here -->
           <div id="map"></div>
 
-          <!-- panel -->
+          <!-- panel with title and description -->
           <div class="as-panel as-panel--top as-panel--right as-bg--ui-01">
             <div class="as-panel__element as-p--16 as-body">
               <h1 class="as-title">Add layer</h1>
               <h4 class="as-subheader as-mb--12">
-                Add one CARTO layer to your map
+                Add one CARTO layer to your map with <em>carto.viz.createMap</em> and <em>carto.viz.Layer</em>
               </h4>
           </div>
         </div>
       </main>
     </div>
 
+    <!-- mapbox-gl js, the corresponding JavaScript for the Mapbox GL library -->
     <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.js"></script>
+
+    <!-- deck.gl library -->
     <script src="https://unpkg.com/deck.gl@8.2.0/dist.min.js"></script>
+
+    <!-- CARTO Web SDK library -->
     <script src="/dist/umd/index.min.js"></script>
 
     <script>
       function initialize() {
+        /* 
+          Set default credentials to access datasets in the CARTO platform, in this case from the 'public' user.
+          You can use your own user account here (there's a free plan available at https://carto.com/signup/)
+        */
         carto.auth.setDefaultCredentials({ username: 'public' });
+
+        /* 
+          If apiKey is the default for public, it can be ommitted, so the previous is equivalent to:
+          `carto.auth.setDefaultCredentials({ username: 'public', apiKey: 'default_public' });`
+        */
+
+        /*
+          This creates a simple world map, but it can be further configured (zoom, center, basemap...). Check the reference
+          and other examples.
+        */
         const deckMap = carto.viz.createMap();
+
+        /*
+          Create a layer with the whole dataset and add it to the map.
+          You can browse available datasets for the account in https://public.carto.com/datasets/
+        */
         const countriesLayer = new carto.viz.Layer('ne_50m_admin_0_countries');
         countriesLayer.addTo(deckMap);
       }
