@@ -295,6 +295,14 @@ export class Layer extends WithEvents implements StyledLayer {
     return features;
   }
 
+  public async getFeatures(excludedFilters: string[] = []) {
+    if (this._source instanceof SQLSource) {
+      return this.getViewportFeatures(excludedFilters);
+    }
+
+    return this._source.getFeatures(excludedFilters);
+  }
+
   private _getLayerProperties() {
     const props = this._source.getProps();
     const styleProps = this.getStyle().getLayerProps(this);

@@ -18,11 +18,9 @@ export class HistogramDataView extends DataView<HistogramDataViewData> {
     options: HistogramDataViewOptions = { bins: 10 }
   ) {
     let dataView;
-    const geoJSONSource = isGeoJSONSource(dataSource);
 
-    if (this.mode === DataViewCalculation.FAST || geoJSONSource) {
-      const useViewport = !(this.mode === DataViewCalculation.PRECISE && geoJSONSource);
-      dataView = new DataViewLocal(dataSource as Layer, column, useViewport);
+    if (this.mode === DataViewCalculation.FAST || isGeoJSONSource(dataSource)) {
+      dataView = new DataViewLocal(dataSource as Layer, column);
     } else if (this.mode === DataViewCalculation.PRECISE) {
       const credentials = getCredentialsFrom(dataSource);
       dataView = new DataViewRemote(dataSource as Layer, column, credentials);

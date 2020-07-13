@@ -11,11 +11,9 @@ import { CartoDataViewError, dataViewErrorTypes } from '../DataViewError';
 export class FormulaDataView extends DataView<FormulaDataViewData> {
   protected buildImpl(dataSource: Layer | Source, column: string, options: FormulaDataViewOptions) {
     let dataView;
-    const geoJSONSource = isGeoJSONSource(dataSource);
 
-    if (this.mode === DataViewCalculation.FAST || geoJSONSource) {
-      const useViewport = !(this.mode === DataViewCalculation.PRECISE && geoJSONSource);
-      dataView = new DataViewLocal(dataSource as Layer, column, useViewport);
+    if (this.mode === DataViewCalculation.FAST || isGeoJSONSource(dataSource)) {
+      dataView = new DataViewLocal(dataSource as Layer, column);
     } else if (this.mode === DataViewCalculation.PRECISE) {
       const credentials = getCredentialsFrom(dataSource);
       dataView = new DataViewRemote(dataSource as Source, column, credentials);
