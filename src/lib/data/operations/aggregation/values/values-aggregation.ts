@@ -1,15 +1,12 @@
-import { CartoError } from '../../../core/errors/CartoError';
+import { CartoDataViewError, dataViewErrorTypes } from '@/viz/dataview/DataViewError';
+import { CartoError } from '@/core/errors/CartoError';
+import { areValidNumbers } from '@/core/utils/number';
+import { AggregationType } from '../AggregationType';
 
-export enum AggregationType {
-  COUNT = 'count',
-  AVG = 'avg',
-  MIN = 'min',
-  MAX = 'max',
-  SUM = 'sum',
-  PERCENTILE = 'percentile'
-}
-
-export function aggregate(values: number[], aggregation: AggregationType = '' as AggregationType) {
+export function aggregateValues(
+  values: number[],
+  aggregation: AggregationType = '' as AggregationType
+) {
   const aggregationData = aggregation.split('_');
   const aggregationName = aggregationData.shift();
 
@@ -23,7 +20,19 @@ export function aggregate(values: number[], aggregation: AggregationType = '' as
     });
   }
 
-  return aggregationFunction(values, aggregationData);
+  if (!areValidNumbers(values)) {
+    throw new CartoDataViewError(
+      `Column property for aggregations can just contain numbers (or nulls). Please check documentation.`,
+      dataViewErrorTypes.PROPERTY_INVALID
+    );
+  }
+
+  const filteredValues = values.filter(Number.isFinite) as number[];
+
+  return {
+    result: aggregationFunction(filteredValues, aggregationData),
+    nullCount: values.length - filteredValues.length
+  };
 }
 
 // eslint-disable-next-line @typescript-eslint/ban-types

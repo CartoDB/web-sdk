@@ -1,5 +1,5 @@
 import { Layer, GeoJSONSource } from '@/viz';
-import { AggregationType, aggregate } from '@/data/operations/aggregation/aggregation';
+import { AggregationType, aggregateValues } from '@/data/operations/aggregation';
 import { groupValuesByColumn } from '@/data/operations/grouping';
 import { castToNumberOrUndefined } from '@/core/utils/number';
 import { ColumnFilters, SpatialFilters } from '@/viz/filters/types';
@@ -15,15 +15,23 @@ export class DataViewLocal extends DataViewMode {
     this.bindEvents();
   }
 
-  public async getSourceData(columns: string[] = [], options: { excludedFilters?: string[] } = {}) {
-    if (!columns.includes(this.column)) {
-      columns.push(this.column);
-    }
-
-    const { excludedFilters = [] } = options;
+  public async getSourceData(
+    options: {
+      excludedFilters?: string[];
+      aggregationOptions?: {
+        dimension?: string[];
+        numeric?: { column: string; operations: string[] }[];
+      };
+    } = {}
+  ) {
+    const { excludedFilters = [], aggregationOptions } = options;
 
     if (this.useViewport) {
-      await (this.dataSource as Layer).addSourceField(this.column);
+      await (this.dataSource as Layer).addAggregationOptions(
+        aggregationOptions?.numeric,
+        aggregationOptions?.dimension
+      );
+
       return (this.dataSource as Layer).getViewportFeatures(excludedFilters);
     }
 
@@ -41,7 +49,7 @@ export class DataViewLocal extends DataViewMode {
     operation: AggregationType,
     options: { excludedFilters: string[] }
   ) {
-    const sourceData = await this.getSourceData([operationColumn || this.column], options);
+    const sourceData = await this.getSourceData(options);
     const { groups, nullCount } = groupValuesByColumn(
       sourceData,
       operationColumn || this.column,
@@ -94,7 +102,7 @@ function createCategory(name: string, data: number[], operation: AggregationType
 
   return {
     name,
-    value: aggregate(categoryValues, operation)
+    value: aggregate(categoryValues, operation).result
   };
 }
 

@@ -49,6 +49,7 @@ export abstract class Source extends WithEvents {
   public needsInitialization: boolean;
   public sourceType: SourceType | unknown;
   protected fields: Set<string>;
+  protected aggregatedColumns: Map<string, Set<string>> = new Map();
 
   constructor(id: string) {
     super();
@@ -90,4 +91,22 @@ export abstract class Source extends WithEvents {
       this.needsInitialization = true;
     }
   }
+
+  addAggregatedColumn(aggregatedColumn: AggregatedColumn) {
+    const aggregatedColumnOperations = this.aggregatedColumns.get(aggregatedColumn.column);
+
+    this.needsInitialization = true;
+
+    if (aggregatedColumnOperations) {
+      aggregatedColumn.operations.forEach(operation => aggregatedColumnOperations.add(operation));
+      return;
+    }
+
+    this.aggregatedColumns.set(aggregatedColumn.column, new Set(aggregatedColumn.operations));
+  }
+}
+
+export interface AggregatedColumn {
+  column: string;
+  operations: string[];
 }
