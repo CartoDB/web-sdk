@@ -1,43 +1,15 @@
-import { Layer, Source } from '@/viz';
-import { DataViewLocal } from '../mode/DataViewLocal';
-import { DataViewRemote } from '../mode/DataViewRemote';
-import { DataViewCalculation } from '../mode/DataViewMode';
-import { DataView, OPTION_CHANGED_DELAY, getCredentialsFrom } from '../DataView';
+import { DataView, OPTION_CHANGED_DELAY } from '../DataView';
 import {
   CategoryOptions,
   CategoryDataViewImpl,
   CategoryDataViewData
 } from './CategoryDataViewImpl';
-import { debounce, isGeoJSONSource } from '../utils';
-import { CartoDataViewError, dataViewErrorTypes } from '../DataViewError';
+import { debounce } from '../utils';
 
 export class CategoryDataView extends DataView<CategoryDataViewData> {
-  protected buildImpl(dataSource: Layer | Source, column: string, options: CategoryOptions) {
-    let dataView;
-    const geoJSONSource = isGeoJSONSource(dataSource);
-
-    if (this.mode === DataViewCalculation.FAST || geoJSONSource) {
-      const useViewport = !(this.mode === DataViewCalculation.PRECISE && geoJSONSource);
-      dataView = new DataViewLocal(dataSource as Layer, column, useViewport);
-    } else if (this.mode === DataViewCalculation.PRECISE) {
-      const credentials = getCredentialsFrom(dataSource);
-      dataView = new DataViewRemote(dataSource, column, credentials);
-    } else {
-      throw new CartoDataViewError(
-        `mode ${this.mode} unknown. Availables: '${DataViewCalculation.FAST}' and '${DataViewCalculation.PRECISE}'.`,
-        dataViewErrorTypes.PROPERTY_INVALID
-      );
-    }
-
-    if (options.filters) {
-      dataView.setFilters(options.filters);
-    }
-
-    if (options.spatialFilter) {
-      dataView.setSpatialFilter(options.spatialFilter);
-    }
-
-    this.dataviewImpl = new CategoryDataViewImpl(dataView, options);
+  protected buildImpl(column: string, options: CategoryOptions) {
+    const dataViewMode = this.createDataViewMode(column, options);
+    this.dataviewImpl = new CategoryDataViewImpl(dataViewMode, options);
   }
 
   public get operationColumn() {
