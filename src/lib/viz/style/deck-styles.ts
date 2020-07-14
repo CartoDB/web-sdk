@@ -9,7 +9,6 @@ const POINTS_WIDTH_FACTOR = 2;
 function pointStyles(opts: any) {
   return {
     opacity: getStyleValue('opacity', 'Point', opts),
-
     filled: true,
     getFillColor: hexToRgb(getStyleValue('color', 'Point', opts)),
     pointRadiusMinPixels: 0,
@@ -21,7 +20,10 @@ function pointStyles(opts: any) {
     stroked: true,
     getLineColor: hexToRgb(getStyleValue('strokeColor', 'Point', opts)),
     getLineWidth: getStyleValue('strokeWidth', 'Point', opts),
-    lineWidthUnits: 'pixels'
+    lineWidthUnits: 'pixels',
+
+    getSize: getStyleValue('size', 'Point', opts),
+    sizeUnits: 'pixels'
   };
 }
 
