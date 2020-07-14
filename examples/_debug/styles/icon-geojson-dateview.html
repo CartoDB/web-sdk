@@ -90,13 +90,13 @@
 
         // const seattleCollisionsLayer = new carto.viz.Layer(collisionsSource, style);
         const data = await fetch('https://cartoframes.carto.com/api/v2/sql?api_key=default_public&q=select* from seattle_collisions&format=geojson').then(response => response.json())
-        const seattleCollisionsLayer = new carto.viz.Layer(data, style);
+        const seattleCollisionsLayer = new carto.viz.Layer(data);
 
         await seattleCollisionsLayer.addTo(deckMap);
 
         const dataview = new carto.viz.dataview.Category(seattleCollisionsLayer, 'collisiontype', {
           operation: 'count',
-          mode:'remote'
+          spatialFilter: 'viewport'
         });
         new carto.viz.widget.Category('as-category-widget', dataview, {
           showClearButton: true,
