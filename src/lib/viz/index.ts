@@ -17,7 +17,8 @@ export {
   sizeCategoriesStyle,
   SizeCategoriesOptionsStyle,
   sizeContinuousStyle,
-  SizeContinuousOptionsStyle
+  iconStyle,
+  IconOptionsStyle
 } from './style';
 
 // Basemap helpers
