@@ -110,6 +110,13 @@ export class Popup {
   public open() {
     if (this._parentElement && !this._isOpen) {
       this._parentElement.appendChild(this._container);
+
+      // adjust width to content
+      const contentWrapper = this._container.querySelector('div.as-infowindow') as HTMLElement;
+
+      if (contentWrapper) {
+        contentWrapper.style.width = 'calc(100% + 17px)';
+      }
     }
 
     this._isOpen = true;
@@ -205,7 +212,12 @@ export class Popup {
       closeButton.className = this._options.closeButtonClassName;
       closeButton.addEventListener('click', this.close.bind(this));
       closeButton.innerHTML = `<i class="as-icon as-icon-close as-color--primary"></i>`;
-      closeButton.style.cssText = 'float: right; margin-top: -10px; margin-right: -10px;';
+      closeButton.style.cssText = `
+        position: absolute;
+        top: 0px;
+        right: 0px;
+        background: transparent;
+      `;
       containerElem.appendChild(closeButton);
     }
 
