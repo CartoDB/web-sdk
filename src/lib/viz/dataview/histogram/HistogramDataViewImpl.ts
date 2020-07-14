@@ -26,10 +26,7 @@ export class HistogramDataViewImpl extends DataViewImpl<HistogramDataViewData> {
     const { bins = 10, start, end } = this.options;
 
     try {
-      const features = (await dataviewLocal.getSourceData([this.column], options)) as Record<
-        string,
-        number
-      >[];
+      const features = (await dataviewLocal.getSourceData(options)) as Record<string, number>[];
       const sortedFeatures = features.map(feature => feature[this.column]).sort((a, b) => a - b);
 
       const startValue = start ?? Math.min(...sortedFeatures);
