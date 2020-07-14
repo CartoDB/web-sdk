@@ -4,10 +4,12 @@ import { Credentials } from '@/auth';
 import { Filter, ColumnFilters, SpatialFilters } from '@/viz/filters/types';
 import { AggregationType } from '@/data/operations/aggregation/aggregation';
 import { DataViewImpl } from './DataViewImpl';
-import { DataViewCalculation } from './mode/DataViewMode';
+import { DataViewCalculation, DataViewMode } from './mode/DataViewMode';
 import { debounce, isGeoJSONSource } from './utils';
 import { SQLSource, DatasetSource, DOSource } from '../source';
 import { CartoDataViewError, dataViewErrorTypes } from './DataViewError';
+import { DataViewLocal } from './mode/DataViewLocal';
+import { DataViewRemote } from './mode/DataViewRemote';
 
 export const OPTION_CHANGED_DELAY = 100;
 
@@ -32,10 +34,36 @@ export abstract class DataView<T> extends WithEvents {
       this.mode = DataViewCalculation.FAST;
     }
 
-    this.buildImpl(dataSource, column, options);
+    this.buildImpl(column, options);
 
     // bind events with the mode
     this.bindEvents();
+  }
+
+  protected createDataViewMode(column: string, options: DataViewOptions): DataViewMode {
+    let dataViewMode;
+
+    if (this.mode === DataViewCalculation.FAST || isGeoJSONSource(this.dataSource)) {
+      dataViewMode = new DataViewLocal(this.dataSource as Layer, column);
+    } else if (this.mode === DataViewCalculation.PRECISE) {
+      const credentials = getCredentialsFrom(this.dataSource);
+      dataViewMode = new DataViewRemote(this.dataSource, column, credentials);
+    } else {
+      throw new CartoDataViewError(
+        `mode ${this.mode} unknown. Availables: '${DataViewCalculation.FAST}' and '${DataViewCalculation.PRECISE}'.`,
+        dataViewErrorTypes.PROPERTY_INVALID
+      );
+    }
+
+    if (options.filters) {
+      dataViewMode.setFilters(options.filters);
+    }
+
+    if (options.spatialFilter) {
+      dataViewMode.setSpatialFilter(options.spatialFilter);
+    }
+
+    return dataViewMode;
   }
 
   public getData(options: { excludedFilters?: string[] } = {}): Promise<T> {
@@ -104,11 +132,7 @@ export abstract class DataView<T> extends WithEvents {
     );
   }
 
-  protected abstract buildImpl(
-    dataSource: Layer | Source,
-    column: string,
-    options: { mode?: DataViewCalculation }
-  ): void;
+  protected abstract buildImpl(column: string, options: DataViewOptions): void;
 }
 
 export function getCredentialsFrom(dataSource: Layer | Source): Credentials | undefined {
