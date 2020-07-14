@@ -7,9 +7,9 @@ import { CartoStylingError, stylingErrorTypes } from '../../errors/styling-error
 
 export interface IconOptionsStyle {
   // icon width in pixels
-  iconWidth: number;
+  width: number;
   // icon height in pixels
-  iconHeight: number;
+  height: number;
   // horizontal position of icon anchor
   anchorX: number;
   // vertical position of icon anchor
@@ -19,8 +19,8 @@ export interface IconOptionsStyle {
 }
 
 interface IconOptionsStyleValidated {
-  iconWidth: number;
-  iconHeight: number;
+  width: number;
+  height: number;
   anchorX?: number;
   anchorY?: number;
   sizeScale?: number;
@@ -29,15 +29,15 @@ interface IconOptionsStyleValidated {
 function getIconStyles(icon: string, options: IconOptionsStyleValidated) {
   const getIconProps = {
     url: icon,
-    width: options.iconWidth,
-    height: options.iconHeight,
-    anchorX: options.anchorX || options.iconWidth / 2,
-    anchorY: options.anchorY || options.iconHeight / 2
+    width: options.width,
+    height: options.height,
+    anchorX: options.anchorX || options.width / 2,
+    anchorY: options.anchorY || options.height / 2
   };
 
   return {
     getIcon: () => getIconProps,
-    getSize: options.iconHeight,
+    getSize: options.height,
     sizeScale: options.sizeScale,
     sizeUnits: 'pixels'
   };
@@ -46,8 +46,8 @@ function getIconStyles(icon: string, options: IconOptionsStyleValidated) {
 function defaultOptions(options: Partial<IconOptionsStyle>) {
   return {
     sizeScale: 1,
-    iconWidth: 20,
-    iconHeight: 20,
+    width: 20,
+    height: 20,
     ...options
   };
 }
@@ -96,14 +96,9 @@ function validateParameters(options: Partial<IconOptionsStyle>, geometryType: Ge
     );
   }
 
-  if (
-    !options.iconWidth ||
-    options.iconWidth < 1 ||
-    !options.iconHeight ||
-    options.iconHeight < 1
-  ) {
+  if (!options.width || options.width < 1 || !options.height || options.height < 1) {
     throw new CartoStylingError(
-      'iconWidth and iconHeight should be greater than 0',
+      'width and height should be greater than 0',
       stylingErrorTypes.PROPERTY_MISMATCH
     );
   }
