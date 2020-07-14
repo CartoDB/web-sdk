@@ -5,6 +5,7 @@ import { DataViewImpl } from '../DataViewImpl';
 import { CartoDataViewError, dataViewErrorTypes } from '../DataViewError';
 import { DataViewLocal } from '../mode/DataViewLocal';
 import { DataViewRemote } from '../mode/DataViewRemote';
+import { DataViewOptions } from '../DataView';
 
 export class HistogramDataViewImpl extends DataViewImpl<HistogramDataViewData> {
   options: HistogramDataViewOptions;
@@ -197,7 +198,7 @@ export interface HistogramDataViewData {
   totalAmount: number;
 }
 
-export interface HistogramDataViewOptions {
+export interface HistogramDataViewOptions extends DataViewOptions {
   bins?: number;
   start?: number;
   end?: number;

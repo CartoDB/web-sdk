@@ -53,9 +53,19 @@
                 </section>
                 <section class="as-box">
                   <as-formula-widget
+                    id="formula-global"
                     class="as-p--16"
-                    heading="Total Estimated Population"
+                    heading="Total Estimated Population (global)"
                     description="Total estimated population of the countries"
+                  >
+                  </as-formula-widget>
+                </section>
+                <section class="as-box">
+                  <as-formula-widget
+                    id="formula-viewport"
+                    class="as-p--16"
+                    heading="Total Estimated Population (viewport)"
+                    description="Total estimated population of the countries shown in the screen"
                   >
                   </as-formula-widget>
                 </section>
@@ -84,11 +94,17 @@
         await countriesLayer.addTo(deckMap);
 
         // Formula Widget
-        const formulaDataview = new carto.viz.dataview.Formula(countriesLayer, 'pop_est', {
+        const formulaGlobal = new carto.viz.dataview.Formula(countriesLayer, 'pop_est', {
           operation: 'max'
         });
 
-        new carto.viz.widget.Formula('as-formula-widget', formulaDataview);
+        const formulaViewport = new carto.viz.dataview.Formula(countriesLayer, 'pop_est', {
+          operation: 'max',
+          spatialFilter: 'viewport'
+        });
+
+        new carto.viz.widget.Formula('#formula-global', formulaGlobal);
+        new carto.viz.widget.Formula('#formula-viewport', formulaViewport);
       }
 
       initialize();

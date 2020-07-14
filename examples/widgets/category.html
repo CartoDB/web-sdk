@@ -57,8 +57,17 @@
                 </section>
                 <section class="as-box">
                   <as-category-widget
-                    heading="Countries"
+                    id="category-global"
+                    heading="Countries (global)"
                     description="Number of countries by continent"
+                  >
+                  </as-category-widget>
+                </section>
+                <section class="as-box">
+                  <as-category-widget
+                    id="category-viewport"
+                    heading="Countries (viewport)"
+                    description="Number of countries by continent shown in the screen"
                   >
                   </as-category-widget>
                 </section>
@@ -86,11 +95,17 @@
         await countriesLayer.addTo(deckMap);
 
         // A data-view to count
-        const dataview = new carto.viz.dataview.Category(countriesLayer, 'continent', {
+        const dataviewGlobal = new carto.viz.dataview.Category(countriesLayer, 'continent', {
           operation: 'count'
         });
 
-        new carto.viz.widget.Category('as-category-widget', dataview);
+        const dataviewViewport = new carto.viz.dataview.Category(countriesLayer, 'continent', {
+          operation: 'count',
+          spatialFilter: 'viewport'
+        });
+
+        new carto.viz.widget.Category('#category-global', dataviewGlobal);
+        new carto.viz.widget.Category('#category-viewport', dataviewViewport);
       }
 
       initialize();

@@ -464,6 +464,18 @@ export class Layer extends WithEvents implements StyledLayer {
     return Promise.resolve();
   }
 
+  public setFilters(filters: ColumnFilters) {
+    this.filtersCollection.clear();
+    this.filtersCollection.addFilter(uuidv4(), filters);
+    this.emit('filterChange');
+
+    if (this._deckLayer) {
+      return this.replaceDeckGLLayer();
+    }
+
+    return Promise.resolve();
+  }
+
   addSourceField(field: string) {
     this._source.addField(field);
     return this.replaceDeckGLLayer();

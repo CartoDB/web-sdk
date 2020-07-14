@@ -12,7 +12,7 @@ describe('DataView', () => {
           new CategoryDataView(new Layer('fake_source'), 'fake_column', {
             operation: AggregationType.AVG,
             operationColumn: 'popEst',
-            mode: DataViewCalculation.LOCAL
+            mode: DataViewCalculation.FAST
           })
       ).not.toThrow();
     });
@@ -23,7 +23,7 @@ describe('DataView', () => {
           new CategoryDataView(new Layer('fake_source'), 'fake_column', {
             operation: undefined as never,
             operationColumn: 'fake_operation_column',
-            mode: DataViewCalculation.LOCAL
+            mode: DataViewCalculation.FAST
           })
       ).toThrow(
         new CartoDataViewError(
@@ -39,7 +39,7 @@ describe('DataView', () => {
           new CategoryDataView(new Layer('fake_source'), 'fake_column', {
             operation: AggregationType.AVG,
             operationColumn: undefined as never,
-            mode: DataViewCalculation.LOCAL
+            mode: DataViewCalculation.FAST
           })
       ).toThrow(
         new CartoDataViewError(
@@ -54,7 +54,7 @@ describe('DataView', () => {
         () =>
           new CategoryDataView(new Layer('fake_source'), 'fake_column', {
             operation: AggregationType.COUNT,
-            mode: DataViewCalculation.LOCAL
+            mode: DataViewCalculation.FAST
           })
       ).not.toThrow();
     });
@@ -76,7 +76,7 @@ describe('DataView', () => {
       const dataView = new CategoryDataView(layer, 'country', {
         operation: AggregationType.AVG,
         operationColumn: 'popEst',
-        mode: DataViewCalculation.LOCAL
+        mode: DataViewCalculation.FAST
       });
 
       expect(await dataView.getData()).toMatchObject({
@@ -107,7 +107,7 @@ describe('DataView', () => {
 
       const dataView = new CategoryDataView(layer, 'country', {
         operation: AggregationType.COUNT,
-        mode: DataViewCalculation.LOCAL
+        mode: DataViewCalculation.FAST
       });
 
       expect(await dataView.getData()).toMatchObject({

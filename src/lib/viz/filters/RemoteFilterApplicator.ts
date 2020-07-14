@@ -3,6 +3,12 @@ import { FilterApplicator } from './FilterApplicator';
 
 export class RemoteFilterApplicator extends FilterApplicator<SpatialFilters> {
   public getBbox(): number[] | undefined {
-    return this.filters.within;
+    let bbox;
+
+    if (this.filters !== 'viewport') {
+      bbox = this.filters.bbox;
+    }
+
+    return bbox;
   }
 }
