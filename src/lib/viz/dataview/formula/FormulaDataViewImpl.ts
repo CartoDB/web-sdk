@@ -9,14 +9,29 @@ export class FormulaDataViewImpl extends DataViewImpl<FormulaDataViewData> {
     const dataviewLocal = this.dataView as DataViewLocal;
 
     try {
-      const features = await dataviewLocal.getSourceData();
+      const features = await dataviewLocal.getSourceData({
+        aggregationOptions: {
+          numeric: [
+            {
+              column: this.column,
+              operations: [this.operation]
+            }
+          ]
+        }
+      });
+
+      const aggregatedColumnName = `${this.operation}__${this.column}`;
+      const columnName = this.column;
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const values = features.map((feature: { [x: string]: any }) => feature[this.column]);
+      const values = features.map(
+        (feature: Record<string, unknown>) => feature[aggregatedColumnName] || feature[columnName]
+      );
+
       validateNumbersOrNullIn(values);
 
       // just include numbers in calculations... TODO: should we consider features with null & undefined for the column?
-      const filteredValues = values.filter(Number.isFinite);
+      const filteredValues = values.filter(Number.isFinite) as number[];
 
       return {
         result: aggregate(filteredValues, this.operation),

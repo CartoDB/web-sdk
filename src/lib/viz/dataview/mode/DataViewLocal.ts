@@ -15,15 +15,23 @@ export class DataViewLocal extends DataViewMode {
     this.bindEvents();
   }
 
-  public async getSourceData(columns: string[] = [], options: { excludedFilters?: string[] } = {}) {
-    if (!columns.includes(this.column)) {
-      columns.push(this.column);
-    }
-
-    const { excludedFilters = [] } = options;
+  public async getSourceData(
+    options: {
+      excludedFilters?: string[];
+      aggregationOptions?: {
+        dimension?: string[];
+        numeric?: { column: string; operations: string[] }[];
+      };
+    } = {}
+  ) {
+    const { excludedFilters = [], aggregationOptions } = options;
 
     if (this.useViewport) {
-      await (this.dataSource as Layer).addSourceField(this.column);
+      await (this.dataSource as Layer).addAggregationOptions(
+        aggregationOptions?.numeric,
+        aggregationOptions?.dimension
+      );
+
       return (this.dataSource as Layer).getViewportFeatures(excludedFilters);
     }
 
@@ -41,7 +49,7 @@ export class DataViewLocal extends DataViewMode {
     operation: AggregationType,
     options: { excludedFilters: string[] }
   ) {
-    const sourceData = await this.getSourceData([operationColumn || this.column], options);
+    const sourceData = await this.getSourceData(options);
     const { groups, nullCount } = groupValuesByColumn(
       sourceData,
       operationColumn || this.column,
