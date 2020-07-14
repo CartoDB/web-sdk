@@ -179,11 +179,12 @@
         });
         formulaRemoteFiltered = new carto.viz.dataview.Formula(countriesLayer, 'gdp_md_est', {
           operation: 'sum',
-          mode: 'remote-filtered'
+          spatialFilter: 'viewport',
+          mode: 'precise'
         });
         formulaLocal = new carto.viz.dataview.Formula(countriesLayer, 'gdp_md_est', {
           operation: 'sum',
-          mode: 'local'
+          spatialFilter: 'viewport'
         });
 
         // intializes the widgets

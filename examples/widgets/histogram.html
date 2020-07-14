@@ -58,16 +58,15 @@
                 </section>
                 <section class="as-box">
                   <as-histogram-widget
-                    class="local"
-                    heading="Local Estimated Population"
+                    id="histogram-global"
+                    heading="Remote Estimated Population (global)"
                     description="Distribution of estimated population in countries"
                     show-clear
                   >
                   </as-histogram-widget>
-
                   <as-histogram-widget
-                    class="remote"
-                    heading="Remote Estimated Population"
+                    id="histogram-viewport"
+                    heading="Estimated Population (viewport)"
                     description="Distribution of estimated population in countries"
                     show-clear
                   >
@@ -96,38 +95,20 @@
         const countriesLayer = new carto.viz.Layer('ne_50m_admin_0_countries');
         await countriesLayer.addTo(deckMap);
 
-        const viewportHistogramDataview = new carto.viz.dataview.Histogram(
-          countriesLayer,
-          'pop_est',
-          {
-            bins: 10,
-            start: 1000000,
-            end: 127078679,
-            spatialFilter: 'viewport'
-          }
-        );
+        const viewportGlobal = new carto.viz.dataview.Histogram(countriesLayer, 'pop_est', {
+          bins: 10,
+          start: 1000000,
+          end: 127078679
+        });
+        const histogramViewport = new carto.viz.dataview.Histogram(countriesLayer, 'pop_est', {
+          bins: 10,
+          start: 1000000,
+          end: 127078679,
+          spatialFilter: 'viewport'
+        });
 
-        const viewportHistogramWidget = new carto.viz.widget.Histogram(
-          document.querySelector('.local'),
-          viewportHistogramDataview
-        );
-
-        const viewportRemoteHistogramDataview = new carto.viz.dataview.Histogram(
-          countriesLayer,
-          'pop_est',
-          {
-            bins: 10,
-            start: 1000000,
-            end: 127078679,
-            spatialFilter: 'viewport',
-            mode: 'precise'
-          }
-        );
-
-        const viewportRemoteHistogramWidget = new carto.viz.widget.Histogram(
-          document.querySelector('.remote'),
-          viewportRemoteHistogramDataview
-        );
+        new carto.viz.widget.Histogram('#histogram-global', viewportGlobal);
+        new carto.viz.widget.Histogram('#histogram-viewport', histogramViewport);
       }
 
       initialize();
