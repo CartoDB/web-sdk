@@ -194,23 +194,32 @@ export class SQLSource extends Source {
   }
 
   private updateMapConfigAggregation() {
-    if (this.fields.size) {
+    if (this.fields.size || this.aggregatedColumns.size) {
       if (!this._mapConfig.aggregation) {
         throw new SourceError('Map Config has not aggregation field');
       }
 
-      if (!this._mapConfig.aggregation.dimensions) {
-        this._mapConfig.aggregation.dimensions = {};
-      }
+      const { dimensions = {}, columns = {} } = this._mapConfig.aggregation;
 
-      const { dimensions } = this._mapConfig.aggregation;
       this.fields.forEach(field => {
         if (field !== DEFAULT_ID_PROPERTY) {
           dimensions[field] = { column: field };
         }
       });
 
+      this.aggregatedColumns.forEach((operations: Set<string>, originalColumn: string) => {
+        operations.forEach(operation => {
+          const aggregatedColumnName = `${operation.toLowerCase()}__${originalColumn}`;
+
+          columns[aggregatedColumnName] = {
+            aggregate_function: operation,
+            aggregated_column: originalColumn
+          };
+        });
+      });
+
       this._mapConfig.aggregation.dimensions = { ...dimensions };
+      this._mapConfig.aggregation.columns = { ...columns };
     }
   }
 
