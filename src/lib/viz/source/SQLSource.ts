@@ -215,6 +215,10 @@ export class SQLSource extends Source {
     }
   }
 
+  public isEmpty() {
+    return !this._metadata?.geometryType;
+  }
+
   addFilter(filterId: string, filter: ColumnFilters) {
     this.columnFiltersCollection.addFilter(filterId, filter);
     this.emit('filterChange');

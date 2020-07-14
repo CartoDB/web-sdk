@@ -20,7 +20,7 @@ export interface SizeBinsOptionsStyle extends Partial<BasicOptionsStyle> {
 }
 
 function defaultOptions(
-  geometryType: GeometryType,
+  geometryType: GeometryType | undefined,
   options: Partial<SizeBinsOptionsStyle>
 ): SizeBinsOptionsStyle {
   let bins = 5;
@@ -47,7 +47,7 @@ export function sizeBinsStyle(
   const evalFN = (layer: StyledLayer) => {
     const meta = layer.source.getMetadata();
 
-    if (!meta.geometryType) {
+    if (layer.source.isEmpty()) {
       return {};
     }
 
@@ -77,7 +77,7 @@ export function sizeBinsStyle(
 function calculateWithBreaks(
   featureProperty: string,
   breaks: number[],
-  geometryType: GeometryType,
+  geometryType: GeometryType | undefined,
   options: SizeBinsOptionsStyle
 ) {
   const styles = getStyles(geometryType, options);
@@ -142,7 +142,7 @@ function calculateWithBreaks(
   };
 }
 
-function validateParameters(options: SizeBinsOptionsStyle, geometryType: GeometryType) {
+function validateParameters(options: SizeBinsOptionsStyle, geometryType?: GeometryType) {
   if (geometryType === 'Polygon') {
     throw new CartoStylingError(
       "Polygon layer doesn't support sizeCategoriesStyle",

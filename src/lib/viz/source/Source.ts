@@ -60,6 +60,11 @@ export abstract class Source extends WithEvents {
     this.registerAvailableEvents(['filterChange']);
   }
 
+  // eslint-disable-next-line class-methods-use-this
+  public isEmpty() {
+    return false;
+  }
+
   abstract async init(): Promise<boolean>;
 
   abstract getProps(): SourceProps;

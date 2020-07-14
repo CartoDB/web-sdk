@@ -17,7 +17,7 @@ export interface SizeContinuousOptionsStyle extends Partial<BasicOptionsStyle> {
 }
 
 function defaultOptions(
-  geometryType: GeometryType,
+  geometryType: GeometryType | undefined,
   options: Partial<SizeContinuousOptionsStyle>
 ): SizeContinuousOptionsStyle {
   return {
@@ -36,7 +36,7 @@ export function sizeContinuousStyle(
   const evalFN = (layer: StyledLayer) => {
     const meta = layer.source.getMetadata();
 
-    if (!meta.geometryType) {
+    if (layer.source.isEmpty()) {
       return {};
     }
 
@@ -59,7 +59,7 @@ export function sizeContinuousStyle(
 
 function calculate(
   featureProperty: string,
-  geometryType: GeometryType,
+  geometryType: GeometryType | undefined,
   options: SizeContinuousOptionsStyle,
   rangeMin: number,
   rangeMax: number
@@ -128,17 +128,17 @@ function calculate(
   };
 }
 
-export function getDefaultSizeRange(geometryType: GeometryType) {
+export function getDefaultSizeRange(geometryType?: GeometryType) {
   const defaultSizeRange = {
     Point: [2, 40],
     Line: [1, 10],
     Polygon: []
   };
 
-  return defaultSizeRange[geometryType];
+  return geometryType ? defaultSizeRange[geometryType] : [];
 }
 
-function getDefaultColor(geometryType: GeometryType) {
+function getDefaultColor(geometryType?: GeometryType) {
   if (geometryType === 'Point') {
     return '#FFB927';
   }
@@ -146,7 +146,7 @@ function getDefaultColor(geometryType: GeometryType) {
   return getStyleValue('color', geometryType, {});
 }
 
-function validateParameters(options: SizeContinuousOptionsStyle, geometryType: GeometryType) {
+function validateParameters(options: SizeContinuousOptionsStyle, geometryType?: GeometryType) {
   if (geometryType === 'Polygon') {
     throw new CartoStylingError(
       "Polygon layer doesn't support sizeContinuousStyle",

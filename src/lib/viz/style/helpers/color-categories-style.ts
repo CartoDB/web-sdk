@@ -22,7 +22,7 @@ export interface ColorCategoriesOptionsStyle extends Partial<BasicOptionsStyle> 
 }
 
 function defaultOptions(
-  geometryType: GeometryType,
+  geometryType: GeometryType | undefined,
   options: Partial<ColorCategoriesOptionsStyle>
 ): ColorCategoriesOptionsStyle {
   return {
@@ -42,7 +42,7 @@ export function colorCategoriesStyle(
   const evalFN = (layer: StyledLayer) => {
     const meta = layer.source.getMetadata();
 
-    if (!meta.geometryType) {
+    if (layer.source.isEmpty()) {
       return {};
     }
 
@@ -76,7 +76,7 @@ export function colorCategoriesStyle(
 function calculateWithCategories(
   featureProperty: string,
   categories: string[],
-  geometryType: GeometryType,
+  geometryType: GeometryType | undefined,
   options: ColorCategoriesOptionsStyle
 ) {
   const styles = getStyles(geometryType, options);

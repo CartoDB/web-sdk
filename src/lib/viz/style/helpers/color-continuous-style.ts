@@ -20,7 +20,7 @@ export interface ColorContinuousOptionsStyle extends Partial<BasicOptionsStyle> 
 }
 
 function defaultOptions(
-  geometryType: GeometryType,
+  geometryType: GeometryType | undefined,
   options: Partial<ColorContinuousOptionsStyle>
 ): ColorContinuousOptionsStyle {
   return {
@@ -39,7 +39,7 @@ export function colorContinuousStyle(
   const evalFN = (layer: StyledLayer) => {
     const meta = layer.source.getMetadata();
 
-    if (!meta.geometryType) {
+    if (layer.source.isEmpty()) {
       return {};
     }
 
@@ -67,7 +67,7 @@ export function colorContinuousStyle(
 
 function calculate(
   featureProperty: string,
-  geometryType: GeometryType,
+  geometryType: GeometryType | undefined,
   options: ColorContinuousOptionsStyle,
   rangeMin: number,
   rangeMax: number
@@ -129,7 +129,7 @@ function validateParameters(options: ColorContinuousOptionsStyle) {
 }
 
 function getDefaultStrokeWidth(
-  geometryType: GeometryType,
+  geometryType: GeometryType | undefined,
   options: Partial<ColorContinuousOptionsStyle>
 ) {
   if (geometryType === 'Point') {
