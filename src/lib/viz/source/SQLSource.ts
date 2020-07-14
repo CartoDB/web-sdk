@@ -7,7 +7,8 @@ import {
   SourceProps,
   SourceMetadata,
   NumericFieldStats,
-  CategoryFieldStats
+  CategoryFieldStats,
+  GeometryType
 } from './Source';
 import { parseGeometryType } from '../style/helpers/utils';
 import { sourceErrorTypes, SourceError } from '../errors/source-error';
@@ -226,11 +227,14 @@ export class SQLSource extends Source {
 
   private extractMetadataFrom(mapInstance: MapInstance) {
     const { stats } = mapInstance.metadata.layers[0].meta;
-    const geometryType = parseGeometryType(stats.geometryType);
+    let geometryType: GeometryType | undefined;
+
+    if (stats.geometryType) {
+      geometryType = parseGeometryType(stats.geometryType);
+    }
+
     const fieldStats = this.getCompleteFieldStats(stats);
-
     const metadata = { geometryType, stats: fieldStats };
-
     return metadata;
   }
 

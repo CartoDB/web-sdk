@@ -50,8 +50,18 @@ function polygonStyles(opts: any) {
   };
 }
 
-export function getStyleValue(variable: string, geometryType: GeometryType, options: any) {
-  const opts = { ...defaultStyles[geometryType], ...options };
+export function getStyleValue(
+  variable: string,
+  geometryType: GeometryType | undefined,
+  options: any
+) {
+  let styles = {};
+
+  if (geometryType) {
+    styles = defaultStyles[geometryType];
+  }
+
+  const opts = { ...styles, ...options };
   return opts[variable];
 }
 
@@ -69,7 +79,11 @@ export interface BasicOptionsStyle {
   strokeWidth: number;
 }
 
-export function getStyles(geometryType: GeometryType, options: Partial<BasicOptionsStyle> = {}) {
+export function getStyles(geometryType?: GeometryType, options: Partial<BasicOptionsStyle> = {}) {
+  if (!geometryType) {
+    return {};
+  }
+
   validateBasicParameters(options);
 
   let styles;

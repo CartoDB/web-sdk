@@ -41,6 +41,11 @@ export function colorCategoriesStyle(
 ) {
   const evalFN = (layer: StyledLayer) => {
     const meta = layer.source.getMetadata();
+
+    if (!meta.geometryType) {
+      return {};
+    }
+
     const opts = defaultOptions(meta.geometryType, options);
 
     validateParameters(opts);
