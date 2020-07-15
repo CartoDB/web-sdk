@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Icon helper</title>
+
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.css"
+    />
+
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://libs.cartocdn.com/airship-style/v2.4/airship.min.css"
+    />
+    <!-- <link rel="stylesheet" type="text/css" href="https://libs.cartocdn.com/airship-icons/v2.4/icons.css"/> -->
+
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+      }
+
+      #map {
+        width: 100vw;
+        height: 100vh;
+      }
+    </style>
+  </head>
+
+  <body class="as-app-body as-app">
+    <div class="as-content">
+      <main class="as-main">
+        <div class="as-map-area">
+          <!-- map -->
+          <div id="map"></div>
+
+          <!-- panel -->
+          <div class="as-panel as-panel--top as-panel--right as-bg--ui-01">
+            <div class="as-panel__element as-p--16 as-body">
+              <h1 class="as-title">Icon helper</h1>
+              <h4 class="as-subheader as-mb--12">
+                Use a custom image in the coordinates of your data in a map
+              </h4>
+
+              <div>
+                <!-- extra controls, if required -->
+              </div>
+              <div id="result">
+                <!-- add here the interactive result, if required -->
+                <p>References to be used are:</p>
+                <ul class="as-list">
+                  <li class="as-list__item">MapboxGL 1.10.0</li>
+                  <li class="as-list__item">DeckGL 8.2.0</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.js"></script>
+    <script src="https://unpkg.com/deck.gl@8.2.0/dist.min.js"></script>
+    <script src="/dist/umd/index.min.js"></script>
+
+    <script>
+      function initialize() {
+        carto.auth.setDefaultCredentials({ username: 'public' });
+        const deckMap = carto.viz.createMap();
+
+        const style = carto.viz.style.icon('./boat.png');
+
+        const countriesLayer = new carto.viz.Layer('world_ports', style);
+        countriesLayer.addTo(deckMap);
+      }
+
+      initialize();
+    </script>
+  </body>
+</html>

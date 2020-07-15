@@ -148,7 +148,7 @@ describe('SourceMetadata', () => {
     await source.init();
 
     const props = source.getProps();
-    expect(props).toEqual({ type: 'GeoJSONLayer', data: geojson });
+    expect(props).toEqual({ type: 'GeoJSONLayer', data: getFeatures(geojson) });
 
     const metadata = source.getMetadata();
     expect(metadata).toEqual({
@@ -182,7 +182,7 @@ describe('SourceMetadata', () => {
     await source.init();
 
     const props = source.getProps();
-    expect(props).toEqual({ type: 'GeoJSONLayer', data: geojson });
+    expect(props).toEqual({ type: 'GeoJSONLayer', data: getFeatures(geojson) });
 
     const metadata = source.getMetadata();
     expect(metadata).toEqual({
