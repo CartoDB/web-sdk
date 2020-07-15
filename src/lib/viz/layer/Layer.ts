@@ -516,6 +516,10 @@ export class Layer extends WithEvents implements StyledLayer {
     isRotating: boolean,
     viewState: ViewState
   ) {
+    if (!isPanning && !isZooming && !isRotating) {
+      return false;
+    }
+
     this.dataState.isPanning = isPanning;
     this.dataState.isZooming = isZooming;
     this.dataState.isRotating = isRotating;
@@ -526,6 +530,8 @@ export class Layer extends WithEvents implements StyledLayer {
       const viewport = new WebMercatorViewport(viewState);
       this._viewportFeaturesGenerator.setViewport(viewport);
     }
+
+    return true;
   }
 
   private sendDataEvent(referer: 'onViewportLoad' | 'onAfterRender') {
@@ -533,6 +539,7 @@ export class Layer extends WithEvents implements StyledLayer {
 
     if (this.dataState.isFirstTime && (isGeoJsonLayer || referer === 'onViewportLoad')) {
       this.dataState.isFirstTime = false;
+
       this.emit('viewportLoad'); // TODO: remove
       return this.emit(DATA_READY_EVENT);
     }
@@ -543,6 +550,10 @@ export class Layer extends WithEvents implements StyledLayer {
       this.dataState.isRotating ||
       referer === 'onViewportLoad'
     ) {
+      this.dataState.isPanning = false;
+      this.dataState.isZooming = false;
+      this.dataState.isRotating = false;
+
       this.emit('viewportLoad'); // TODO: remove
       return this.emit(DATA_CHANGED_EVENT);
     }
