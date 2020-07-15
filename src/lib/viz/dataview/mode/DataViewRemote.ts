@@ -7,6 +7,7 @@ import { RemoteFilterApplicator } from '@/viz/filters/RemoteFilterApplicator';
 import { uuidv4 } from '@/core/utils/uuid';
 import { DataViewMode } from './DataViewMode';
 import { CartoDataViewError, dataViewErrorTypes } from '../DataViewError';
+import { GetDataOptions } from '../DataViewImpl';
 
 export class DataViewRemote extends DataViewMode {
   private _dataviewsApi: DataviewsApi;
@@ -86,7 +87,7 @@ export class DataViewRemote extends DataViewMode {
     });
   }
 
-  public updateDataViewSource(options: { excludedFilters: string[] }) {
+  public updateDataViewSource(options: GetDataOptions) {
     const sql = this._remoteSource.getSQLWithFilters(options.excludedFilters);
     this.dataviewsApi.setSource(sql);
   }

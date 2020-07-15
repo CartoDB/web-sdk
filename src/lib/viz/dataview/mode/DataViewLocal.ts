@@ -4,6 +4,7 @@ import { groupValuesByColumn } from '@/data/operations/grouping';
 import { castToNumberOrUndefined } from '@/core/utils/number';
 import { ColumnFilters, SpatialFilters } from '@/viz/filters/types';
 import { DataViewMode } from './DataViewMode';
+import { GetDataOptions } from '../DataViewImpl';
 
 export class DataViewLocal extends DataViewMode {
   private useViewport = true;
@@ -15,15 +16,7 @@ export class DataViewLocal extends DataViewMode {
     this.bindEvents();
   }
 
-  public async getSourceData(
-    options: {
-      excludedFilters?: string[];
-      aggregationOptions?: {
-        dimension?: string[];
-        numeric?: { column: string; operations: string[] }[];
-      };
-    } = {}
-  ) {
+  public async getSourceData(options: GetDataOptions = {}) {
     const { excludedFilters = [], aggregationOptions } = options;
 
     if (this.useViewport) {
@@ -47,14 +40,22 @@ export class DataViewLocal extends DataViewMode {
   public async groupBy(
     operationColumn: string,
     operation: AggregationType,
-    options: { excludedFilters: string[] }
+    options: GetDataOptions
   ) {
+    const columnName = operationColumn || this.column;
+    const aggregatedColumnName = `${operation}__${columnName}`;
+
     const sourceData = await this.getSourceData(options);
-    const { groups, nullCount } = groupValuesByColumn(
-      sourceData,
-      operationColumn || this.column,
-      this.column
-    );
+    const adaptedFeatures = sourceData.map((feature: Record<string, unknown>) => {
+      return {
+        ...feature,
+        [columnName]: feature[aggregatedColumnName]
+          ? feature[aggregatedColumnName]
+          : feature[columnName]
+      };
+    });
+
+    const { groups, nullCount } = groupValuesByColumn(adaptedFeatures, columnName, this.column);
     const categories = Object.keys(groups)
       .map(group => createCategory(group, groups[group] as number[], operation))
       .sort(categoryOrder());

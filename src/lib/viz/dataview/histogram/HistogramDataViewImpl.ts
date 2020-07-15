@@ -1,7 +1,7 @@
 import { isVariableDefined } from '@/core/utils/variables';
 import { AggregationType, aggregate } from '@/data/operations/aggregation/aggregation';
 import { DataViewMode, DataViewCalculation } from '../mode/DataViewMode';
-import { DataViewImpl } from '../DataViewImpl';
+import { DataViewImpl, GetDataOptions } from '../DataViewImpl';
 import { CartoDataViewError, dataViewErrorTypes } from '../DataViewError';
 import { DataViewLocal } from '../mode/DataViewLocal';
 import { DataViewRemote } from '../mode/DataViewRemote';
@@ -19,9 +19,7 @@ export class HistogramDataViewImpl extends DataViewImpl<HistogramDataViewData> {
     this.options = options;
   }
 
-  public async getLocalData(options: {
-    excludedFilters: string[];
-  }): Promise<HistogramDataViewData> {
+  public async getLocalData(options: GetDataOptions): Promise<HistogramDataViewData> {
     const dataviewLocal = this.dataView as DataViewLocal;
     const { bins = 10, start, end } = this.options;
 
@@ -88,9 +86,7 @@ export class HistogramDataViewImpl extends DataViewImpl<HistogramDataViewData> {
     }
   }
 
-  public async getRemoteData(options: {
-    excludedFilters: string[];
-  }): Promise<HistogramDataViewData> {
+  public async getRemoteData(options: GetDataOptions): Promise<HistogramDataViewData> {
     const dataviewRemote = this.dataView as DataViewRemote;
     const { bins = 10, start, end } = this.options;
 

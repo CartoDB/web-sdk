@@ -14,6 +14,12 @@ export abstract class DataViewMode extends WithEvents {
 
     this.column = column;
     this.dataSource = dataSource;
+
+    if (this.dataSource instanceof Layer) {
+      this.dataSource.addSourceField(this.column);
+    } else {
+      this.dataSource.addField(this.column);
+    }
   }
 
   public addFilter(filterId: string, filter: Filter) {

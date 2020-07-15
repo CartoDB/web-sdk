@@ -1,6 +1,6 @@
 import { AggregationType, aggregate } from '../../../data/operations/aggregation/aggregation';
 import { DataViewMode, DataViewCalculation } from '../mode/DataViewMode';
-import { DataViewImpl } from '../DataViewImpl';
+import { DataViewImpl, GetDataOptions } from '../DataViewImpl';
 import { CartoDataViewError, dataViewErrorTypes } from '../DataViewError';
 import { DataViewLocal, CategoryElement } from '../mode/DataViewLocal';
 import { DataViewRemote } from '../mode/DataViewRemote';
@@ -21,15 +21,33 @@ export class CategoryDataViewImpl extends DataViewImpl<CategoryDataViewData> {
     this.limit = limit;
   }
 
-  public async getLocalData(options: { excludedFilters: string[] }): Promise<CategoryDataViewData> {
+  public async getLocalData(options: GetDataOptions = {}): Promise<CategoryDataViewData> {
     const dataviewLocal = this.dataView as DataViewLocal;
+
+    let aggregationOptions;
+
+    if (this.operation !== AggregationType.COUNT) {
+      aggregationOptions = {
+        dimension: [this.column],
+        numeric: [
+          {
+            column: this.operationColumn,
+            operations: [this.operation]
+          }
+        ]
+      };
+    }
 
     try {
       const { categories, nullCount } = await dataviewLocal.groupBy(
         this.operationColumn,
         this.operation,
-        options
+        {
+          ...options,
+          aggregationOptions
+        }
       );
+
       const categoryValues = categories.map(category => category.value);
       return {
         categories: Number.isInteger(this.limit as number)
@@ -47,9 +65,7 @@ export class CategoryDataViewImpl extends DataViewImpl<CategoryDataViewData> {
     }
   }
 
-  public async getRemoteData(options: {
-    excludedFilters: string[];
-  }): Promise<CategoryDataViewData> {
+  public async getRemoteData(options: GetDataOptions): Promise<CategoryDataViewData> {
     const dataviewRemote = this.dataView as DataViewRemote;
 
     try {

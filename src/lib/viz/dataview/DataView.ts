@@ -3,7 +3,7 @@ import { Layer, Source } from '@/viz';
 import { Credentials } from '@/auth';
 import { Filter, ColumnFilters, SpatialFilters } from '@/viz/filters/types';
 import { AggregationType } from '@/data/operations/aggregation/aggregation';
-import { DataViewImpl } from './DataViewImpl';
+import { DataViewImpl, GetDataOptions } from './DataViewImpl';
 import { DataViewCalculation, DataViewMode } from './mode/DataViewMode';
 import { debounce, isGeoJSONSource } from './utils';
 import { SQLSource, DatasetSource, DOSource } from '../source';
@@ -68,7 +68,7 @@ export abstract class DataView<T> extends WithEvents {
     return dataViewMode;
   }
 
-  public getData(options: { excludedFilters?: string[] } = {}): Promise<T> {
+  public getData(options: GetDataOptions = {}): Promise<T> {
     let data;
     const { excludedFilters = [] } = options;
 
