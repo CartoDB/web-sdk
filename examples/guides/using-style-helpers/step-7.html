@@ -33,7 +33,7 @@
     <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.js'></script>
 
     <!-- Include Web SDK from the CARTO CDN -->
-    <script src="https://libs.cartocdn.com/web-sdk/%VERSION%/index.min.js"></script>
+    <script src="https://libs.cartocdn.com/web-sdk/v1.0.0-alpha/index.min.js"></script>
 
     <script>
         carto.auth.setDefaultCredentials({ username: 'public' });
@@ -44,12 +44,15 @@
             zoom: 14
           }
         });
-        const airbnbSizeStyle = new carto.viz.style.sizeCategories('bedrooms', { 
-          categories: ['Dorm', 'Apartment', 'Loft', 'House'],
-          sizeRange: [6, 9],
-          palette: 'purp' 
+        const airbnbSizeStyle = new carto.viz.style.sizeCategories('property_type', { 
+          categories: ['Dorm', 'Bed & Breakfast', 'Apartment', 'Condominium', 'Loft', 'House', 'Chalet']
         });
         const airbnbLayer = new carto.viz.Layer('listings_madrid', airbnbSizeStyle);
+        airbnbLayer.setPopupHover([
+          {
+            attr: 'property_type'
+          },
+        ]);
         airbnbLayer.addTo(deckMap);
     </script>
   

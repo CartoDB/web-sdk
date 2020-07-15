@@ -190,12 +190,11 @@ const airbnbLayer = new carto.viz.Layer('listings_madrid', airbnbSizeStyle);
 </div>
 > View this step [here](/developers/web-sdk/examples/maps/guides/using-style-helpers/step-6.html)
 
-Now we are going to use the `carto.viz.style.sizeCategories` helper to assign a different size to each Airbnb place depending on the `bedrooms` feature property that contains the number of bedrooms for each place. Please go to the [reference](ToDo Add link) to view the full list of options and default values for this helper. In this example, we are going to specify the color palette and we are going to specify manually the categories. 
+Now we are going to use the `carto.viz.style.sizeCategories` helper to assign a different size to each Airbnb place depending on the `property_type` feature property. Please go to the [reference](ToDo Add link) to view the full list of options and default values for this helper. In this example, we are going to specify manually the categories so they are ordered in size. 
 
 ```js
-const airbnbSizeStyle = new carto.viz.style.sizeCategories('bedrooms', { 
-  categories: ['Dorm', 'Apartment' 'Loft', 'House'],
-  palette: 'purp' 
+const airbnbSizeStyle = new carto.viz.style.sizeCategories('property_type', { 
+  categories: ['Dorm', 'Bed & Breakfast', 'Apartment', 'Condominium', 'Loft', 'House', 'Chalet']
 });
 const airbnbLayer = new carto.viz.Layer('listings_madrid', airbnbSizeStyle);
 ```
@@ -212,7 +211,7 @@ const airbnbLayer = new carto.viz.Layer('listings_madrid', airbnbSizeStyle);
 </div>
 > View this step [here](/developers/web-sdk/examples/maps/guides/using-style-helpers/step-7.html)
 
-Finally we are going to use the `carto.viz.style.sizeContinuous` helper to create a continuous color ramp depending on the `square_feet` feature property. This time we are not sending any parameter so we will use the default values. Please go to the [reference](ToDo Add link) to view the full list of options and default values for this helper.  
+Finally we are going to use the `carto.viz.style.sizeContinuous` helper to create a continuous size ramp depending on the `square_feet` feature property. This time we are not sending any parameter so we will use the default values. Please go to the [reference](ToDo Add link) to view the full list of options and default values for this helper.  
 
 ```js
 const airbnbSizeStyle = new carto.viz.style.sizeContinuous('square_feet');
