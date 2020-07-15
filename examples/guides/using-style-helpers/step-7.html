@@ -48,11 +48,6 @@
           categories: ['Dorm', 'Bed & Breakfast', 'Apartment', 'Condominium', 'Loft', 'House', 'Chalet']
         });
         const airbnbLayer = new carto.viz.Layer('listings_madrid', airbnbSizeStyle);
-        airbnbLayer.setPopupHover([
-          {
-            attr: 'property_type'
-          },
-        ]);
         airbnbLayer.addTo(deckMap);
     </script>
   
