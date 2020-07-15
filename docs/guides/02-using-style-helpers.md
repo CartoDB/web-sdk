@@ -4,16 +4,6 @@ In this guide, you will learn how to create insightful visualizations with few l
 
 After completing this guide, you will be able to use style helpers to create stunning visualizations in a very easy way!
 
-<div class="example-map">
-    <iframe
-        id="getting-started-final-result"
-        src="/developers/web-sdk/examples/maps/guides/getting-started/step-3.html"
-        width="100%"
-        height="500"
-        frameBorder="0">
-    </iframe>
-</div>
-
 ### Introduction
 
 The style helpers are methods inside the `carto.viz.style` namespace that allows you to visualize your layers using different properties like size or color. All the style helpers have predefined defaults for the style options that will be applied if they are not specified.
