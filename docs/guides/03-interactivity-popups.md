@@ -115,12 +115,13 @@ const countriesLayer = new carto.viz.Layer('ne_50m_admin_0_countries', carto.viz
 
 The Web SDK allows you to add pop-ups both when the user moves the pointer over a feature and when the user clicks on a feature. We add the pop-up by calling the `setPopupHover` or `setPopupClick` methods in the `Layer` object. We can call the methods before or after adding the layer to the map. We need to specify the attributes/feature properties that we want to show in the pop-up. For each attribute we show the attribute name (title) and the value. We can specify a different attribute name using the `title` property and we can apply a specific format in the `value` property.
 
-Pop-ups use the Airship Infowindow component, so we need to add the Airship CSS and JavaScript files to our page.
+Pop-ups use the Airship library, so we need to add the Airship CSS and JavaScript files to our page.
 
 ```html
     <!-- Include Airship from the CARTO CDN -->
     <link rel="stylesheet" href="https://libs.cartocdn.com/airship-style/v2.4.0/airship.css">
-    <script src="https://libs.cartocdn.com/airship-components/v2.4.0/airship.js"></script>
+    <script type="module" src="https://libs.cartocdn.com/airship-components/v2.4.0/airship/airship.esm.js"></script>
+    <script nomodule="" src="https://libs.cartocdn.com/airship-components/v2.4.0/airship/airship.js"></script>
 ```
 
 The `addTo` method in the Layer object and the `setPopupHover`and `setPopupClick` are [async](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function) functions. To be sure that we get the desired results when calling these methods, it is safer to called them using the `await` statement, inside another function defined as `async`.
@@ -263,7 +264,8 @@ This is the complete example with feature highlighting and pop-ups both for hove
     <script src="https://libs.cartocdn.com/web-sdk/v1.0.0-alpha/index.min.js"></script>
 
     <!-- Include Airship from the CARTO CDN -->
-    <script src="https://libs.cartocdn.com/airship-components/v2.4.0/airship.js"></script>
+    <script type="module" src="https://libs.cartocdn.com/airship-components/v2.4.0/airship/airship.esm.js"></script>
+    <script nomodule="" src="https://libs.cartocdn.com/airship-components/v2.4.0/airship/airship.js"></script>
 
     <script>
       async function initialize()
