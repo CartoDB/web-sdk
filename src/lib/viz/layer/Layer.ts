@@ -72,6 +72,7 @@ export class Layer extends WithEvents implements StyledLayer {
     this.registerAvailableEvents([
       DATA_READY_EVENT,
       DATA_CHANGED_EVENT,
+      'viewportLoad',
       'filterChange',
       InteractivityEventType.CLICK.toString(),
       InteractivityEventType.HOVER.toString()
@@ -83,7 +84,7 @@ export class Layer extends WithEvents implements StyledLayer {
     };
 
     this._interactivity = this._buildInteractivity(options);
-    this.buildDataState();
+    this.dataState = buildDataState();
   }
 
   getMapInstance(): Deck {
@@ -190,7 +191,7 @@ export class Layer extends WithEvents implements StyledLayer {
         }
       },
       onAfterRender: () => {
-        this.sendDataEvent();
+        this.sendDataEvent('onAfterRender');
       }
     });
 
@@ -324,7 +325,7 @@ export class Layer extends WithEvents implements StyledLayer {
           styleProperties.onViewportLoad(...args);
         }
 
-        this.emit('viewportLoad');
+        this.sendDataEvent('onViewportLoad');
       },
       onClick: this._interactivity.onClick.bind(this._interactivity),
       onHover: this._interactivity.onHover.bind(this._interactivity)
@@ -509,13 +510,6 @@ export class Layer extends WithEvents implements StyledLayer {
     }
   }
 
-  private buildDataState() {
-    this.dataState.isFirstTime = false;
-    this.dataState.isPanning = false;
-    this.dataState.isZooming = false;
-    this.dataState.isRotating = false;
-  }
-
   private saveDataState(
     isPanning: boolean,
     isZooming: boolean,
@@ -534,13 +528,22 @@ export class Layer extends WithEvents implements StyledLayer {
     }
   }
 
-  private sendDataEvent() {
-    if (this.dataState.isFirstTime) {
+  private sendDataEvent(referer: 'onViewportLoad' | 'onAfterRender') {
+    const isGeoJsonLayer = this._source.sourceType === 'GeoJSONSource';
+
+    if (this.dataState.isFirstTime && (isGeoJsonLayer || referer === 'onViewportLoad')) {
       this.dataState.isFirstTime = false;
+      this.emit('viewportLoad'); // TODO: remove
       return this.emit(DATA_READY_EVENT);
     }
 
-    if (this.dataState.isPanning || this.dataState.isZooming || this.dataState.isRotating) {
+    if (
+      this.dataState.isPanning ||
+      this.dataState.isZooming ||
+      this.dataState.isRotating ||
+      referer === 'onViewportLoad'
+    ) {
+      this.emit('viewportLoad'); // TODO: remove
       return this.emit(DATA_CHANGED_EVENT);
     }
 
@@ -623,4 +626,13 @@ function addInTheRightPosition(deckglLayer: any, layers: any[], opts: LayerPosit
 interface LayerPosition {
   beforeLayerId?: string;
   afterLayerId?: string;
+}
+
+function buildDataState() {
+  return {
+    isFirstTime: true,
+    isPanning: false,
+    isZooming: false,
+    isRotating: false
+  };
 }
