@@ -84,7 +84,7 @@ export class Layer extends WithEvents implements StyledLayer {
     };
 
     this._interactivity = this._buildInteractivity(options);
-    this.dataState = buildDataState();
+    this.dataState = buildInitialDataState();
   }
 
   getMapInstance(): Deck {
@@ -105,6 +105,7 @@ export class Layer extends WithEvents implements StyledLayer {
    */
   public async setSource(source: string | Source) {
     this._source = buildSource(source);
+    this.dataState = buildInitialDataState();
 
     if (this._deckLayer) {
       await this.replaceDeckGLLayer();
@@ -639,7 +640,7 @@ interface LayerPosition {
   afterLayerId?: string;
 }
 
-function buildDataState() {
+function buildInitialDataState() {
   return {
     isFirstTime: true,
     isPanning: false,
