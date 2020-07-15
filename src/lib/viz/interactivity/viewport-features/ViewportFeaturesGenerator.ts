@@ -1,9 +1,8 @@
 import { Deck, Viewport, WebMercatorViewport } from '@deck.gl/core';
 import { MVTLayer } from '@deck.gl/geo-layers';
 import { Matrix4 } from '@math.gl/core';
-import { GeoJSON } from 'geojson';
+import { GeoJSON, Feature } from 'geojson';
 import { GeoJsonLayer, IconLayer } from '@deck.gl/layers';
-import { getFeatures } from '@/viz/source/GeoJSONSource';
 import { selectPropertiesFrom } from '../../utils/object';
 import { ViewportTile } from '../../declarations/deckgl';
 import { GeometryData, ViewportFrustumPlanes } from './geometry/types';
@@ -146,13 +145,12 @@ export class ViewportFeaturesGenerator {
     return this.deckLayer.state.tileset.selectedTiles;
   }
 
-  private getGeoJSONFeatures() {
+  private getGeoJSONFeatures(): Feature[] {
     if (!this.deckLayer || !this.deckLayer.props || !this.deckLayer.props.data) {
       return [];
     }
 
-    const geoJSON = (this.deckLayer.props.data as unknown) as GeoJSON;
-    return getFeatures(geoJSON);
+    return (this.deckLayer.props.data as unknown) as Feature[];
   }
 
   private getViewport() {
