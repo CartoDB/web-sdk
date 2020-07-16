@@ -36,7 +36,9 @@ const aggregationFunctions: Record<AggregationType, Function> = {
   },
 
   [AggregationType.AVG](aggregatedFeatures: AggregatedFeatureProperties[]) {
-    return aggregationFunctions.sum(aggregatedFeatures) / aggregatedFeatures.length;
+    return (
+      aggregationFunctions.sum(aggregatedFeatures) / aggregationFunctions.count(aggregatedFeatures)
+    );
   },
 
   [AggregationType.MIN](aggregatedFeatures: AggregatedFeatureProperties[]) {

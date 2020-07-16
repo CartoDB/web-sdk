@@ -1,6 +1,4 @@
-import { CartoDataViewError, dataViewErrorTypes } from '@/viz/dataview/DataViewError';
 import { CartoError } from '@/core/errors/CartoError';
-import { areValidNumbers } from '@/core/utils/number';
 import { AggregationType } from '../AggregationType';
 
 export function aggregateValues(
@@ -20,18 +18,15 @@ export function aggregateValues(
     });
   }
 
-  if (!areValidNumbers(values) && aggregation !== AggregationType.COUNT) {
-    throw new CartoDataViewError(
-      `Column property for aggregations can just contain numbers (or nulls). Please check documentation.`,
-      dataViewErrorTypes.PROPERTY_INVALID
-    );
-  }
+  const shouldFilterValues = aggregationName !== AggregationType.COUNT;
 
-  const filteredValues = values.filter(Number.isFinite) as number[];
+  const valuesToAggregate = shouldFilterValues
+    ? (values.filter(Number.isFinite) as number[])
+    : values;
 
   return {
-    result: aggregationFunction(filteredValues, aggregationData),
-    nullCount: values.length - filteredValues.length
+    result: aggregationFunction(valuesToAggregate, aggregationData),
+    nullCount: values.length - valuesToAggregate.length
   };
 }
 
