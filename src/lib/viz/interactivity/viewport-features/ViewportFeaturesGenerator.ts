@@ -60,7 +60,16 @@ export class ViewportFeaturesGenerator {
 
   private async getGeoJSONLayerFeatures(properties: string[] = []) {
     const features = this.getGeoJSONFeatures();
-    const viewport = this.getViewport();
+    let viewport: Viewport;
+
+    try {
+      viewport = this.getViewport();
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.warn('Viewport not ready');
+      return [];
+    }
+
     const currentFrustumPlanes = viewport.getFrustumPlanes();
 
     return features
