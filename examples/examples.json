@@ -137,6 +137,39 @@
           "file": "widget/histogramWidget.html"
         }
       ]
+    },
+    {
+      "title": "Interactivity",
+      "samples": [
+        {
+          "title": "Popup on click",
+          "file": "interactivity/popupOnClick.html"
+        },
+        {
+          "title": "Popup on hover",
+          "file": "interactivity/popupOnHover.html"
+        },
+        {
+          "title": "Feature click",
+          "file": "interactivity/featureClick.html"
+        },
+        {
+          "title": "Feature hover",
+          "file": "interactivity/featureHover.html"
+        },
+        {
+          "title": "Interactive style",
+          "file": "interactivity/interactiveStyle.html"
+        },
+        {
+          "title": "Popup format",
+          "file": "interactivity/popupFormat.html"
+        },
+        {
+          "title": "Manual popup",
+          "file": "interactivity/manualPopup.html"
+        }
+      ]
     }
   ]
 }

@@ -3,19 +3,19 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Simple Popup</title>
+    <title>Manual popup</title>
 
     <link
       rel="stylesheet"
       type="text/css"
       href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.css"
     />
+
     <link
       rel="stylesheet"
       type="text/css"
       href="https://libs.cartocdn.com/airship-style/v2.4/airship.min.css"
     />
-    <!-- <link rel="stylesheet" type="text/css" href="https://libs.cartocdn.com/airship-icons/v2.4/icons.css"/> -->
 
     <style>
       body {
@@ -26,6 +26,11 @@
       #map {
         width: 100vw;
         height: 100vh;
+      }
+
+      .customPopup {
+        background-color: white;
+        padding: 16px;
       }
     </style>
   </head>
@@ -40,16 +45,10 @@
           <!-- panel -->
           <div class="as-panel as-panel--top as-panel--right as-bg--ui-01">
             <div class="as-panel__element as-p--16 as-body">
-              <h1 class="as-title">Basic example template</h1>
+              <h1 class="as-title">Manual popup</h1>
               <h4 class="as-subheader as-mb--12">
-                A (short) description of the example
+                A custom popup on arbitrary coordinates with <em>carto.viz.Popup</em>
               </h4>
-
-              <div>
-                <!-- extra controls, if required -->
-                WIP - TODO end preparation
-              </div>
-              <div id="result"></div>
             </div>
           </div>
         </div>
@@ -58,19 +57,20 @@
 
     <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.js"></script>
     <script src="https://unpkg.com/deck.gl@8.2.0/dist.min.js"></script>
+    
     <script src="/dist/umd/index.min.js"></script>
 
     <script>
       function initialize() {
         carto.auth.setDefaultCredentials({ username: 'public' });
-        const deckMap = carto.viz.createMap();
 
-        // deckMap.props.map.on('load', () => {
+        const deckMap = carto.viz.createMap({ basemap: 'darkmatter' });
+
         const popup = new carto.viz.Popup();
-        popup.setContent('This <b>is</b> a simple popup');
+        popup.setContent('<div class="customPopup">HELLO!</div>');
         popup.setCoordinates([0, 0]);
         popup.addTo(deckMap);
-        // });
+        popup.open();
       }
 
       initialize();
