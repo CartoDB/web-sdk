@@ -102,7 +102,7 @@ function createCategory(name: string, data: number[], operation: AggregationType
 
   return {
     name,
-    value: aggregate(categoryValues, operation).result
+    value: aggregateValues(categoryValues, operation).result
   };
 }
 
