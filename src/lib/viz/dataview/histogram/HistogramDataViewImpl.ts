@@ -82,7 +82,7 @@ export class HistogramDataViewImpl extends DataViewImpl<HistogramDataViewData> {
           return;
         }
 
-        binContainer.value += clusterCount;
+        binContainer.value += clusterCount || 1;
         binContainer.values.push(featureValue);
       });
 
