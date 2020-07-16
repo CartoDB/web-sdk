@@ -212,6 +212,10 @@ export class DOSource extends Source {
     return this._metadata;
   }
 
+  public isEmpty() {
+    return !!(this._metadata && !this._metadata.geometryType);
+  }
+
   // eslint-disable-next-line class-methods-use-this
   getFeatures(): Record<string, unknown>[] {
     throw new Error(`Method not implemented`);
