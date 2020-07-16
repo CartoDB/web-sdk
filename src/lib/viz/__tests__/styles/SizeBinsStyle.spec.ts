@@ -20,9 +20,10 @@ const getMetadata = jest.fn().mockImplementation(() => {
     stats: [stats]
   };
 });
+const isEmpty = jest.fn().mockImplementation(() => false);
 
 jest.mock('../../source/DatasetSource', () => ({
-  DatasetSource: jest.fn().mockImplementation(() => ({ getMetadata }))
+  DatasetSource: jest.fn().mockImplementation(() => ({ getMetadata, isEmpty }))
 }));
 
 const styledLayer = {
