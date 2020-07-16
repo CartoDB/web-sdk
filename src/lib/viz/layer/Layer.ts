@@ -25,9 +25,10 @@ import { basicStyle } from '../style/helpers/basic-style';
 const DATA_READY_EVENT = 'layerDataReady';
 const DATA_CHANGED_EVENT = 'layerDataChanged';
 
-export interface LayerDataState {
-  isFirstTime: boolean;
-  isChanging: boolean;
+enum DATA_STATES {
+  STARTING,
+  READY,
+  UPDATING
 }
 
 export class Layer extends WithEvents implements StyledLayer {
@@ -55,7 +56,7 @@ export class Layer extends WithEvents implements StyledLayer {
   private filtersCollection = new FiltersCollection<ColumnFilters, FunctionFilterApplicator>(
     FunctionFilterApplicator
   );
-  private dataState: LayerDataState;
+  private dataState: DATA_STATES = DATA_STATES.STARTING;
 
   constructor(
     source: string | Source,
@@ -82,7 +83,7 @@ export class Layer extends WithEvents implements StyledLayer {
     };
 
     this._interactivity = this._buildInteractivity(options);
-    this.dataState = buildInitialDataState();
+    this.dataState = DATA_STATES.STARTING;
   }
 
   getMapInstance(): Deck {
@@ -103,10 +104,10 @@ export class Layer extends WithEvents implements StyledLayer {
    */
   public async setSource(source: string | Source) {
     this._source = buildSource(source);
-    this.dataState = buildInitialDataState();
 
     if (this._deckLayer) {
       await this.replaceDeckGLLayer();
+      this.dataState = DATA_STATES.STARTING;
     }
   }
 
@@ -510,39 +511,35 @@ export class Layer extends WithEvents implements StyledLayer {
   }
 
   private saveDataState(isChanging: boolean, viewState: ViewState) {
-    if (!isChanging) {
-      return false;
+    if (isChanging) {
+      this.dataState = DATA_STATES.UPDATING;
+
+      const isGeoJsonLayer = this._source.sourceType === 'GeoJSONSource';
+
+      if (isGeoJsonLayer) {
+        const viewport = new WebMercatorViewport(viewState);
+        this._viewportFeaturesGenerator.setViewport(viewport);
+      }
     }
-
-    this.dataState.isChanging = isChanging;
-    const isGeoJsonLayer = this._source.sourceType === 'GeoJSONSource';
-
-    if (isChanging && isGeoJsonLayer) {
-      const viewport = new WebMercatorViewport(viewState);
-      this._viewportFeaturesGenerator.setViewport(viewport);
-    }
-
-    return true;
   }
 
   private sendDataEvent(referer: 'onViewportLoad' | 'onAfterRender') {
     const isGeoJsonLayer = this._source.sourceType === 'GeoJSONSource';
 
-    if (this.dataState.isFirstTime && (isGeoJsonLayer || referer === 'onViewportLoad')) {
-      this.dataState.isFirstTime = false;
-
+    if (
+      this.dataState === DATA_STATES.STARTING &&
+      (isGeoJsonLayer || referer === 'onViewportLoad')
+    ) {
       this.emit('viewportLoad'); // TODO: remove
-      return this.emit(DATA_READY_EVENT);
+      this.emit(DATA_READY_EVENT);
     }
 
-    if (this.dataState.isChanging || referer === 'onViewportLoad') {
-      this.dataState.isChanging = false;
-
+    if (this.dataState === DATA_STATES.UPDATING || referer === 'onViewportLoad') {
       this.emit('viewportLoad'); // TODO: remove
-      return this.emit(DATA_CHANGED_EVENT);
+      this.emit(DATA_CHANGED_EVENT);
     }
 
-    return false;
+    this.dataState = DATA_STATES.READY;
   }
 }
 
@@ -621,11 +618,4 @@ function addInTheRightPosition(deckglLayer: any, layers: any[], opts: LayerPosit
 interface LayerPosition {
   beforeLayerId?: string;
   afterLayerId?: string;
-}
-
-function buildInitialDataState() {
-  return {
-    isFirstTime: true,
-    isChanging: false
-  };
 }
