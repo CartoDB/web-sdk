@@ -4,30 +4,30 @@ import { Filter, ColumnFilters, SpatialFilters } from '@/viz/filters/types';
 import { CartoDataViewError, dataViewErrorTypes } from '../DataViewError';
 
 export abstract class DataViewMode extends WithEvents {
-  protected dataSource: Layer | Source;
+  protected dataOrigin: Layer | Source;
   public column: string;
 
-  constructor(dataSource: Layer | Source, column: string) {
+  constructor(dataOrigin: Layer | Source, column: string) {
     super();
 
-    validateParameters(dataSource, column);
+    validateParameters(dataOrigin, column);
 
     this.column = column;
-    this.dataSource = dataSource;
+    this.dataOrigin = dataOrigin;
 
-    if (this.dataSource instanceof Layer) {
-      this.dataSource.addSourceField(this.column);
+    if (this.dataOrigin instanceof Layer) {
+      this.dataOrigin.addSourceField(this.column);
     } else {
-      this.dataSource.addField(this.column);
+      this.dataOrigin.addField(this.column);
     }
   }
 
   public addFilter(filterId: string, filter: Filter) {
-    this.dataSource.addFilter(filterId, { [this.column]: filter });
+    this.dataOrigin.addFilter(filterId, { [this.column]: filter });
   }
 
   public removeFilter(filterId: string) {
-    this.dataSource.removeFilter(filterId);
+    this.dataOrigin.removeFilter(filterId);
   }
 
   public abstract setFilters(filters: ColumnFilters): void;

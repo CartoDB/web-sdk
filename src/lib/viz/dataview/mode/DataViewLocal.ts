@@ -9,8 +9,8 @@ import { GetDataOptions } from '../DataViewImpl';
 export class DataViewLocal extends DataViewMode {
   private useViewport = true;
 
-  constructor(dataSource: Layer, column: string, useViewport = true) {
-    super(dataSource, column);
+  constructor(dataOrigin: Layer, column: string, useViewport = true) {
+    super(dataOrigin, column);
 
     this.useViewport = useViewport;
     this.bindEvents();
@@ -20,21 +20,21 @@ export class DataViewLocal extends DataViewMode {
     const { excludedFilters = [], aggregationOptions } = options;
 
     if (this.useViewport) {
-      await (this.dataSource as Layer).addAggregationOptions(
+      await (this.dataOrigin as Layer).addAggregationOptions(
         aggregationOptions?.numeric,
         aggregationOptions?.dimension
       );
 
-      return (this.dataSource as Layer).getViewportFeatures(excludedFilters);
+      return (this.dataOrigin as Layer).getViewportFeatures(excludedFilters);
     }
 
     // is GeoJSON Layer
-    if (this.dataSource instanceof Layer) {
-      return (this.dataSource.source as GeoJSONSource).getFeatures(excludedFilters);
+    if (this.dataOrigin instanceof Layer) {
+      return (this.dataOrigin.source as GeoJSONSource).getFeatures(excludedFilters);
     }
 
     // is GeoJSON Source
-    return (this.dataSource as GeoJSONSource).getFeatures(excludedFilters);
+    return (this.dataOrigin as GeoJSONSource).getFeatures(excludedFilters);
   }
 
   public async groupBy(
@@ -64,8 +64,8 @@ export class DataViewLocal extends DataViewMode {
   }
 
   public setFilters(filters: ColumnFilters) {
-    if (this.dataSource instanceof Layer) {
-      this.dataSource.setFilters(filters);
+    if (this.dataOrigin instanceof Layer) {
+      this.dataOrigin.setFilters(filters);
     }
   }
 
@@ -77,11 +77,11 @@ export class DataViewLocal extends DataViewMode {
   private bindEvents() {
     this.registerAvailableEvents(['dataUpdate', 'error']);
 
-    this.dataSource.on('viewportLoad', () => {
+    this.dataOrigin.on('viewportLoad', () => {
       this.onDataUpdate();
     });
 
-    this.dataSource.on('filterChange', () => {
+    this.dataOrigin.on('filterChange', () => {
       this.onDataUpdate();
     });
   }
