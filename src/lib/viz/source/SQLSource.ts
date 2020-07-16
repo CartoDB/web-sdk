@@ -274,6 +274,11 @@ export class SQLSource extends Source {
 
     return fieldStats;
   }
+
+  // eslint-disable-next-line class-methods-use-this
+  public getFeatures(): Record<string, unknown>[] {
+    throw new Error(`Method not implemented`);
+  }
 }
 
 function getUrlsFrom(mapInstance: MapInstance): string | string[] {
