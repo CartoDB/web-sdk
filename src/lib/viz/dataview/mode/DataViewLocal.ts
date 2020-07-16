@@ -1,6 +1,6 @@
 import { Layer } from '@/viz';
 import { DATA_CHANGED_EVENT } from '@/viz/layer/Layer';
-import { AggregationType, aggregate } from '@/data/operations/aggregation/aggregation';
+import { AggregationType, aggregateValues } from '@/data/operations/aggregation';
 import { groupValuesByColumn } from '@/data/operations/grouping';
 import { castToNumberOrUndefined } from '@/core/utils/number';
 import { ColumnFilters, SpatialFilters } from '@/viz/filters/types';
@@ -14,13 +14,27 @@ export class DataViewLocal extends DataViewMode {
     this.bindEvents();
   }
 
-  public async getSourceData(columns: string[] = [], options: { excludedFilters?: string[] } = {}) {
-    if (!columns.includes(this.column)) {
-      columns.push(this.column);
+  public async getSourceData(
+    options: {
+      excludedFilters?: string[];
+      aggregationOptions?: {
+        dimension?: string[];
+        numeric?: { column: string; operations: string[] }[];
+      };
+    } = {}
+  ) {
+    const { excludedFilters = [], aggregationOptions } = options;
+
+    if (this.useViewport) {
+      await (this.dataSource as Layer).addAggregationOptions(
+        aggregationOptions?.numeric,
+        aggregationOptions?.dimension
+      );
+
+      return (this.dataSource as Layer).getViewportFeatures(excludedFilters);
     }
 
-    const { excludedFilters = [] } = options;
-
+    // is GeoJSON Layer
     if (this.dataSource instanceof Layer) {
       await this.dataSource.addSourceField(this.column);
     } else {
@@ -37,7 +51,7 @@ export class DataViewLocal extends DataViewMode {
     operation: AggregationType,
     options: { excludedFilters: string[] }
   ) {
-    const sourceData = await this.getSourceData([operationColumn || this.column], options);
+    const sourceData = await this.getSourceData(options);
     const { groups, nullCount } = groupValuesByColumn(
       sourceData,
       operationColumn || this.column,
@@ -89,7 +103,7 @@ function createCategory(name: string, data: number[], operation: AggregationType
 
   return {
     name,
-    value: aggregate(categoryValues, operation)
+    value: aggregateValues(categoryValues, operation).result
   };
 }
 

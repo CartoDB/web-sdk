@@ -9,6 +9,7 @@ import { GeoJSON } from 'geojson';
 import { uuidv4 } from '@/core/utils/uuid';
 import { WithEvents } from '@/core/mixins/WithEvents';
 import { DatasetSource, SQLSource, GeoJSONSource, Source } from '@/viz';
+import { AggregatedColumn } from '../source/Source';
 import { DOLayer } from '../deck/DOLayer';
 import { getStyles, StyleProperties, Style } from '../style';
 import { ViewportFeaturesGenerator } from '../interactivity/viewport-features/ViewportFeaturesGenerator';
@@ -487,6 +488,13 @@ export class Layer extends WithEvents implements StyledLayer {
     }
 
     return Promise.resolve();
+  }
+
+  addAggregationOptions(columns: AggregatedColumn[] = [], dimensions: string[] = []) {
+    dimensions.forEach(dimension => this._source.addField(dimension));
+    columns.forEach(aggregatedColumn => this._source.addAggregatedColumn(aggregatedColumn));
+
+    return this.replaceDeckGLLayer();
   }
 
   addSourceField(field: string) {

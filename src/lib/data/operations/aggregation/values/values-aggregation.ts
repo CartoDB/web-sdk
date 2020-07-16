@@ -1,15 +1,10 @@
-import { CartoError } from '../../../core/errors/CartoError';
+import { CartoError } from '@/core/errors/CartoError';
+import { AggregationType } from '../AggregationType';
 
-export enum AggregationType {
-  COUNT = 'count',
-  AVG = 'avg',
-  MIN = 'min',
-  MAX = 'max',
-  SUM = 'sum',
-  PERCENTILE = 'percentile'
-}
-
-export function aggregate(values: number[], aggregation: AggregationType = '' as AggregationType) {
+export function aggregateValues(
+  values: number[],
+  aggregation: AggregationType = '' as AggregationType
+) {
   const aggregationData = aggregation.split('_');
   const aggregationName = aggregationData.shift();
 
@@ -23,7 +18,16 @@ export function aggregate(values: number[], aggregation: AggregationType = '' as
     });
   }
 
-  return aggregationFunction(values, aggregationData);
+  const shouldFilterValues = aggregationName !== AggregationType.COUNT;
+
+  const valuesToAggregate = shouldFilterValues
+    ? (values.filter(Number.isFinite) as number[])
+    : values;
+
+  return {
+    result: aggregationFunction(valuesToAggregate, aggregationData),
+    nullCount: values.length - valuesToAggregate.length
+  };
 }
 
 // eslint-disable-next-line @typescript-eslint/ban-types
