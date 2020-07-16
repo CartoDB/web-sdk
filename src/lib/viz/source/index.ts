@@ -8,5 +8,6 @@ export {
   CategoryFieldStats,
   Category,
   NumericFieldStats,
-  Source
+  Source,
+  AggregatedColumn
 } from './Source';

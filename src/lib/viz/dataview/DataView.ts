@@ -2,7 +2,7 @@ import { WithEvents } from '@/core/mixins/WithEvents';
 import { Layer, Source } from '@/viz';
 import { Credentials } from '@/auth';
 import { Filter, ColumnFilters, SpatialFilters } from '@/viz/filters/types';
-import { AggregationType } from '@/data/operations/aggregation/aggregation';
+import { AggregationType } from '@/data/operations/aggregation/';
 import { DataViewImpl } from './DataViewImpl';
 import { DataViewCalculation, DataViewMode } from './mode/DataViewMode';
 import { debounce, isGeoJSONSource } from './utils';
@@ -42,11 +42,9 @@ export abstract class DataView<T> extends WithEvents {
 
   protected createDataViewMode(column: string, options: DataViewOptions): DataViewMode {
     let dataViewMode;
-    const geoJSONSource = isGeoJSONSource(this.dataSource);
 
-    if (this.mode === DataViewCalculation.FAST || geoJSONSource) {
-      const useViewport = !(this.mode === DataViewCalculation.PRECISE && geoJSONSource);
-      dataViewMode = new DataViewLocal(this.dataSource as Layer, column, useViewport);
+    if (this.mode === DataViewCalculation.FAST || isGeoJSONSource(this.dataSource)) {
+      dataViewMode = new DataViewLocal(this.dataSource as Layer, column);
     } else if (this.mode === DataViewCalculation.PRECISE) {
       const credentials = getCredentialsFrom(this.dataSource);
       dataViewMode = new DataViewRemote(this.dataSource, column, credentials);

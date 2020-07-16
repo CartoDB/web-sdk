@@ -17,7 +17,7 @@ export interface SizeCategoriesOptionsStyle extends Partial<BasicOptionsStyle> {
 }
 
 function defaultOptions(
-  geometryType: GeometryType,
+  geometryType: GeometryType | undefined,
   options: Partial<SizeCategoriesOptionsStyle>
 ): SizeCategoriesOptionsStyle {
   return {
@@ -45,6 +45,11 @@ export function sizeCategoriesStyle(
 ) {
   const evalFN = (layer: StyledLayer) => {
     const meta = layer.source.getMetadata();
+
+    if (layer.source.isEmpty()) {
+      return {};
+    }
+
     const opts = defaultOptions(meta.geometryType, options);
     validateParameters(opts, meta.geometryType);
 
@@ -56,7 +61,7 @@ export function sizeCategoriesStyle(
       const stats = meta.stats.find(c => c.name === featureProperty) as CategoryFieldStats;
 
       if (!stats.categories || !stats.categories.length) {
-        throw new CartoStylingError('The featureProperty has not categories');
+        throw new CartoStylingError(`Current dataset has not categories for '${featureProperty}'`);
       }
 
       categories = stats.categories.map((c: Category) => c.category);
@@ -74,7 +79,7 @@ export function sizeCategoriesStyle(
 function calculateWithCategories(
   featureProperty: string,
   categories: string[],
-  geometryType: GeometryType,
+  geometryType: GeometryType | undefined,
   options: SizeCategoriesOptionsStyle
 ) {
   const styles = getStyles(geometryType, options);
@@ -129,7 +134,7 @@ function calculateWithCategories(
   };
 }
 
-function validateParameters(options: SizeCategoriesOptionsStyle, geometryType: GeometryType) {
+function validateParameters(options: SizeCategoriesOptionsStyle, geometryType?: GeometryType) {
   if (geometryType === 'Polygon') {
     throw new CartoStylingError(
       "Polygon layer doesn't support sizeCategoriesStyle",
@@ -160,7 +165,7 @@ function validateParameters(options: SizeCategoriesOptionsStyle, geometryType: G
 }
 
 export function getDefaultSizeRange(
-  geometryType: GeometryType,
+  geometryType: GeometryType | undefined,
   options: Partial<SizeCategoriesOptionsStyle>
 ) {
   if (geometryType === 'Point') {
@@ -170,7 +175,10 @@ export function getDefaultSizeRange(
   return getStyleValue('sizeRange', geometryType, options);
 }
 
-function getDefaultColor(geometryType: GeometryType, options: Partial<SizeCategoriesOptionsStyle>) {
+function getDefaultColor(
+  geometryType: GeometryType | undefined,
+  options: Partial<SizeCategoriesOptionsStyle>
+) {
   if (geometryType === 'Point') {
     return options.color || '#F46D43';
   }

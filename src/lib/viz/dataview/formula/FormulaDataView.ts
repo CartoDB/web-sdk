@@ -1,5 +1,5 @@
 import { DataViewCalculation } from '../mode/DataViewMode';
-import { AggregationType } from '../../../data/operations/aggregation/aggregation';
+import { AggregationType } from '../../../data/operations/aggregation';
 import { DataView, DataViewOptions } from '../DataView';
 import { FormulaDataViewImpl, FormulaDataViewData } from './FormulaDataViewImpl';
 

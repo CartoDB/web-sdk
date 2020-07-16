@@ -24,7 +24,7 @@ export interface ColorBinsOptionsStyle extends Partial<BasicOptionsStyle> {
 }
 
 function defaultOptions(
-  geometryType: GeometryType,
+  geometryType: GeometryType | undefined,
   options: Partial<ColorBinsOptionsStyle>
 ): ColorBinsOptionsStyle {
   let bins = 5;
@@ -50,6 +50,11 @@ export function colorBinsStyle(
 ) {
   const evalFN = (layer: StyledLayer) => {
     const meta = layer.source.getMetadata();
+
+    if (layer.source.isEmpty()) {
+      return {};
+    }
+
     const opts = defaultOptions(meta.geometryType, options);
 
     validateParameters(opts);
@@ -70,7 +75,7 @@ export function colorBinsStyle(
 function calculateWithBreaks(
   featureProperty: string,
   breaks: number[],
-  geometryType: GeometryType,
+  geometryType: GeometryType | undefined,
   options: ColorBinsOptionsStyle
 ) {
   const styles = getStyles(geometryType, options);

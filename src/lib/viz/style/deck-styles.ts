@@ -9,7 +9,6 @@ const POINTS_WIDTH_FACTOR = 2;
 function pointStyles(opts: any) {
   return {
     opacity: getStyleValue('opacity', 'Point', opts),
-
     filled: true,
     getFillColor: hexToRgb(getStyleValue('color', 'Point', opts)),
     pointRadiusMinPixels: 0,
@@ -21,7 +20,10 @@ function pointStyles(opts: any) {
     stroked: true,
     getLineColor: hexToRgb(getStyleValue('strokeColor', 'Point', opts)),
     getLineWidth: getStyleValue('strokeWidth', 'Point', opts),
-    lineWidthUnits: 'pixels'
+    lineWidthUnits: 'pixels',
+
+    getSize: getStyleValue('size', 'Point', opts),
+    sizeUnits: 'pixels'
   };
 }
 
@@ -50,8 +52,18 @@ function polygonStyles(opts: any) {
   };
 }
 
-export function getStyleValue(variable: string, geometryType: GeometryType, options: any) {
-  const opts = { ...defaultStyles[geometryType], ...options };
+export function getStyleValue(
+  variable: string,
+  geometryType: GeometryType | undefined,
+  options: any
+) {
+  let styles = {};
+
+  if (geometryType) {
+    styles = defaultStyles[geometryType];
+  }
+
+  const opts = { ...styles, ...options };
   return opts[variable];
 }
 
@@ -69,7 +81,11 @@ export interface BasicOptionsStyle {
   strokeWidth: number;
 }
 
-export function getStyles(geometryType: GeometryType, options: Partial<BasicOptionsStyle> = {}) {
+export function getStyles(geometryType?: GeometryType, options: Partial<BasicOptionsStyle> = {}) {
+  if (!geometryType) {
+    return {};
+  }
+
   validateBasicParameters(options);
 
   let styles;

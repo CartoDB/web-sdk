@@ -1,13 +1,15 @@
 import { Deck, WebMercatorViewport } from '@deck.gl/core';
 import { CartoError } from '@/core/errors/CartoError';
-import { GeoJsonLayer } from '@deck.gl/layers';
+import { GeoJsonLayer, IconLayer } from '@deck.gl/layers';
 import { MVTLayer } from '@deck.gl/geo-layers';
+import ViewState from '@deck.gl/core/controllers/view-state';
 import mitt from 'mitt';
 import deepmerge from 'deepmerge';
 import { GeoJSON } from 'geojson';
 import { uuidv4 } from '@/core/utils/uuid';
 import { WithEvents } from '@/core/mixins/WithEvents';
 import { DatasetSource, SQLSource, GeoJSONSource, Source } from '@/viz';
+import { AggregatedColumn } from '../source/Source';
 import { DOLayer } from '../deck/DOLayer';
 import { getStyles, StyleProperties, Style } from '../style';
 import { ViewportFeaturesGenerator } from '../interactivity/viewport-features/ViewportFeaturesGenerator';
@@ -20,6 +22,15 @@ import { FiltersCollection } from '../filters/FiltersCollection';
 import { FunctionFilterApplicator } from '../filters/FunctionFilterApplicator';
 import { ColumnFilters } from '../filters/types';
 import { basicStyle } from '../style/helpers/basic-style';
+
+export const DATA_READY_EVENT = 'dataReady';
+export const DATA_CHANGED_EVENT = 'dataChanged';
+
+enum DATA_STATES {
+  STARTING,
+  READY,
+  UPDATING
+}
 
 export class Layer extends WithEvents implements StyledLayer {
   private _source: Source;
@@ -46,7 +57,7 @@ export class Layer extends WithEvents implements StyledLayer {
   private filtersCollection = new FiltersCollection<ColumnFilters, FunctionFilterApplicator>(
     FunctionFilterApplicator
   );
-  private callToViewportLoad = false;
+  private dataState: DATA_STATES = DATA_STATES.STARTING;
 
   constructor(
     source: string | Source,
@@ -59,7 +70,8 @@ export class Layer extends WithEvents implements StyledLayer {
     this._style = buildStyle(style);
 
     this.registerAvailableEvents([
-      'viewportLoad',
+      DATA_READY_EVENT,
+      DATA_CHANGED_EVENT,
       'filterChange',
       InteractivityEventType.CLICK.toString(),
       InteractivityEventType.HOVER.toString()
@@ -71,6 +83,7 @@ export class Layer extends WithEvents implements StyledLayer {
     };
 
     this._interactivity = this._buildInteractivity(options);
+    this.dataState = DATA_STATES.STARTING;
   }
 
   getMapInstance(): Deck {
@@ -94,6 +107,7 @@ export class Layer extends WithEvents implements StyledLayer {
 
     if (this._deckLayer) {
       await this.replaceDeckGLLayer();
+      this.dataState = DATA_STATES.STARTING;
     }
   }
 
@@ -163,29 +177,21 @@ export class Layer extends WithEvents implements StyledLayer {
 
     addInTheRightPosition(createdDeckGLLayer, layers, opts);
 
-    const hasGeoJsonLayer = layers.some(layer => layer instanceof GeoJsonLayer);
-
     const { onViewStateChange } = deckInstance.props;
     deckInstance.setProps({
       layers,
       onViewStateChange: args => {
         const { interactionState, viewState } = args;
 
-        if ((interactionState.isPanning || interactionState.isZooming) && hasGeoJsonLayer) {
-          const viewport = new WebMercatorViewport(viewState);
-          this._viewportFeaturesGenerator.setViewport(viewport);
-          this.callToViewportLoad = true;
-        }
+        const { isPanning, isZooming, isRotating } = interactionState;
+        this.saveDataState(!!isPanning || !!isZooming || !!isRotating, viewState);
 
         if (onViewStateChange) {
           onViewStateChange(args); // keep stateless view management, if set up initially
         }
       },
       onAfterRender: () => {
-        if (this.callToViewportLoad) {
-          this.callToViewportLoad = false;
-          this.emit('viewportLoad');
-        }
+        this.sendDataEvent('onAfterRender');
       }
     });
 
@@ -195,10 +201,6 @@ export class Layer extends WithEvents implements StyledLayer {
 
     this._viewportFeaturesGenerator.setDeckInstance(deckInstance);
     this._viewportFeaturesGenerator.setDeckLayer(createdDeckGLLayer);
-
-    if (hasGeoJsonLayer) {
-      this.emit('viewportLoad');
-    }
   }
 
   /**
@@ -266,7 +268,11 @@ export class Layer extends WithEvents implements StyledLayer {
     if (this._source.sourceType === 'SQLSource' || this._source.sourceType === 'DatasetSource') {
       this._deckLayer = new MVTLayer(layerProperties);
     } else if (this._source.sourceType === 'GeoJSONSource') {
-      this._deckLayer = new GeoJsonLayer(layerProperties);
+      if (layerProperties._isIconLayer) {
+        this._deckLayer = new IconLayer(layerProperties);
+      } else {
+        this._deckLayer = new GeoJsonLayer(layerProperties);
+      }
     } else if (this._source.sourceType === 'DOSource') {
       this._deckLayer = new DOLayer(layerProperties);
     } else {
@@ -295,6 +301,14 @@ export class Layer extends WithEvents implements StyledLayer {
     return features;
   }
 
+  public async getFeatures(excludedFilters: string[] = []) {
+    if (this._source instanceof SQLSource) {
+      return this.getViewportFeatures(excludedFilters);
+    }
+
+    return this._source.getFeatures(excludedFilters);
+  }
+
   private _getLayerProperties() {
     const props = this._source.getProps();
     const styleProps = this.getStyle().getLayerProps(this);
@@ -311,7 +325,7 @@ export class Layer extends WithEvents implements StyledLayer {
           styleProperties.onViewportLoad(...args);
         }
 
-        this.emit('viewportLoad');
+        this.sendDataEvent('onViewportLoad');
       },
       onClick: this._interactivity.onClick.bind(this._interactivity),
       onHover: this._interactivity.onHover.bind(this._interactivity)
@@ -476,6 +490,13 @@ export class Layer extends WithEvents implements StyledLayer {
     return Promise.resolve();
   }
 
+  addAggregationOptions(columns: AggregatedColumn[] = [], dimensions: string[] = []) {
+    dimensions.forEach(dimension => this._source.addField(dimension));
+    columns.forEach(aggregatedColumn => this._source.addAggregatedColumn(aggregatedColumn));
+
+    return this.replaceDeckGLLayer();
+  }
+
   addSourceField(field: string) {
     this._source.addField(field);
     return this.replaceDeckGLLayer();
@@ -494,6 +515,39 @@ export class Layer extends WithEvents implements StyledLayer {
         this._source.addField(field);
       });
     }
+  }
+
+  private saveDataState(isChanging: boolean, viewState: ViewState) {
+    if (isChanging) {
+      this.dataState = DATA_STATES.UPDATING;
+
+      const isGeoJsonLayer = this._source.sourceType === 'GeoJSONSource';
+
+      if (isGeoJsonLayer) {
+        const viewport = new WebMercatorViewport(viewState);
+        this._viewportFeaturesGenerator.setViewport(viewport);
+      }
+    }
+  }
+
+  private sendDataEvent(referer: 'onViewportLoad' | 'onAfterRender') {
+    const isGeoJsonLayer = this._source.sourceType === 'GeoJSONSource';
+
+    if (
+      this.dataState === DATA_STATES.STARTING &&
+      (isGeoJsonLayer || referer === 'onViewportLoad')
+    ) {
+      console.log(DATA_CHANGED_EVENT, DATA_READY_EVENT);
+      this.emit(DATA_READY_EVENT);
+      this.emit(DATA_CHANGED_EVENT);
+    }
+
+    if (this.dataState === DATA_STATES.UPDATING || referer === 'onViewportLoad') {
+      console.log(DATA_CHANGED_EVENT);
+      this.emit(DATA_CHANGED_EVENT);
+    }
+
+    this.dataState = DATA_STATES.READY;
   }
 }
 
@@ -541,6 +595,7 @@ function ensureRelatedStyleProps(layerProps: any) {
   return layerPropsValidated;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function addInTheRightPosition(deckglLayer: any, layers: any[], opts: LayerPosition = {}) {
   const { beforeLayerId, afterLayerId } = opts;
 

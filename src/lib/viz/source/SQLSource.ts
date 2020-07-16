@@ -7,7 +7,8 @@ import {
   SourceProps,
   SourceMetadata,
   NumericFieldStats,
-  CategoryFieldStats
+  CategoryFieldStats,
+  GeometryType
 } from './Source';
 import { parseGeometryType } from '../style/helpers/utils';
 import { sourceErrorTypes, SourceError } from '../errors/source-error';
@@ -194,24 +195,37 @@ export class SQLSource extends Source {
   }
 
   private updateMapConfigAggregation() {
-    if (this.fields.size) {
+    if (this.fields.size || this.aggregatedColumns.size) {
       if (!this._mapConfig.aggregation) {
         throw new SourceError('Map Config has not aggregation field');
       }
 
-      if (!this._mapConfig.aggregation.dimensions) {
-        this._mapConfig.aggregation.dimensions = {};
-      }
+      const { dimensions = {}, columns = {} } = this._mapConfig.aggregation;
 
-      const { dimensions } = this._mapConfig.aggregation;
       this.fields.forEach(field => {
         if (field !== DEFAULT_ID_PROPERTY) {
           dimensions[field] = { column: field };
         }
       });
 
+      this.aggregatedColumns.forEach((operations: Set<string>, originalColumn: string) => {
+        operations.forEach(operation => {
+          const aggregatedColumnName = `${operation.toLowerCase()}__${originalColumn}`;
+
+          columns[aggregatedColumnName] = {
+            aggregate_function: operation,
+            aggregated_column: originalColumn
+          };
+        });
+      });
+
       this._mapConfig.aggregation.dimensions = { ...dimensions };
+      this._mapConfig.aggregation.columns = { ...columns };
     }
+  }
+
+  public isEmpty() {
+    return !this._metadata?.geometryType;
   }
 
   addFilter(filterId: string, filter: ColumnFilters) {
@@ -226,11 +240,14 @@ export class SQLSource extends Source {
 
   private extractMetadataFrom(mapInstance: MapInstance) {
     const { stats } = mapInstance.metadata.layers[0].meta;
-    const geometryType = parseGeometryType(stats.geometryType);
+    let geometryType: GeometryType | undefined;
+
+    if (stats.geometryType) {
+      geometryType = parseGeometryType(stats.geometryType);
+    }
+
     const fieldStats = this.getCompleteFieldStats(stats);
-
     const metadata = { geometryType, stats: fieldStats };
-
     return metadata;
   }
 
@@ -273,6 +290,11 @@ export class SQLSource extends Source {
     });
 
     return fieldStats;
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  public getFeatures(): Record<string, unknown>[] {
+    throw new Error(`Method not implemented`);
   }
 }
 

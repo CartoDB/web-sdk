@@ -35,7 +35,7 @@ export interface CategoryFieldStats {
 }
 
 export interface SourceMetadata {
-  geometryType: GeometryType;
+  geometryType?: GeometryType;
   stats: (NumericFieldStats | CategoryFieldStats)[];
 }
 
@@ -49,6 +49,7 @@ export abstract class Source extends WithEvents {
   public needsInitialization: boolean;
   public sourceType: SourceType | unknown;
   protected fields: Set<string>;
+  protected aggregatedColumns: Map<string, Set<string>> = new Map();
 
   constructor(id: string) {
     super();
@@ -60,11 +61,15 @@ export abstract class Source extends WithEvents {
     this.registerAvailableEvents(['filterChange']);
   }
 
+  abstract isEmpty(): boolean;
+
   abstract async init(): Promise<boolean>;
 
   abstract getProps(): SourceProps;
 
   abstract getMetadata(): SourceMetadata;
+
+  abstract getFeatures(excludedFilters: string[]): Record<string, unknown>[];
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars, class-methods-use-this
   addFilter(_filterId: string, _filter: ColumnFilters) {
@@ -90,4 +95,22 @@ export abstract class Source extends WithEvents {
       this.needsInitialization = true;
     }
   }
+
+  addAggregatedColumn(aggregatedColumn: AggregatedColumn) {
+    const aggregatedColumnOperations = this.aggregatedColumns.get(aggregatedColumn.column);
+
+    this.needsInitialization = true;
+
+    if (aggregatedColumnOperations) {
+      aggregatedColumn.operations.forEach(operation => aggregatedColumnOperations.add(operation));
+      return;
+    }
+
+    this.aggregatedColumns.set(aggregatedColumn.column, new Set(aggregatedColumn.operations));
+  }
+}
+
+export interface AggregatedColumn {
+  column: string;
+  operations: string[];
 }
