@@ -95,4 +95,6 @@ export abstract class Source extends WithEvents {
       this.needsInitialization = true;
     }
   }
+
+  abstract getFeatures(excludedFilters: string[]): Record<string, unknown>[];
 }

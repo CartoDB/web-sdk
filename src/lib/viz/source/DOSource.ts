@@ -211,6 +211,11 @@ export class DOSource extends Source {
 
     return this._metadata;
   }
+
+  // eslint-disable-next-line class-methods-use-this
+  getFeatures(): Record<string, unknown>[] {
+    throw new Error(`Method not implemented`);
+  }
 }
 
 function parseFetchJSON(r: Response) {
