@@ -532,6 +532,7 @@ export class Layer extends WithEvents implements StyledLayer {
     ) {
       this.emit('viewportLoad'); // TODO: remove
       this.emit(DATA_READY_EVENT);
+      this.emit(DATA_CHANGED_EVENT);
     }
 
     if (this.dataState === DATA_STATES.UPDATING || referer === 'onViewportLoad') {
