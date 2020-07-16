@@ -1,12 +1,15 @@
 ## Using style helpers
 
-In this guide, you will learn how to create insightful visualizations with few lines of code using the Web SDK style helpers. It is recommended to have read the Getting Started guide to understand the basic structure of a Web SDK application.
+In this guide, you will learn how to create insightful visualizations with a few lines of code using the Web SDK style helpers. It is recommended to read first the Getting Started guide to understand the basic structure of a Web SDK application.
 
 After completing this guide, you will be able to use style helpers to create stunning visualizations in a very easy way!
 
 ### Introduction
 
 The style helpers are methods inside the `carto.viz.style` namespace that allows you to visualize your layers using different properties like size or color. All the style helpers have predefined defaults for the style options that will be applied if they are not specified.
+
+**Note:**
+**Web SDK and deck.gl styles**: The Web SDK uses internally deck.gl, so you can always use pure deck.gl styles if you prefer; see for example this layer style [here](/developers/web-sdk/examples/maps/deckgl/deckStyles.html). But with the style helpers you can get more easily some common layer visualizations (like for example creating a bubble map taking into account different classification methods for your bins). 
 
 This is the list of currently available style helpers:
 
@@ -34,7 +37,7 @@ The basic style helper allows to specify these options through the `BasicOptions
 
 Each of these options have different defaults depending on the type of geometry. For instance, the default color for points is #EE4D5A, #4CC8A3 for lines and #826DBA for polygons. For a complete list of all the default values for the different properties, please go to the [reference](ToDo Add link).
 
-If we use the basic style helper without specifying options, we will obtain the same result that if we were not using the helper.
+If you use the basic style helper without specifying options, you will obtain the same result that if you were not using the helper.
 
 ```js
 const countriesLayer = new carto.viz.Layer('ne_50m_admin_0_countries');
@@ -85,7 +88,7 @@ const countriesLayer = new carto.viz.Layer('ne_50m_admin_0_countries', countries
 
 You can use these helpers to easily change the color of features depending on the values of a given feature property. If the property data type is numeric, you can group the features in bins using the `carto.viz.style.colorBins` helper. If the property data type is a string representing values from a data domain, you can group the features in categories using the `carto.viz.style.colorCategories` helper. There is an additional helper `carto.viz.style.colorContinuous` that you can use for creating a continuous color ramp for numeric feature properties.
 
-Starting with the `carto.viz.style.colorBins` helper, we can specify different options like the number of bins, the palette to be used for colors or the classification method. If a parameter is not specified, it will use the default value (i.e. quantiles as the classification method). Please go to the [reference](ToDo Add link) to view the full list of options and default values for this helper.  
+Starting with the `carto.viz.style.colorBins` helper, you can specify different options like the number of bins, the palette to be used for colors or the classification method. If a parameter is not specified, it will use the default value (i.e. quantiles as the classification method). Please go to the [reference](ToDo Add link) to view the full list of options and default values for this helper.  
 
 We are going to apply the helper to assign a different color to each country polygon using the estimated population (pop_est) property, 7 bins and the teal palette from [CARTOcolors](https://carto.com/carto-colors/).
 
@@ -109,7 +112,7 @@ const countriesLayer = new carto.viz.Layer('ne_50m_admin_0_countries', countries
 </div>
 > View this step [here](/developers/web-sdk/examples/maps/guides/using-style-helpers/step-3.html)
 
-Now we are going to use the `carto.viz.style.colorCategories` helper to assign a different color to each country depending on the `continent` feature property. We can leave empty the `options` object or we can specify one or more parameters. Please go to the [reference](ToDo Add link) to view the full list of options and default values for this helper. In this example, we are only specifying the color palette. 
+Now we are going to use the `carto.viz.style.colorCategories` helper to assign a different color to each country depending on the `continent` feature property. You can leave empty the `options` object or you can specify one or more parameters. Please go to the [reference](ToDo Add link) to view the full list of options and default values for this helper. In this example, we are only specifying the color palette. 
 
 ```js
 const countriesColorStyle = new carto.viz.style.colorCategories('continent', { palette: 'teal' });
@@ -149,9 +152,9 @@ const countriesLayer = new carto.viz.Layer('ne_50m_admin_0_countries', countries
 
 ### Size style helpers
 
-Similar to the color style helpers, you can use the size style helpers to easily change the size ot the symbology representing the features depending on the values of a given feature property. If the property data type is numeric, you can group the features in bins using the `carto.viz.style.sizeBins` helper. If the property data type is a string representing values from a data domain, you can group the features in categories using the `carto.viz.style.sizeCategories` helper. There is an additional helper `carto.viz.style.sizeContinuous` that you can use for creating a continuous color ramp for numeric feature properties.
+Similar to the color style helpers, you can use the size style helpers to easily change the size ot the symbology representing the features depending on the values of a given feature property. If the property data type is numeric, you can group the features in bins using the `carto.viz.style.sizeBins` helper. If the property data type is a string representing values from a data domain, you can group the features in categories using the `carto.viz.style.sizeCategories` helper. There is an additional helper `carto.viz.style.sizeContinuous` that you can use for creating a continuous size ramp for numeric feature properties.
 
-We are going to start with the `carto.viz.style.sizeBins` helper. As it is the case with all the helpers, we can specify different options or use the default values. For this helper we have different options available like the number of bins or the classification method. Please go to the [reference](ToDo Add link) to view the full list of options and default values for this helper. 
+We are going to start with the `carto.viz.style.sizeBins` helper. As it is the case with all the helpers, you can specify different options or use the default values. For this helper you have different options available like the number of bins or the classification method. Please go to the [reference](ToDo Add link) to view the full list of options and default values for this helper. 
 
 For the size style helpers example we are going to use the `listings_madrid` point dataset that contains information for Airbnb places in Madrid.
 
