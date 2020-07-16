@@ -48,7 +48,10 @@ const aggregationFunctions: Record<AggregationType, Function> = {
   },
 
   [AggregationType.SUM](aggregatedFeatures: AggregatedFeatureProperties[]) {
-    return aggregatedFeatures.reduce((total, feature) => total + feature.aggregatedValue, 0);
+    return aggregatedFeatures.reduce(
+      (total, feature) => total + feature.aggregatedValue * feature.clusterCount,
+      0
+    );
   },
 
   [AggregationType.PERCENTILE]() {
