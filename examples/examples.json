@@ -87,15 +87,15 @@
           "file": "style/colorContinuous.html"
         },
         {
-          "title": "x-Size bins",
+          "title": "Size bins",
           "file": "style/sizeBins.html"
         },
         {
-          "title": "x-Size categories",
+          "title": "Size categories",
           "file": "style/sizeCategories.html"
         },
         {
-          "title": "x-Size continuous",
+          "title": "Size continuous",
           "file": "style/sizeContinuous.html"
         }
       ]

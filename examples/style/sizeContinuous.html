@@ -3,13 +3,18 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>GeoJSON Layer with CARTO Tiles Example</title>
+    <title>Size continous</title>
 
-    <!-- Custom CSS -->
     <link
       rel="stylesheet"
       type="text/css"
       href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.css"
+    />
+
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://libs.cartocdn.com/airship-style/v2.4/airship.min.css"
     />
 
     <style>
@@ -25,13 +30,30 @@
     </style>
   </head>
 
-  <body>
-    <section id="map"></section>
+  <body class="as-app-body as-app">
+    <div class="as-content">
+      <main class="as-main">
+        <div class="as-map-area">
+          <!-- map -->
+          <div id="map"></div>
 
-    <!-- Map libraries-->
+          <!-- panel -->
+          <div class="as-panel as-panel--top as-panel--right as-bg--ui-01">
+            <div class="as-panel__element as-p--16 as-body">
+              <h1 class="as-title">Size continuous</h1>
+              <h4 class="as-subheader as-mb--12">
+                Create a thematic map with <em>carto.viz.style.sizeContinuous</em>, 
+                to represent distribution of a numerical field in the dataset (in this case, population size).
+                Used with points, you get a nice "Bubble Map"
+              </h4>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
     <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.js"></script>
     <script src="https://unpkg.com/deck.gl@8.2.0/dist.min.js"></script>
-
     <script src="/dist/umd/index.min.js"></script>
 
     <script>
@@ -47,6 +69,9 @@
           }
         });
 
+        /*
+          Size values are selected by default, but of course they can be further configured.
+        */
         const style = carto.viz.style.sizeContinuous('total_pop');
         const tempLayer = new carto.viz.Layer('ca_measures', style);
         tempLayer.addTo(deckMap);
