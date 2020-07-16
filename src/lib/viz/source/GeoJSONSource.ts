@@ -92,6 +92,10 @@ export class GeoJSONSource extends Source {
     this.emit('filterChange');
   }
 
+  isEmpty() {
+    return getFeatures(this._geojson).length === 0;
+  }
+
   private _buildMetadata() {
     const geometryType = getGeomType(this._geojson);
     const stats = this._getStats();
