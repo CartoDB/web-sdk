@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Set source</title>
+    <title>SQL Source</title>
 
     <link
       rel="stylesheet"
@@ -40,9 +40,9 @@
           <!-- panel -->
           <div class="as-panel as-panel--top as-panel--right as-bg--ui-01">
             <div class="as-panel__element as-p--16 as-body">
-              <h1 class="as-title">Set source</h1>
+              <h1 class="as-title">SQL source</h1>
               <h4 class="as-subheader as-mb--12">
-                Set a new source to a CARTO Layer, using a SQL query and <em>carto.layer.setSource</em>
+                Set a <em>carto.viz.source.SQL</em> source to a Layer, using a SQL query and <em>carto.layer.setSource</em>
               </h4>
               <div>
                 <!-- Clicking the button will replace the original source -->
@@ -59,8 +59,7 @@
 
     <script>
       /* 
-        countries layer is referenced in an external variable, so it can be later accessed from 
-        updateSource code
+        countries layer is an external variable, so it can be later accessed from `updateSource`
       */
       let countries;
 
@@ -72,6 +71,12 @@
           A common layer, connected to a CARTO Dataset
         */
         countries = new carto.viz.Layer('ne_50m_admin_0_countries');
+        /* 
+          previous is equivalent to...
+            countries = new carto.viz.Layer(new carto.viz.source.Dataset('ne_50m_admin_0_countries')); // full table
+          and also the same as...
+            countries = new carto.viz.Layer(new carto.viz.source.SQL('SELECT * FROM ne_50m_admin_0_countries')); // custom SQL
+        */ 
         countries.addTo(deckMap);
       }
 
@@ -83,8 +88,14 @@
           Replace the original source (the whole dataset) with a subset of it, expressed as a SQL query
         */
         countries.setSource(`SELECT * FROM ne_50m_admin_0_countries WHERE continent='North America'`);
-        /* 
-          You can see the dataset and its columns at https://public.carto.com/tables/ne_50m_admin_0_countries/
+        /*
+          And you could have directly created the layer with:
+            countries = new carto.viz.Layer(`SELECT * FROM ne_50m_admin_0_countries WHERE continent='North America'`);
+          
+            Remember that you have the full power of PostGIS from CARTO Platform in those queries!
+          
+          If you want to experiment with SQL, you can see this dataset and its columns at 
+          https://public.carto.com/tables/ne_50m_admin_0_countries/
         */
       }
     </script>

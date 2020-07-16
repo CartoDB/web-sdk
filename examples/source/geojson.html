@@ -42,7 +42,8 @@
             <div class="as-panel__element as-p--16 as-body">
               <h1 class="as-title">GeoJSON</h1>
               <h4 class="as-subheader as-mb--12">
-                Add one GeoJSON layer to your map
+                Add a GeoJSON layer to your map. The common layer accepts geojson data thanks 
+                to the <em>carto.viz.source.GeoJSON</em>
               </h4>
           </div>
         </div>
@@ -55,8 +56,17 @@
 
     <script>
       async function initialize() {
-        // here we use CARTO sql endpoint, but you can use any other GeoJSON source
-        const url = 'https://public.carto.com/api/v2/sql?api_key=default_public&q=select* from world_ports&format=geojson';
+        /* 
+          Here we use CARTO SQL API endpoint (https://carto.com/developers/sql-api/), but you can use any other 
+          source for standard GeoJSON.
+          When you load data this way, there is just one request for all the features, thus it can work well
+          if its number is low. But for bigger layers coming from CARTO, we always recommend the `Dataset`
+          or `SQLSource` types, which work internally more efficiently with MVT Tiles.
+        */
+        const user = 'public';
+        const apiKey = 'default_public';
+        const sql = 'SELECT * FROM world_ports';
+        const url = `https://${user}.carto.com/api/v2/sql?api_key=${apiKey}&q=${sql}&format=geojson`;
         const geojsonData = await fetch(url).then(response => response.json());
 
         const deckMap = carto.viz.createMap();
@@ -68,10 +78,14 @@
           strokeWidth: 6
         });
 
+        /* 
+          Notice how we just pass the geojsonData to the constructor...
+        */
         const layer = new carto.viz.Layer(geojsonData, basicStyle);
-        // equivalent to...
-        // const layer = new carto.viz.Layer(new carto.viz.source.GeoJSON(geojsonData), basicStyle);
-
+        /*
+          ...which is interpreted internally the same way as:
+            const layer = new carto.viz.Layer(new carto.viz.source.GeoJSON(geojsonData), basicStyle);
+        */
         layer.addTo(deckMap);
       }
 

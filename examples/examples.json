@@ -11,10 +11,6 @@
           "file": "basic/layer.html"
         },
         {
-          "title": "Set source",
-          "file": "basic/setSource.html"
-        },
-        {
           "title": "Set style",
           "file": "basic/setSyle.html"
         },
@@ -51,6 +47,19 @@
         {
           "title": "Google Maps",
           "file": "basemap/gmap.html"
+        }
+      ]
+    },
+    {
+      "title": "Source",
+      "samples": [
+        {
+          "title": "SQL",
+          "file": "source/sql.html"
+        },
+        {
+          "title": "GeoJSON",
+          "file": "source/geojson.html"
         }
       ]
     },
