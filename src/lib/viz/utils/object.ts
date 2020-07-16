@@ -21,3 +21,7 @@ export function selectPropertiesFrom<T>(
     return accumulator;
   }, {});
 }
+
+export function isDefined(value: unknown) {
+  return value !== undefined && value !== null && value !== '';
+}
