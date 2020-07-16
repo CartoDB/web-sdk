@@ -55,6 +55,11 @@ function defaultOptions(options: Partial<IconOptionsStyle>) {
 export function iconStyle(icon: string, options: Partial<IconOptionsStyle> = {}) {
   const evalFN = (layer: StyledLayer) => {
     const meta = layer.source.getMetadata();
+
+    if (layer.source.isEmpty()) {
+      return {};
+    }
+
     const iconOptions = defaultOptions(options);
 
     validateParameters(iconOptions, meta.geometryType);
@@ -74,7 +79,7 @@ export function iconStyle(icon: string, options: Partial<IconOptionsStyle> = {})
   return new Style(evalFN);
 }
 
-function validateParameters(options: Partial<IconOptionsStyle>, geometryType: GeometryType) {
+function validateParameters(options: Partial<IconOptionsStyle>, geometryType?: GeometryType) {
   if (geometryType !== 'Point') {
     throw new CartoStylingError(
       'Only Points layers support iconStyle',

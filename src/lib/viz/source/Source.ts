@@ -35,7 +35,7 @@ export interface CategoryFieldStats {
 }
 
 export interface SourceMetadata {
-  geometryType: GeometryType;
+  geometryType?: GeometryType;
   stats: (NumericFieldStats | CategoryFieldStats)[];
 }
 
@@ -59,6 +59,8 @@ export abstract class Source extends WithEvents {
     this.fields = new Set();
     this.registerAvailableEvents(['filterChange']);
   }
+
+  abstract isEmpty(): boolean;
 
   abstract async init(): Promise<boolean>;
 
@@ -90,4 +92,6 @@ export abstract class Source extends WithEvents {
       this.needsInitialization = true;
     }
   }
+
+  abstract getFeatures(excludedFilters: string[]): Record<string, unknown>[];
 }

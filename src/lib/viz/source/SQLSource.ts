@@ -7,7 +7,8 @@ import {
   SourceProps,
   SourceMetadata,
   NumericFieldStats,
-  CategoryFieldStats
+  CategoryFieldStats,
+  GeometryType
 } from './Source';
 import { parseGeometryType } from '../style/helpers/utils';
 import { sourceErrorTypes, SourceError } from '../errors/source-error';
@@ -214,6 +215,10 @@ export class SQLSource extends Source {
     }
   }
 
+  public isEmpty() {
+    return !this._metadata?.geometryType;
+  }
+
   addFilter(filterId: string, filter: ColumnFilters) {
     this.columnFiltersCollection.addFilter(filterId, filter);
     this.emit('filterChange');
@@ -226,11 +231,14 @@ export class SQLSource extends Source {
 
   private extractMetadataFrom(mapInstance: MapInstance) {
     const { stats } = mapInstance.metadata.layers[0].meta;
-    const geometryType = parseGeometryType(stats.geometryType);
+    let geometryType: GeometryType | undefined;
+
+    if (stats.geometryType) {
+      geometryType = parseGeometryType(stats.geometryType);
+    }
+
     const fieldStats = this.getCompleteFieldStats(stats);
-
     const metadata = { geometryType, stats: fieldStats };
-
     return metadata;
   }
 
@@ -273,6 +281,11 @@ export class SQLSource extends Source {
     });
 
     return fieldStats;
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  public getFeatures(): Record<string, unknown>[] {
+    throw new Error(`Method not implemented`);
   }
 }
 
