@@ -1,4 +1,5 @@
-import { Layer, GeoJSONSource } from '@/viz';
+import { Layer } from '@/viz';
+import { DATA_CHANGED_EVENT } from '@/viz/layer/Layer';
 import { AggregationType, aggregateValues } from '@/data/operations/aggregation';
 import { groupValuesByColumn } from '@/data/operations/grouping';
 import { castToNumberOrUndefined } from '@/core/utils/number';
@@ -6,12 +7,10 @@ import { ColumnFilters, SpatialFilters } from '@/viz/filters/types';
 import { DataViewMode } from './DataViewMode';
 
 export class DataViewLocal extends DataViewMode {
-  private useViewport = true;
+  private useViewport = false;
 
-  constructor(dataSource: Layer, column: string, useViewport = true) {
+  constructor(dataSource: Layer, column: string) {
     super(dataSource, column);
-
-    this.useViewport = useViewport;
     this.bindEvents();
   }
 
@@ -37,11 +36,14 @@ export class DataViewLocal extends DataViewMode {
 
     // is GeoJSON Layer
     if (this.dataSource instanceof Layer) {
-      return (this.dataSource.source as GeoJSONSource).getFeatures(excludedFilters);
+      await this.dataSource.addSourceField(this.column);
+    } else {
+      this.dataSource.addField(this.column);
     }
 
-    // is GeoJSON Source
-    return (this.dataSource as GeoJSONSource).getFeatures(excludedFilters);
+    return this.useViewport
+      ? (this.dataSource as Layer).getViewportFeatures(excludedFilters)
+      : this.dataSource.getFeatures(excludedFilters);
   }
 
   public async groupBy(
@@ -68,15 +70,14 @@ export class DataViewLocal extends DataViewMode {
     }
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars, class-methods-use-this
-  public setSpatialFilter(_spatialFilter: SpatialFilters) {
-    return undefined;
+  public setSpatialFilter(spatialFilter: SpatialFilters) {
+    this.useViewport = spatialFilter === 'viewport';
   }
 
   private bindEvents() {
     this.registerAvailableEvents(['dataUpdate', 'error']);
 
-    this.dataSource.on('viewportLoad', () => {
+    this.dataSource.on(DATA_CHANGED_EVENT, () => {
       this.onDataUpdate();
     });
 

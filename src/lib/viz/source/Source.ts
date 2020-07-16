@@ -35,7 +35,7 @@ export interface CategoryFieldStats {
 }
 
 export interface SourceMetadata {
-  geometryType: GeometryType;
+  geometryType?: GeometryType;
   stats: (NumericFieldStats | CategoryFieldStats)[];
 }
 
@@ -61,11 +61,15 @@ export abstract class Source extends WithEvents {
     this.registerAvailableEvents(['filterChange']);
   }
 
+  abstract isEmpty(): boolean;
+
   abstract async init(): Promise<boolean>;
 
   abstract getProps(): SourceProps;
 
   abstract getMetadata(): SourceMetadata;
+
+  abstract getFeatures(excludedFilters: string[]): Record<string, unknown>[];
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars, class-methods-use-this
   addFilter(_filterId: string, _filter: ColumnFilters) {

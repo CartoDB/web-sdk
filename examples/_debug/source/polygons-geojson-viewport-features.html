@@ -62,7 +62,7 @@
         const countriesLayer = new carto.viz.Layer(data);
 
         // vieportLoad will be triggered after every viewport change (zoom, pan...)
-        countriesLayer.on('viewportLoad', async () => {
+        countriesLayer.on('dataChanged', async () => {
           const features = await countriesLayer.getViewportFeatures();
 
           // clear the panel

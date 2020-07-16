@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Category widget with layer credentials</title>
+
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.css"
+    />
+
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://libs.cartocdn.com/airship-style/v2.4/airship.min.css"
+    />
+
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+      }
+
+      #map {
+        width: 100vw;
+        height: 100vh;
+      }
+
+      #panel {
+        width: 300px;
+      }
+      #panel .as-box {
+        width: 250px;
+      }
+    </style>
+  </head>
+
+  <body class="as-app-body as-app">
+    <div class="as-content">
+      <main class="as-main">
+        <div class="as-map-area">
+          <!-- map -->
+          <div id="map"></div>
+
+          <!-- panel -->
+          <div id="panel" class="as-panel as-panel--top as-panel--right as-bg--ui-01">
+            <div class="as-panel__element as-p--16 as-body">
+              <div class="as-container as-container--scrollable">
+                <section class="as-box">
+                  <h1 class="as-title">Category widget with layer credentials</h1>
+                  <h4 class="as-subheader as-mb--12">
+                    Create a widget for a layer with especific credentials
+                  </h4>
+                </section>
+                <section class="as-box">
+                  <as-category-widget
+                    heading="Collisions"
+                    description="Number of collisions types in Seattle"
+                  >
+                  </as-category-widget>
+                </section>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.js"></script>
+    <script src="https://unpkg.com/deck.gl@8.2.0/dist.min.js"></script>
+    <script src="https://libs.cartocdn.com/airship-components/v2.4/airship.js"></script>
+    <script src="/dist/umd/index.min.js"></script>
+
+    <script>
+      const widgetElement = document.querySelector('as-category-widget');
+
+      async function initialize() {
+        carto.auth.setDefaultCredentials({ username: 'public' });
+
+        const deckMap = carto.viz.createMap();
+
+        const credentials = new carto.auth.Credentials('cartoframes', 'default_public');
+        const collisionsSource = new carto.viz.source.Dataset('seattle_collisions', {
+          credentials
+        });
+
+        const style = carto.viz.style.icon('./carto.jpg');
+
+        // const seattleCollisionsLayer = new carto.viz.Layer(collisionsSource, style);
+        const data = await fetch('https://cartoframes.carto.com/api/v2/sql?api_key=default_public&q=select* from seattle_collisions&format=geojson').then(response => response.json())
+        const seattleCollisionsLayer = new carto.viz.Layer(data);
+
+        await seattleCollisionsLayer.addTo(deckMap);
+
+        const dataview = new carto.viz.dataview.Category(seattleCollisionsLayer, 'collisiontype', {
+          operation: 'count',
+          spatialFilter: 'viewport'
+        });
+        new carto.viz.widget.Category('as-category-widget', dataview, {
+          showClearButton: true,
+          disableInteractivity: false
+        });
+      }
+
+      initialize();
+    </script>
+  </body>
+</html>
