@@ -69,6 +69,8 @@ export abstract class Source extends WithEvents {
 
   abstract getMetadata(): SourceMetadata;
 
+  abstract getFeatures(excludedFilters: string[]): Record<string, unknown>[];
+
   // eslint-disable-next-line @typescript-eslint/no-unused-vars, class-methods-use-this
   addFilter(_filterId: string, _filter: ColumnFilters) {
     throw new Error(`Method not implemented`);

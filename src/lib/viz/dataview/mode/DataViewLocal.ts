@@ -25,6 +25,7 @@ export class DataViewLocal extends DataViewMode {
       );
     }
 
+    // is GeoJSON Layer
     if (this.dataOrigin instanceof Layer) {
       await this.dataOrigin.addSourceField(this.column);
     } else {

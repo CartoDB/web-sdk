@@ -3,7 +3,7 @@ import { AggregationType } from '../AggregationType';
 
 export interface AggregatedFeatureProperties {
   aggregatedValue: number;
-  clusterCount: number;
+  featureCount: number;
 }
 
 export function aggregateFeatures(
@@ -32,11 +32,13 @@ export function aggregateFeatures(
 // eslint-disable-next-line @typescript-eslint/ban-types
 const aggregationFunctions: Record<AggregationType, Function> = {
   [AggregationType.COUNT](aggregatedFeatures: AggregatedFeatureProperties[]) {
-    return aggregatedFeatures.reduce((total, feature) => total + feature.clusterCount, 0);
+    return aggregatedFeatures.reduce((total, feature) => total + feature.featureCount, 0);
   },
 
   [AggregationType.AVG](aggregatedFeatures: AggregatedFeatureProperties[]) {
-    return aggregationFunctions.sum(aggregatedFeatures) / aggregateFeatures.length;
+    return (
+      aggregationFunctions.sum(aggregatedFeatures) / aggregationFunctions.count(aggregatedFeatures)
+    );
   },
 
   [AggregationType.MIN](aggregatedFeatures: AggregatedFeatureProperties[]) {
@@ -49,7 +51,7 @@ const aggregationFunctions: Record<AggregationType, Function> = {
 
   [AggregationType.SUM](aggregatedFeatures: AggregatedFeatureProperties[]) {
     return aggregatedFeatures.reduce(
-      (total, feature) => total + feature.aggregatedValue * feature.clusterCount,
+      (total, feature) => total + feature.aggregatedValue * feature.featureCount,
       0
     );
   },

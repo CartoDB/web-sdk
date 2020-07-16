@@ -32,7 +32,7 @@ export class FormulaDataViewImpl extends DataViewImpl<FormulaDataViewData> {
       const values = containsAggregatedData
         ? features.map((feature: Record<string, unknown>) => ({
             aggregatedValue: feature[aggregatedColumnName],
-            clusterCount: feature._cdb_feature_count
+            featureCount: feature._cdb_feature_count
           }))
         : features.map((feature: Record<string, unknown>) => feature[columnName]);
 
