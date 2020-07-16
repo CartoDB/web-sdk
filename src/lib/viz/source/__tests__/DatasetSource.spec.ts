@@ -310,11 +310,11 @@ describe('DatasetSource', () => {
         },
         aggregation: {
           columns: {
-            max__column1: {
+            _cdb_max__column1: {
               aggregate_function: 'max',
               aggregated_column: 'column1'
             },
-            min__column1: {
+            _cdb_min__column1: {
               aggregate_function: 'min',
               aggregated_column: 'column1'
             }

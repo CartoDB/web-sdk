@@ -210,7 +210,7 @@ export class SQLSource extends Source {
 
       this.aggregatedColumns.forEach((operations: Set<string>, originalColumn: string) => {
         operations.forEach(operation => {
-          const aggregatedColumnName = `${operation.toLowerCase()}__${originalColumn}`;
+          const aggregatedColumnName = `_cdb_${operation.toLowerCase()}__${originalColumn}`;
 
           columns[aggregatedColumnName] = {
             aggregate_function: operation,

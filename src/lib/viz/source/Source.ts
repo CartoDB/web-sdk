@@ -108,8 +108,6 @@ export abstract class Source extends WithEvents {
 
     this.aggregatedColumns.set(aggregatedColumn.column, new Set(aggregatedColumn.operations));
   }
-
-  abstract getFeatures(excludedFilters: string[]): Record<string, unknown>[];
 }
 
 export interface AggregatedColumn {

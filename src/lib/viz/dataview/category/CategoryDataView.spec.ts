@@ -222,11 +222,11 @@ describe('DataView', () => {
 
     it('should return the sum of popEst grouped by category from aggregated data', async () => {
       const aggregatedData = [
-        { country: 'Country 5', sum__popEst: 50 },
-        { country: 'Country 4', sum__popEst: 40 },
-        { country: 'Country 4', sum__popEst: 30 },
-        { country: 'Country 2', sum__popEst: 20 },
-        { country: 'Country 2', sum__popEst: 10 }
+        { country: 'Country 5', _cdb_sum__popEst: 50 },
+        { country: 'Country 4', _cdb_sum__popEst: 40 },
+        { country: 'Country 4', _cdb_sum__popEst: 30 },
+        { country: 'Country 2', _cdb_sum__popEst: 20 },
+        { country: 'Country 2', _cdb_sum__popEst: 10 }
       ];
 
       const layer = new Layer('fake_source');
