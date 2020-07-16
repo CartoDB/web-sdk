@@ -71,19 +71,19 @@
           "file": "style/basic.html"
         },
         {
-          "title": "x-Icon",
+          "title": "Icon",
           "file": "style/icon.html"
         },
         {
-          "title": "x-Color bins",
+          "title": "Color bins",
           "file": "style/colorBins.html"
         },
         {
-          "title": "x-Color categories",
+          "title": "Color categories",
           "file": "style/colorCategories.html"
         },
         {
-          "title": "x-Color continuous",
+          "title": "Color continuous",
           "file": "style/colorContinuous.html"
         },
         {
