@@ -42,11 +42,9 @@ export abstract class DataView<T> extends WithEvents {
 
   protected createDataViewMode(column: string, options: DataViewOptions): DataViewMode {
     let dataViewMode;
-    const geoJSONSource = isGeoJSONSource(this.dataOrigin);
 
-    if (this.mode === DataViewCalculation.FAST || geoJSONSource) {
-      const useViewport = !(this.mode === DataViewCalculation.PRECISE && geoJSONSource);
-      dataViewMode = new DataViewLocal(this.dataOrigin as Layer, column, useViewport);
+    if (this.mode === DataViewCalculation.FAST || isGeoJSONSource(this.dataOrigin)) {
+      dataViewMode = new DataViewLocal(this.dataOrigin as Layer, column);
     } else if (this.mode === DataViewCalculation.PRECISE) {
       const credentials = getCredentialsFrom(this.dataOrigin);
       dataViewMode = new DataViewRemote(this.dataOrigin, column, credentials);

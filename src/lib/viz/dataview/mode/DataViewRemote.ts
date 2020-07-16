@@ -1,6 +1,7 @@
 import { MapsDataviews as DataviewsApi } from '@/maps/MapsDataviews';
 import { defaultCredentials } from '@/auth';
 import { Layer, Source, SQLSource, DatasetSource } from '@/viz';
+import { DATA_CHANGED_EVENT } from '@/viz/layer/Layer';
 import { Filter, SpatialFilters, ColumnFilters } from '@/viz/filters/types';
 import { FiltersCollection } from '@/viz/filters/FiltersCollection';
 import { RemoteFilterApplicator } from '@/viz/filters/RemoteFilterApplicator';
@@ -71,7 +72,7 @@ export class DataViewRemote extends DataViewMode {
       );
     }
 
-    this.dataOrigin.on('viewportLoad', () => {
+    this.dataOrigin.on(DATA_CHANGED_EVENT, () => {
       const deckInstance = (this.dataOrigin as Layer).getMapInstance();
       const viewport = deckInstance.getViewports(undefined)[0];
 

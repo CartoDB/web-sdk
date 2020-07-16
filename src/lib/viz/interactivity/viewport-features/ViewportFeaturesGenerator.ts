@@ -1,9 +1,8 @@
 import { Deck, Viewport, WebMercatorViewport } from '@deck.gl/core';
 import { MVTLayer } from '@deck.gl/geo-layers';
 import { Matrix4 } from '@math.gl/core';
-import { GeoJSON } from 'geojson';
-import { GeoJsonLayer } from '@deck.gl/layers';
-import { getFeatures } from '@/viz/source/GeoJSONSource';
+import { GeoJSON, Feature } from 'geojson';
+import { GeoJsonLayer, IconLayer } from '@deck.gl/layers';
 import { selectPropertiesFrom } from '../../utils/object';
 import { ViewportTile } from '../../declarations/deckgl';
 import { GeometryData, ViewportFrustumPlanes } from './geometry/types';
@@ -41,7 +40,7 @@ export class ViewportFeaturesGenerator {
   }
 
   async getFeatures(properties: string[] = []) {
-    if (this.deckLayer instanceof GeoJsonLayer) {
+    if (this.deckLayer instanceof GeoJsonLayer || this.deckLayer instanceof IconLayer) {
       return this.getGeoJSONLayerFeatures(properties);
     }
 
@@ -61,7 +60,16 @@ export class ViewportFeaturesGenerator {
 
   private async getGeoJSONLayerFeatures(properties: string[] = []) {
     const features = this.getGeoJSONFeatures();
-    const viewport = this.getViewport();
+    let viewport: Viewport;
+
+    try {
+      viewport = this.getViewport();
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.warn('Viewport not ready');
+      return [];
+    }
+
     const currentFrustumPlanes = viewport.getFrustumPlanes();
 
     return features
@@ -146,13 +154,12 @@ export class ViewportFeaturesGenerator {
     return this.deckLayer.state.tileset.selectedTiles;
   }
 
-  private getGeoJSONFeatures() {
+  private getGeoJSONFeatures(): Feature[] {
     if (!this.deckLayer || !this.deckLayer.props || !this.deckLayer.props.data) {
       return [];
     }
 
-    const geoJSON = (this.deckLayer.props.data as unknown) as GeoJSON;
-    return getFeatures(geoJSON);
+    return (this.deckLayer.props.data as unknown) as Feature[];
   }
 
   private getViewport() {

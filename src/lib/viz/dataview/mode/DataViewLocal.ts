@@ -1,4 +1,5 @@
-import { Layer, GeoJSONSource } from '@/viz';
+import { Layer } from '@/viz';
+import { DATA_CHANGED_EVENT } from '@/viz/layer/Layer';
 import { AggregationType, aggregate } from '@/data/operations/aggregation/aggregation';
 import { groupValuesByColumn } from '@/data/operations/grouping';
 import { castToNumberOrUndefined } from '@/core/utils/number';
@@ -7,12 +8,10 @@ import { DataViewMode } from './DataViewMode';
 import { GetDataOptions } from '../DataViewImpl';
 
 export class DataViewLocal extends DataViewMode {
-  private useViewport = true;
+  private useViewport = false;
 
-  constructor(dataOrigin: Layer, column: string, useViewport = true) {
+  constructor(dataOrigin: Layer, column: string) {
     super(dataOrigin, column);
-
-    this.useViewport = useViewport;
     this.bindEvents();
   }
 
@@ -24,17 +23,17 @@ export class DataViewLocal extends DataViewMode {
         aggregationOptions?.numeric,
         aggregationOptions?.dimension
       );
-
-      return (this.dataOrigin as Layer).getViewportFeatures(excludedFilters);
     }
 
-    // is GeoJSON Layer
     if (this.dataOrigin instanceof Layer) {
-      return (this.dataOrigin.source as GeoJSONSource).getFeatures(excludedFilters);
+      await this.dataOrigin.addSourceField(this.column);
+    } else {
+      this.dataOrigin.addField(this.column);
     }
 
-    // is GeoJSON Source
-    return (this.dataOrigin as GeoJSONSource).getFeatures(excludedFilters);
+    return this.useViewport
+      ? (this.dataOrigin as Layer).getViewportFeatures(excludedFilters)
+      : this.dataOrigin.getFeatures(excludedFilters);
   }
 
   public async groupBy(
@@ -69,15 +68,14 @@ export class DataViewLocal extends DataViewMode {
     }
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars, class-methods-use-this
-  public setSpatialFilter(_spatialFilter: SpatialFilters) {
-    return undefined;
+  public setSpatialFilter(spatialFilter: SpatialFilters) {
+    this.useViewport = spatialFilter === 'viewport';
   }
 
   private bindEvents() {
     this.registerAvailableEvents(['dataUpdate', 'error']);
 
-    this.dataOrigin.on('viewportLoad', () => {
+    this.dataOrigin.on(DATA_CHANGED_EVENT, () => {
       this.onDataUpdate();
     });
 

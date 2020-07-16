@@ -24,7 +24,8 @@ import {
   colorContinuousStyle,
   sizeBinsStyle,
   sizeCategoriesStyle,
-  sizeContinuousStyle
+  sizeContinuousStyle,
+  iconStyle
 } from './viz/style';
 
 // Dataviews
@@ -83,7 +84,8 @@ const style = {
   colorContinuous: colorContinuousStyle,
   sizeBins: sizeBinsStyle,
   sizeCategories: sizeCategoriesStyle,
-  sizeContinuous: sizeContinuousStyle
+  sizeContinuous: sizeContinuousStyle,
+  icon: iconStyle
 };
 
 export const viz = {
