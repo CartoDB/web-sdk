@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Histogram dataview</title>
+
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.css"
+    />
+
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://libs.cartocdn.com/airship-style/v2.4/airship.min.css"
+    />
+
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+      }
+
+      #map {
+        width: 100vw;
+        height: 100vh;
+      }
+    </style>
+  </head>
+
+  <body class="as-app-body as-app">
+    <div class="as-content">
+      <main class="as-main">
+        <div class="as-map-area">
+          <!-- map -->
+          <div id="map"></div>
+
+          <!-- panel -->
+          <div id="panel" class="as-panel as-panel--top as-panel--right as-bg--ui-01">
+            <div class="as-panel__element as-p--16 as-body">
+              <h1 class="as-title">Histogram dataview</h1>
+              <h4 class="as-subheader as-mb--12">
+                Compute frequency values, aggregating features in bins, with
+                <em>carto.viz.dataview.Histogram</em>. In this case estimated population per country
+              </h4>
+              
+              <hr/>
+              <div id="result"></div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.js"></script>
+    <script src="https://unpkg.com/deck.gl@8.2.0/dist.min.js"></script>
+    <script src="/dist/umd/index.min.js"></script>
+
+    <script>
+      async function initialize() {
+        carto.auth.setDefaultCredentials({ username: 'public' });
+
+        const deckMap = carto.viz.createMap();
+
+        const countriesLayer = new carto.viz.Layer('ne_50m_admin_0_countries');
+        await countriesLayer.addTo(deckMap);
+
+        /*
+          A histogram dataview allows computing bins easily.
+        */
+        const dataview = new carto.viz.dataview.Histogram(countriesLayer, 'pop_est', {
+          bins: 10,
+          start: 1000000,
+          end: 127078679,
+          spatialFilter: 'viewport' // data will be updated on every viewport change (remove for 'global')
+        });
+
+        dataview.on('dataUpdate', async () => {
+          const data = await dataview.getData();
+
+          console.log(data); // review the dataview info
+
+          /*
+            You can use here the data for any arbitrary representation. 
+            (eg on an external chart lib). 
+            We'll just present the raw data in a list, but check the HistogramWidget example
+            for a complete UI solution
+          */
+          const $result = document.getElementById('result');
+          $result.innerHTML = '';
+
+          /*
+            Iterate on every bin, to display its start-end and frequency value
+          */
+          var list = document.createElement('ul');
+          for (let i = 0; i < 10; i++) {
+            const bin = data.bins[i];
+            var li = document.createElement('li');
+            const { start, end, value } = bin;
+            li.textContent = `(${start.toFixed(0)} to ${end.toFixed(0)}) => ${value}`;
+            list.appendChild(li);
+          }
+
+          $result.append(list);
+        });
+      }
+
+      initialize();
+    </script>
+  </body>
+</html>

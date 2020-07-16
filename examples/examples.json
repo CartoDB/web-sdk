@@ -17,7 +17,7 @@
         {
           "title": "Several layers",
           "file": "basic/severalLayers.html"
-        }       
+        }
       ]
     },
     {
@@ -103,6 +103,18 @@
     {
       "title": "Dataview",
       "samples": [
+        {
+          "title": "Formula",
+          "file": "dataview/formulaDataview.html"
+        },
+        {
+          "title": "Category",
+          "file": "dataview/categoryDataview.html"
+        },
+        {
+          "title": "Histogram",
+          "file": "dataview/histogramDataview.html"
+        },
         {
           "title": "Viewport features",
           "file": "dataview/viewportFeatures.html"
