@@ -3,7 +3,7 @@ import { Layer, Source } from '@/viz';
 import { Credentials } from '@/auth';
 import { Filter, ColumnFilters, SpatialFilters } from '@/viz/filters/types';
 import { AggregationType } from '@/data/operations/aggregation/';
-import { DataViewImpl } from './DataViewImpl';
+import { DataViewImpl, GetDataOptions } from './DataViewImpl';
 import { DataViewCalculation, DataViewMode } from './mode/DataViewMode';
 import { debounce, isGeoJSONSource } from './utils';
 import { SQLSource, DatasetSource, DOSource } from '../source';
@@ -16,7 +16,7 @@ export const OPTION_CHANGED_DELAY = 100;
 export abstract class DataView<T> extends WithEvents {
   protected mode: DataViewCalculation;
   protected dataviewImpl!: DataViewImpl<T>;
-  protected dataSource: Layer | Source;
+  protected dataOrigin: Layer | Source;
 
   /**
    * Debounce scope to prevent multiple calls
@@ -24,10 +24,10 @@ export abstract class DataView<T> extends WithEvents {
    */
   protected setOptionScope: { timeoutId?: number } = {};
 
-  constructor(dataSource: Layer | Source, column: string, options: Record<string, unknown> = {}) {
+  constructor(dataOrigin: Layer | Source, column: string, options: Record<string, unknown> = {}) {
     super();
 
-    this.dataSource = dataSource;
+    this.dataOrigin = dataOrigin;
     this.mode = (options.mode as DataViewCalculation) || DataViewCalculation.PRECISE;
 
     if (!options.mode && options.spatialFilter === 'viewport') {
@@ -43,11 +43,11 @@ export abstract class DataView<T> extends WithEvents {
   protected createDataViewMode(column: string, options: DataViewOptions): DataViewMode {
     let dataViewMode;
 
-    if (this.mode === DataViewCalculation.FAST || isGeoJSONSource(this.dataSource)) {
-      dataViewMode = new DataViewLocal(this.dataSource as Layer, column);
+    if (this.mode === DataViewCalculation.FAST || isGeoJSONSource(this.dataOrigin)) {
+      dataViewMode = new DataViewLocal(this.dataOrigin as Layer, column);
     } else if (this.mode === DataViewCalculation.PRECISE) {
-      const credentials = getCredentialsFrom(this.dataSource);
-      dataViewMode = new DataViewRemote(this.dataSource, column, credentials);
+      const credentials = getCredentialsFrom(this.dataOrigin);
+      dataViewMode = new DataViewRemote(this.dataOrigin, column, credentials);
     } else {
       throw new CartoDataViewError(
         `mode ${this.mode} unknown. Availables: '${DataViewCalculation.FAST}' and '${DataViewCalculation.PRECISE}'.`,
@@ -66,12 +66,12 @@ export abstract class DataView<T> extends WithEvents {
     return dataViewMode;
   }
 
-  public getData(options: { excludedFilters?: string[] } = {}): Promise<T> {
+  public getData(options: GetDataOptions = {}): Promise<T> {
     let data;
     const { excludedFilters = [] } = options;
 
     // GeoJSON has the features in local
-    if (this.mode === DataViewCalculation.FAST || isGeoJSONSource(this.dataSource)) {
+    if (this.mode === DataViewCalculation.FAST || isGeoJSONSource(this.dataOrigin)) {
       data = this.dataviewImpl.getLocalData({ excludedFilters });
     } else if (this.mode === DataViewCalculation.PRECISE) {
       data = this.dataviewImpl.getRemoteData({ excludedFilters });
@@ -135,8 +135,8 @@ export abstract class DataView<T> extends WithEvents {
   protected abstract buildImpl(column: string, options: DataViewOptions): void;
 }
 
-export function getCredentialsFrom(dataSource: Layer | Source): Credentials | undefined {
-  let source = dataSource;
+export function getCredentialsFrom(dataOrigin: Layer | Source): Credentials | undefined {
+  let source = dataOrigin;
 
   if (source instanceof Layer) {
     source = source.source;

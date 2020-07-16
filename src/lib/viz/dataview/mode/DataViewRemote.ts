@@ -8,6 +8,7 @@ import { RemoteFilterApplicator } from '@/viz/filters/RemoteFilterApplicator';
 import { uuidv4 } from '@/core/utils/uuid';
 import { DataViewMode } from './DataViewMode';
 import { CartoDataViewError, dataViewErrorTypes } from '../DataViewError';
+import { GetDataOptions } from '../DataViewImpl';
 
 export class DataViewRemote extends DataViewMode {
   private _dataviewsApi: DataviewsApi;
@@ -17,10 +18,10 @@ export class DataViewRemote extends DataViewMode {
     RemoteFilterApplicator
   );
 
-  constructor(dataSource: Layer | Source, column: string, credentials = defaultCredentials) {
-    super(dataSource, column);
+  constructor(dataOrigin: Layer | Source, column: string, credentials = defaultCredentials) {
+    super(dataOrigin, column);
 
-    const remoteSource = getRemoteSource(dataSource);
+    const remoteSource = getRemoteSource(dataOrigin);
     this._remoteSource = remoteSource;
     this._dataviewsApi = new DataviewsApi(remoteSource.value, credentials);
 
@@ -54,7 +55,7 @@ export class DataViewRemote extends DataViewMode {
   }
 
   public setFilters(filters: ColumnFilters) {
-    this.dataSource.setFilters(filters);
+    this.dataOrigin.setFilters(filters);
   }
 
   public setSpatialFilter(spatialFilter: SpatialFilters) {
@@ -64,15 +65,15 @@ export class DataViewRemote extends DataViewMode {
   }
 
   private createViewportSpatialFilter(filterId: string) {
-    if (this.dataSource instanceof Source) {
+    if (this.dataOrigin instanceof Source) {
       throw new CartoDataViewError(
         `To filter by viewport a Layer is needed but a Source was provided`,
         dataViewErrorTypes.PROPERTY_INVALID
       );
     }
 
-    this.dataSource.on(DATA_CHANGED_EVENT, () => {
-      const deckInstance = (this.dataSource as Layer).getMapInstance();
+    this.dataOrigin.on(DATA_CHANGED_EVENT, () => {
+      const deckInstance = (this.dataOrigin as Layer).getMapInstance();
       const viewport = deckInstance.getViewports(undefined)[0];
 
       if (viewport) {
@@ -87,18 +88,18 @@ export class DataViewRemote extends DataViewMode {
     });
   }
 
-  public updateDataViewSource(options: { excludedFilters: string[] }) {
+  public updateDataViewSource(options: GetDataOptions) {
     const sql = this._remoteSource.getSQLWithFilters(options.excludedFilters);
     this.dataviewsApi.setSource(sql);
   }
 }
 
-function getRemoteSource(dataSource: Layer | Source) {
-  if (dataSource instanceof Source) {
+function getRemoteSource(dataOrigin: Layer | Source) {
+  if (dataOrigin instanceof Source) {
     // TODO what about the other sources? Check DOSource and its instantiation process
-    return dataSource as SQLSource | DatasetSource;
+    return dataOrigin as SQLSource | DatasetSource;
   }
 
-  const layer = dataSource as Layer;
+  const layer = dataOrigin as Layer;
   return layer.source as SQLSource | DatasetSource;
 }
