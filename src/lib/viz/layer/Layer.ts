@@ -22,8 +22,8 @@ import { FunctionFilterApplicator } from '../filters/FunctionFilterApplicator';
 import { ColumnFilters } from '../filters/types';
 import { basicStyle } from '../style/helpers/basic-style';
 
-const DATA_READY_EVENT = 'layerDataReady';
-const DATA_CHANGED_EVENT = 'layerDataChanged';
+export const DATA_READY_EVENT = 'layerDataReady';
+export const DATA_CHANGED_EVENT = 'layerDataChanged';
 
 enum DATA_STATES {
   STARTING,
@@ -71,7 +71,6 @@ export class Layer extends WithEvents implements StyledLayer {
     this.registerAvailableEvents([
       DATA_READY_EVENT,
       DATA_CHANGED_EVENT,
-      'viewportLoad',
       'filterChange',
       InteractivityEventType.CLICK.toString(),
       InteractivityEventType.HOVER.toString()
@@ -530,13 +529,11 @@ export class Layer extends WithEvents implements StyledLayer {
       this.dataState === DATA_STATES.STARTING &&
       (isGeoJsonLayer || referer === 'onViewportLoad')
     ) {
-      this.emit('viewportLoad'); // TODO: remove
       this.emit(DATA_READY_EVENT);
       this.emit(DATA_CHANGED_EVENT);
     }
 
     if (this.dataState === DATA_STATES.UPDATING || referer === 'onViewportLoad') {
-      this.emit('viewportLoad'); // TODO: remove
       this.emit(DATA_CHANGED_EVENT);
     }
 
