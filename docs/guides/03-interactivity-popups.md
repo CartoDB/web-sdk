@@ -7,7 +7,7 @@ After completing this guide, you will know how to make your geospatial applicati
 <div class="example-map">
     <iframe
         id="interactivity-popups-final-result"
-        src="/developers/web-sdk/examples/maps/guides/interactivity-popups/step-3.html"
+        src="/developers/web-sdk/examples/maps/guides/interactivity-popups/step-7.html"
         width="100%"
         height="500"
         frameBorder="0">
@@ -18,7 +18,7 @@ After completing this guide, you will know how to make your geospatial applicati
 
 With the Web SDK it is very easy to highlight features. You can highlight a feature when the pointer moves over the feature and when the feature is clicked. You can specify one or both events and have a different style for each event.
 
-We are going to start by highlighting the features when the pointer moves over them. In order to do that we must specify the `hoverStyle` parameter in the `options` object while creating the layer. We can specify different parameters like the color (fill), stroke color or stroke width. There is a `default` style that specifies light yellow as the stroke color, a slightly darker yellow as the stroke color and 5 as the stroke width. The `options` parameter is the third parameter to the `Layer` constructor so we need to specify also the `style` parameter. The highlighting is removed when we move the pointer out of the feature.
+We are going to start by highlighting the features when the pointer moves over them. In order to do that you must specify the `hoverStyle` parameter in the `options` object while creating the layer. You can specify different parameters like the color (fill), stroke color or stroke width. There is a `default` style that specifies light yellow as the stroke color, a slightly darker yellow as the stroke color and 5 as the stroke width. The `options` parameter is the third parameter to the `Layer` constructor so we need to specify also the `style` parameter. The highlighting is removed when we move the pointer out of the feature.
 
 ```js
 const countriesLayer = new carto.viz.Layer('ne_50m_admin_0_countries', carto.viz.style.basic(), {
@@ -38,7 +38,7 @@ const countriesLayer = new carto.viz.Layer('ne_50m_admin_0_countries', carto.viz
 </div>
 > View this step [here](/developers/web-sdk/examples/maps/guides/interactivity-popups/step-1.html)
 
-We can specify custom highlighting properties directly use the deck.gl properties like `getFillColor` or `getLineColor`. 
+You can specify custom highlighting properties directly usings the deck.gl properties like `getFillColor` or `getLineColor`. 
 
 ```js
 const countriesLayer = new carto.viz.Layer('ne_50m_admin_0_countries', carto.viz.style.basic(), {
@@ -62,7 +62,7 @@ const countriesLayer = new carto.viz.Layer('ne_50m_admin_0_countries', carto.viz
 </div>
 > View this step [here](/developers/web-sdk/examples/maps/guides/interactivity-popups/step-2.html)
 
-If we want to highlight the features when the user clicks on them, we must use the `clickStyle` parameter. The options are the same for this parameter and the `hoverStyle` parameter. The highlighting is removed when we click on another feature.
+If you want to highlight the features when the user clicks on them, you must use the `clickStyle` parameter. The options are the same for this parameter and the `hoverStyle` parameter. The highlighting is removed when we click on another feature.
 
 ```js
 const countriesLayer = new carto.viz.Layer('ne_50m_admin_0_countries', carto.viz.style.basic(), {
@@ -86,7 +86,7 @@ const countriesLayer = new carto.viz.Layer('ne_50m_admin_0_countries', carto.viz
 </div>
 > View this step [here](/developers/web-sdk/examples/maps/guides/interactivity-popups/step-3.html)
 
-We can apply both highlighting styles to the same layer. In this case we are going to use the `default` highlighting for the `hoverStyle` parameter and use a custom highlighting style for the `clickStyle` parameter.
+You can apply both highlighting styles to the same layer. In this case we are going to use the `default` highlighting for the `hoverStyle` parameter and use a custom highlighting style for the `clickStyle` parameter.
 
 ```js
 const countriesLayer = new carto.viz.Layer('ne_50m_admin_0_countries', carto.viz.style.basic(), {
@@ -113,9 +113,9 @@ const countriesLayer = new carto.viz.Layer('ne_50m_admin_0_countries', carto.viz
 
 ### Pop-Ups
 
-The Web SDK allows you to add pop-ups both when the user moves the pointer over a feature and when the user clicks on a feature. We add the pop-up by calling the `setPopupHover` or `setPopupClick` methods in the `Layer` object. We can call the methods before or after adding the layer to the map. We need to specify the attributes/feature properties that we want to show in the pop-up. For each attribute we show the attribute name (title) and the value. We can specify a different attribute name using the `title` property and we can apply a specific format in the `value` property.
+The Web SDK allows you to add pop-ups both when the user moves the pointer over a feature and when the user clicks on a feature. You can add the pop-up by calling the `setPopupHover` or `setPopupClick` methods in the `Layer` object. You can call the methods before or after adding the layer to the map. You need to specify the attributes/feature properties that you want to show in the pop-up. For each attribute the Web SDK shows the attribute name (title) and the value. You can specify a different attribute name using the `title` property and you can apply a specific format for the `value` property.
 
-Pop-ups use the Airship library, so we need to add the Airship CSS and JavaScript files to our page.
+Pop-ups use the Airship library, so you need to add the Airship CSS and JavaScript files to our page.
 
 ```html
     <!-- Include Airship from the CARTO CDN -->
@@ -124,7 +124,7 @@ Pop-ups use the Airship library, so we need to add the Airship CSS and JavaScrip
     <script nomodule="" src="https://libs.cartocdn.com/airship-components/v2.4.0/airship/airship.js"></script>
 ```
 
-The `addTo` method in the Layer object and the `setPopupHover`and `setPopupClick` are [async](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function) functions. To be sure that we get the desired results when calling these methods, it is safer to called them using the `await` statement, inside another function defined as `async`.
+The `addTo` method in the Layer object and the `setPopupHover`and `setPopupClick` are [async](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function) functions. To be sure that you get the desired results when calling these methods, it is safer to called them using the `await` statement, inside another function defined as `async`.
 
 ```js
 async function initialize()
@@ -135,7 +135,7 @@ async function initialize()
 };
 ```
 
-We are going to start by adding a pop-up when the user moves the pointer over a feature. We will show the country name and the estimated population. In addition to that, we are going to hide the name attribute title and show a more meaningful title for the `pop_est` attribute. The pop-up is hidden when we move the pointer out of the feature.
+We are going to start by adding a pop-up when the user moves the pointer over a feature. We will show the country name and the estimated population. In addition to that, we are going to hide the name attribute title and show a more meaningful title for the `pop_est` attribute. The pop-up is hidden when you move the pointer out of the feature.
 
 ```js
 await countriesLayer.setPopupHover([
@@ -162,7 +162,7 @@ await countriesLayer.setPopupHover([
 </div>
 > View this step [here](/developers/web-sdk/examples/maps/guides/interactivity-popups/step-5.html)
 
-Now we are going to add a pop-up when the user clicks on a feature. In this case we are going to add more attributes and apply some formatting for the numeric values. The pop-up is hidden when we click in another feature.
+Now we are going to add a pop-up when the user clicks on a feature. In this case we are going to add more attributes and apply some formatting for the numeric values. The pop-up is hidden when you click in another feature.
 
 ```js
 await countriesLayer.setPopupClick([
@@ -198,7 +198,7 @@ await countriesLayer.setPopupClick([
 </div>
 > View this step [here](/developers/web-sdk/examples/maps/guides/interactivity-popups/step-6.html)
 
-Once we have added a pop-up for a layer, we can easily disable it by calling the pop-up function with a null argument.
+Once you have added a pop-up for a layer, you can easily disable it by calling the pop-up function with a null argument.
 
 ```js
 await countriesLayer.setPopupHover(null);
@@ -223,7 +223,6 @@ This is the complete example with feature highlighting and pop-ups both for hove
 > You can explore the final step [here](/developers/web-sdk/examples/maps/guides/interactivity-popups/step-7.html)
 
 ```html
-<!DOCTYPE html>
 <!DOCTYPE html>
 <html lang="en">
   <head>
