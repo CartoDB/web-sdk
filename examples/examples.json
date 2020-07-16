@@ -64,6 +64,43 @@
       ]
     },
     {
+      "title": "Style",
+      "samples": [
+        {
+          "title": "Basic",
+          "file": "style/basic.html"
+        },
+        {
+          "title": "x-Icon",
+          "file": "style/icon.html"
+        },
+        {
+          "title": "x-Color bins",
+          "file": "style/colorBins.html"
+        },
+        {
+          "title": "x-Color categories",
+          "file": "style/colorCategories.html"
+        },
+        {
+          "title": "x-Color continuous",
+          "file": "style/colorContinuous.html"
+        },
+        {
+          "title": "x-Size bins",
+          "file": "style/sizeBins.html"
+        },
+        {
+          "title": "x-Size categories",
+          "file": "style/sizeCategories.html"
+        },
+        {
+          "title": "x-Size continuous",
+          "file": "style/sizeContinuous.html"
+        }
+      ]
+    },
+    {
       "title": "WIP",
       "samples": [
         {
