@@ -20,7 +20,7 @@ export function aggregateValues(
     });
   }
 
-  if (!areValidNumbers(values)) {
+  if (!areValidNumbers(values) && aggregation !== AggregationType.COUNT) {
     throw new CartoDataViewError(
       `Column property for aggregations can just contain numbers (or nulls). Please check documentation.`,
       dataViewErrorTypes.PROPERTY_INVALID
