@@ -101,11 +101,28 @@
       ]
     },
     {
-      "title": "WIP",
+      "title": "Dataview",
       "samples": [
         {
-          "title": "xViewport features",
-          "file": "basic/viewport-features.html"
+          "title": "Viewport features",
+          "file": "dataview/viewportFeatures.html"
+        }
+      ]
+    },
+    {
+      "title": "Widget",
+      "samples": [
+        {
+          "title": "Formula",
+          "file": "widget/formulaWidget.html"
+        },
+        {
+          "title": "Category",
+          "file": "widget/categoryWidget.html"
+        },
+        {
+          "title": "Histogram",
+          "file": "widget/histogramWidget.html"
         }
       ]
     }

@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Histogram Widget</title>
+    <title>Histogram widget</title>
 
     <link
       rel="stylesheet"
@@ -32,6 +32,12 @@
         width: 300px;
       }
 
+      @media (max-width: 812px) {
+        .as-panel {
+          max-height: 600px;
+        }
+      }
+
       #panel .as-box {
         width: 250px;
       }
@@ -52,11 +58,12 @@
                 <section class="as-box">
                   <h1 class="as-title">Histogram widget</h1>
                   <h4 class="as-subheader as-mb--12">
-                    Create an Histogram widget, aggregating values in bins, for those features
-                    currently visible. It includes a filtering feature out of the box
+                    Create a histogram widget, aggregating values in bins, with
+                    <em>carto.viz.widget.Histogram</em>
                   </h4>
                 </section>
                 <section class="as-box">
+                  <!-- An airship widget for the 'global' data -->
                   <as-histogram-widget
                     id="histogram-global"
                     heading="Remote Estimated Population (global)"
@@ -64,6 +71,8 @@
                     show-clear
                   >
                   </as-histogram-widget>
+
+                  <!-- An airship widget for the 'viewport' data -->
                   <as-histogram-widget
                     id="histogram-viewport"
                     heading="Estimated Population (viewport)"
@@ -95,19 +104,31 @@
         const countriesLayer = new carto.viz.Layer('ne_50m_admin_0_countries');
         await countriesLayer.addTo(deckMap);
 
-        const viewportGlobal = new carto.viz.dataview.Histogram(countriesLayer, 'pop_est', {
+        /*
+          The dataviews define the histogram params
+        */
+        const histogramGlobal = new carto.viz.dataview.Histogram(countriesLayer, 'pop_est', {
           bins: 10,
           start: 1000000,
           end: 127078679
         });
+
         const histogramViewport = new carto.viz.dataview.Histogram(countriesLayer, 'pop_est', {
           bins: 10,
           start: 1000000,
           end: 127078679,
-          spatialFilter: 'viewport'
+          spatialFilter: 'viewport' // data will be updated on every viewport change
         });
 
-        new carto.viz.widget.Histogram('#histogram-global', viewportGlobal);
+        /*
+          There are two option availables: 
+          - global: values for the whole layer or
+          - a viewport spatial filter: considering just features on screen
+
+          Widgets include a filtering feature out of the box, so you can display / hide the categories
+          on the map
+        */
+        new carto.viz.widget.Histogram('#histogram-global', histogramGlobal);
         new carto.viz.widget.Histogram('#histogram-viewport', histogramViewport);
       }
 

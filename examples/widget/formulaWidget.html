@@ -3,9 +3,8 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Formula Widget Example</title>
+    <title>Formula widget</title>
 
-    <!-- Custom CSS -->
     <link
       rel="stylesheet"
       type="text/css"
@@ -24,11 +23,18 @@
         height: 100vh;
       }
 
-      .panel {
+      #panel {
         width: 300px;
       }
 
-      .panel .as-box {
+      @media (max-width: 812px) {
+        .as-panel {
+          max-height: 600px;
+          
+        }
+      }
+
+      #panel .as-box {
         width: 250px;
       }
     </style>
@@ -42,30 +48,31 @@
           <div id="map"></div>
 
           <!-- panel -->
-          <div class="panel as-panel as-panel--top as-panel--right as-bg--ui-01">
+          <div id="panel" class="as-panel as-panel--top as-panel--right as-bg--ui-01">
             <div class="as-panel__element as-p--16 as-body">
               <div class="as-container as-container--scrollable">
                 <section class="as-box">
                   <h1 class="as-title">Formula widget</h1>
                   <h4 class="as-subheader as-mb--12">
-                    Display values from a Formula DataView aggregation
+                    Display values from a Formula aggregation (min, max, avg...) width
+                    <em>carto.viz.widget.Formula</em>
                   </h4>
                 </section>
                 <section class="as-box">
+                  <!-- An airship widget for the 'global' data -->
                   <as-formula-widget
                     id="formula-global"
-                    class="as-p--16"
                     heading="Total Estimated Population (global)"
-                    description="Total estimated population of the countries"
+                    description="All countries"
                   >
                   </as-formula-widget>
                 </section>
                 <section class="as-box">
+                  <!-- An airship widget for the 'viewport' data -->
                   <as-formula-widget
                     id="formula-viewport"
-                    class="as-p--16"
                     heading="Total Estimated Population (viewport)"
-                    description="Total estimated population of the countries shown in the screen"
+                    description="Countries on screen"
                   >
                   </as-formula-widget>
                 </section>
@@ -93,16 +100,24 @@
         const countriesLayer = new carto.viz.Layer('ne_50m_admin_0_countries');
         await countriesLayer.addTo(deckMap);
 
-        // Formula Widget
+        /*
+          The dataviews define the operation to apply (in this case 'max'), and the field
+          to query in the features ('pop_est')
+        */
         const formulaGlobal = new carto.viz.dataview.Formula(countriesLayer, 'pop_est', {
           operation: 'max'
         });
 
         const formulaViewport = new carto.viz.dataview.Formula(countriesLayer, 'pop_est', {
           operation: 'max',
-          spatialFilter: 'viewport'
+          spatialFilter: 'viewport' // data will be updated on every viewport change
         });
 
+        /*
+          There are two option availables: 
+          - global: values for the whole layer or
+          - a viewport spatial filter: considering just features on screen
+        */
         new carto.viz.widget.Formula('#formula-global', formulaGlobal);
         new carto.viz.widget.Formula('#formula-viewport', formulaViewport);
       }
