@@ -73,14 +73,14 @@
         left: 10px;
         top: 10px;
         height: 110px;
-        width: 250px;
+        width: 300px;
         padding: 16px;
         background-color: #fff;
       "
     >
       <section class="as-body">
         <div>
-          <as-widget-header header="World commerce (remote)" subheader="Sum of GDP">
+          <as-widget-header header="World commerce (global)" subheader="Sum of GDP">
           </as-widget-header>
           <p
             id="formula-remote"
@@ -97,14 +97,14 @@
         left: 10px;
         top: 130px;
         height: 110px;
-        width: 250px;
+        width: 300px;
         padding: 16px;
         background-color: #fff;
       "
     >
       <section class="as-body">
         <div>
-          <as-widget-header header="World commerce (remote-filtered)" subheader="Sum of GDP">
+          <as-widget-header header="World commerce (viewport precise mode)" subheader="Sum of GDP">
           </as-widget-header>
           <p
             id="formula-remote-filtered"
@@ -121,14 +121,14 @@
         left: 10px;
         top: 250px;
         height: 110px;
-        width: 250px;
+        width: 300px;
         padding: 16px;
         background-color: #fff;
       "
     >
       <section class="as-body">
         <div>
-          <as-widget-header header="World commerce (local)" subheader="Sum of GDP">
+          <as-widget-header header="World commerce (viewport fast mode)" subheader="Sum of GDP">
           </as-widget-header>
           <p
             id="formula-local"
@@ -145,7 +145,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-format/1.3.0/d3-format.min.js"></script>
 
     <script src="/dist/umd/index.min.js"></script>
-
 
     <script>
       const operationElem = document.querySelector('as-dropdown');
@@ -180,11 +179,12 @@
         });
         formulaRemoteFiltered = new carto.viz.dataview.Formula(countriesLayer, 'gdp_md_est', {
           operation: 'sum',
-          mode: 'remote-filtered'
+          spatialFilter: 'viewport',
+          mode: 'precise'
         });
         formulaLocal = new carto.viz.dataview.Formula(countriesLayer, 'gdp_md_est', {
           operation: 'sum',
-          mode: 'local'
+          spatialFilter: 'viewport'
         });
 
         // intializes the widgets

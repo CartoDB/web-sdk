@@ -1,57 +1,15 @@
-import { Layer, Source } from '@/viz';
-import { BuiltInFilters } from '@/viz/filters/types';
-import { uuidv4 } from '@/core/utils/uuid';
-import { DataViewLocal } from '../mode/DataViewLocal';
-import { DataViewRemote } from '../mode/DataViewRemote';
-import { DataViewCalculation } from '../mode/DataViewMode';
-import { DataView, OPTION_CHANGED_DELAY, getCredentialsFrom } from '../DataView';
+import { DataView, OPTION_CHANGED_DELAY } from '../DataView';
 import {
   CategoryOptions,
   CategoryDataViewImpl,
   CategoryDataViewData
 } from './CategoryDataViewImpl';
-import { debounce, isGeoJSONSource } from '../utils';
+import { debounce } from '../utils';
 
 export class CategoryDataView extends DataView<CategoryDataViewData> {
-  protected buildImpl(dataSource: Layer | Source, column: string, options: CategoryOptions) {
-    let dataView;
-    const { mode } = options;
-
-    switch (mode) {
-      case DataViewCalculation.LOCAL: {
-        dataView = new DataViewLocal(dataSource as Layer, column);
-        break;
-      }
-
-      case DataViewCalculation.REMOTE: {
-        if (isGeoJSONSource(dataSource)) {
-          const useViewport = false;
-          dataView = new DataViewLocal(dataSource as Layer, column, useViewport);
-          break;
-        }
-
-        const credentials = getCredentialsFrom(dataSource);
-        dataView = new DataViewRemote(dataSource, column, credentials);
-        break;
-      }
-
-      case DataViewCalculation.REMOTE_FILTERED:
-
-      // eslint-disable-next-line no-fallthrough
-      default: {
-        if (isGeoJSONSource(dataSource)) {
-          dataView = new DataViewLocal(dataSource as Layer, column);
-          break;
-        }
-
-        const credentials = getCredentialsFrom(dataSource);
-        dataView = new DataViewRemote(dataSource, column, credentials);
-        dataView.addFilter(`VIEWPORT_FILTER_${uuidv4()}`, BuiltInFilters.VIEWPORT);
-        break;
-      }
-    }
-
-    this.dataviewImpl = new CategoryDataViewImpl(dataView, options);
+  protected buildImpl(column: string, options: CategoryOptions) {
+    const dataViewMode = this.createDataViewMode(column, options);
+    this.dataviewImpl = new CategoryDataViewImpl(dataViewMode, options);
   }
 
   public get operationColumn() {

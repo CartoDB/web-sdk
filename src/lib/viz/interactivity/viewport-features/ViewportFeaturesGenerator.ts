@@ -2,7 +2,7 @@ import { Deck, Viewport, WebMercatorViewport } from '@deck.gl/core';
 import { MVTLayer } from '@deck.gl/geo-layers';
 import { Matrix4 } from '@math.gl/core';
 import { GeoJSON } from 'geojson';
-import { GeoJsonLayer } from '@deck.gl/layers';
+import { GeoJsonLayer, IconLayer } from '@deck.gl/layers';
 import { getFeatures } from '@/viz/source/GeoJSONSource';
 import { selectPropertiesFrom } from '../../utils/object';
 import { ViewportTile } from '../../declarations/deckgl';
@@ -41,7 +41,7 @@ export class ViewportFeaturesGenerator {
   }
 
   async getFeatures(properties: string[] = []) {
-    if (this.deckLayer instanceof GeoJsonLayer) {
+    if (this.deckLayer instanceof GeoJsonLayer || this.deckLayer instanceof IconLayer) {
       return this.getGeoJSONLayerFeatures(properties);
     }
 

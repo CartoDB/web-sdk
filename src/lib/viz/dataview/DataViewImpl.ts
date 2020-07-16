@@ -1,5 +1,5 @@
 import { WithEvents } from '@/core/mixins/WithEvents';
-import { Filter } from '@/viz/filters/types';
+import { Filter, ColumnFilters, SpatialFilters } from '@/viz/filters/types';
 import { DataViewMode } from './mode/DataViewMode';
 import { AggregationType } from '../../data/operations/aggregation/aggregation';
 import { CartoDataViewError, dataViewErrorTypes } from './DataViewError';
@@ -37,6 +37,14 @@ export abstract class DataViewImpl<T> extends WithEvents {
 
   public removeFilter(filterId: string) {
     this.dataView.removeFilter(filterId);
+  }
+
+  public setFilters(filters: ColumnFilters) {
+    this.dataView.setFilters(filters);
+  }
+
+  public setSpatialFilter(spatialFilter: SpatialFilters) {
+    this.dataView.setSpatialFilter(spatialFilter);
   }
 
   private bindEvents() {

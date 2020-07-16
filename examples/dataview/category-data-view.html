@@ -58,7 +58,7 @@
         const dataview = new carto.viz.dataview.Category(countriesLayer, 'continent', {
           operation: 'count',
           operationColumn: 'pop_est',
-          mode: 'local'
+          spatialFilter: 'viewport'
         });
 
         dataview.on('dataUpdate', async () => {

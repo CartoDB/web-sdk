@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Category widget</title>
+    <title>Category widget with layer credentials</title>
 
     <link
       rel="stylesheet"
@@ -49,25 +49,15 @@
             <div class="as-panel__element as-p--16 as-body">
               <div class="as-container as-container--scrollable">
                 <section class="as-box">
-                  <h1 class="as-title">Category widget</h1>
+                  <h1 class="as-title">Category widget with layer credentials</h1>
                   <h4 class="as-subheader as-mb--12">
-                    Create a widget, aggregating values per category, for those features currently
-                    visible. It includes a filtering feature out of the box
+                    Create a widget for a layer with especific credentials
                   </h4>
                 </section>
                 <section class="as-box">
                   <as-category-widget
-                    id="category-global"
-                    heading="Countries (global)"
-                    description="Number of countries by continent"
-                  >
-                  </as-category-widget>
-                </section>
-                <section class="as-box">
-                  <as-category-widget
-                    id="category-viewport"
-                    heading="Countries (viewport)"
-                    description="Number of countries by continent shown in the screen"
+                    heading="Collisions"
+                    description="Number of collisions types in Seattle"
                   >
                   </as-category-widget>
                 </section>
@@ -91,21 +81,27 @@
 
         const deckMap = carto.viz.createMap();
 
-        const countriesLayer = new carto.viz.Layer('ne_50m_admin_0_countries');
-        await countriesLayer.addTo(deckMap);
-
-        // A data-view to count
-        const dataviewGlobal = new carto.viz.dataview.Category(countriesLayer, 'continent', {
-          operation: 'count'
+        const credentials = new carto.auth.Credentials('cartoframes', 'default_public');
+        const collisionsSource = new carto.viz.source.Dataset('seattle_collisions', {
+          credentials
         });
 
-        const dataviewViewport = new carto.viz.dataview.Category(countriesLayer, 'continent', {
+        const style = carto.viz.style.icon('./carto.jpg');
+
+        // const seattleCollisionsLayer = new carto.viz.Layer(collisionsSource, style);
+        const data = await fetch('https://cartoframes.carto.com/api/v2/sql?api_key=default_public&q=select* from seattle_collisions&format=geojson').then(response => response.json())
+        const seattleCollisionsLayer = new carto.viz.Layer(data);
+
+        await seattleCollisionsLayer.addTo(deckMap);
+
+        const dataview = new carto.viz.dataview.Category(seattleCollisionsLayer, 'collisiontype', {
           operation: 'count',
           spatialFilter: 'viewport'
         });
-
-        new carto.viz.widget.Category('#category-global', dataviewGlobal);
-        new carto.viz.widget.Category('#category-viewport', dataviewViewport);
+        new carto.viz.widget.Category('as-category-widget', dataview, {
+          showClearButton: true,
+          disableInteractivity: false
+        });
       }
 
       initialize();

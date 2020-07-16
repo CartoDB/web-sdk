@@ -1,6 +1,6 @@
 import { Layer, Source } from '@/viz';
 import { WithEvents } from '@/core/mixins/WithEvents';
-import { Filter } from '@/viz/filters/types';
+import { Filter, ColumnFilters, SpatialFilters } from '@/viz/filters/types';
 import { CartoDataViewError, dataViewErrorTypes } from '../DataViewError';
 
 export abstract class DataViewMode extends WithEvents {
@@ -23,6 +23,10 @@ export abstract class DataViewMode extends WithEvents {
   public removeFilter(filterId: string) {
     this.dataSource.removeFilter(filterId);
   }
+
+  public abstract setFilters(filters: ColumnFilters): void;
+
+  public abstract setSpatialFilter(spatialFilter: SpatialFilters): void;
 
   public onDataUpdate() {
     this.emit('dataUpdate');
@@ -47,7 +51,6 @@ function validateParameters(source: any, column: string) {
 }
 
 export enum DataViewCalculation {
-  REMOTE = 'remote',
-  LOCAL = 'local',
-  REMOTE_FILTERED = 'remote-filtered'
+  PRECISE = 'precise',
+  FAST = 'fast'
 }

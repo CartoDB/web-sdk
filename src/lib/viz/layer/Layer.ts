@@ -1,6 +1,6 @@
 import { Deck, WebMercatorViewport } from '@deck.gl/core';
 import { CartoError } from '@/core/errors/CartoError';
-import { GeoJsonLayer } from '@deck.gl/layers';
+import { GeoJsonLayer, IconLayer } from '@deck.gl/layers';
 import { MVTLayer } from '@deck.gl/geo-layers';
 import mitt from 'mitt';
 import deepmerge from 'deepmerge';
@@ -266,7 +266,11 @@ export class Layer extends WithEvents implements StyledLayer {
     if (this._source.sourceType === 'SQLSource' || this._source.sourceType === 'DatasetSource') {
       this._deckLayer = new MVTLayer(layerProperties);
     } else if (this._source.sourceType === 'GeoJSONSource') {
-      this._deckLayer = new GeoJsonLayer(layerProperties);
+      if (layerProperties._isIconLayer) {
+        this._deckLayer = new IconLayer(layerProperties);
+      } else {
+        this._deckLayer = new GeoJsonLayer(layerProperties);
+      }
     } else if (this._source.sourceType === 'DOSource') {
       this._deckLayer = new DOLayer(layerProperties);
     } else {
@@ -293,6 +297,14 @@ export class Layer extends WithEvents implements StyledLayer {
     }
 
     return features;
+  }
+
+  public async getFeatures(excludedFilters: string[] = []) {
+    if (this._source instanceof SQLSource) {
+      return this.getViewportFeatures(excludedFilters);
+    }
+
+    return this._source.getFeatures(excludedFilters);
   }
 
   private _getLayerProperties() {
@@ -455,6 +467,18 @@ export class Layer extends WithEvents implements StyledLayer {
 
   removeFilter(filterId: string) {
     this.filtersCollection.removeFilter(filterId);
+    this.emit('filterChange');
+
+    if (this._deckLayer) {
+      return this.replaceDeckGLLayer();
+    }
+
+    return Promise.resolve();
+  }
+
+  public setFilters(filters: ColumnFilters) {
+    this.filtersCollection.clear();
+    this.filtersCollection.addFilter(uuidv4(), filters);
     this.emit('filterChange');
 
     if (this._deckLayer) {

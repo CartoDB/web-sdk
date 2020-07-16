@@ -15,7 +15,9 @@ export {
   sizeCategoriesStyle,
   SizeCategoriesOptionsStyle,
   sizeContinuousStyle,
-  SizeContinuousOptionsStyle
+  SizeContinuousOptionsStyle,
+  iconStyle,
+  IconOptionsStyle
 } from './helpers';
 
 export { getStyles, getStyleValue, BasicOptionsStyle } from './deck-styles';
