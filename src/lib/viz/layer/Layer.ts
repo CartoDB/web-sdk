@@ -22,14 +22,12 @@ import { FunctionFilterApplicator } from '../filters/FunctionFilterApplicator';
 import { ColumnFilters } from '../filters/types';
 import { basicStyle } from '../style/helpers/basic-style';
 
-const DATA_READY_EVENT = 'layer:data:ready';
-const DATA_CHANGED_EVENT = 'layer:data:changed';
+const DATA_READY_EVENT = 'layerDataReady';
+const DATA_CHANGED_EVENT = 'layerDataChanged';
 
 export interface LayerDataState {
   isFirstTime: boolean;
-  isPanning: boolean;
-  isZooming: boolean;
-  isRotating: boolean;
+  isChanging: boolean;
 }
 
 export class Layer extends WithEvents implements StyledLayer {
@@ -185,7 +183,7 @@ export class Layer extends WithEvents implements StyledLayer {
         const { interactionState, viewState } = args;
 
         const { isPanning, isZooming, isRotating } = interactionState;
-        this.saveDataState(!!isPanning, !!isZooming, !!isRotating, viewState);
+        this.saveDataState(!!isPanning || !!isZooming || !!isRotating, viewState);
 
         if (onViewStateChange) {
           onViewStateChange(args); // keep stateless view management, if set up initially
@@ -511,23 +509,15 @@ export class Layer extends WithEvents implements StyledLayer {
     }
   }
 
-  private saveDataState(
-    isPanning: boolean,
-    isZooming: boolean,
-    isRotating: boolean,
-    viewState: ViewState
-  ) {
-    if (!isPanning && !isZooming && !isRotating) {
+  private saveDataState(isChanging: boolean, viewState: ViewState) {
+    if (!isChanging) {
       return false;
     }
 
-    this.dataState.isPanning = isPanning;
-    this.dataState.isZooming = isZooming;
-    this.dataState.isRotating = isRotating;
-
+    this.dataState.isChanging = isChanging;
     const isGeoJsonLayer = this._source.sourceType === 'GeoJSONSource';
 
-    if ((isPanning || isZooming) && isGeoJsonLayer) {
+    if (isChanging && isGeoJsonLayer) {
       const viewport = new WebMercatorViewport(viewState);
       this._viewportFeaturesGenerator.setViewport(viewport);
     }
@@ -545,21 +535,14 @@ export class Layer extends WithEvents implements StyledLayer {
       return this.emit(DATA_READY_EVENT);
     }
 
-    if (
-      this.dataState.isPanning ||
-      this.dataState.isZooming ||
-      this.dataState.isRotating ||
-      referer === 'onViewportLoad'
-    ) {
-      this.dataState.isPanning = false;
-      this.dataState.isZooming = false;
-      this.dataState.isRotating = false;
+    if (this.dataState.isChanging || referer === 'onViewportLoad') {
+      this.dataState.isChanging = false;
 
       this.emit('viewportLoad'); // TODO: remove
       return this.emit(DATA_CHANGED_EVENT);
     }
 
-    return true;
+    return false;
   }
 }
 
@@ -643,8 +626,6 @@ interface LayerPosition {
 function buildInitialDataState() {
   return {
     isFirstTime: true,
-    isPanning: false,
-    isZooming: false,
-    isRotating: false
+    isChanging: false
   };
 }
