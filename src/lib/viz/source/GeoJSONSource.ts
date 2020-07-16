@@ -1,6 +1,6 @@
 import { GeoJSON, Feature, GeoJsonGeometryTypes } from 'geojson';
 import { uuidv4 } from '@/core/utils/uuid';
-import { aggregate, AggregationType } from '@/data/operations/aggregation/aggregation';
+import { aggregateValues, AggregationType } from '@/data/operations/aggregation';
 import { FiltersCollection } from '../filters/FiltersCollection';
 import { FunctionFilterApplicator } from '../filters/FunctionFilterApplicator';
 import { ColumnFilters } from '../filters/types';
@@ -188,10 +188,10 @@ export class GeoJSONSource extends Source {
 
     // eslint-disable-next-line no-restricted-syntax
     for (const [propName, values] of Object.entries(this._numericFieldValues)) {
-      const min = aggregate(values, AggregationType.MIN);
-      const max = aggregate(values, AggregationType.MAX);
-      const avg = aggregate(values, AggregationType.AVG);
-      const sum = aggregate(values, AggregationType.SUM);
+      const min = aggregateValues(values, AggregationType.MIN).result;
+      const max = aggregateValues(values, AggregationType.MAX).result;
+      const avg = aggregateValues(values, AggregationType.AVG).result;
+      const sum = aggregateValues(values, AggregationType.SUM).result;
       const sample = createSample(values);
 
       numericStats.push({

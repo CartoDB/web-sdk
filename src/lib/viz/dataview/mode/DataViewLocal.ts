@@ -1,6 +1,6 @@
 import { Layer } from '@/viz';
 import { DATA_CHANGED_EVENT } from '@/viz/layer/Layer';
-import { AggregationType, aggregate } from '@/data/operations/aggregation/aggregation';
+import { AggregationType, aggregateValues } from '@/data/operations/aggregation';
 import { groupValuesByColumn } from '@/data/operations/grouping';
 import { castToNumberOrUndefined } from '@/core/utils/number';
 import { ColumnFilters, SpatialFilters } from '@/viz/filters/types';
@@ -42,7 +42,7 @@ export class DataViewLocal extends DataViewMode {
     options: GetDataOptions
   ) {
     const columnName = operationColumn || this.column;
-    const aggregatedColumnName = `${operation}__${columnName}`;
+    const aggregatedColumnName = `_cdb_${operation}__${columnName}`;
 
     const sourceData = await this.getSourceData(options);
     const adaptedFeatures = sourceData.map((feature: Record<string, unknown>) => {
@@ -101,7 +101,7 @@ function createCategory(name: string, data: number[], operation: AggregationType
 
   return {
     name,
-    value: aggregate(categoryValues, operation)
+    value: aggregateValues(categoryValues, operation).result
   };
 }
 

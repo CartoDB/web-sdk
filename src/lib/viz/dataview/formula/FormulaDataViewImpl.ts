@@ -1,4 +1,8 @@
-import { AggregationType, aggregate } from '../../../data/operations/aggregation/aggregation';
+import { AggregationType, aggregateValues } from '@/data/operations/aggregation';
+import {
+  aggregateFeatures,
+  AggregatedFeatureProperties
+} from '@/data/operations/aggregation/feature/feature-aggregation';
 import { DataViewImpl, GetDataOptions } from '../DataViewImpl';
 import { DataViewLocal } from '../mode/DataViewLocal';
 import { DataViewRemote } from '../mode/DataViewRemote';
@@ -20,23 +24,26 @@ export class FormulaDataViewImpl extends DataViewImpl<FormulaDataViewData> {
         }
       });
 
-      const aggregatedColumnName = `${this.operation}__${this.column}`;
+      const aggregatedColumnName = `_cdb_${this.operation}__${this.column}`;
       const columnName = this.column;
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const values = features.map(
-        (feature: Record<string, unknown>) => feature[aggregatedColumnName] || feature[columnName]
-      );
+      const containsAggregatedData = aggregatedColumnName in features[0];
 
-      validateNumbersOrNullIn(values);
+      const values = containsAggregatedData
+        ? features.map((feature: Record<string, unknown>) => ({
+            aggregatedValue: feature[aggregatedColumnName],
+            clusterCount: feature._cdb_feature_count
+          }))
+        : features.map((feature: Record<string, unknown>) => feature[columnName]);
 
-      // just include numbers in calculations... TODO: should we consider features with null & undefined for the column?
-      const filteredValues = values.filter(Number.isFinite) as number[];
+      const aggregation = containsAggregatedData
+        ? aggregateFeatures(values as AggregatedFeatureProperties[], this.operation)
+        : aggregateValues(values as number[], this.operation);
 
       return {
-        result: aggregate(filteredValues, this.operation),
-        operation: this.operation,
-        nullCount: values.length - filteredValues.length
+        result: aggregation.result,
+        nullCount: aggregation.nullCount,
+        operation: this.operation
       };
     } catch (error) {
       this.emit('error', [error]);
@@ -78,25 +85,6 @@ export class FormulaDataViewImpl extends DataViewImpl<FormulaDataViewData> {
       throw error;
     }
   }
-}
-
-/**
- * Check the values are numbers or null | undefined, taking a small sample
- * @param features
- */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function validateNumbersOrNullIn(values: any[]) {
-  const sample = values.slice(0, Math.min(values.length, 10));
-  sample.forEach(value => {
-    const isAcceptedNull = value === null || value === undefined; // TODO should we just support null?
-
-    if (!isAcceptedNull && typeof value !== 'number') {
-      throw new CartoDataViewError(
-        `Column property for Formula can just contain numbers (or nulls) and a ${typeof value} with ${value} value was found. Please check documentation.`,
-        dataViewErrorTypes.PROPERTY_INVALID
-      );
-    }
-  });
 }
 
 export interface FormulaDataViewData {

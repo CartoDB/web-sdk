@@ -1,5 +1,5 @@
 import { isVariableDefined } from '@/core/utils/variables';
-import { AggregationType, aggregate } from '@/data/operations/aggregation/aggregation';
+import { AggregationType, aggregateValues } from '@/data/operations/aggregation';
 import { DataViewMode, DataViewCalculation } from '../mode/DataViewMode';
 import { DataViewImpl, GetDataOptions } from '../DataViewImpl';
 import { CartoDataViewError, dataViewErrorTypes } from '../DataViewError';
@@ -68,9 +68,9 @@ export class HistogramDataViewImpl extends DataViewImpl<HistogramDataViewData> {
           start: binContainer.start,
           end: binContainer.end,
           value: binContainer.value,
-          min: aggregate(binContainer.values, AggregationType.MIN),
-          max: aggregate(binContainer.values, AggregationType.MAX),
-          avg: aggregate(binContainer.values, AggregationType.AVG),
+          min: aggregateValues(binContainer.values, AggregationType.MIN).result,
+          max: aggregateValues(binContainer.values, AggregationType.MAX).result,
+          avg: aggregateValues(binContainer.values, AggregationType.AVG).result,
           normalized: binContainer.values.length / features.length
         };
       });

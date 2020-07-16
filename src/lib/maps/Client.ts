@@ -1,4 +1,4 @@
-import { AggregationType } from '@/data/operations/aggregation/aggregation';
+import { AggregationType } from '@/data/operations/aggregation';
 import { uuidv4 } from '@/core/utils/uuid';
 import { Credentials } from '../auth';
 import errorHandlers from './errors';

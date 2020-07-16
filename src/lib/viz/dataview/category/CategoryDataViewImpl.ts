@@ -1,4 +1,4 @@
-import { AggregationType, aggregate } from '../../../data/operations/aggregation/aggregation';
+import { AggregationType, aggregateValues } from '../../../data/operations/aggregation';
 import { DataViewMode, DataViewCalculation } from '../mode/DataViewMode';
 import { DataViewImpl, GetDataOptions } from '../DataViewImpl';
 import { CartoDataViewError, dataViewErrorTypes } from '../DataViewError';
@@ -49,14 +49,15 @@ export class CategoryDataViewImpl extends DataViewImpl<CategoryDataViewData> {
       );
 
       const categoryValues = categories.map(category => category.value);
+
       return {
         categories: Number.isInteger(this.limit as number)
           ? categories.splice(0, this.limit)
           : categories,
         count: categories.length,
         operation: this.operation,
-        max: aggregate(categoryValues, AggregationType.MAX),
-        min: aggregate(categoryValues, AggregationType.MIN),
+        max: aggregateValues(categoryValues, AggregationType.MAX).result,
+        min: aggregateValues(categoryValues, AggregationType.MIN).result,
         nullCount
       };
     } catch (error) {

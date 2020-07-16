@@ -2,7 +2,7 @@ import { Client } from '@/maps/Client';
 import { Deck } from '@deck.gl/core';
 import { Layer } from '../../layer/Layer';
 import { CategoryDataView } from './CategoryDataView';
-import { AggregationType } from '../../../data/operations/aggregation/aggregation';
+import { AggregationType } from '../../../data/operations/aggregation';
 import { CartoDataViewError, dataViewErrorTypes } from '../DataViewError';
 import { DataViewCalculation } from '../mode/DataViewMode';
 

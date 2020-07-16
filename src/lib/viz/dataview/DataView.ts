@@ -2,7 +2,7 @@ import { WithEvents } from '@/core/mixins/WithEvents';
 import { Layer, Source } from '@/viz';
 import { Credentials } from '@/auth';
 import { Filter, ColumnFilters, SpatialFilters } from '@/viz/filters/types';
-import { AggregationType } from '@/data/operations/aggregation/aggregation';
+import { AggregationType } from '@/data/operations/aggregation/';
 import { DataViewImpl, GetDataOptions } from './DataViewImpl';
 import { DataViewCalculation, DataViewMode } from './mode/DataViewMode';
 import { debounce, isGeoJSONSource } from './utils';
