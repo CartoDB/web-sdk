@@ -3,7 +3,7 @@ import {
   aggregateFeatures,
   AggregatedFeatureProperties
 } from '@/data/operations/aggregation/feature/feature-aggregation';
-import { DataViewImpl } from '../DataViewImpl';
+import { DataViewImpl, GetDataOptions } from '../DataViewImpl';
 import { DataViewLocal } from '../mode/DataViewLocal';
 import { DataViewRemote } from '../mode/DataViewRemote';
 import { CartoDataViewError, dataViewErrorTypes } from '../DataViewError';
@@ -51,7 +51,7 @@ export class FormulaDataViewImpl extends DataViewImpl<FormulaDataViewData> {
     }
   }
 
-  public async getRemoteData(options: { excludedFilters: string[] }): Promise<FormulaDataViewData> {
+  public async getRemoteData(options: GetDataOptions): Promise<FormulaDataViewData> {
     const dataviewRemote = this.dataView as DataViewRemote;
 
     try {

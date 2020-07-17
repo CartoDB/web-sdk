@@ -57,7 +57,9 @@
     <script>
       async function initialize() {
         carto.auth.setDefaultCredentials({ username: 'public' });
+
         const deckMap = carto.viz.createMap();
+
         const countriesLayer = new carto.viz.Layer('ne_50m_admin_0_countries');
 
         // vieportLoad will be triggered after every viewport change (zoom, pan...)

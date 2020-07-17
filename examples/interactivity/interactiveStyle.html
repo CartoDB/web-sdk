@@ -3,14 +3,14 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Interactive based styling example</title>
+    <title>Interactive style</title>
 
-    <!-- Custom CSS -->
     <link
       rel="stylesheet"
       type="text/css"
       href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.css"
     />
+
     <link
       rel="stylesheet"
       type="text/css"
@@ -35,18 +35,18 @@
       <div class="as-content">
         <main class="as-main">
           <div class="as-map-area">
-            <section id="map"></section>
-            <div class="as-map-panels">
-              <div class="as-panel as-panel--top as-panel--right as-bg--ui-01">
-                <div class="as-container">
-                  <section class="as-box">
-                    <h1 class="as-title">Interactive based styling</h1>
-                    <p class="as-body">
-                      Style a feature based on type of interactivity
-                    </p>
-                    <p class="as-body">Hover and click on the points</p>
-                  </section>
-                </div>
+            <!-- map -->
+            <div id="map"></div>
+
+            <!-- panel -->
+            <div class="as-panel as-panel--top as-panel--right as-bg--ui-01">
+              <div class="as-panel__element as-p--16 as-body">
+                <h1 class="as-title">Interactive style</h1>
+                <h4 class="as-subheader as-mb--12">
+                  Hover and clik the points, to see a style change due to the interaction, 
+                  with <em>hoverStylr</em> and <em>clickStyle</em> options
+                </h4>
+                <div id="result"></div>
               </div>
             </div>
           </div>
@@ -54,44 +54,35 @@
       </div>
     </div>
 
-    <!-- Map libraries-->
     <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.js"></script>
     <script src="https://unpkg.com/deck.gl@8.2.0/dist.min.js"></script>
 
-    <!-- CARTO Deck.gl's Tile Layer -->
     <script src="/dist/umd/index.min.js"></script>
 
     <script>
       async function initialize() {
-        carto.auth.setDefaultCredentials({
-          username: 'cartovl',
-          apiKey: 'default_public'
-        });
+        carto.auth.setDefaultCredentials({ username: 'public' });
 
-        const deckMap = carto.viz.createMap({
-          basemap: 'voyager',
-          view: {
-            longitude: 0,
-            latitude: 30,
-            zoom: 1.5
-          }
-        });
+        const deckMap = carto.viz.createMap();
 
         const sizeBinStyle = new carto.viz.style.sizeBins('pop_2015', {
-          sizeRange: [1, 50]
+          sizeRange: [1, 50],
+          opacity: 0.5
         });
+
+        /*
+          A custom hover style is specified in the options. 
+          For the click, a 'default' with a yellow color is set
+        */
         const populationLayer = new carto.viz.Layer('world_population_2015', sizeBinStyle, {
           hoverStyle: {
             getFillColor: [255, 0, 165, 200],
             getLineColor: [214, 0, 138, 200],
             getLineWidth: 4
           },
-          clickStyle: {
-            getFillColor: [0, 78, 255, 200],
-            getLineColor: [0, 50, 160, 200],
-            getLineWidth: 7
-          }
+          clickStyle: 'default'
         });
+
         populationLayer.addTo(deckMap);
       }
       initialize();

@@ -537,13 +537,11 @@ export class Layer extends WithEvents implements StyledLayer {
       this.dataState === DATA_STATES.STARTING &&
       (isGeoJsonLayer || referer === 'onViewportLoad')
     ) {
-      console.log(DATA_CHANGED_EVENT, DATA_READY_EVENT);
       this.emit(DATA_READY_EVENT);
       this.emit(DATA_CHANGED_EVENT);
     }
 
     if (this.dataState === DATA_STATES.UPDATING || referer === 'onViewportLoad') {
-      console.log(DATA_CHANGED_EVENT);
       this.emit(DATA_CHANGED_EVENT);
     }
 

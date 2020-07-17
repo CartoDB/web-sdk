@@ -3,23 +3,18 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Add popup on click example</title>
+    <title>Popup on click</title>
 
-    <!-- Custom CSS -->
     <link
       rel="stylesheet"
       type="text/css"
       href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.css"
     />
+
     <link
       rel="stylesheet"
       type="text/css"
       href="https://libs.cartocdn.com/airship-style/v2.4/airship.min.css"
-    />
-    <link
-      rel="stylesheet"
-      type="text/css"
-      href="https://libs.cartocdn.com/airship-icons/v2.4/icons.css"
     />
 
     <style>
@@ -40,15 +35,16 @@
       <div class="as-content">
         <main class="as-main">
           <div class="as-map-area">
-            <section id="map"></section>
-            <div class="as-map-panels">
-              <div class="as-panel as-panel--top as-panel--right as-bg--ui-01">
-                <div class="as-container">
-                  <section class="as-box">
-                    <h1 class="as-title">Pop-ups on click</h1>
-                    <p class="as-body">Configure pop-up windows on click</p>
-                  </section>
-                </div>
+            <!-- map -->
+            <div id="map"></div>
+
+            <!-- panel -->
+            <div class="as-panel as-panel--top as-panel--right as-bg--ui-01">
+              <div class="as-panel__element as-p--16 as-body">
+                <h1 class="as-title">Popup on click</h1>
+                <h4 class="as-subheader as-mb--12">
+                  Configure popup windows on click
+                </h4>
               </div>
             </div>
           </div>
@@ -56,37 +52,30 @@
       </div>
     </div>
 
-    <!-- Map libraries-->
     <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.js"></script>
     <script src="https://unpkg.com/deck.gl@8.2.0/dist.min.js"></script>
-    <!-- Airship -->
     <script src="https://libs.cartocdn.com/airship-components/v2.4/airship.js"></script>
 
-    <!-- CARTO Deck.gl's Tile Layer -->
     <script src="/dist/umd/index.min.js"></script>
 
     <script>
-      async function initialize() {
-        carto.auth.setDefaultCredentials({
-          username: 'cartovl',
-          apiKey: 'default_public'
-        });
+      function initialize() {
+        carto.auth.setDefaultCredentials({ username: 'public' });
 
-        const deckMap = carto.viz.createMap({
-          basemap: 'voyager',
-          view: {
-            longitude: 0,
-            latitude: 30,
-            zoom: 1.5
-          }
-        });
+        const deckMap = carto.viz.createMap();
 
         const sizeBinStyle = new carto.viz.style.sizeBins('pop_2015', {
           sizeRange: [1, 50]
         });
         const populationLayer = new carto.viz.Layer('world_population_2015', sizeBinStyle);
+
         populationLayer.setPopupClick(['cartodb_id', { attr: 'pop_2015', title: 'Population' }]);
-        await populationLayer.addTo(deckMap);
+
+        populationLayer.addTo(deckMap);
+        /*
+          you can easily disable later on the popups with 
+            populationLayer.setPopupClick(null);
+        */
       }
       initialize();
     </script>

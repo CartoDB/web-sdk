@@ -53,9 +53,9 @@ export abstract class DataViewImpl<T> extends WithEvents {
     events.forEach((e: string) => this.dataView.on(e, (args: any[]) => this.emit(e, args)));
   }
 
-  public abstract async getLocalData(options: { excludedFilters: string[] }): Promise<T>;
+  public abstract async getLocalData(options: GetDataOptions): Promise<T>;
 
-  public abstract async getRemoteData(options: { excludedFilters: string[] }): Promise<T>;
+  public abstract async getRemoteData(options: GetDataOptions): Promise<T>;
 }
 
 function validateParameters(operation: AggregationType, column: string) {
@@ -73,3 +73,11 @@ function validateParameters(operation: AggregationType, column: string) {
     );
   }
 }
+
+export type GetDataOptions = {
+  excludedFilters?: string[];
+  aggregationOptions?: {
+    dimension?: string[];
+    numeric?: { column: string; operations: string[] }[];
+  };
+};
