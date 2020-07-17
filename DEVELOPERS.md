@@ -49,9 +49,10 @@ Steps for a release:
 2. pass all the checks on it (build, test, lint, doc...).
 3. update the `CHANGELOG`, adding the current date, expected version and its notes, and then a new *Unreleased* section. Commit it to the branch.
 4. set up the upstream branch (eg. `git push --set-upstream origin release/v1.0.0`).
-4. launch the release process (which includes the version bump aand the npm & cdn publication) and specify the desired version, eg. `v1.0.0`. See section 2.3 to know more details about this step.
-5. after a succesful release, merge the `release` or `hotfix` branch to `master`
-6. merge `master` back to `develop`, because it always have to be updated with `master`.
+5. create a PR, in draft mode, for some previous revision from your mates. Name the PR after the release, eg `release/v1.0.0`. Don't start the release process without that feedback.
+6. launch the release process (which includes the version bump aand the npm & cdn publication) and specify the desired version, eg. `v1.0.0`. See section 2.3 to know more details about this step.
+7. after a succesful release, merge the `release` or `hotfix` branch to `master`
+8. merge `master` back to `develop`, because it always have to be updated with `master`.
 
 > Note: The next sections, about releases, are just for internal use at CARTO and they require the proper permissions (with a `secrets.json`).
 
