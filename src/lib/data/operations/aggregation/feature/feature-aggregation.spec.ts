@@ -32,7 +32,7 @@ describe('Feature Aggregation', () => {
     });
 
     it(AggregationType.SUM, async () => {
-      expect(aggregateFeatures(values, AggregationType.SUM).result).toEqual(620);
+      expect(aggregateFeatures(values, AggregationType.SUM).result).toEqual(150);
     });
 
     it.skip('percentile_50', async () => {
