@@ -1,4 +1,5 @@
 import { isVariableDefined } from '@/core/utils/variables';
+import { isDefined } from '@/viz/utils/object';
 import { AggregationType, aggregateValues } from '@/data/operations/aggregation';
 import { DataViewMode, DataViewCalculation } from '../mode/DataViewMode';
 import { DataViewImpl, GetDataOptions } from '../DataViewImpl';
@@ -6,12 +7,13 @@ import { CartoDataViewError, dataViewErrorTypes } from '../DataViewError';
 import { DataViewLocal } from '../mode/DataViewLocal';
 import { DataViewRemote } from '../mode/DataViewRemote';
 import { DataViewOptions } from '../DataView';
+import { getFeatureValue } from '../utils';
 
 export class HistogramDataViewImpl extends DataViewImpl<HistogramDataViewData> {
   options: HistogramDataViewOptions;
 
   constructor(dataView: DataViewMode, options: HistogramDataViewOptions) {
-    super(dataView, { operation: AggregationType.COUNT });
+    super(dataView, { operation: AggregationType.AVG });
 
     const { bins, start, end } = options;
     validateParameters(bins, start, end);
@@ -22,6 +24,9 @@ export class HistogramDataViewImpl extends DataViewImpl<HistogramDataViewData> {
   public async getLocalData(options: GetDataOptions): Promise<HistogramDataViewData> {
     const dataviewLocal = this.dataView as DataViewLocal;
     const { bins = 10, start, end } = this.options;
+
+    const aggregatedColumnName = `_cdb_${this.operation}__${this.column}`;
+    const columnName = this.column;
 
     try {
       const features = (await dataviewLocal.getSourceData(options)) as Record<string, number>[];
@@ -42,10 +47,14 @@ export class HistogramDataViewImpl extends DataViewImpl<HistogramDataViewData> {
           values: [] as number[]
         }));
 
-      sortedFeatures.forEach(feature => {
-        const featureValue = feature;
+      features.forEach(feature => {
+        const { featureValue, clusterCount } = getFeatureValue(
+          feature,
+          aggregatedColumnName,
+          columnName
+        );
 
-        if (!featureValue) {
+        if (!isDefined(featureValue)) {
           nulls += 1;
           return;
         }
@@ -58,7 +67,7 @@ export class HistogramDataViewImpl extends DataViewImpl<HistogramDataViewData> {
           return;
         }
 
-        binContainer.value += 1;
+        binContainer.value += clusterCount || 1;
         binContainer.values.push(featureValue);
       });
 
