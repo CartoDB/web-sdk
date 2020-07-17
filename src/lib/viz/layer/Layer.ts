@@ -25,6 +25,7 @@ import { basicStyle } from '../style/helpers/basic-style';
 
 export const DATA_READY_EVENT = 'dataReady';
 export const DATA_CHANGED_EVENT = 'dataChanged';
+export const TILES_LOADED_EVENT = 'tilesLoaded';
 
 enum DATA_STATES {
   STARTING,
@@ -72,6 +73,7 @@ export class Layer extends WithEvents implements StyledLayer {
     this.registerAvailableEvents([
       DATA_READY_EVENT,
       DATA_CHANGED_EVENT,
+      TILES_LOADED_EVENT,
       'filterChange',
       InteractivityEventType.CLICK.toString(),
       InteractivityEventType.HOVER.toString()
@@ -543,6 +545,10 @@ export class Layer extends WithEvents implements StyledLayer {
 
     if (this.dataState === DATA_STATES.UPDATING || referer === 'onViewportLoad') {
       this.emit(DATA_CHANGED_EVENT);
+    }
+
+    if (referer === 'onViewportLoad') {
+      this.emit(TILES_LOADED_EVENT);
     }
 
     this.dataState = DATA_STATES.READY;
