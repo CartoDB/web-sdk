@@ -351,10 +351,15 @@ function coordinates2pixels(coordinates: number[], deckInstance?: Deck) {
   let pixels;
 
   if (deckInstance) {
-    const viewport = deckInstance.getViewports(undefined)[0];
+    try {
+      const viewports = deckInstance.getViewports(undefined);
+      const viewport = viewports[0];
 
-    if (viewport) {
-      pixels = viewport.project(coordinates);
+      if (viewport) {
+        pixels = viewport.project(coordinates);
+      }
+    } catch (e) {
+      console.warn('viewManager in deckInstance not ready yet');
     }
   }
 
