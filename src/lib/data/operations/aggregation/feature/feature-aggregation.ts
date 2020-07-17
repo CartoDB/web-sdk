@@ -36,22 +36,26 @@ const aggregationFunctions: Record<AggregationType, Function> = {
   },
 
   [AggregationType.AVG](aggregatedFeatures: AggregatedFeatureProperties[]) {
-    return (
-      aggregationFunctions.sum(aggregatedFeatures) / aggregationFunctions.count(aggregatedFeatures)
-    );
+    let totalFeatureCount = 0;
+
+    const totalSum = aggregatedFeatures.reduce((total, feature) => {
+      totalFeatureCount += feature.featureCount;
+      return total + Number(feature.aggregatedValue) * feature.featureCount;
+    }, 0);
+    return totalSum / totalFeatureCount;
   },
 
   [AggregationType.MIN](aggregatedFeatures: AggregatedFeatureProperties[]) {
-    return Math.min(...aggregatedFeatures.map(feature => feature.aggregatedValue));
+    return Math.min(...aggregatedFeatures.map(feature => Number(feature.aggregatedValue)));
   },
 
   [AggregationType.MAX](aggregatedFeatures: AggregatedFeatureProperties[]) {
-    return Math.max(...aggregatedFeatures.map(feature => feature.aggregatedValue));
+    return Math.max(...aggregatedFeatures.map(feature => Number(feature.aggregatedValue)));
   },
 
   [AggregationType.SUM](aggregatedFeatures: AggregatedFeatureProperties[]) {
     return aggregatedFeatures.reduce(
-      (total, feature) => total + feature.aggregatedValue * feature.featureCount,
+      (total, feature) => total + Number(feature.aggregatedValue),
       0
     );
   },
