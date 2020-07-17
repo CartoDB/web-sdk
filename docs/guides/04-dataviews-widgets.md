@@ -32,7 +32,7 @@ We have three different types of dataviews:
 
 When we create the dataview, we specify the data source, the feature property/field used for calculations and some additional options. These are the options that are available for all dataviews:
 
-* `mode`. When you are using a CARTO dataset as the data source, you can use the information from the vector tiles in the client to perform the dataview calculations or you can perform the calculations server-side. The tiles might not include all the existing features in the dataset because there are some aggregations that happen while creating the tiles to speed-up the visualization. This means that some operations (i.e. average) must not yield exact results. If exact results are needed, you must use server-side calculations. This option controls the calculation mode and the possible values are `DataViewCalculation.FAST` for using the tiles (this is the default) and `DataViewCalculation.PRECISE` for performing server-side calculations.  
+* `mode`. When you are using a CARTO dataset as the data source, you can use the information from the vector tiles in the client to perform the dataview calculations or you can perform the calculations server-side. The tiles might not include all the existing features in the dataset because there are some aggregations that happen while creating the tiles to speed-up the visualization. This means that some operations (i.e. average) must not yield exact results. If exact results are needed, you must use server-side calculations. This option controls the calculation mode and the possible values are `'fast'` for using the tiles (this is the default) and `'precise'` for performing server-side calculations.  
 * `filters`. You can use this option to specify column filters while creating your dataview so you can filter the data source specifying additional conditions.
 * `spatialFilter`. You can specify a spatial filter to restrict the features that are used for dataview calculations. Currently the only possible value for this option is `viewport`, that will filter the data to include only the features in the current viewport.
 
@@ -44,7 +44,7 @@ The `carto.viz.dataview.Formula` and `carto.viz.dataview.Category` dataviews pro
   * `'sum'`
   * `'percentile'` 
 
-In addition to these options, there are other options specifice to some dataviews. Please go to the reference to see the options available for each dataview.
+In addition to these options, there are other options specific to some dataviews. Please go to the reference to see the options available for each dataview.
 
 If you are specifying the layer and not directly the data source, you must be sure that it has already been loaded before creating the dataview. In order to do that, we should use the `await` instruction when adding the layer to the map, as explained in the [Interactivity and Pop-Ups](../interactivity-popups/) guide.
 
