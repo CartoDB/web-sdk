@@ -73,8 +73,8 @@
           Size values are selected by default, but of course they can be further configured.
         */
         const style = carto.viz.style.sizeContinuous('total_pop');
-        const tempLayer = new carto.viz.Layer('ca_measures', style);
-        tempLayer.addTo(deckMap);
+        const californiaPopulationLayer = new carto.viz.Layer('ca_measures', style);
+        californiaPopulationLayer.addTo(deckMap);
       }
 
       initialize();

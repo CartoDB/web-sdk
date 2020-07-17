@@ -42,7 +42,8 @@
             <div class="as-panel__element as-p--16 as-body">
               <h1 class="as-title">Style with Icon</h1>
               <h4 class="as-subheader as-mb--12">
-                Use a custom image for your point layers, using <em>carto.viz.style.icon</em>
+                Use a custom image for your point layers, using <em>carto.viz.style.icon</em>. In
+                this case representing the subway stations in New York City.
               </h4>
             </div>
           </div>
@@ -57,18 +58,24 @@
     <script>
       function initialize() {
         carto.auth.setDefaultCredentials({ username: 'public' });
-        const deckMap = carto.viz.createMap();
-
-        /*
-          In this case this image is just a .png as a relative url (you can use of course an absolute url...)
-          and its size is specified in pixels
-        */
-        const style = carto.viz.style.icon('./boat.png', {
-          height: 24,
-          width: 24
+        const deckMap = carto.viz.createMap({
+          view: {
+            longitude: -73.915942,
+            latitude: 40.709481,
+            zoom: 12
+          }
         });
 
-        const countriesLayer = new carto.viz.Layer('world_ports', style);
+        /*
+          In this case this image is just a .png as a relative url (but you can use an absolute url
+          and several formats, like .svg, .bmp, jpg...). The icon size is specified in pixels
+        */
+        const style = carto.viz.style.icon('./subway-icon.png', {
+          height: 40,
+          width: 40
+        });
+
+        const countriesLayer = new carto.viz.Layer('ny_subway_stations', style);
         countriesLayer.addTo(deckMap);
       }
 
