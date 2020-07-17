@@ -97,16 +97,17 @@ export abstract class Source extends WithEvents {
   }
 
   addAggregatedColumn(aggregatedColumn: AggregatedColumn) {
-    const aggregatedColumnOperations = this.aggregatedColumns.get(aggregatedColumn.column);
+    const aggregatedColumnOperations =
+      this.aggregatedColumns.get(aggregatedColumn.column) || new Set();
 
-    this.needsInitialization = true;
+    const { size } = aggregatedColumnOperations;
 
-    if (aggregatedColumnOperations) {
-      aggregatedColumn.operations.forEach(operation => aggregatedColumnOperations.add(operation));
-      return;
+    aggregatedColumn.operations.forEach(operation => aggregatedColumnOperations.add(operation));
+    this.aggregatedColumns.set(aggregatedColumn.column, aggregatedColumnOperations);
+
+    if (size < aggregatedColumnOperations.size) {
+      this.needsInitialization = true;
     }
-
-    this.aggregatedColumns.set(aggregatedColumn.column, new Set(aggregatedColumn.operations));
   }
 }
 
