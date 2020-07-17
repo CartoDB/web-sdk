@@ -7,7 +7,7 @@ After completing this guide, you will know how to create applications with data-
 <div class="example-map">
     <iframe
         id="dataviews-widgets-final-result"
-        src="/developers/web-sdk/examples/maps/guides/dataviews-widgets/step-3.html"
+        src="/developers/web-sdk/examples/maps/guides/dataviews-widgets/step-4.html"
         width="100%"
         height="500"
         frameBorder="0">
@@ -32,7 +32,7 @@ We have three different types of dataviews:
 
 When we create the dataview, we specify the data source, the feature property/field used for calculations and some additional options. These are the options that are available for all dataviews:
 
-* `mode`. When you are using a CARTO dataset as the data source, you can use the information from the vector tiles in the client to perform the dataview calculations or you can perform the calculations server-side. The tiles might not include all the existing features in the dataset because there are some aggregations that happen while creating the tiles to speed-up the visualization. This means that some operations (i.e. average) must not yield exact results. If exact results are needed, you must use server-side calculations. This option controls the calculation mode and the possible values are `DataViewCalculation.FAST` for using the tiles and `DataViewCalculation.PRECISE` for performing server-side calculations.  
+* `mode`. When you are using a CARTO dataset as the data source, you can use the information from the vector tiles in the client to perform the dataview calculations or you can perform the calculations server-side. The tiles might not include all the existing features in the dataset because there are some aggregations that happen while creating the tiles to speed-up the visualization. This means that some operations (i.e. average) must not yield exact results. If exact results are needed, you must use server-side calculations. This option controls the calculation mode and the possible values are `DataViewCalculation.FAST` for using the tiles (this is the default) and `DataViewCalculation.PRECISE` for performing server-side calculations.  
 * `filters`. You can use this option to specify column filters while creating your dataview so you can filter the data source specifying additional conditions.
 * `spatialFilter`. You can specify a spatial filter to restrict the features that are used for dataview calculations. Currently the only possible value for this option is `viewport`, that will filter the data to include only the features in the current viewport.
 
@@ -73,13 +73,9 @@ const dataviewHistogram = new carto.viz.dataview.Histogram(countriesLayer, 'pop_
 });
 ```
 
-### Widgets
+You use the dataviews for performing calculations on the data sources. Once you have defined the dataview, a logical next step is showing the result to the user. The Web SDK provides ready to use Airship widgets, described in the next section, that can be connected easily to your dataviews. In this case, we are going to add a simple user interface for showing the results from the category dataview defined above.
 
-You use the dataviews for performing calculations on the data sources. Once you have defined the dataview, a logical next step is showing the result to the user. You can use your own user interface component but the Web SDK provides ready to use Airship components that can be connected easily to your dataviews.
-
-In order to add these widgets to your application, the first step is adding the Airship web components to your HTML markup. You can go to the Airship [reference](https://carto.com/developers/airship/reference/) to know more about this library.
-
-We are going to create a slightly more complex layout taking advantage of Airship components. We are going to create a left sidebar for containing our widgets. We will start just adding a Formula widget (`as-formula-widget`). This is the HTML structure for the layout.
+We are going to create a slightly more complex layout taking advantage of Airship components. We are going to create a left sidebar for containing our widgets. We will start just adding a section for holding some information from the dataview. This is the HTML structure for the layout.
 
 ```html
 <body class="as-app-body as-app">
@@ -89,13 +85,14 @@ We are going to create a slightly more complex layout taking advantage of Airshi
     <!-- Left sidebar -->
     <aside class="as-sidebar as-sidebar--left">
         <div class="as-container">
-            <section class="as-box">
-              <as-formula-widget
-                  id="widgetFormula"
-                  class="as-p--16"
-                  heading="GDP"
-                  description="Sum of Countries GDP">
-              </as-formula-widget>
+            <section class="as-box as-p--16 as-body">
+                <h1 class="as-title">Category dataview</h1>
+                <h4 class="as-subheader as-mb--12">
+                  Compute aggregation values per category with
+                  <em>carto.viz.dataview.Category</em>
+                </h4>
+                <hr/>
+                <div id="result"></div>
             </section>
         </div>
     </aside>
@@ -112,10 +109,34 @@ We are going to create a slightly more complex layout taking advantage of Airshi
 </body>
 ```
 
-Now you can create the `carto.viz.widget.Formula` widget using the HTML DOM element and the dataview.  
+Now we are going to add the information from the dataview to the HTML section. When the information on the dataview is refreshed, the `dataUpdate` event is emitted. We are going to add a handler to this event that calls the `getData` method from the dataview object to retrieve the dataview information.
 
 ```js
-new carto.viz.widget.Formula("#widgetFormula", dataviewFormula);
+dataview.on('dataUpdate', async () => {
+  const data = await dataview.getData();
+  ...
+});
+```
+
+The first thing we can add to our `div` is the number of categories.
+
+```js
+const numberOfCategories = data.count;
+$result.append(`Total: ${numberOfCategories}`);
+```
+
+After that, we are going to loop through the categories and add the information to a list that will be finally added to the `div` in the HTML markup.
+
+```js  
+var list = document.createElement('ul');
+for (let i = 0; i < numberOfCategories; i++) {
+  const category = data.categories[i];
+  var li = document.createElement('li');
+  const { name, value } = category;
+  li.textContent = `${name}: ${value}`;
+  list.appendChild(li);
+}
+$result.append(list);
 ```
 
 <div class="example-map">
@@ -130,18 +151,22 @@ new carto.viz.widget.Formula("#widgetFormula", dataviewFormula);
 </div>
 > View this step [here](/developers/web-sdk/examples/maps/guides/dataviews-widgets/step-1.html)
 
-You can follow a similar approach for adding the Category dataview:
+### Widgets
+
+In order to add widgets to your application, the first step is adding the Airship web components to your HTML markup. You can go to the Airship [reference](https://carto.com/developers/airship/reference/) to know more about this library. First we add the Airship formula widget.
 
 ```html
-<as-category-widget
-  id="widgetCategory"
-  heading="Countries by continent"
-  description="Number of countries by continent (on screen)">
-</as-category-widget>
+<as-formula-widget
+    id="widgetFormula"
+    class="as-p--16"
+    heading="GDP"
+    description="Sum of Countries GDP">
+</as-formula-widget>
 ```
+Now you can create the `carto.viz.widget.Formula` widget using the HTML DOM element and the dataview.  
 
 ```js
-new carto.viz.widget.Category("#widgetCategory", dataviewCategory);
+new carto.viz.widget.Formula("#widgetFormula", dataviewFormula);
 ```
 
 <div class="example-map">
@@ -156,18 +181,19 @@ new carto.viz.widget.Category("#widgetCategory", dataviewCategory);
 </div>
 > View this step [here](/developers/web-sdk/examples/maps/guides/dataviews-widgets/step-2.html)
 
-Finally, we are going to add an Histogram widget:
+You can follow a similar approach for adding the Category dataview:
 
 ```html
-<as-histogram-widget
-  id="widgetHistogram"
-  heading="Countries by population"
-  description="Distribution of countries by population">
-</as-histogram-widget>
+<as-category-widget
+  id="widgetCategory"
+  heading="Countries by continent"
+  description="Number of countries by continent (on screen)"
+  show-clear-button>
+</as-category-widget>
 ```
 
 ```js
-new carto.viz.widget.Histogram("#widgetHistogram", dataviewHistogram);
+new carto.viz.widget.Category("#widgetCategory", dataviewCategory);
 ```
 
 <div class="example-map">
@@ -182,6 +208,33 @@ new carto.viz.widget.Histogram("#widgetHistogram", dataviewHistogram);
 </div>
 > View this step [here](/developers/web-sdk/examples/maps/guides/dataviews-widgets/step-3.html)
 
+Finally, we are going to add an Histogram widget:
+
+```html
+<as-histogram-widget
+  id="widgetHistogram"
+  heading="Countries by population"
+  description="Distribution of countries by population"
+  show-clear>
+</as-histogram-widget>
+```
+
+```js
+new carto.viz.widget.Histogram("#widgetHistogram", dataviewHistogram);
+```
+
+<div class="example-map">
+    <iframe
+        id="dataviews-widgets-step-4"
+        src="/developers/web-sdk/examples/maps/guides/dataviews-widgets/step-4.html"
+        width="100%"
+        height="500"
+        style="margin: 20px auto !important"
+        frameBorder="0">
+    </iframe>
+</div>
+> View this step [here](/developers/web-sdk/examples/maps/guides/dataviews-widgets/step-4.html)
+
 ### All together
 
 Below you can find the full code for the final example.
@@ -194,7 +247,7 @@ Below you can find the full code for the final example.
 
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Getting Started Guide - Step 3</title>
+    <title>Dataviews & Widgets - Step 4</title>
 
     <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.css' rel='stylesheet' />
   
@@ -233,14 +286,16 @@ Below you can find the full code for the final example.
                   <as-category-widget
                     id="widgetCategory"
                     heading="Countries by continent"
-                    description="Number of countries by continent (on screen)">
+                    description="Number of countries by continent (on screen)"
+                    show-clear-button>
                   </as-category-widget>
                 </section>
                 <section class="as-box">
                     <as-histogram-widget
                       id="widgetHistogram"
                       heading="Countries by population"
-                      description="Distribution of countries by population">
+                      description="Distribution of countries by population"
+                      show-clear>
                     </as-histogram-widget>
                 </section>
             </div>

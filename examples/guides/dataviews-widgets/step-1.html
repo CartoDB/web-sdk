@@ -32,13 +32,14 @@
         <!-- Left sidebar -->
         <aside class="as-sidebar as-sidebar--left">
             <div class="as-container">
-                <section class="as-box">
-                  <as-formula-widget
-                      id="widgetFormula"
-                      class="as-p--16"
-                      heading="GDP"
-                      description="Sum of GDP">
-                  </as-formula-widget>
+                <section class="as-box as-p--16 as-body">
+                    <h1 class="as-title">Category dataview</h1>
+                    <h4 class="as-subheader as-mb--12">
+                      Compute aggregation values per category with
+                      <em>carto.viz.dataview.Category</em>
+                    </h4>
+                    <hr/>
+                    <div id="result"></div>
                 </section>
             </div>
         </aside>
@@ -72,8 +73,46 @@
         const deckMap = carto.viz.createMap();
         const countriesLayer = new carto.viz.Layer('ne_50m_admin_0_countries');
         await countriesLayer.addTo(deckMap);
-        const dataviewFormula = new carto.viz.dataview.Formula(countriesLayer, 'gdp_md_est', { operation: 'sum' });
-        new carto.viz.widget.Formula("#widgetFormula", dataviewFormula);
+
+        const dataviewCategory = new carto.viz.dataview.Category(countriesLayer, 'continent', {
+          operation: 'count',
+          spatialFilter: 'viewport'
+        });
+
+        dataviewCategory.on('dataUpdate', async () => {
+          const data = await dataviewCategory.getData();
+
+          console.log(data); // review the dataview info
+          
+          /*
+            You can use here the data for any arbitrary representation. 
+            (eg on an external chart lib). 
+            We'll just present the raw data in a list, but check the CategoryWidget example
+            for a complete UI solution
+          */
+          const $result = document.getElementById('result');
+          $result.innerHTML = '';
+
+          /* 
+            total number of aggregations (categories) with .count
+          */
+          const numberOfCategories = data.count;
+          $result.append(`Total: ${numberOfCategories}`);
+
+          /*
+            Iterate on every category, to display its name and aggregatedd 'sum' value
+          */
+          var list = document.createElement('ul');
+          for (let i = 0; i < numberOfCategories; i++) {
+            const category = data.categories[i];
+            var li = document.createElement('li');
+            const { name, value } = category;
+            li.textContent = `${name}: ${value}`;
+            list.appendChild(li);
+          }
+
+          $result.append(list);
+        });
       }
       
       initialize();

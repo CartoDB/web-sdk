@@ -41,18 +41,12 @@
                     </as-formula-widget>
                 </section>
                 <section class="as-box">
-                  <as-category-widget
-                    id="widgetCategory"
-                    heading="Countries by continent (on screen)"
-                    description="Number of countries by continent">
-                  </as-category-widget>
-                </section>
-                <section class="as-box">
-                    <as-histogram-widget
-                      id="widgetHistogram"
-                      heading="Countries by population"
-                      description="Distribution of countries by population">
-                    </as-histogram-widget>
+                    <as-category-widget
+                        id="widgetCategory"
+                        heading="Countries by continent (on screen)"
+                        description="Number of countries by continent"
+                        show-clear-button>
+                    </as-category-widget>
                 </section>
             </div>
         </aside>
@@ -97,14 +91,6 @@
           spatialFilter: 'viewport'
         });
         new carto.viz.widget.Category("#widgetCategory", dataviewCategory);
-
-        // Histogram Dataview & Widget
-        const dataviewHistogram = new carto.viz.dataview.Histogram(countriesLayer, 'pop_est', { 
-          bins: 10,
-          start: 100000,
-          end: 100000000 
-        });
-        new carto.viz.widget.Histogram("#widgetHistogram", dataviewHistogram);
       }
       
       initialize();
