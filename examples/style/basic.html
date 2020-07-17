@@ -3,13 +3,18 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>GeoJSON Layer with CARTO Tiles Example</title>
+    <title>Basic style</title>
 
-    <!-- Custom CSS -->
     <link
       rel="stylesheet"
       type="text/css"
       href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.css"
+    />
+
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://libs.cartocdn.com/airship-style/v2.4/airship.min.css"
     />
 
     <style>
@@ -25,13 +30,28 @@
     </style>
   </head>
 
-  <body>
-    <section id="map"></section>
+  <body class="as-app-body as-app">
+    <div class="as-content">
+      <main class="as-main">
+        <div class="as-map-area">
+          <!-- map -->
+          <div id="map"></div>
 
-    <!-- Map libraries-->
+          <!-- panel -->
+          <div class="as-panel as-panel--top as-panel--right as-bg--ui-01">
+            <div class="as-panel__element as-p--16 as-body">
+              <h1 class="as-title">Basic style</h1>
+              <h4 class="as-subheader as-mb--12">
+                A simple style for a Layer, using <em>carto.viz.style.basic</em> helper
+              </h4>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
     <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.js"></script>
     <script src="https://unpkg.com/deck.gl@8.2.0/dist.min.js"></script>
-
     <script src="/dist/umd/index.min.js"></script>
 
     <script>
@@ -48,17 +68,27 @@
         });
 
         const basicStyle = carto.viz.style.basic({
-          // Color: hex, rgb or named color value.
-          // Defaults is '#EE4D5A' points, '#4CC8A3'lines and '#826DBA' polygons
+          /*
+            Color as a HEX value. 
+            Defaults are points: '#EE4D5A', lines: '#4CC8A3' and polygons: '#826DBA'
+          */
           color: '#831123',
-          // Size of point or line features. 10 for points and 4 for lines.
-          // size: 12
-          // Opacity value. Default is 1 for points and lines and 0.9 for polygons.
+          /* 
+            Opacity value 
+            (1 = 100% visible and 0 = transparent)
+          */
           opacity: 0.7,
-          // Color of the stroke. Default is '#222'.
+          /* 
+            Color of the stroke
+          */
           strokeColor: '#fff',
-          // Size of the stroke
-          strokeWidth: 1
+          /* 
+            Size of the stroke
+          */
+          strokeWidth: 2
+          /*
+            In a point layer, you would have available the 'size' property...
+          */
         });
 
         const airbnbLayer = new carto.viz.Layer('ne_50m_admin_1_states_1', basicStyle);

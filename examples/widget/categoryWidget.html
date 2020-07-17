@@ -31,6 +31,13 @@
       #panel {
         width: 300px;
       }
+
+      @media (max-width: 812px) {
+        .as-panel {
+          max-height: 600px;
+        }
+      }
+
       #panel .as-box {
         width: 250px;
       }
@@ -51,23 +58,25 @@
                 <section class="as-box">
                   <h1 class="as-title">Category widget</h1>
                   <h4 class="as-subheader as-mb--12">
-                    Create a widget, aggregating values per category, for those features currently
-                    visible. It includes a filtering feature out of the box
+                    Create widgets aggregating values per category, with
+                    <em>carto.viz.widget.Category</em>
                   </h4>
                 </section>
                 <section class="as-box">
+                  <!-- An airship widget for the 'global' data -->
                   <as-category-widget
                     id="category-global"
-                    heading="Countries (global)"
-                    description="Number of countries by continent"
+                    heading="Countries per continent (global)"
+                    description="All countries"
                   >
                   </as-category-widget>
                 </section>
                 <section class="as-box">
+                  <!-- An airship widget for the 'viewport' data -->
                   <as-category-widget
                     id="category-viewport"
-                    heading="Countries (viewport)"
-                    description="Number of countries by continent shown in the screen"
+                    heading="Countries per continent (viewport)"
+                    description="Countries on screen"
                   >
                   </as-category-widget>
                 </section>
@@ -94,16 +103,27 @@
         const countriesLayer = new carto.viz.Layer('ne_50m_admin_0_countries');
         await countriesLayer.addTo(deckMap);
 
-        // A data-view to count
+        /*
+          The dataviews define the operation to apply (in this case 'count'), and how to group
+          the features (countries grouped by 'continent' field).
+        */
         const dataviewGlobal = new carto.viz.dataview.Category(countriesLayer, 'continent', {
           operation: 'count'
         });
 
         const dataviewViewport = new carto.viz.dataview.Category(countriesLayer, 'continent', {
           operation: 'count',
-          spatialFilter: 'viewport'
+          spatialFilter: 'viewport' // data will be updated on every viewport change
         });
 
+        /*
+          There are two option availables: 
+          - global: values for the whole layer or
+          - a viewport spatial filter: considering just features on screen
+
+          Widgets include a filtering feature out of the box, so you can display / hide the categories
+          on the map
+        */
         new carto.viz.widget.Category('#category-global', dataviewGlobal);
         new carto.viz.widget.Category('#category-viewport', dataviewViewport);
       }

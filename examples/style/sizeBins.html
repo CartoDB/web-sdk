@@ -3,19 +3,19 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Simple Popup</title>
+    <title>Size bins</title>
 
     <link
       rel="stylesheet"
       type="text/css"
       href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.css"
     />
+
     <link
       rel="stylesheet"
       type="text/css"
       href="https://libs.cartocdn.com/airship-style/v2.4/airship.min.css"
     />
-    <!-- <link rel="stylesheet" type="text/css" href="https://libs.cartocdn.com/airship-icons/v2.4/icons.css"/> -->
 
     <style>
       body {
@@ -40,16 +40,12 @@
           <!-- panel -->
           <div class="as-panel as-panel--top as-panel--right as-bg--ui-01">
             <div class="as-panel__element as-p--16 as-body">
-              <h1 class="as-title">Basic example template</h1>
+              <h1 class="as-title">Size bins</h1>
               <h4 class="as-subheader as-mb--12">
-                A (short) description of the example
+                Create a thematic map with <em>carto.viz.style.sizeBins</em>, to represent
+                distribution of a numerical field in the dataset with 'size' (in this case, number
+                of available days for airbnb apartments)
               </h4>
-
-              <div>
-                <!-- extra controls, if required -->
-                WIP - TODO end preparation
-              </div>
-              <div id="result"></div>
             </div>
           </div>
         </div>
@@ -63,14 +59,29 @@
     <script>
       function initialize() {
         carto.auth.setDefaultCredentials({ username: 'public' });
-        const deckMap = carto.viz.createMap();
 
-        // deckMap.props.map.on('load', () => {
-        const popup = new carto.viz.Popup();
-        popup.setContent('This <b>is</b> a simple popup');
-        popup.setCoordinates([0, 0]);
-        popup.addTo(deckMap);
-        // });
+        const deckMap = carto.viz.createMap({
+          basemap: 'voyager',
+          view: {
+            longitude: -3.700385991742541,
+            latitude: 40.41532659629741,
+            zoom: 14
+          }
+        });
+
+        /*
+          Number of bins and size range are selected by default, but of course they can be further configured.
+        */
+        const availabilityStyle = carto.viz.style.sizeBins('availability_365');
+        /*
+          previous would be equivalent to 
+            carto.viz.style.sizeBins('availability_365', {
+              bins: 5,
+              sizeRange: [2, 14]
+            });
+        */
+        const airbnbLayer = new carto.viz.Layer('listings_madrid', availabilityStyle);
+        airbnbLayer.addTo(deckMap);
       }
 
       initialize();

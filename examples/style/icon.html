@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Icon helper</title>
+    <title>Style with Icon</title>
 
     <link
       rel="stylesheet"
@@ -16,7 +16,6 @@
       type="text/css"
       href="https://libs.cartocdn.com/airship-style/v2.4/airship.min.css"
     />
-    <!-- <link rel="stylesheet" type="text/css" href="https://libs.cartocdn.com/airship-icons/v2.4/icons.css"/> -->
 
     <style>
       body {
@@ -41,22 +40,10 @@
           <!-- panel -->
           <div class="as-panel as-panel--top as-panel--right as-bg--ui-01">
             <div class="as-panel__element as-p--16 as-body">
-              <h1 class="as-title">Icon helper</h1>
+              <h1 class="as-title">Style with Icon</h1>
               <h4 class="as-subheader as-mb--12">
-                Use a custom image in the coordinates of your data in a map
+                Use a custom image for your point layers, using <em>carto.viz.style.icon</em>
               </h4>
-
-              <div>
-                <!-- extra controls, if required -->
-              </div>
-              <div id="result">
-                <!-- add here the interactive result, if required -->
-                <p>References to be used are:</p>
-                <ul class="as-list">
-                  <li class="as-list__item">MapboxGL 1.10.0</li>
-                  <li class="as-list__item">DeckGL 8.2.0</li>
-                </ul>
-              </div>
             </div>
           </div>
         </div>
@@ -72,7 +59,14 @@
         carto.auth.setDefaultCredentials({ username: 'public' });
         const deckMap = carto.viz.createMap();
 
-        const style = carto.viz.style.icon('./boat.png');
+        /*
+          In this case this image is just a .png as a relative url (you can use of course an absolute url...)
+          and its size is specified in pixels
+        */
+        const style = carto.viz.style.icon('./boat.png', {
+          height: 24,
+          width: 24
+        });
 
         const countriesLayer = new carto.viz.Layer('world_ports', style);
         countriesLayer.addTo(deckMap);

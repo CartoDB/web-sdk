@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Add a GeoJSON Layer</title>
+
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.css"
+    />
+
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://libs.cartocdn.com/airship-style/v2.4/airship.min.css"
+    />
+
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+      }
+
+      #map {
+        width: 100vw;
+        height: 100vh;
+      }
+    </style>
+  </head>
+
+  <body class="as-app-body as-app">
+    <div class="as-content">
+      <main class="as-main">
+        <div class="as-map-area">
+          <!-- map -->
+          <div id="map"></div>
+
+          <!-- panel -->
+          <div class="as-panel as-panel--top as-panel--right as-bg--ui-01">
+            <div class="as-panel__element as-p--16 as-body">
+              <h1 class="as-title">GeoJSON</h1>
+              <h4 class="as-subheader as-mb--12">
+                Add a GeoJSON layer to your map. The common layer accepts geojson data thanks 
+                to the <em>carto.viz.source.GeoJSON</em>
+              </h4>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.js"></script>
+    <script src="https://unpkg.com/deck.gl@8.2.0/dist.min.js"></script>
+    <script src="/dist/umd/index.min.js"></script>
+
+    <script>
+      async function initialize() {
+        /* 
+          Here we use CARTO SQL API endpoint (https://carto.com/developers/sql-api/), but you can use any other 
+          source for standard GeoJSON.
+          When you load data this way, there is just one request for all the features, thus it can work well
+          if its number is low. But for bigger layers coming from CARTO, we always recommend the `Dataset`
+          or `SQLSource` types, which work internally more efficiently with MVT Tiles.
+        */
+        const user = 'public';
+        const apiKey = 'default_public';
+        const sql = 'SELECT * FROM world_ports';
+        const url = `https://${user}.carto.com/api/v2/sql?api_key=${apiKey}&q=${sql}&format=geojson`;
+        const geojsonData = await fetch(url).then(response => response.json());
+
+        const deckMap = carto.viz.createMap();
+
+        const basicStyle = carto.viz.style.basic({
+          color: '#0000FF',
+          size: 14,
+          strokeColor: '#0000FF44',
+          strokeWidth: 6
+        });
+
+        /* 
+          Notice how we just pass the geojsonData to the constructor...
+        */
+        const layer = new carto.viz.Layer(geojsonData, basicStyle);
+        /*
+          ...which is interpreted internally the same way as:
+            const layer = new carto.viz.Layer(new carto.viz.source.GeoJSON(geojsonData), basicStyle);
+        */
+        layer.addTo(deckMap);
+      }
+
+      initialize();
+    </script>
+  </body>
+</html>
