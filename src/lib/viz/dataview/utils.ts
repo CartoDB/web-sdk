@@ -32,3 +32,19 @@ export function isGeoJSONSource(dataOrigin: Layer | Source) {
     dataOrigin instanceof GeoJSONSource
   );
 }
+
+const CLUSTER_COUNT_PROPERTY = '_cdb_feature_count';
+
+export function getFeatureValue(
+  feature: Record<string, number>,
+  aggregatedColumnName: string,
+  column: string
+): { featureValue: number; clusterCount: number } {
+  const clusterCount = feature[CLUSTER_COUNT_PROPERTY];
+  const featureValue = feature[aggregatedColumnName] || feature[column];
+
+  return {
+    featureValue,
+    clusterCount
+  };
+}
