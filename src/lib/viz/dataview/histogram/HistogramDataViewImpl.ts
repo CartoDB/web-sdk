@@ -25,7 +25,7 @@ export class HistogramDataViewImpl extends DataViewImpl<HistogramDataViewData> {
     const dataviewLocal = this.dataView as DataViewLocal;
     const { bins = 10, start, end } = this.options;
 
-    const aggregatedColumnName = `${this.operation}__${this.column}`;
+    const aggregatedColumnName = `_cdb_${this.operation}__${this.column}`;
     const columnName = this.column;
 
     try {
