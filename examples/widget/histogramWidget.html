@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Histogram widget</title>
+
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.css"
+    />
+
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://libs.cartocdn.com/airship-style/v2.4/airship.min.css"
+    />
+
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+      }
+
+      #map {
+        width: 100vw;
+        height: 100vh;
+      }
+
+      #panel {
+        width: 300px;
+      }
+
+      @media (max-width: 812px) {
+        .as-panel {
+          max-height: 600px;
+        }
+      }
+
+      #panel .as-box {
+        width: 250px;
+      }
+    </style>
+  </head>
+
+  <body class="as-app-body as-app">
+    <div class="as-content">
+      <main class="as-main">
+        <div class="as-map-area">
+          <!-- map -->
+          <div id="map"></div>
+
+          <!-- panel -->
+          <div id="panel" class="as-panel as-panel--top as-panel--right as-bg--ui-01">
+            <div class="as-panel__element as-p--16 as-body">
+              <div class="as-container as-container--scrollable">
+                <section class="as-box">
+                  <h1 class="as-title">Histogram widget</h1>
+                  <h4 class="as-subheader as-mb--12">
+                    Create a histogram widget, aggregating values in bins, with
+                    <em>carto.viz.widget.Histogram</em>
+                  </h4>
+                </section>
+                <section class="as-box">
+                  <!-- An airship widget for the 'global' data -->
+                  <as-histogram-widget
+                    id="histogram-global"
+                    heading="Estimated Population (global)"
+                    description="Distribution of estimated population in countries"
+                    show-clear
+                  >
+                  </as-histogram-widget>
+
+                  <!-- An airship widget for the 'viewport' data -->
+                  <as-histogram-widget
+                    id="histogram-viewport"
+                    heading="Estimated Population (viewport)"
+                    description="Distribution of estimated population in countries"
+                    show-clear
+                  >
+                  </as-histogram-widget>
+                </section>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.js"></script>
+    <script src="https://unpkg.com/deck.gl@8.2.0/dist.min.js"></script>
+    <script src="https://libs.cartocdn.com/airship-components/v2.4/airship.js"></script>
+    <script src="/dist/umd/index.min.js"></script>
+
+    <script>
+      const widgetElement = document.querySelector('as-category-widget');
+
+      async function initialize() {
+        carto.auth.setDefaultCredentials({ username: 'public' });
+
+        const deckMap = carto.viz.createMap();
+
+        const countriesLayer = new carto.viz.Layer('ne_50m_admin_0_countries');
+        await countriesLayer.addTo(deckMap);
+
+        /*
+          The dataviews define the histogram params
+        */
+        const histogramGlobal = new carto.viz.dataview.Histogram(countriesLayer, 'pop_est', {
+          bins: 10,
+          start: 1000000,
+          end: 127078679
+        });
+
+        const histogramViewport = new carto.viz.dataview.Histogram(countriesLayer, 'pop_est', {
+          bins: 10,
+          start: 1000000,
+          end: 127078679,
+          spatialFilter: 'viewport' // data will be updated on every viewport change
+        });
+
+        /*
+          There are two option availables: 
+          - global: values for the whole layer or
+          - a viewport spatial filter: considering just features on screen
+
+          Widgets include a filtering feature out of the box, so you can display / hide the categories
+          on the map
+        */
+        new carto.viz.widget.Histogram('#histogram-global', histogramGlobal);
+        new carto.viz.widget.Histogram('#histogram-viewport', histogramViewport);
+      }
+
+      initialize();
+    </script>
+  </body>
+</html>

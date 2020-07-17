@@ -49,6 +49,7 @@ export abstract class Source extends WithEvents {
   public needsInitialization: boolean;
   public sourceType: SourceType | unknown;
   protected fields: Set<string>;
+  protected aggregatedColumns: Map<string, Set<string>> = new Map();
 
   constructor(id: string) {
     super();
@@ -67,6 +68,8 @@ export abstract class Source extends WithEvents {
   abstract getProps(): SourceProps;
 
   abstract getMetadata(): SourceMetadata;
+
+  abstract getFeatures(excludedFilters: string[]): Record<string, unknown>[];
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars, class-methods-use-this
   addFilter(_filterId: string, _filter: ColumnFilters) {
@@ -93,5 +96,22 @@ export abstract class Source extends WithEvents {
     }
   }
 
-  abstract getFeatures(excludedFilters: string[]): Record<string, unknown>[];
+  addAggregatedColumn(aggregatedColumn: AggregatedColumn) {
+    const aggregatedColumnOperations =
+      this.aggregatedColumns.get(aggregatedColumn.column) || new Set();
+
+    const { size } = aggregatedColumnOperations;
+
+    aggregatedColumn.operations.forEach(operation => aggregatedColumnOperations.add(operation));
+    this.aggregatedColumns.set(aggregatedColumn.column, aggregatedColumnOperations);
+
+    if (size < aggregatedColumnOperations.size) {
+      this.needsInitialization = true;
+    }
+  }
+}
+
+export interface AggregatedColumn {
+  column: string;
+  operations: string[];
 }

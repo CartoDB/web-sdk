@@ -26,9 +26,25 @@ export function debounce(
   };
 }
 
-export function isGeoJSONSource(dataSource: Layer | Source) {
+export function isGeoJSONSource(dataOrigin: Layer | Source) {
   return (
-    (dataSource instanceof Layer && dataSource.source instanceof GeoJSONSource) ||
-    dataSource instanceof GeoJSONSource
+    (dataOrigin instanceof Layer && dataOrigin.source instanceof GeoJSONSource) ||
+    dataOrigin instanceof GeoJSONSource
   );
+}
+
+const CLUSTER_COUNT_PROPERTY = '_cdb_feature_count';
+
+export function getFeatureValue(
+  feature: Record<string, number>,
+  aggregatedColumnName: string,
+  column: string
+): { featureValue: number; clusterCount: number } {
+  const clusterCount = feature[CLUSTER_COUNT_PROPERTY];
+  const featureValue = feature[aggregatedColumnName] || feature[column];
+
+  return {
+    featureValue,
+    clusterCount
+  };
 }

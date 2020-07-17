@@ -1,47 +1,61 @@
 import { Layer } from '@/viz';
-import { AggregationType, aggregate } from '@/data/operations/aggregation/aggregation';
+import { DATA_CHANGED_EVENT } from '@/viz/layer/Layer';
+import { AggregationType, aggregateValues } from '@/data/operations/aggregation';
 import { groupValuesByColumn } from '@/data/operations/grouping';
 import { castToNumberOrUndefined } from '@/core/utils/number';
 import { ColumnFilters, SpatialFilters } from '@/viz/filters/types';
 import { DataViewMode } from './DataViewMode';
+import { GetDataOptions } from '../DataViewImpl';
 
 export class DataViewLocal extends DataViewMode {
   private useViewport = false;
 
-  constructor(dataSource: Layer, column: string) {
-    super(dataSource, column);
+  constructor(dataOrigin: Layer, column: string) {
+    super(dataOrigin, column);
     this.bindEvents();
   }
 
-  public async getSourceData(columns: string[] = [], options: { excludedFilters?: string[] } = {}) {
-    if (!columns.includes(this.column)) {
-      columns.push(this.column);
+  public async getSourceData(options: GetDataOptions = {}) {
+    const { excludedFilters = [], aggregationOptions } = options;
+
+    if (this.useViewport) {
+      await (this.dataOrigin as Layer).addAggregationOptions(
+        aggregationOptions?.numeric,
+        aggregationOptions?.dimension
+      );
     }
 
-    const { excludedFilters = [] } = options;
-
-    if (this.dataSource instanceof Layer) {
-      await this.dataSource.addSourceField(this.column);
+    // is GeoJSON Layer
+    if (this.dataOrigin instanceof Layer) {
+      await this.dataOrigin.addSourceField(this.column);
     } else {
-      this.dataSource.addField(this.column);
+      this.dataOrigin.addField(this.column);
     }
 
     return this.useViewport
-      ? (this.dataSource as Layer).getViewportFeatures(excludedFilters)
-      : this.dataSource.getFeatures(excludedFilters);
+      ? (this.dataOrigin as Layer).getViewportFeatures(excludedFilters)
+      : this.dataOrigin.getFeatures(excludedFilters);
   }
 
   public async groupBy(
     operationColumn: string,
     operation: AggregationType,
-    options: { excludedFilters: string[] }
+    options: GetDataOptions
   ) {
-    const sourceData = await this.getSourceData([operationColumn || this.column], options);
-    const { groups, nullCount } = groupValuesByColumn(
-      sourceData,
-      operationColumn || this.column,
-      this.column
-    );
+    const columnName = operationColumn || this.column;
+    const aggregatedColumnName = `_cdb_${operation}__${columnName}`;
+
+    const sourceData = await this.getSourceData(options);
+    const adaptedFeatures = sourceData.map((feature: Record<string, unknown>) => {
+      return {
+        ...feature,
+        [columnName]: feature[aggregatedColumnName]
+          ? feature[aggregatedColumnName]
+          : feature[columnName]
+      };
+    });
+
+    const { groups, nullCount } = groupValuesByColumn(adaptedFeatures, columnName, this.column);
     const categories = Object.keys(groups)
       .map(group => createCategory(group, groups[group] as number[], operation))
       .sort(categoryOrder());
@@ -50,8 +64,8 @@ export class DataViewLocal extends DataViewMode {
   }
 
   public setFilters(filters: ColumnFilters) {
-    if (this.dataSource instanceof Layer) {
-      this.dataSource.setFilters(filters);
+    if (this.dataOrigin instanceof Layer) {
+      this.dataOrigin.setFilters(filters);
     }
   }
 
@@ -62,11 +76,11 @@ export class DataViewLocal extends DataViewMode {
   private bindEvents() {
     this.registerAvailableEvents(['dataUpdate', 'error']);
 
-    this.dataSource.on('viewportLoad', () => {
+    this.dataOrigin.on(DATA_CHANGED_EVENT, () => {
       this.onDataUpdate();
     });
 
-    this.dataSource.on('filterChange', () => {
+    this.dataOrigin.on('filterChange', () => {
       this.onDataUpdate();
     });
   }
@@ -88,7 +102,7 @@ function createCategory(name: string, data: number[], operation: AggregationType
 
   return {
     name,
-    value: aggregate(categoryValues, operation)
+    value: aggregateValues(categoryValues, operation).result
   };
 }
 

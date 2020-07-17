@@ -258,5 +258,80 @@ describe('DatasetSource', () => {
 
       expect(instantiateMapFromMock.mock.calls[0][0]).toStrictEqual(expectedmapConfig);
     });
+
+    it('should add aggregation config to Map Config', async () => {
+      const mapOptions = {
+        vectorExtent: 2048,
+        vectorSimplifyExtent: 512,
+        bufferSize: {
+          mvt: 30
+        },
+        metadata: {
+          geometryType: true,
+          columnStats: {
+            topCategories: 5,
+            includeNulls: false
+          },
+          sample: {
+            num_rows: 1000,
+            include_columns: ['column1']
+          }
+        },
+        aggregation: {
+          placement: 'centroid',
+          resolution: 2,
+          threshold: 2
+        }
+      };
+
+      const source = new DatasetSource(DEFAULT_DATASET, { mapOptions });
+      source.addField('column2');
+      source.addAggregatedColumn({ column: 'column1', operations: ['max', 'min'] });
+
+      await source.init();
+
+      const expectedmapConfig = {
+        vectorExtent: 2048,
+        vectorSimplifyExtent: 512,
+        bufferSize: {
+          mvt: 30
+        },
+        metadata: {
+          geometryType: true,
+          columnStats: {
+            topCategories: 5,
+            includeNulls: false
+          },
+          dimensions: true,
+          sample: {
+            num_rows: 1000,
+            include_columns: ['column1', 'column2']
+          }
+        },
+        aggregation: {
+          columns: {
+            _cdb_max__column1: {
+              aggregate_function: 'max',
+              aggregated_column: 'column1'
+            },
+            _cdb_min__column1: {
+              aggregate_function: 'min',
+              aggregated_column: 'column1'
+            }
+          },
+          dimensions: {
+            column2: {
+              column: 'column2'
+            }
+          },
+          placement: 'centroid',
+          resolution: 2,
+          threshold: 2
+        },
+        sql: `SELECT * FROM ${DEFAULT_DATASET}`
+      };
+
+      expect(instantiateMapFromMock.mock.calls[0][0]).toStrictEqual(expectedmapConfig);
+    });
   });
 });

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Style with Icon</title>
+
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.css"
+    />
+
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://libs.cartocdn.com/airship-style/v2.4/airship.min.css"
+    />
+
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+      }
+
+      #map {
+        width: 100vw;
+        height: 100vh;
+      }
+    </style>
+  </head>
+
+  <body class="as-app-body as-app">
+    <div class="as-content">
+      <main class="as-main">
+        <div class="as-map-area">
+          <!-- map -->
+          <div id="map"></div>
+
+          <!-- panel -->
+          <div class="as-panel as-panel--top as-panel--right as-bg--ui-01">
+            <div class="as-panel__element as-p--16 as-body">
+              <h1 class="as-title">Style with Icon</h1>
+              <h4 class="as-subheader as-mb--12">
+                Use a custom image for your point layers, using <em>carto.viz.style.icon</em>. In
+                this case representing the subway stations in New York City.
+              </h4>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.js"></script>
+    <script src="https://unpkg.com/deck.gl@8.2.0/dist.min.js"></script>
+    <script src="/dist/umd/index.min.js"></script>
+
+    <script>
+      function initialize() {
+        carto.auth.setDefaultCredentials({ username: 'public' });
+        const deckMap = carto.viz.createMap({
+          view: {
+            longitude: -73.915942,
+            latitude: 40.709481,
+            zoom: 12
+          }
+        });
+
+        /*
+          In this case this image is just a .png as a relative url (but you can use an absolute url
+          and several formats, like .svg, .bmp, jpg...). The icon size is specified in pixels
+        */
+        const style = carto.viz.style.icon('./subway-icon.png', {
+          height: 40,
+          width: 40
+        });
+
+        const countriesLayer = new carto.viz.Layer('ny_subway_stations', style);
+        countriesLayer.addTo(deckMap);
+      }
+
+      initialize();
+    </script>
+  </body>
+</html>

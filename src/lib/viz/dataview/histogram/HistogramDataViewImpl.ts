@@ -1,17 +1,19 @@
 import { isVariableDefined } from '@/core/utils/variables';
-import { AggregationType, aggregate } from '@/data/operations/aggregation/aggregation';
+import { isDefined } from '@/viz/utils/object';
+import { AggregationType, aggregateValues } from '@/data/operations/aggregation';
 import { DataViewMode, DataViewCalculation } from '../mode/DataViewMode';
-import { DataViewImpl } from '../DataViewImpl';
+import { DataViewImpl, GetDataOptions } from '../DataViewImpl';
 import { CartoDataViewError, dataViewErrorTypes } from '../DataViewError';
 import { DataViewLocal } from '../mode/DataViewLocal';
 import { DataViewRemote } from '../mode/DataViewRemote';
 import { DataViewOptions } from '../DataView';
+import { getFeatureValue } from '../utils';
 
 export class HistogramDataViewImpl extends DataViewImpl<HistogramDataViewData> {
   options: HistogramDataViewOptions;
 
   constructor(dataView: DataViewMode, options: HistogramDataViewOptions) {
-    super(dataView, { operation: AggregationType.COUNT });
+    super(dataView, { operation: AggregationType.AVG });
 
     const { bins, start, end } = options;
     validateParameters(bins, start, end);
@@ -19,17 +21,15 @@ export class HistogramDataViewImpl extends DataViewImpl<HistogramDataViewData> {
     this.options = options;
   }
 
-  public async getLocalData(options: {
-    excludedFilters: string[];
-  }): Promise<HistogramDataViewData> {
+  public async getLocalData(options: GetDataOptions): Promise<HistogramDataViewData> {
     const dataviewLocal = this.dataView as DataViewLocal;
     const { bins = 10, start, end } = this.options;
 
+    const aggregatedColumnName = `_cdb_${this.operation}__${this.column}`;
+    const columnName = this.column;
+
     try {
-      const features = (await dataviewLocal.getSourceData([this.column], options)) as Record<
-        string,
-        number
-      >[];
+      const features = (await dataviewLocal.getSourceData(options)) as Record<string, number>[];
       const sortedFeatures = features.map(feature => feature[this.column]).sort((a, b) => a - b);
 
       const startValue = start ?? Math.min(...sortedFeatures);
@@ -47,10 +47,14 @@ export class HistogramDataViewImpl extends DataViewImpl<HistogramDataViewData> {
           values: [] as number[]
         }));
 
-      sortedFeatures.forEach(feature => {
-        const featureValue = feature;
+      features.forEach(feature => {
+        const { featureValue, clusterCount } = getFeatureValue(
+          feature,
+          aggregatedColumnName,
+          columnName
+        );
 
-        if (!featureValue) {
+        if (!isDefined(featureValue)) {
           nulls += 1;
           return;
         }
@@ -63,7 +67,7 @@ export class HistogramDataViewImpl extends DataViewImpl<HistogramDataViewData> {
           return;
         }
 
-        binContainer.value += 1;
+        binContainer.value += clusterCount || 1;
         binContainer.values.push(featureValue);
       });
 
@@ -73,9 +77,9 @@ export class HistogramDataViewImpl extends DataViewImpl<HistogramDataViewData> {
           start: binContainer.start,
           end: binContainer.end,
           value: binContainer.value,
-          min: aggregate(binContainer.values, AggregationType.MIN),
-          max: aggregate(binContainer.values, AggregationType.MAX),
-          avg: aggregate(binContainer.values, AggregationType.AVG),
+          min: aggregateValues(binContainer.values, AggregationType.MIN).result,
+          max: aggregateValues(binContainer.values, AggregationType.MAX).result,
+          avg: aggregateValues(binContainer.values, AggregationType.AVG).result,
           normalized: binContainer.values.length / features.length
         };
       });
@@ -91,9 +95,7 @@ export class HistogramDataViewImpl extends DataViewImpl<HistogramDataViewData> {
     }
   }
 
-  public async getRemoteData(options: {
-    excludedFilters: string[];
-  }): Promise<HistogramDataViewData> {
+  public async getRemoteData(options: GetDataOptions): Promise<HistogramDataViewData> {
     const dataviewRemote = this.dataView as DataViewRemote;
     const { bins = 10, start, end } = this.options;
 

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Formula widget</title>
+
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.css"
+    />
+    <link rel="stylesheet" href="https://libs.cartocdn.com/airship-style/v2.4.0-rc.0/airship.css" />
+
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+      }
+
+      #map {
+        width: 100vw;
+        height: 100vh;
+      }
+
+      #panel {
+        width: 300px;
+      }
+
+      @media (max-width: 812px) {
+        .as-panel {
+          max-height: 600px;
+          
+        }
+      }
+
+      #panel .as-box {
+        width: 250px;
+      }
+    </style>
+  </head>
+
+  <body class="as-app-body as-app">
+    <div class="as-content">
+      <main class="as-main">
+        <div class="as-map-area">
+          <!-- map -->
+          <div id="map"></div>
+
+          <!-- panel -->
+          <div id="panel" class="as-panel as-panel--top as-panel--right as-bg--ui-01">
+            <div class="as-panel__element as-p--16 as-body">
+              <div class="as-container as-container--scrollable">
+                <section class="as-box">
+                  <h1 class="as-title">Formula widget</h1>
+                  <h4 class="as-subheader as-mb--12">
+                    Display values from a Formula aggregation with
+                    <em>carto.viz.widget.Formula</em>, In this case, it is the MAX value of estimated population
+                  </h4>
+                </section>
+                <section class="as-box">
+                  <!-- An airship widget for the 'global' data -->
+                  <as-formula-widget
+                    id="formula-global"
+                    heading="Max Estimated Population (global)"
+                    description="All countries"
+                  >
+                  </as-formula-widget>
+                </section>
+                <section class="as-box">
+                  <!-- An airship widget for the 'viewport' data -->
+                  <as-formula-widget
+                    id="formula-viewport"
+                    heading="Max Estimated Population (viewport)"
+                    description="Countries on screen"
+                  >
+                  </as-formula-widget>
+                </section>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.js"></script>
+    <script src="https://unpkg.com/deck.gl@8.2.0/dist.min.js"></script>
+    <script src="https://libs.cartocdn.com/airship-components/v2.4.0-rc.0/airship.js"></script>
+
+    <script src="/dist/umd/index.min.js"></script>
+
+    <script>
+      const widgetElement = document.querySelector('as-category-widget');
+
+      async function initialize() {
+        carto.auth.setDefaultCredentials({ username: 'public' });
+
+        const deckMap = carto.viz.createMap();
+
+        const countriesLayer = new carto.viz.Layer('ne_50m_admin_0_countries');
+        await countriesLayer.addTo(deckMap);
+
+        /*
+          The dataviews define the operation to apply (in this case 'max'), and the field
+          to query in the features ('pop_est')
+        */
+        const formulaGlobal = new carto.viz.dataview.Formula(countriesLayer, 'pop_est', {
+          operation: 'max'
+        });
+
+        const formulaViewport = new carto.viz.dataview.Formula(countriesLayer, 'pop_est', {
+          operation: 'max',
+          spatialFilter: 'viewport' // data will be updated on every viewport change
+        });
+
+        /*
+          There are two option availables: 
+          - global: values for the whole layer or
+          - a viewport spatial filter: considering just features on screen
+        */
+        new carto.viz.widget.Formula('#formula-global', formulaGlobal);
+        new carto.viz.widget.Formula('#formula-viewport', formulaViewport);
+      }
+
+      initialize();
+    </script>
+  </body>
+</html>
