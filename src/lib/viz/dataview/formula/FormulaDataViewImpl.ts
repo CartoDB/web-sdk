@@ -27,7 +27,8 @@ export class FormulaDataViewImpl extends DataViewImpl<FormulaDataViewData> {
       const aggregatedColumnName = `_cdb_${this.operation}__${this.column}`;
       const columnName = this.column;
 
-      const containsAggregatedData = aggregatedColumnName in features[0];
+      const anyFeature = features.length > 0;
+      const containsAggregatedData = anyFeature ? aggregatedColumnName in features[0] : false;
 
       const values = containsAggregatedData
         ? features.map((feature: Record<string, unknown>) => ({
