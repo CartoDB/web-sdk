@@ -1,15 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
-
   <head>
-
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Dataviews & Widgets - Step 4</title>
 
-    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.css' rel='stylesheet' />
-  
-    <link href="https://libs.cartocdn.com/airship-style/v2.4.0/airship.css" rel="stylesheet" >
+    <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.css" rel="stylesheet" />
+
+    <link href="https://libs.cartocdn.com/airship-style/v2.4.0/airship.css" rel="stylesheet" />
 
     <style>
       body {
@@ -22,96 +20,100 @@
         height: 100vh;
       }
     </style>
-
   </head>
 
   <body class="as-app-body as-app">
-
     <as-responsive-content>
+      <!-- Left sidebar -->
+      <aside class="as-sidebar as-sidebar--left">
+        <div class="as-container">
+          <section class="as-box">
+            <as-formula-widget
+              id="widgetFormula"
+              class="as-p--16"
+              heading="GDP"
+              description="Sum of GDP"
+            >
+            </as-formula-widget>
+          </section>
+          <section class="as-box">
+            <as-category-widget
+              id="widgetCategory"
+              heading="Countries by continent (on screen)"
+              description="Number of countries by continent"
+              show-clear-button
+            >
+            </as-category-widget>
+          </section>
+          <section class="as-box">
+            <as-histogram-widget
+              id="widgetHistogram"
+              heading="Countries by population"
+              description="Distribution of countries by population"
+              show-clear
+            >
+            </as-histogram-widget>
+          </section>
+        </div>
+      </aside>
 
-        <!-- Left sidebar -->
-        <aside class="as-sidebar as-sidebar--left">
-            <div class="as-container">
-                <section class="as-box">
-                    <as-formula-widget
-                        id="widgetFormula"
-                        class="as-p--16"
-                        heading="GDP"
-                        description="Sum of GDP">
-                    </as-formula-widget>
-                </section>
-                <section class="as-box">
-                    <as-category-widget
-                        id="widgetCategory"
-                        heading="Countries by continent (on screen)"
-                        description="Number of countries by continent"
-                        show-clear-button>
-                    </as-category-widget>
-                </section>
-                <section class="as-box">
-                    <as-histogram-widget
-                        id="widgetHistogram"
-                        heading="Countries by population"
-                        description="Distribution of countries by population"
-                        show-clear>
-                    </as-histogram-widget>
-                </section>
-            </div>
-        </aside>
-      
-        <!-- Map area -->
-        <main class="as-main">
-            <div class="as-map-area">
-                <div id="map"></div>
-            </div>
-        </main>
-  
+      <!-- Map area -->
+      <main class="as-main">
+        <div class="as-map-area">
+          <div id="map"></div>
+        </div>
+      </main>
     </as-responsive-content>
 
     <!-- Include deck.gl from unpkg CDN -->
     <script src="https://unpkg.com/deck.gl@8.2.0/dist.min.js"></script>
 
     <!-- Include Mapbox GL from the Mabpox CDN -->
-    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.js'></script>
+    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.js"></script>
 
     <!-- Include Web SDK from the CARTO CDN -->
-    <script src="https://libs.cartocdn.com/web-sdk/%VERSION%/index.min.js"></script>
+    <script src="/dist/umd/index.min.js"></script>
 
     <!-- Include Airship from the CARTO CDN -->
-    <script type="module" src="https://libs.cartocdn.com/airship-components/v2.4.0/airship/airship.esm.js"></script>
-    <script nomodule="" src="https://libs.cartocdn.com/airship-components/v2.4.0/airship/airship.js"></script>
-  
+    <script
+      type="module"
+      src="https://libs.cartocdn.com/airship-components/v2.4.0/airship/airship.esm.js"
+    ></script>
+    <script
+      nomodule=""
+      src="https://libs.cartocdn.com/airship-components/v2.4.0/airship/airship.js"
+    ></script>
+
     <script>
-      async function initialize()
-      {
+      async function initialize() {
         carto.auth.setDefaultCredentials({ username: 'public' });
         const deckMap = carto.viz.createMap();
         const countriesLayer = new carto.viz.Layer('ne_50m_admin_0_countries');
         await countriesLayer.addTo(deckMap);
 
         // Formula Dataview & Widget
-        const dataviewFormula = new carto.viz.dataview.Formula(countriesLayer, 'gdp_md_est', { operation: 'sum' });
-        new carto.viz.widget.Formula("#widgetFormula", dataviewFormula);
+        const dataviewFormula = new carto.viz.dataview.Formula(countriesLayer, 'gdp_md_est', {
+          operation: 'sum'
+        });
+        new carto.viz.widget.Formula('#widgetFormula', dataviewFormula);
 
         // Category Dataview & Widget
         const dataviewCategory = new carto.viz.dataview.Category(countriesLayer, 'continent', {
           operation: 'count',
           spatialFilter: 'viewport'
         });
-        new carto.viz.widget.Category("#widgetCategory", dataviewCategory);
+        new carto.viz.widget.Category('#widgetCategory', dataviewCategory);
 
         // Histogram Dataview & Widget
-        const dataviewHistogram = new carto.viz.dataview.Histogram(countriesLayer, 'pop_est', { 
+        const dataviewHistogram = new carto.viz.dataview.Histogram(countriesLayer, 'pop_est', {
           bins: 10,
           start: 100000,
-          end: 100000000 
+          end: 100000000
         });
-        new carto.viz.widget.Histogram("#widgetHistogram", dataviewHistogram);
+        new carto.viz.widget.Histogram('#widgetHistogram', dataviewHistogram);
       }
-      
+
       initialize();
     </script>
-  
   </body>
-
 </html>
