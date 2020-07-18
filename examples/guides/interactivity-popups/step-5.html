@@ -1,14 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Interactivity and Pop-ups Guide - Step 5</title>
 
-    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.css' rel='stylesheet' />
-  
-    <link href="https://libs.cartocdn.com/airship-style/v2.4.0/airship.css" rel="stylesheet" >
+    <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.css" rel="stylesheet" />
+
+    <link href="https://libs.cartocdn.com/airship-style/v2.4.0/airship.css" rel="stylesheet" />
 
     <style>
       body {
@@ -21,29 +20,32 @@
         height: 100vh;
       }
     </style>
-
   </head>
 
   <body>
-
     <div id="map"></div>
 
     <!-- Include deck.gl from unpkg CDN -->
     <script src="https://unpkg.com/deck.gl@8.2.0/dist.min.js"></script>
 
     <!-- Include Mapbox GL from the Mabpox CDN -->
-    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.js'></script>
+    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.js"></script>
 
     <!-- Include Web SDK from the CARTO CDN -->
-    <script src="https://libs.cartocdn.com/web-sdk/%VERSION%/index.min.js"></script>
+    <script src="/dist/umd/index.min.js"></script>
 
     <!-- Include Airship from the CARTO CDN -->
-    <script type="module" src="https://libs.cartocdn.com/airship-components/v2.4.0/airship/airship.esm.js"></script>
-    <script nomodule="" src="https://libs.cartocdn.com/airship-components/v2.4.0/airship/airship.js"></script>
-  
+    <script
+      type="module"
+      src="https://libs.cartocdn.com/airship-components/v2.4.0/airship/airship.esm.js"
+    ></script>
+    <script
+      nomodule=""
+      src="https://libs.cartocdn.com/airship-components/v2.4.0/airship/airship.js"
+    ></script>
+
     <script>
-      async function initialize()
-      {
+      async function initialize() {
         carto.auth.setDefaultCredentials({ username: 'public' });
         const deckMap = carto.viz.createMap();
         const countriesLayer = new carto.viz.Layer('ne_50m_admin_0_countries');
@@ -51,7 +53,7 @@
         await countriesLayer.setPopupHover([
           {
             attr: 'name',
-            title: null 
+            title: null
           },
           {
             attr: 'pop_est',
@@ -59,10 +61,8 @@
           }
         ]);
       }
-      
+
       initialize();
     </script>
-  
   </body>
-
 </html>
