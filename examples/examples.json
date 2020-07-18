@@ -125,15 +125,15 @@
       "title": "Widget",
       "samples": [
         {
-          "title": "Formula",
+          "title": "Formula widget",
           "file": "widget/formulaWidget.html"
         },
         {
-          "title": "Category",
+          "title": "Category widget",
           "file": "widget/categoryWidget.html"
         },
         {
-          "title": "Histogram",
+          "title": "Histogram widget",
           "file": "widget/histogramWidget.html"
         }
       ]
