@@ -25,7 +25,7 @@ export class HistogramDataViewImpl extends DataViewImpl<HistogramDataViewData> {
     const dataviewLocal = this.dataView as DataViewLocal;
     const { bins = 10, start, end } = this.options;
 
-    const aggregatedColumnName = `_cdb_${this.operation}__${this.column}`;
+    const aggregatedColumnName = this.getAggregationColumnName();
     const columnName = this.column;
 
     try {
@@ -48,7 +48,7 @@ export class HistogramDataViewImpl extends DataViewImpl<HistogramDataViewData> {
         }));
 
       features.forEach(feature => {
-        const { featureValue, clusterCount } = getFeatureValue(
+        const { featureValue, clusterCount, containsAggregatedData } = getFeatureValue(
           feature,
           aggregatedColumnName,
           columnName
@@ -69,6 +69,7 @@ export class HistogramDataViewImpl extends DataViewImpl<HistogramDataViewData> {
 
         binContainer.value += clusterCount || 1;
         binContainer.values.push(featureValue);
+        this.containsAggregatedData = this.containsAggregatedData || containsAggregatedData;
       });
 
       const transformedBins = binsNumber.map(binContainer => {

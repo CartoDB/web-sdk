@@ -5,3 +5,7 @@ export type FilterTypes = 'in' | 'within';
 export type Filter = Dictionary<FilterTypes, string[]>;
 export type ColumnFilters = Dictionary<string, Filter>;
 export type SpatialFilters = Dictionary<SpatialFilterTypes, number[]> | 'viewport';
+
+export interface FilterOptions {
+  columnName?: string;
+}

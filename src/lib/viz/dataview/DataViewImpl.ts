@@ -6,6 +6,7 @@ import { CartoDataViewError, dataViewErrorTypes } from './DataViewError';
 
 export abstract class DataViewImpl<T> extends WithEvents {
   protected dataView: DataViewMode;
+  protected containsAggregatedData = false;
 
   public operation: AggregationType;
 
@@ -31,8 +32,16 @@ export abstract class DataViewImpl<T> extends WithEvents {
     this.dataView.column = newColumn;
   }
 
+  public getAggregationColumnName() {
+    return `_cdb_${this.operation}__${this.column}`;
+  }
+
   public addFilter(filterId: string, filter: Filter) {
-    this.dataView.addFilter(filterId, filter);
+    const filterOptions = {
+      ...(this.containsAggregatedData ? { columnName: this.getAggregationColumnName() } : {})
+    };
+
+    this.dataView.addFilter(filterId, filter, filterOptions);
   }
 
   public removeFilter(filterId: string) {
