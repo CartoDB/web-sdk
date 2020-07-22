@@ -85,6 +85,14 @@ export abstract class DataView<T> extends WithEvents {
     return data;
   }
 
+  public on(type: string, handler: mitt.Handler) {
+    if (type === 'dataUpdate' && this.dataOrigin instanceof Source) {
+      return handler();
+    }
+
+    return super.on(type, handler);
+  }
+
   public addFilter(filterId: string, filter: Filter) {
     this.dataviewImpl.addFilter(filterId, filter);
   }
