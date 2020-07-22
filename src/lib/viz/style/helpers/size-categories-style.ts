@@ -4,6 +4,7 @@ import { Style, getStyleValue, BasicOptionsStyle, getStyles } from '..';
 import { CartoStylingError, stylingErrorTypes } from '../../errors/styling-error';
 import { StyledLayer } from '../layer-style';
 import { sizeRangeValidation } from '../validators';
+import { SizeProperties, isSizeProperty } from './properties-by-helper';
 
 export interface SizeCategoriesOptionsStyle extends Partial<BasicOptionsStyle> {
   // Number of categories. Default is 11. Values can range from 1 to 16.
@@ -14,6 +15,8 @@ export interface SizeCategoriesOptionsStyle extends Partial<BasicOptionsStyle> {
   sizeRange: number[];
   // Size for null values
   nullSize: number;
+  // Styling property.
+  property?: SizeProperties;
 }
 
 function defaultOptions(
@@ -112,12 +115,16 @@ function calculateWithCategories(
   let obj;
 
   if (geometryType === 'Point') {
-    obj = {
-      getRadius: getSizeValue,
-      pointRadiusMinPixels: minSize,
-      pointRadiusMaxPixels: maxSize,
-      radiusUnits: 'pixels'
-    };
+    if (!options.property || options.property === 'size') {
+      obj = {
+        getRadius: getSizeValue,
+        pointRadiusMinPixels: minSize,
+        pointRadiusMaxPixels: maxSize,
+        radiusUnits: 'pixels'
+      };
+    } else if (options.property === 'strokeWidth') {
+      obj = { getLineWidth: getSizeValue };
+    }
   } else {
     obj = {
       getLineWidth: getSizeValue,
@@ -159,6 +166,13 @@ function validateParameters(options: SizeCategoriesOptionsStyle, geometryType?: 
   if (options.nullSize && options.nullSize < 0) {
     throw new CartoStylingError(
       'nullSize must be greater or equal to 0',
+      stylingErrorTypes.PROPERTY_MISMATCH
+    );
+  }
+
+  if (options.property && !isSizeProperty(options.property)) {
+    throw new CartoStylingError(
+      `property '${options.property}' is not valid`,
       stylingErrorTypes.PROPERTY_MISMATCH
     );
   }

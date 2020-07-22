@@ -42,7 +42,7 @@
             <div class="as-panel__element as-p--16 as-body">
               <h1 class="as-title">Color bins</h1>
               <h4 class="as-subheader as-mb--12">
-                Create a thematic map with <em>carto.viz.style.colorBins</em>, 
+                Create a thematic map with <em>carto.viz.style.colorBins</em>,
                 to represent distribution of a numerical field in the dataset with 'color'
                 (in this case, number of available days for airbnb apartments)
               </h4>
@@ -74,7 +74,7 @@
         */
         const availabilityStyle = carto.viz.style.colorBins('availability_365');
         /*
-          previous would be equivalent to 
+          previous would be equivalent to
             carto.viz.style.colorBins('availability_365', {
               bins: 5,
               method: 'quantiles', // automatically calculated from layer's data

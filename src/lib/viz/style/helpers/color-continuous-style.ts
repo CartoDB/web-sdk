@@ -5,6 +5,7 @@ import { StyledLayer } from '../layer-style';
 import { BasicOptionsStyle, getStyleValue, getStyles, Style } from '..';
 import { CartoStylingError, stylingErrorTypes } from '../../errors/styling-error';
 import { colorValidation } from '../validators';
+import { ColorsProperties, isColorProperty } from './properties-by-helper';
 
 const DEFAULT_PALETTE = 'BluYl';
 
@@ -17,6 +18,8 @@ export interface ColorContinuousOptionsStyle extends Partial<BasicOptionsStyle> 
   palette: string[] | string;
   // Color applied to features which the attribute value is null.
   nullColor: string;
+  // Styling property.
+  property?: ColorsProperties;
 }
 
 function defaultOptions(
@@ -90,7 +93,7 @@ function calculate(
 
   let geomStyles;
 
-  if (geometryType === 'Line') {
+  if (geometryType === 'Line' || options.property === 'strokeColor') {
     geomStyles = {
       getLineColor: getFillColor,
       updateTriggers: getUpdateTriggers({
@@ -123,6 +126,13 @@ function validateParameters(options: ColorContinuousOptionsStyle) {
   if (options.nullColor && !colorValidation(options.nullColor)) {
     throw new CartoStylingError(
       `nullColor '${options.color}' is not valid`,
+      stylingErrorTypes.PROPERTY_MISMATCH
+    );
+  }
+
+  if (options.property && !isColorProperty(options.property)) {
+    throw new CartoStylingError(
+      `property '${options.property}' is not valid`,
       stylingErrorTypes.PROPERTY_MISMATCH
     );
   }
