@@ -76,9 +76,11 @@ export class DataViewLocal extends DataViewMode {
   private bindEvents() {
     this.registerAvailableEvents(['dataUpdate', 'error']);
 
-    this.dataOrigin.on(DATA_CHANGED_EVENT, () => {
-      this.onDataUpdate();
-    });
+    if (this.dataOrigin instanceof Layer) {
+      this.dataOrigin.on(DATA_CHANGED_EVENT, () => {
+        this.onDataUpdate();
+      });
+    }
 
     this.dataOrigin.on('filterChange', () => {
       this.onDataUpdate();
