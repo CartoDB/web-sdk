@@ -9,6 +9,7 @@ import { uuidv4 } from '@/core/utils/uuid';
 import { DataViewMode } from './DataViewMode';
 import { CartoDataViewError, dataViewErrorTypes } from '../DataViewError';
 import { GetDataOptions } from '../DataViewImpl';
+import { DataViewEvent } from '../utils';
 
 export class DataViewRemote extends DataViewMode {
   private _dataviewsApi: DataviewsApi;
@@ -29,7 +30,7 @@ export class DataViewRemote extends DataViewMode {
   }
 
   private bindEvents() {
-    this.registerAvailableEvents(['dataUpdate', 'error']);
+    this.registerAvailableEvents([DataViewEvent.DATA_UPDATE, DataViewEvent.ERROR]);
 
     this._remoteSource.on('filterChange', () => {
       this.onDataUpdate();
@@ -83,7 +84,7 @@ export class DataViewRemote extends DataViewMode {
         const bbox = [nw[0], se[1], se[0], nw[1]];
         this.filtersCollection.removeFilter(filterId);
         this.filtersCollection.addFilter(filterId, { bbox });
-        this.emit('dataUpdate');
+        this.emit(DataViewEvent.DATA_UPDATE);
       }
     });
   }

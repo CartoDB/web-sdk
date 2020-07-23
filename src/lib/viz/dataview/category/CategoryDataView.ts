@@ -1,10 +1,11 @@
 import { DataView, OPTION_CHANGED_DELAY } from '../DataView';
+
 import {
   CategoryOptions,
   CategoryDataViewImpl,
   CategoryDataViewData
 } from './CategoryDataViewImpl';
-import { debounce } from '../utils';
+import { debounce, DataViewEvent } from '../utils';
 
 export class CategoryDataView extends DataView<CategoryDataViewData> {
   protected buildImpl(column: string, options: CategoryOptions) {
@@ -18,7 +19,11 @@ export class CategoryDataView extends DataView<CategoryDataViewData> {
 
   public set operationColumn(operationColumn: string) {
     (this.dataviewImpl as CategoryDataViewImpl).operationColumn = operationColumn;
-    debounce(() => this.emit('dataUpdate'), OPTION_CHANGED_DELAY, this.setOptionScope)();
+    debounce(
+      () => this.emit(DataViewEvent.DATA_UPDATE),
+      OPTION_CHANGED_DELAY,
+      this.setOptionScope
+    )();
   }
 
   public get limit() {
@@ -27,6 +32,10 @@ export class CategoryDataView extends DataView<CategoryDataViewData> {
 
   public set limit(limit: number | undefined) {
     (this.dataviewImpl as CategoryDataViewImpl).limit = limit;
-    debounce(() => this.emit('dataUpdate'), OPTION_CHANGED_DELAY, this.setOptionScope)();
+    debounce(
+      () => this.emit(DataViewEvent.DATA_UPDATE),
+      OPTION_CHANGED_DELAY,
+      this.setOptionScope
+    )();
   }
 }

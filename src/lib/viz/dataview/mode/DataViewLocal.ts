@@ -6,6 +6,7 @@ import { castToNumberOrUndefined } from '@/core/utils/number';
 import { ColumnFilters, SpatialFilters } from '@/viz/filters/types';
 import { DataViewMode } from './DataViewMode';
 import { GetDataOptions } from '../DataViewImpl';
+import { DataViewEvent } from '../utils';
 
 export class DataViewLocal extends DataViewMode {
   private useViewport = false;
@@ -74,7 +75,7 @@ export class DataViewLocal extends DataViewMode {
   }
 
   private bindEvents() {
-    this.registerAvailableEvents(['dataUpdate', 'error']);
+    this.registerAvailableEvents([DataViewEvent.DATA_UPDATE, DataViewEvent.ERROR]);
 
     if (this.dataOrigin instanceof Layer) {
       this.dataOrigin.on(DATA_CHANGED_EVENT, () => {

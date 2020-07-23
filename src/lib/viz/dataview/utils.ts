@@ -46,3 +46,8 @@ export function getFeatureValue(
     containsAggregatedData: aggregatedColumnName in feature
   };
 }
+
+export enum DataViewEvent {
+  DATA_UPDATE = 'dataUpdate',
+  ERROR = 'error'
+}
