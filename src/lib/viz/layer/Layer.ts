@@ -16,16 +16,19 @@ import { ViewportFeaturesGenerator } from '../interactivity/viewport-features/Vi
 import { PopupElement } from '../popups/Popup';
 import { StyledLayer } from '../style/layer-style';
 import { CartoLayerError, layerErrorTypes } from '../errors/layer-error';
-import { LayerInteractivity, InteractivityEventType } from './LayerInteractivity';
+import { LayerInteractivity, InteractivityEvent } from './LayerInteractivity';
 import { LayerOptions } from './LayerOptions';
 import { FiltersCollection } from '../filters/FiltersCollection';
 import { FunctionFilterApplicator } from '../filters/FunctionFilterApplicator';
 import { ColumnFilters } from '../filters/types';
 import { basicStyle } from '../style/helpers/basic-style';
 
-export const DATA_READY_EVENT = 'dataReady';
-export const DATA_CHANGED_EVENT = 'dataChanged';
-export const TILES_LOADED_EVENT = 'tilesLoaded';
+export enum LayerEvent {
+  DATA_READY = 'dataReady',
+  DATA_CHANGED = 'dataChanged',
+  TILES_LOADED = 'tilesLoaded',
+  FILTER_CHANGE = 'filterChange' // must be the same value as GenericDataSourceEvent.FILTER_CHANGE
+}
 
 enum DATA_STATES {
   STARTING,
@@ -71,12 +74,12 @@ export class Layer extends WithEvents implements StyledLayer {
     this._style = buildStyle(style);
 
     this.registerAvailableEvents([
-      DATA_READY_EVENT,
-      DATA_CHANGED_EVENT,
-      TILES_LOADED_EVENT,
-      'filterChange',
-      InteractivityEventType.CLICK.toString(),
-      InteractivityEventType.HOVER.toString()
+      LayerEvent.DATA_READY,
+      LayerEvent.DATA_CHANGED,
+      LayerEvent.TILES_LOADED,
+      LayerEvent.FILTER_CHANGE,
+      InteractivityEvent.CLICK,
+      InteractivityEvent.HOVER
     ]);
 
     this._options = {
@@ -211,9 +214,9 @@ export class Layer extends WithEvents implements StyledLayer {
    * @param eventType - Event type
    * @param eventHandler - Event handler defined by the user
    */
-  public async on(eventType: InteractivityEventType | string, eventHandler: mitt.Handler) {
+  public async on(eventType: InteractivityEvent | string, eventHandler: mitt.Handler) {
     // mark the layer as pickable
-    if (eventType === InteractivityEventType.CLICK || eventType === InteractivityEventType.HOVER) {
+    if (eventType === InteractivityEvent.CLICK || eventType === InteractivityEvent.HOVER) {
       this._pickableEventsCount += 1;
 
       if (!this._options.pickable) {
@@ -235,10 +238,10 @@ export class Layer extends WithEvents implements StyledLayer {
    * @param eventType - Event type
    * @param eventHandler - Event handler defined by the user
    */
-  public async off(eventType: InteractivityEventType | string, eventHandler: mitt.Handler) {
+  public async off(eventType: InteractivityEvent | string, eventHandler: mitt.Handler) {
     // mark the layer as non-pickable
     if (
-      (eventType === InteractivityEventType.CLICK || eventType === InteractivityEventType.HOVER) &&
+      (eventType === InteractivityEvent.CLICK || eventType === InteractivityEvent.HOVER) &&
       this._pickableEventsCount > 0
     ) {
       this._pickableEventsCount -= 1;
@@ -460,7 +463,7 @@ export class Layer extends WithEvents implements StyledLayer {
 
   addFilter(filterId: string, filter: ColumnFilters) {
     this.filtersCollection.addFilter(filterId, filter);
-    this.emit('filterChange');
+    this.emit(LayerEvent.FILTER_CHANGE);
 
     if (this._deckLayer) {
       return this.replaceDeckGLLayer();
@@ -471,7 +474,7 @@ export class Layer extends WithEvents implements StyledLayer {
 
   removeFilter(filterId: string) {
     this.filtersCollection.removeFilter(filterId);
-    this.emit('filterChange');
+    this.emit(LayerEvent.FILTER_CHANGE);
 
     if (this._deckLayer) {
       return this.replaceDeckGLLayer();
@@ -483,7 +486,7 @@ export class Layer extends WithEvents implements StyledLayer {
   public setFilters(filters: ColumnFilters) {
     this.filtersCollection.clear();
     this.filtersCollection.addFilter(uuidv4(), filters);
-    this.emit('filterChange');
+    this.emit(LayerEvent.FILTER_CHANGE);
 
     if (this._deckLayer) {
       return this.replaceDeckGLLayer();
@@ -539,18 +542,18 @@ export class Layer extends WithEvents implements StyledLayer {
       this.dataState === DATA_STATES.STARTING &&
       (isGeoJsonLayer || referer === 'onViewportLoad')
     ) {
-      this.emit(DATA_READY_EVENT);
-      this.emit(DATA_CHANGED_EVENT);
+      this.emit(LayerEvent.DATA_READY);
+      this.emit(LayerEvent.DATA_CHANGED);
       this.dataState = DATA_STATES.READY;
     }
 
     if (this.dataState === DATA_STATES.UPDATING || referer === 'onViewportLoad') {
-      this.emit(DATA_CHANGED_EVENT);
+      this.emit(LayerEvent.DATA_CHANGED);
       this.dataState = DATA_STATES.READY;
     }
 
     if (referer === 'onViewportLoad') {
-      this.emit(TILES_LOADED_EVENT);
+      this.emit(LayerEvent.TILES_LOADED);
     }
   }
 }

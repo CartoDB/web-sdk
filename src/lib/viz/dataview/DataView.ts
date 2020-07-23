@@ -5,7 +5,7 @@ import { Filter, ColumnFilters, SpatialFilters } from '@/viz/filters/types';
 import { AggregationType } from '@/data/operations/aggregation/';
 import { DataViewImpl, GetDataOptions } from './DataViewImpl';
 import { DataViewCalculation, DataViewMode } from './mode/DataViewMode';
-import { debounce, isGeoJSONSource } from './utils';
+import { debounce, isGeoJSONSource, DataViewEvent } from './utils';
 import { SQLSource, DatasetSource, DOSource } from '../source';
 import { CartoDataViewError, dataViewErrorTypes } from './DataViewError';
 import { DataViewLocal } from './mode/DataViewLocal';
@@ -85,6 +85,14 @@ export abstract class DataView<T> extends WithEvents {
     return data;
   }
 
+  public on(type: string, handler: mitt.Handler) {
+    if (type === DataViewEvent.DATA_UPDATE && this.dataOrigin instanceof Source) {
+      return handler();
+    }
+
+    return super.on(type, handler);
+  }
+
   public addFilter(filterId: string, filter: Filter) {
     this.dataviewImpl.addFilter(filterId, filter);
   }
@@ -107,7 +115,11 @@ export abstract class DataView<T> extends WithEvents {
 
   public set column(column: string) {
     this.dataviewImpl.column = column;
-    debounce(() => this.emit('dataUpdate'), OPTION_CHANGED_DELAY, this.setOptionScope)();
+    debounce(
+      () => this.emit(DataViewEvent.DATA_UPDATE),
+      OPTION_CHANGED_DELAY,
+      this.setOptionScope
+    )();
   }
 
   public get operation() {
@@ -116,14 +128,18 @@ export abstract class DataView<T> extends WithEvents {
 
   public set operation(operation: AggregationType) {
     this.dataviewImpl.operation = operation;
-    debounce(() => this.emit('dataUpdate'), OPTION_CHANGED_DELAY, this.setOptionScope)();
+    debounce(
+      () => this.emit(DataViewEvent.DATA_UPDATE),
+      OPTION_CHANGED_DELAY,
+      this.setOptionScope
+    )();
   }
 
   private bindEvents() {
     const events = [...this.dataviewImpl.availableEvents];
 
-    if (!events.includes('dataUpdate')) {
-      events.push('dataUpdate');
+    if (!events.includes(DataViewEvent.DATA_UPDATE)) {
+      events.push(DataViewEvent.DATA_UPDATE);
     }
 
     this.registerAvailableEvents(events);

@@ -2,6 +2,7 @@ import { CartoError } from '@/core/errors/CartoError';
 import { uuidv4 } from '@/core/utils/uuid';
 import { DataView } from '@/viz/dataview/DataView';
 import { queryDOMElement } from '@/core/utils/dom';
+import { DataViewEvent } from '@/viz/dataview/utils';
 
 export abstract class Widget<T> {
   protected element: HTMLElement;
@@ -17,7 +18,7 @@ export abstract class Widget<T> {
   }
 
   protected bindEvents() {
-    this.dataView.on('dataUpdate', () => this.updateData());
+    this.dataView.on(DataViewEvent.DATA_UPDATE, () => this.updateData());
   }
 
   // eslint-disable-next-line class-methods-use-this

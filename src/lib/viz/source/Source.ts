@@ -43,6 +43,10 @@ export interface SourceProps {
   type: 'TileLayer' | 'GeoJSONLayer';
 }
 
+export enum SourceEvent {
+  FILTER_CHANGE = 'filterChange' // must be the same value as GenericDataSourceEvent.FILTER_CHANGE
+}
+
 export abstract class Source extends WithEvents {
   // ID of the source. It's mandatory for the source but not for the user.
   public id: string;
@@ -58,7 +62,7 @@ export abstract class Source extends WithEvents {
     this.needsInitialization = true;
     this.sourceType = 'Source';
     this.fields = new Set();
-    this.registerAvailableEvents(['filterChange']);
+    this.registerAvailableEvents([SourceEvent.FILTER_CHANGE]);
   }
 
   abstract isEmpty(): boolean;
