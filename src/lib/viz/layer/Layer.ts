@@ -541,17 +541,17 @@ export class Layer extends WithEvents implements StyledLayer {
     ) {
       this.emit(DATA_READY_EVENT);
       this.emit(DATA_CHANGED_EVENT);
+      this.dataState = DATA_STATES.READY;
     }
 
     if (this.dataState === DATA_STATES.UPDATING || referer === 'onViewportLoad') {
       this.emit(DATA_CHANGED_EVENT);
+      this.dataState = DATA_STATES.READY;
     }
 
     if (referer === 'onViewportLoad') {
       this.emit(TILES_LOADED_EVENT);
     }
-
-    this.dataState = DATA_STATES.READY;
   }
 }
 
