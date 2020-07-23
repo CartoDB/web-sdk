@@ -16,7 +16,7 @@ import { ViewportFeaturesGenerator } from '../interactivity/viewport-features/Vi
 import { PopupElement } from '../popups/Popup';
 import { StyledLayer } from '../style/layer-style';
 import { CartoLayerError, layerErrorTypes } from '../errors/layer-error';
-import { LayerInteractivity, InteractivityEventType } from './LayerInteractivity';
+import { LayerInteractivity, InteractivityEvent } from './LayerInteractivity';
 import { LayerOptions } from './LayerOptions';
 import { FiltersCollection } from '../filters/FiltersCollection';
 import { FunctionFilterApplicator } from '../filters/FunctionFilterApplicator';
@@ -75,8 +75,8 @@ export class Layer extends WithEvents implements StyledLayer {
       DATA_CHANGED_EVENT,
       TILES_LOADED_EVENT,
       'filterChange',
-      InteractivityEventType.CLICK.toString(),
-      InteractivityEventType.HOVER.toString()
+      InteractivityEvent.CLICK.toString(),
+      InteractivityEvent.HOVER.toString()
     ]);
 
     this._options = {
@@ -211,9 +211,9 @@ export class Layer extends WithEvents implements StyledLayer {
    * @param eventType - Event type
    * @param eventHandler - Event handler defined by the user
    */
-  public async on(eventType: InteractivityEventType | string, eventHandler: mitt.Handler) {
+  public async on(eventType: InteractivityEvent | string, eventHandler: mitt.Handler) {
     // mark the layer as pickable
-    if (eventType === InteractivityEventType.CLICK || eventType === InteractivityEventType.HOVER) {
+    if (eventType === InteractivityEvent.CLICK || eventType === InteractivityEvent.HOVER) {
       this._pickableEventsCount += 1;
 
       if (!this._options.pickable) {
@@ -235,10 +235,10 @@ export class Layer extends WithEvents implements StyledLayer {
    * @param eventType - Event type
    * @param eventHandler - Event handler defined by the user
    */
-  public async off(eventType: InteractivityEventType | string, eventHandler: mitt.Handler) {
+  public async off(eventType: InteractivityEvent | string, eventHandler: mitt.Handler) {
     // mark the layer as non-pickable
     if (
-      (eventType === InteractivityEventType.CLICK || eventType === InteractivityEventType.HOVER) &&
+      (eventType === InteractivityEvent.CLICK || eventType === InteractivityEvent.HOVER) &&
       this._pickableEventsCount > 0
     ) {
       this._pickableEventsCount -= 1;
