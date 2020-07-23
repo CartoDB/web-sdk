@@ -1,15 +1,23 @@
 # Changelog
 
 All notable changes to this project will be documented in this file.
-
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 
+
 ## [Unreleased]
+
+### Added
+- Aggregated data filtering in widgets ([#96](https://github.com/CartoDB/web-sdk/pull/96))
+
+### Fixed
+- Fix `dataReady` event in `carto.viz.Layer` ([#99](https://github.com/CartoDB/web-sdk/pull/99/))
+- Fix GeoJSON use on `carto.viz.dataview` and `dataUpdate` event with a `Source` instance ([#97](https://github.com/CartoDB/web-sdk/pull/97/))
 
 
 ## [1.0.0-alpha.1] 2020-07-17
 
 ### Added
+
 - New `carto.viz.style.icon` helper ([#53](https://github.com/CartoDB/web-sdk/pull/53/))
 - Add `beforeLayerId` and `afterLayerId` options to `carto.viz.Layer.addTo` method, to customize layer position ([#67](https://github.com/CartoDB/web-sdk/pull/67))
 - Widget synchronization when using remote dataviews ([#76](https://github.com/CartoDB/web-sdk/pull/76/))
@@ -18,14 +26,15 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 - A better documentation, with a new set of guides & examples
 
 ### Changed
+
 - Remove d3.format option from `carto.viz.Popup` ([#68](https://github.com/CartoDB/web-sdk/pull/68))
 - New public API and defaults for the `carto.viz.dataview` namespace classes: `Formula`, `Category`, `Histogram` ([#72](https://github.com/CartoDB/web-sdk/pull/72))
 
 ### Fixed
+
 - Fix remote widgets synchronization ([#63](https://github.com/CartoDB/web-sdk/pull/63))
 - Fix popup interactivity glitch on hover ([#69](https://github.com/CartoDB/web-sdk/pull/69))
 - Fix layer with empty data issue ([#78](https://github.com/CartoDB/web-sdk/pull/78))
-
 
 ## [1.0.0-alpha.0] 2020-07-06
 

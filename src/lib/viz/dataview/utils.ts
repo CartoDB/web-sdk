@@ -39,12 +39,15 @@ export function getFeatureValue(
   feature: Record<string, number>,
   aggregatedColumnName: string,
   column: string
-): { featureValue: number; clusterCount: number } {
-  const clusterCount = feature[CLUSTER_COUNT_PROPERTY];
-  const featureValue = feature[aggregatedColumnName] || feature[column];
-
+): { featureValue: number; clusterCount: number; containsAggregatedData: boolean } {
   return {
-    featureValue,
-    clusterCount
+    featureValue: feature[aggregatedColumnName] || feature[column],
+    clusterCount: feature[CLUSTER_COUNT_PROPERTY],
+    containsAggregatedData: aggregatedColumnName in feature
   };
+}
+
+export enum DataViewEvent {
+  DATA_UPDATE = 'dataUpdate',
+  ERROR = 'error'
 }

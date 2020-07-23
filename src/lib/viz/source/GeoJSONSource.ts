@@ -11,7 +11,8 @@ import {
   SourceMetadata,
   NumericFieldStats,
   CategoryFieldStats,
-  GeometryType
+  GeometryType,
+  SourceEvent
 } from './Source';
 
 import { sourceErrorTypes, SourceError } from '../errors/source-error';
@@ -84,12 +85,12 @@ export class GeoJSONSource extends Source {
 
   addFilter(filterId: string, filter: ColumnFilters) {
     this.filtersCollection.addFilter(filterId, filter);
-    this.emit('filterChange');
+    this.emit(SourceEvent.FILTER_CHANGE);
   }
 
   removeFilter(filterId: string) {
     this.filtersCollection.removeFilter(filterId);
-    this.emit('filterChange');
+    this.emit(SourceEvent.FILTER_CHANGE);
   }
 
   isEmpty() {

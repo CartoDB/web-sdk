@@ -1,7 +1,8 @@
 import { Layer, Source } from '@/viz';
 import { WithEvents } from '@/core/mixins/WithEvents';
-import { Filter, ColumnFilters, SpatialFilters } from '@/viz/filters/types';
+import { Filter, ColumnFilters, SpatialFilters, FilterOptions } from '@/viz/filters/types';
 import { CartoDataViewError, dataViewErrorTypes } from '../DataViewError';
+import { DataViewEvent } from '../utils';
 
 export abstract class DataViewMode extends WithEvents {
   protected dataOrigin: Layer | Source;
@@ -22,8 +23,8 @@ export abstract class DataViewMode extends WithEvents {
     }
   }
 
-  public addFilter(filterId: string, filter: Filter) {
-    this.dataOrigin.addFilter(filterId, { [this.column]: filter });
+  public addFilter(filterId: string, filter: Filter, filterOptions: FilterOptions = {}) {
+    this.dataOrigin.addFilter(filterId, { [filterOptions.columnName || this.column]: filter });
   }
 
   public removeFilter(filterId: string) {
@@ -35,7 +36,7 @@ export abstract class DataViewMode extends WithEvents {
   public abstract setSpatialFilter(spatialFilter: SpatialFilters): void;
 
   public onDataUpdate() {
-    this.emit('dataUpdate');
+    this.emit(DataViewEvent.DATA_UPDATE);
   }
 }
 

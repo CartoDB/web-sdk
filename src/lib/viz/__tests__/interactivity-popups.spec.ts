@@ -1,5 +1,5 @@
 import { Layer } from '../layer/Layer';
-import { InteractivityEventType, LayerInteractivity } from '../layer/LayerInteractivity';
+import { InteractivityEvent, LayerInteractivity } from '../layer/LayerInteractivity';
 import { Popup } from '../popups/Popup';
 
 const FAKE_COORDS = [0, 0];
@@ -64,14 +64,14 @@ describe('interaction popup', () => {
     it('should show a popup when a feature is clicked with default title', async () => {
       await layer.setPopupClick(DEFAULT_TITLE);
 
-      layer.emit(InteractivityEventType.CLICK, [[FEATURE], FAKE_COORDS]);
+      layer.emit(InteractivityEvent.CLICK, [[FEATURE], FAKE_COORDS]);
       expect(setContentMockClick).toHaveBeenCalledWith(`<p class="as-body">pop</p>
               <p class="as-subheader as-font--medium">10435000</p>`);
     });
     it('should show a popup when a feature is clicked with a custom title, no format and custom format function', async () => {
       await layer.setPopupClick(CUSTOM_PARAM);
 
-      layer.emit(InteractivityEventType.CLICK, [[FEATURE], FAKE_COORDS]);
+      layer.emit(InteractivityEvent.CLICK, [[FEATURE], FAKE_COORDS]);
       expect(setContentMockClick).toHaveBeenCalledWith(`<p class="as-body"></p>
               <p class="as-subheader as-font--medium">15</p><p class="as-body">Population D3</p>
               <p class="as-subheader as-font--medium">10435000</p><p class="as-body">Population Custom</p>
@@ -80,21 +80,21 @@ describe('interaction popup', () => {
     it('should do nothing if no parameter is provided', async () => {
       await layer.setPopupClick();
 
-      layer.emit(InteractivityEventType.CLICK, [[FEATURE], FAKE_COORDS]);
+      layer.emit(InteractivityEvent.CLICK, [[FEATURE], FAKE_COORDS]);
       expect(setContentMockClick).toHaveBeenCalledTimes(0);
     });
     it('should do nothing if the parameter provided is null', async () => {
       await layer.setPopupClick(null);
 
-      layer.emit(InteractivityEventType.CLICK, [[FEATURE], FAKE_COORDS]);
+      layer.emit(InteractivityEvent.CLICK, [[FEATURE], FAKE_COORDS]);
       expect(setContentMockClick).toHaveBeenCalledTimes(0);
     });
     it('should stop showing a popup with a custom title and format after call the method with no parameters', async () => {
       await layer.setPopupClick(CUSTOM_PARAM);
-      layer.emit(InteractivityEventType.CLICK, [[FEATURE], FAKE_COORDS]);
+      layer.emit(InteractivityEvent.CLICK, [[FEATURE], FAKE_COORDS]);
 
       await layer.setPopupClick();
-      layer.emit(InteractivityEventType.CLICK, [[FEATURE], FAKE_COORDS]);
+      layer.emit(InteractivityEvent.CLICK, [[FEATURE], FAKE_COORDS]);
 
       expect(setContentMockClick).toHaveBeenCalledWith(`<p class="as-body"></p>
               <p class="as-subheader as-font--medium">15</p><p class="as-body">Population D3</p>
@@ -104,10 +104,10 @@ describe('interaction popup', () => {
     });
     it('should stop showing a popup with a custom title and format after call the method with null', async () => {
       await layer.setPopupClick(CUSTOM_PARAM);
-      layer.emit(InteractivityEventType.CLICK, [[FEATURE], FAKE_COORDS]);
+      layer.emit(InteractivityEvent.CLICK, [[FEATURE], FAKE_COORDS]);
 
       await layer.setPopupClick(null);
-      layer.emit(InteractivityEventType.CLICK, [[FEATURE], FAKE_COORDS]);
+      layer.emit(InteractivityEvent.CLICK, [[FEATURE], FAKE_COORDS]);
 
       expect(setContentMockClick).toHaveBeenCalledWith(`<p class="as-body"></p>
               <p class="as-subheader as-font--medium">15</p><p class="as-body">Population D3</p>
@@ -120,14 +120,14 @@ describe('interaction popup', () => {
     it('should show a popup when a feature is hovered with default title', async () => {
       await layer.setPopupHover(DEFAULT_TITLE);
 
-      layer.emit(InteractivityEventType.HOVER, [[FEATURE], FAKE_COORDS]);
+      layer.emit(InteractivityEvent.HOVER, [[FEATURE], FAKE_COORDS]);
       expect(setContentMockHover).toHaveBeenCalledWith(`<p class="as-body">pop</p>
               <p class="as-subheader as-font--medium">10435000</p>`);
     });
     it('should show a popup when a feature is hovered with a custom title, D3 format and custom format function', async () => {
       await layer.setPopupHover(CUSTOM_PARAM);
 
-      layer.emit(InteractivityEventType.HOVER, [[FEATURE], FAKE_COORDS]);
+      layer.emit(InteractivityEvent.HOVER, [[FEATURE], FAKE_COORDS]);
       expect(setContentMockHover).toHaveBeenCalledWith(`<p class="as-body"></p>
               <p class="as-subheader as-font--medium">15</p><p class="as-body">Population D3</p>
               <p class="as-subheader as-font--medium">10435000</p><p class="as-body">Population Custom</p>
@@ -136,21 +136,21 @@ describe('interaction popup', () => {
     it('should do nothing if no parameter is provided', async () => {
       await layer.setPopupHover();
 
-      layer.emit(InteractivityEventType.HOVER, [[FEATURE], FAKE_COORDS]);
+      layer.emit(InteractivityEvent.HOVER, [[FEATURE], FAKE_COORDS]);
       expect(setContentMockHover).toHaveBeenCalledTimes(0);
     });
     it('should do nothing if the parameter provided is null', async () => {
       await layer.setPopupHover(null);
 
-      layer.emit(InteractivityEventType.HOVER, [[FEATURE], FAKE_COORDS]);
+      layer.emit(InteractivityEvent.HOVER, [[FEATURE], FAKE_COORDS]);
       expect(setContentMockHover).toHaveBeenCalledTimes(0);
     });
     it('should stop showing a popup with a custom title and format after call the method with no parameters', async () => {
       await layer.setPopupHover(CUSTOM_PARAM);
-      layer.emit(InteractivityEventType.HOVER, [[FEATURE], FAKE_COORDS]);
+      layer.emit(InteractivityEvent.HOVER, [[FEATURE], FAKE_COORDS]);
 
       await layer.setPopupHover();
-      layer.emit(InteractivityEventType.HOVER, [[FEATURE], FAKE_COORDS]);
+      layer.emit(InteractivityEvent.HOVER, [[FEATURE], FAKE_COORDS]);
 
       expect(setContentMockHover).toHaveBeenCalledWith(`<p class="as-body"></p>
               <p class="as-subheader as-font--medium">15</p><p class="as-body">Population D3</p>
@@ -160,10 +160,10 @@ describe('interaction popup', () => {
     });
     it('should stop showing a popup with a custom title and format after call the method with null', async () => {
       await layer.setPopupHover(CUSTOM_PARAM);
-      layer.emit(InteractivityEventType.HOVER, [[FEATURE], FAKE_COORDS]);
+      layer.emit(InteractivityEvent.HOVER, [[FEATURE], FAKE_COORDS]);
 
       await layer.setPopupHover(null);
-      layer.emit(InteractivityEventType.HOVER, [[FEATURE], FAKE_COORDS]);
+      layer.emit(InteractivityEvent.HOVER, [[FEATURE], FAKE_COORDS]);
 
       expect(setContentMockHover).toHaveBeenCalledWith(`<p class="as-body"></p>
               <p class="as-subheader as-font--medium">15</p><p class="as-body">Population D3</p>
