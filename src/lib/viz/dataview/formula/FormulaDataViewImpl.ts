@@ -24,11 +24,12 @@ export class FormulaDataViewImpl extends DataViewImpl<FormulaDataViewData> {
         }
       });
 
-      const aggregatedColumnName = `_cdb_${this.operation}__${this.column}`;
+      const aggregatedColumnName = this.getAggregationColumnName();
       const columnName = this.column;
 
       const anyFeature = features.length > 0;
       const containsAggregatedData = anyFeature ? aggregatedColumnName in features[0] : false;
+      this.containsAggregatedData = this.containsAggregatedData || containsAggregatedData;
 
       const values = containsAggregatedData
         ? features.map((feature: Record<string, unknown>) => ({
