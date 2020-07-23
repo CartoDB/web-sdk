@@ -1,4 +1,4 @@
-import { Layer, DATA_CHANGED_EVENT } from '../layer/Layer';
+import { Layer, LayerEvent } from '../layer/Layer';
 import { DataViewLocal } from './mode/DataViewLocal';
 import { CartoDataViewError, dataViewErrorTypes } from './DataViewError';
 import { DataViewEvent } from './utils';
@@ -37,7 +37,7 @@ describe('DataView', () => {
       const dataUpdateSpy = jest.fn();
       dataView.on(DataViewEvent.DATA_UPDATE, dataUpdateSpy);
 
-      layer.emit(DATA_CHANGED_EVENT);
+      layer.emit(LayerEvent.DATA_CHANGED);
 
       expect(dataUpdateSpy).toHaveBeenCalled();
     });

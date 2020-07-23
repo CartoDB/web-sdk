@@ -1,7 +1,7 @@
 import { MapsDataviews as DataviewsApi } from '@/maps/MapsDataviews';
 import { defaultCredentials } from '@/auth';
 import { Layer, Source, SQLSource, DatasetSource } from '@/viz';
-import { TILES_LOADED_EVENT } from '@/viz/layer/Layer';
+import { LayerEvent } from '@/viz/layer/Layer';
 import { Filter, SpatialFilters, ColumnFilters } from '@/viz/filters/types';
 import { FiltersCollection } from '@/viz/filters/FiltersCollection';
 import { RemoteFilterApplicator } from '@/viz/filters/RemoteFilterApplicator';
@@ -73,7 +73,7 @@ export class DataViewRemote extends DataViewMode {
       );
     }
 
-    this.dataOrigin.on(TILES_LOADED_EVENT, () => {
+    this.dataOrigin.on(LayerEvent.TILES_LOADED, () => {
       const deckInstance = (this.dataOrigin as Layer).getMapInstance();
       const viewport = deckInstance.getViewports(undefined)[0];
 

@@ -23,9 +23,11 @@ import { FunctionFilterApplicator } from '../filters/FunctionFilterApplicator';
 import { ColumnFilters } from '../filters/types';
 import { basicStyle } from '../style/helpers/basic-style';
 
-export const DATA_READY_EVENT = 'dataReady';
-export const DATA_CHANGED_EVENT = 'dataChanged';
-export const TILES_LOADED_EVENT = 'tilesLoaded';
+export enum LayerEvent {
+  DATA_READY = 'dataReady',
+  DATA_CHANGED = 'dataChanged',
+  TILES_LOADED = 'tilesLoaded'
+}
 
 enum DATA_STATES {
   STARTING,
@@ -71,9 +73,9 @@ export class Layer extends WithEvents implements StyledLayer {
     this._style = buildStyle(style);
 
     this.registerAvailableEvents([
-      DATA_READY_EVENT,
-      DATA_CHANGED_EVENT,
-      TILES_LOADED_EVENT,
+      LayerEvent.DATA_READY,
+      LayerEvent.DATA_CHANGED,
+      LayerEvent.TILES_LOADED,
       'filterChange',
       InteractivityEvent.CLICK.toString(),
       InteractivityEvent.HOVER.toString()
@@ -539,18 +541,18 @@ export class Layer extends WithEvents implements StyledLayer {
       this.dataState === DATA_STATES.STARTING &&
       (isGeoJsonLayer || referer === 'onViewportLoad')
     ) {
-      this.emit(DATA_READY_EVENT);
-      this.emit(DATA_CHANGED_EVENT);
+      this.emit(LayerEvent.DATA_READY);
+      this.emit(LayerEvent.DATA_CHANGED);
       this.dataState = DATA_STATES.READY;
     }
 
     if (this.dataState === DATA_STATES.UPDATING || referer === 'onViewportLoad') {
-      this.emit(DATA_CHANGED_EVENT);
+      this.emit(LayerEvent.DATA_CHANGED);
       this.dataState = DATA_STATES.READY;
     }
 
     if (referer === 'onViewportLoad') {
-      this.emit(TILES_LOADED_EVENT);
+      this.emit(LayerEvent.TILES_LOADED);
     }
   }
 }

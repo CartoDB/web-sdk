@@ -1,5 +1,5 @@
 import { Layer } from '@/viz';
-import { DATA_CHANGED_EVENT } from '@/viz/layer/Layer';
+import { LayerEvent } from '@/viz/layer/Layer';
 import { AggregationType, aggregateValues } from '@/data/operations/aggregation';
 import { groupValuesByColumn } from '@/data/operations/grouping';
 import { castToNumberOrUndefined } from '@/core/utils/number';
@@ -78,7 +78,7 @@ export class DataViewLocal extends DataViewMode {
     this.registerAvailableEvents([DataViewEvent.DATA_UPDATE, DataViewEvent.ERROR]);
 
     if (this.dataOrigin instanceof Layer) {
-      this.dataOrigin.on(DATA_CHANGED_EVENT, () => {
+      this.dataOrigin.on(LayerEvent.DATA_CHANGED, () => {
         this.onDataUpdate();
       });
     }
