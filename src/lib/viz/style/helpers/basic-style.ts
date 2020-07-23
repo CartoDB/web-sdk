@@ -9,6 +9,9 @@ export function basicStyle(options: Partial<BasicOptionsStyle> = {}) {
   };
 
   const evalFNLegend = (layer: StyledLayer, properties = {}): LegendProperties[] => {
+    // TODO getMetadata throws an exception if source is empty. It could happen
+    // if the user calls getLegendData layer method before ready event has been sent
+
     const meta = layer.source.getMetadata();
 
     if (!meta.geometryType) {
