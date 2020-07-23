@@ -43,7 +43,7 @@
               <as-legend
                 heading="Basic legend"
                 description="A simple legend for a Layer">
-                <as-legend-category id="legend" slot="legends" orientation="horizontal"></as-legend-category>
+                <as-legend-color-category-polygon id="legend" slot="legends" orientation="horizontal"></as-legend-color-category-polygon>
               </as-legend>
             </div>
           </div>
@@ -96,9 +96,7 @@
         const airbnbLayer = new carto.viz.Layer('ne_50m_admin_1_states_1', basicStyle);
         airbnbLayer.addTo(deckMap);
 
-        // setTimeout(function () {
-          new carto.viz.Legend('#legend', airbnbLayer);
-        // }, 5000);
+        new carto.viz.Legend('#legend', airbnbLayer, { label: 'ne_50m_admin_1_states_1' });
 
       }
 

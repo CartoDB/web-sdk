@@ -7,7 +7,7 @@ export type StyleProperties =
   | GeoJsonLayerProps<any>
   | ((layerStyle: StyledLayer) => GeoJsonLayerProps<any>);
 
-type LegendPropertiesFunction = (layerStyle: StyledLayer) => LegendProperties[];
+type LegendPropertiesFunction = (layerStyle: StyledLayer, options: any) => LegendProperties[];
 
 export class Style {
   private _styleProperties: StyleProperties;
@@ -43,9 +43,9 @@ export class Style {
     return this._field;
   }
 
-  public getLegendProps(layerStyle: StyledLayer) {
+  public getLegendProps(layerStyle: StyledLayer, options = {}) {
     if (this._legendProperties) {
-      return this._legendProperties(layerStyle);
+      return this._legendProperties(layerStyle, options);
     }
 
     return undefined;
