@@ -4,6 +4,7 @@ import { AggregationType, aggregateValues } from '@/data/operations/aggregation'
 import { groupValuesByColumn } from '@/data/operations/grouping';
 import { castToNumberOrUndefined } from '@/core/utils/number';
 import { ColumnFilters, SpatialFilters } from '@/viz/filters/types';
+import { GenericDataSourceEvent } from '@/viz/utils';
 import { DataViewMode } from './DataViewMode';
 import { GetDataOptions } from '../DataViewImpl';
 import { DataViewEvent } from '../utils';
@@ -83,7 +84,7 @@ export class DataViewLocal extends DataViewMode {
       });
     }
 
-    this.dataOrigin.on('filterChange', () => {
+    this.dataOrigin.on(GenericDataSourceEvent.FILTER_CHANGE, () => {
       this.onDataUpdate();
     });
   }

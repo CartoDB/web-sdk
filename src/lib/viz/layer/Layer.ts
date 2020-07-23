@@ -26,7 +26,8 @@ import { basicStyle } from '../style/helpers/basic-style';
 export enum LayerEvent {
   DATA_READY = 'dataReady',
   DATA_CHANGED = 'dataChanged',
-  TILES_LOADED = 'tilesLoaded'
+  TILES_LOADED = 'tilesLoaded',
+  FILTER_CHANGE = 'filterChange' // must be the same value as GenericDataSourceEvent.FILTER_CHANGE
 }
 
 enum DATA_STATES {
@@ -76,7 +77,7 @@ export class Layer extends WithEvents implements StyledLayer {
       LayerEvent.DATA_READY,
       LayerEvent.DATA_CHANGED,
       LayerEvent.TILES_LOADED,
-      'filterChange',
+      LayerEvent.FILTER_CHANGE,
       InteractivityEvent.CLICK.toString(),
       InteractivityEvent.HOVER.toString()
     ]);
@@ -462,7 +463,7 @@ export class Layer extends WithEvents implements StyledLayer {
 
   addFilter(filterId: string, filter: ColumnFilters) {
     this.filtersCollection.addFilter(filterId, filter);
-    this.emit('filterChange');
+    this.emit(LayerEvent.FILTER_CHANGE);
 
     if (this._deckLayer) {
       return this.replaceDeckGLLayer();
@@ -473,7 +474,7 @@ export class Layer extends WithEvents implements StyledLayer {
 
   removeFilter(filterId: string) {
     this.filtersCollection.removeFilter(filterId);
-    this.emit('filterChange');
+    this.emit(LayerEvent.FILTER_CHANGE);
 
     if (this._deckLayer) {
       return this.replaceDeckGLLayer();
@@ -485,7 +486,7 @@ export class Layer extends WithEvents implements StyledLayer {
   public setFilters(filters: ColumnFilters) {
     this.filtersCollection.clear();
     this.filtersCollection.addFilter(uuidv4(), filters);
-    this.emit('filterChange');
+    this.emit(LayerEvent.FILTER_CHANGE);
 
     if (this._deckLayer) {
       return this.replaceDeckGLLayer();

@@ -8,7 +8,8 @@ import {
   SourceMetadata,
   NumericFieldStats,
   CategoryFieldStats,
-  GeometryType
+  GeometryType,
+  SourceEvent
 } from './Source';
 import { parseGeometryType } from '../style/helpers/utils';
 import { sourceErrorTypes, SourceError } from '../errors/source-error';
@@ -230,12 +231,12 @@ export class SQLSource extends Source {
 
   addFilter(filterId: string, filter: ColumnFilters) {
     this.columnFiltersCollection.addFilter(filterId, filter);
-    this.emit('filterChange');
+    this.emit(SourceEvent.FILTER_CHANGE);
   }
 
   removeFilter(filterId: string) {
     this.columnFiltersCollection.removeFilter(filterId);
-    this.emit('filterChange');
+    this.emit(SourceEvent.FILTER_CHANGE);
   }
 
   private extractMetadataFrom(mapInstance: MapInstance) {

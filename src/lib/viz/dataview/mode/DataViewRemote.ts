@@ -6,6 +6,7 @@ import { Filter, SpatialFilters, ColumnFilters } from '@/viz/filters/types';
 import { FiltersCollection } from '@/viz/filters/FiltersCollection';
 import { RemoteFilterApplicator } from '@/viz/filters/RemoteFilterApplicator';
 import { uuidv4 } from '@/core/utils/uuid';
+import { SourceEvent } from '@/viz/source/Source';
 import { DataViewMode } from './DataViewMode';
 import { CartoDataViewError, dataViewErrorTypes } from '../DataViewError';
 import { GetDataOptions } from '../DataViewImpl';
@@ -32,7 +33,7 @@ export class DataViewRemote extends DataViewMode {
   private bindEvents() {
     this.registerAvailableEvents([DataViewEvent.DATA_UPDATE, DataViewEvent.ERROR]);
 
-    this._remoteSource.on('filterChange', () => {
+    this._remoteSource.on(SourceEvent.FILTER_CHANGE, () => {
       this.onDataUpdate();
     });
   }
