@@ -78,8 +78,8 @@ export class Layer extends WithEvents implements StyledLayer {
       LayerEvent.DATA_CHANGED,
       LayerEvent.TILES_LOADED,
       LayerEvent.FILTER_CHANGE,
-      InteractivityEvent.CLICK.toString(),
-      InteractivityEvent.HOVER.toString()
+      InteractivityEvent.CLICK,
+      InteractivityEvent.HOVER
     ]);
 
     this._options = {
