@@ -11,6 +11,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 
 ### Fixed
 - Fix `dataReady` event in `carto.viz.Layer` ([#99](https://github.com/CartoDB/web-sdk/pull/99/))
+- Fix GeoJSON use on `carto.viz.dataview` and `dataUpdate` event with a `Source` instance ([#97](https://github.com/CartoDB/web-sdk/pull/97/))
 
 
 ## [1.0.0-alpha.1] 2020-07-17
