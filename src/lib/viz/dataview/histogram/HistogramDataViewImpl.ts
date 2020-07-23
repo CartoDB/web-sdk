@@ -25,19 +25,21 @@ export class HistogramDataViewImpl extends DataViewImpl<HistogramDataViewData> {
     const dataviewLocal = this.dataView as DataViewLocal;
     const { bins = 10, start, end } = this.options;
 
-    const aggregatedColumnName = `_cdb_${this.operation}__${this.column}`;
+    const aggregatedColumnName = this.getAggregationColumnName();
     const columnName = this.column;
 
     try {
       const features = (await dataviewLocal.getSourceData(options)) as Record<string, number>[];
-      const sortedFeatures = features.map(feature => feature[this.column]).sort((a, b) => a - b);
+      const sortedFeatures = features
+        .map(feature => feature[aggregatedColumnName] || feature[columnName])
+        .sort((a, b) => a - b);
 
       const startValue = start ?? Math.min(...sortedFeatures);
       const endValue = end ?? Math.max(...sortedFeatures);
       let nulls = 0;
 
       const binsDistance = (endValue - startValue) / bins;
-      const binsNumber = Array(bins)
+      const binsContainer = Array(bins)
         .fill(bins)
         .map((_, currentIndex) => ({
           bin: currentIndex,
@@ -48,7 +50,7 @@ export class HistogramDataViewImpl extends DataViewImpl<HistogramDataViewData> {
         }));
 
       features.forEach(feature => {
-        const { featureValue, clusterCount } = getFeatureValue(
+        const { featureValue, clusterCount, containsAggregatedData } = getFeatureValue(
           feature,
           aggregatedColumnName,
           columnName
@@ -59,7 +61,7 @@ export class HistogramDataViewImpl extends DataViewImpl<HistogramDataViewData> {
           return;
         }
 
-        const binContainer = binsNumber.find(
+        const binContainer = binsContainer.find(
           bin => bin.start <= featureValue && bin.end > featureValue
         );
 
@@ -69,9 +71,10 @@ export class HistogramDataViewImpl extends DataViewImpl<HistogramDataViewData> {
 
         binContainer.value += clusterCount || 1;
         binContainer.values.push(featureValue);
+        this.containsAggregatedData = this.containsAggregatedData || containsAggregatedData;
       });
 
-      const transformedBins = binsNumber.map(binContainer => {
+      const transformedBins = binsContainer.map(binContainer => {
         return {
           bin: binContainer.bin,
           start: binContainer.start,

@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+### Added
+- Aggregated data filtering in widgets ([#96](https://github.com/CartoDB/web-sdk/pull/96))
+
 
 ## [1.0.0-alpha.1] 2020-07-17
 
