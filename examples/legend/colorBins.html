@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Color bins</title>
+
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.css"
+    />
+
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://libs.cartocdn.com/airship-style/v2.4/airship.min.css"
+    />
+
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+      }
+
+      #map {
+        width: 100vw;
+        height: 100vh;
+      }
+    </style>
+  </head>
+
+  <body class="as-app-body as-app">
+    <div class="as-content">
+      <main class="as-main">
+        <div class="as-map-area">
+          <!-- map -->
+          <div id="map"></div>
+
+          <!-- panel -->
+          <div class="as-map-panels">
+            <div class="as-panel as-panel--top as-panel--left">
+              <as-legend
+                heading="Color bins legend"
+                description="Number of available days for airbnb apartments">
+                <as-legend-color-bins id="legend" slot="legends" orientation="horizontal"></as-legend-color-bins>
+              </as-legend>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.js"></script>
+    <script src="https://libs.cartocdn.com/airship-components/v2.4/airship.js"></script>
+    <script src="https://unpkg.com/deck.gl@8.2.0/dist.min.js"></script>
+    <script src="/dist/umd/index.min.js"></script>
+
+    <script>
+      function initialize() {
+        carto.auth.setDefaultCredentials({ username: 'public' });
+
+        const deckMap = carto.viz.createMap({
+          basemap: 'voyager',
+          view: {
+            longitude: -3.7003859,
+            latitude: 40.4153265,
+            zoom: 12
+          }
+        });
+
+        /*
+          Number of bins and palette are selected by default, but of course they can be further configured.
+        */
+        const availabilityStyle = carto.viz.style.colorBins('availability_365');
+        /*
+          previous would be equivalent to
+            carto.viz.style.colorBins('availability_365', {
+              bins: 5,
+              method: 'quantiles', // automatically calculated from layer's data
+              palette: 'purpor' // See CARTO Colors at https://carto.com/carto-colors/
+            });
+        */
+        const airbnbLayer = new carto.viz.Layer('listings_madrid', availabilityStyle);
+        airbnbLayer.addTo(deckMap);
+        new carto.viz.Legend('#legend', airbnbLayer, {type: 'polygon'});
+      }
+
+      initialize();
+    </script>
+  </body>
+</html>
