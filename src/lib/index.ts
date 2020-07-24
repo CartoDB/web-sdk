@@ -35,7 +35,7 @@ import { CategoryDataView, FormulaDataView, HistogramDataView } from './viz/data
 import { CategoryWidget, FormulaWidget, HistogramWidget } from './viz/widget';
 
 // Legend
-import { Legend } from './viz/legend';
+import { LegendWidget as Legend } from './viz/legend';
 
 /*
  * --- Public API ---

@@ -14,7 +14,7 @@ export type LegendProperties = {
   width?: number;
 };
 
-export class Legend {
+export class LegendWidget {
   constructor(element: string | HTMLElement, layer: Layer, options = {}) {
     const domElement = queryDOMElement(element);
     validateParameters(domElement, layer, options);
