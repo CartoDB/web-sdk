@@ -1,11 +1,13 @@
 import { Layer } from '@/viz';
-import { DATA_CHANGED_EVENT } from '@/viz/layer/Layer';
+import { LayerEvent } from '@/viz/layer/Layer';
 import { AggregationType, aggregateValues } from '@/data/operations/aggregation';
 import { groupValuesByColumn } from '@/data/operations/grouping';
 import { castToNumberOrUndefined } from '@/core/utils/number';
 import { ColumnFilters, SpatialFilters } from '@/viz/filters/types';
+import { GenericDataSourceEvent } from '@/viz/utils';
 import { DataViewMode } from './DataViewMode';
 import { GetDataOptions } from '../DataViewImpl';
+import { DataViewEvent } from '../utils';
 
 export class DataViewLocal extends DataViewMode {
   private useViewport = false;
@@ -74,13 +76,15 @@ export class DataViewLocal extends DataViewMode {
   }
 
   private bindEvents() {
-    this.registerAvailableEvents(['dataUpdate', 'error']);
+    this.registerAvailableEvents([DataViewEvent.DATA_UPDATE, DataViewEvent.ERROR]);
 
-    this.dataOrigin.on(DATA_CHANGED_EVENT, () => {
-      this.onDataUpdate();
-    });
+    if (this.dataOrigin instanceof Layer) {
+      this.dataOrigin.on(LayerEvent.DATA_CHANGED, () => {
+        this.onDataUpdate();
+      });
+    }
 
-    this.dataOrigin.on('filterChange', () => {
+    this.dataOrigin.on(GenericDataSourceEvent.FILTER_CHANGE, () => {
       this.onDataUpdate();
     });
   }

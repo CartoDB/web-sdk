@@ -41,14 +41,14 @@ export class LayerInteractivity {
     this._layerOffFn = options.layerOffFn;
 
     if (this._clickStyle) {
-      this._layerOnFn(InteractivityEventType.CLICK, () => {
+      this._layerOnFn(InteractivityEvent.CLICK, () => {
         const interactiveStyle = this._wrapInteractiveStyle();
         this._layerSetStyleFn(interactiveStyle);
       });
     }
 
     if (this._hoverStyle) {
-      this._layerOnFn(InteractivityEventType.HOVER, () => {
+      this._layerOnFn(InteractivityEvent.HOVER, () => {
         const interactiveStyle = this._wrapInteractiveStyle();
         this._layerSetStyleFn(interactiveStyle);
       });
@@ -58,14 +58,14 @@ export class LayerInteractivity {
   }
 
   public onClick(info: any, event: HammerInput) {
-    this.fireOnEvent(InteractivityEventType.CLICK, info, event);
+    this.fireOnEvent(InteractivityEvent.CLICK, info, event);
   }
 
   public onHover(info: any, event: HammerInput) {
-    this.fireOnEvent(InteractivityEventType.HOVER, info, event);
+    this.fireOnEvent(InteractivityEvent.HOVER, info, event);
   }
 
-  public fireOnEvent(eventType: InteractivityEventType, info: any, event: HammerInput) {
+  public fireOnEvent(eventType: InteractivityEvent, info: any, event: HammerInput) {
     const features = [];
     const { coordinate, object } = info;
 
@@ -73,9 +73,9 @@ export class LayerInteractivity {
       features.push(object);
     }
 
-    if (eventType === InteractivityEventType.CLICK) {
+    if (eventType === InteractivityEvent.CLICK) {
       this._clickFeature = object;
-    } else if (eventType === InteractivityEventType.HOVER) {
+    } else if (eventType === InteractivityEvent.HOVER) {
       this._hoverFeature = object;
       this._setStyleCursor(info);
     }
@@ -115,7 +115,7 @@ export class LayerInteractivity {
       }
     }
 
-    await this._popupHandler(InteractivityEventType.CLICK, this._clickPopup, elements);
+    await this._popupHandler(InteractivityEvent.CLICK, this._clickPopup, elements);
   }
 
   public async setPopupHover(elements: PopupElement[] | string[] | null = []) {
@@ -128,17 +128,17 @@ export class LayerInteractivity {
       }
     }
 
-    await this._popupHandler(InteractivityEventType.HOVER, this._hoverPopup, elements);
+    await this._popupHandler(InteractivityEvent.HOVER, this._hoverPopup, elements);
   }
 
   private async _popupHandler(
-    eventType: InteractivityEventType,
+    eventType: InteractivityEvent,
     popup: Popup,
     elements: PopupElement[] | string[] | null = []
   ) {
     let handlerFn;
 
-    if (eventType === InteractivityEventType.CLICK) {
+    if (eventType === InteractivityEvent.CLICK) {
       if (!this._clickPopupHandler) {
         this._clickPopupHandler = popup.createHandler(elements);
       }
@@ -333,14 +333,14 @@ export interface LayerInteractivityOptions {
   clickStyle?: Style | string;
 }
 
-export enum InteractivityEventType {
+export enum InteractivityEvent {
   HOVER = 'hover',
   CLICK = 'click'
 }
 
 export type InteractionHandler = (eventResult: EventResult) => void;
 
-type EventHandler = (type: InteractivityEventType, handler: InteractionHandler) => void;
+type EventHandler = (type: InteractivityEvent, handler: InteractionHandler) => void;
 
 type EventResult = [Record<string, any>[], number[], HammerInput];
 

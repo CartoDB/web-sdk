@@ -1,14 +1,16 @@
 import { MapsDataviews as DataviewsApi } from '@/maps/MapsDataviews';
 import { defaultCredentials } from '@/auth';
 import { Layer, Source, SQLSource, DatasetSource } from '@/viz';
-import { TILES_LOADED_EVENT } from '@/viz/layer/Layer';
+import { LayerEvent } from '@/viz/layer/Layer';
 import { Filter, SpatialFilters, ColumnFilters } from '@/viz/filters/types';
 import { FiltersCollection } from '@/viz/filters/FiltersCollection';
 import { RemoteFilterApplicator } from '@/viz/filters/RemoteFilterApplicator';
 import { uuidv4 } from '@/core/utils/uuid';
+import { SourceEvent } from '@/viz/source/Source';
 import { DataViewMode } from './DataViewMode';
 import { CartoDataViewError, dataViewErrorTypes } from '../DataViewError';
 import { GetDataOptions } from '../DataViewImpl';
+import { DataViewEvent } from '../utils';
 
 export class DataViewRemote extends DataViewMode {
   private _dataviewsApi: DataviewsApi;
@@ -29,9 +31,9 @@ export class DataViewRemote extends DataViewMode {
   }
 
   private bindEvents() {
-    this.registerAvailableEvents(['dataUpdate', 'error']);
+    this.registerAvailableEvents([DataViewEvent.DATA_UPDATE, DataViewEvent.ERROR]);
 
-    this._remoteSource.on('filterChange', () => {
+    this._remoteSource.on(SourceEvent.FILTER_CHANGE, () => {
       this.onDataUpdate();
     });
   }
@@ -72,7 +74,7 @@ export class DataViewRemote extends DataViewMode {
       );
     }
 
-    this.dataOrigin.on(TILES_LOADED_EVENT, () => {
+    this.dataOrigin.on(LayerEvent.TILES_LOADED, () => {
       const deckInstance = (this.dataOrigin as Layer).getMapInstance();
       const viewport = deckInstance.getViewports(undefined)[0];
 
@@ -83,7 +85,7 @@ export class DataViewRemote extends DataViewMode {
         const bbox = [nw[0], se[1], se[0], nw[1]];
         this.filtersCollection.removeFilter(filterId);
         this.filtersCollection.addFilter(filterId, { bbox });
-        this.emit('dataUpdate');
+        this.emit(DataViewEvent.DATA_UPDATE);
       }
     });
   }

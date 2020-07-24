@@ -1,6 +1,7 @@
-import { Layer, DATA_CHANGED_EVENT } from '../layer/Layer';
+import { Layer, LayerEvent } from '../layer/Layer';
 import { DataViewLocal } from './mode/DataViewLocal';
 import { CartoDataViewError, dataViewErrorTypes } from './DataViewError';
+import { DataViewEvent } from './utils';
 
 describe('DataView', () => {
   describe('Instance Creation', () => {
@@ -29,14 +30,14 @@ describe('DataView', () => {
 
   describe('Events', () => {
     // TODO skip event test, until we figure out a way to manage mitt with ts-jest
-    it.skip('dataUpdate', () => {
+    it.skip('data update', () => {
       const layer = new Layer('fake_source');
       const dataView = new DataViewLocal(layer, 'popEst');
 
       const dataUpdateSpy = jest.fn();
-      dataView.on('dataUpdate', dataUpdateSpy);
+      dataView.on(DataViewEvent.DATA_UPDATE, dataUpdateSpy);
 
-      layer.emit(DATA_CHANGED_EVENT);
+      layer.emit(LayerEvent.DATA_CHANGED);
 
       expect(dataUpdateSpy).toHaveBeenCalled();
     });

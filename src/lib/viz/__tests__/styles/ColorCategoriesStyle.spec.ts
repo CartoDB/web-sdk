@@ -127,6 +127,36 @@ describe('ColorCategoriesStyle', () => {
         expect(error).toBeInstanceOf(CartoStylingError);
       }
     });
+
+    it('If geometryType is Polygon and property is strokeColor getLineColor should be a function', () => {
+      const style = colorCategoriesStyle(FIELD_NAME, {
+        property: 'strokeColor'
+      });
+      const styleLayerPoint = { ...styledLayer };
+      styleLayerPoint.source.getMetadata = jest.fn().mockImplementation(() => {
+        return {
+          geometryType: 'Polygon',
+          stats: [
+            {
+              name: FIELD_NAME,
+              categories: mapStats.columns[FIELD_NAME].categories
+            }
+          ]
+        };
+      });
+      const response = style.getLayerProps(styledLayer);
+      expect(response).toHaveProperty('getLineColor');
+      expect(response.getLineColor).toBeInstanceOf(Function);
+    });
+
+    it('If geometryType is Point and property is strokeColor getLineColor should be a function', () => {
+      const style = colorCategoriesStyle(FIELD_NAME, {
+        property: 'strokeColor'
+      });
+      const response = style.getLayerProps(styledLayer);
+      expect(response).toHaveProperty('getLineColor');
+      expect(response.getLineColor).toBeInstanceOf(Function);
+    });
   });
 
   describe('Data validation', () => {

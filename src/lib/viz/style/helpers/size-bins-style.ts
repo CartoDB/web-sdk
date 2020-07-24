@@ -5,7 +5,7 @@ import { CartoStylingError, stylingErrorTypes } from '../../errors/styling-error
 import { StyledLayer } from '../layer-style';
 import { Style, BasicOptionsStyle, getStyles, getStyleValue } from '..';
 import { sizeRangeValidation } from '../validators';
-import { SizeProperties, isSizeProperty } from './properties-by-helper';
+import { SizeProperty, isSizeProperty } from './properties-by-helper';
 
 export interface SizeBinsOptionsStyle extends Partial<BasicOptionsStyle> {
   // Number of size classes (bins) for map. Default is 5.
@@ -19,7 +19,7 @@ export interface SizeBinsOptionsStyle extends Partial<BasicOptionsStyle> {
   // Size applied to features which the attribute value is null. Default 0
   nullSize: number;
   // Styling property.
-  property?: SizeProperties;
+  property?: SizeProperty;
 }
 
 function defaultOptions(

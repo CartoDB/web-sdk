@@ -1,11 +1,11 @@
 const stringLitArray = <L extends string>(arr: L[]) => arr;
 
-const colorsProperties = stringLitArray(['color', 'strokeColor']);
-type ColorsProperties = typeof colorsProperties[number];
-const isColorProperty = (x: any): x is ColorsProperties => colorsProperties.includes(x);
+const ColorProperty = stringLitArray(['color', 'strokeColor']);
+type ColorProperty = typeof ColorProperty[number];
+const isColorProperty = (x: any): x is ColorProperty => ColorProperty.includes(x);
 
-const sizeProperties = stringLitArray(['size', 'strokeWidth']);
-type SizeProperties = typeof sizeProperties[number];
-const isSizeProperty = (x: any): x is SizeProperties => sizeProperties.includes(x);
+const SizeProperty = stringLitArray(['size', 'strokeWidth']);
+type SizeProperty = typeof SizeProperty[number];
+const isSizeProperty = (x: any): x is SizeProperty => SizeProperty.includes(x);
 
-export { ColorsProperties, SizeProperties, isColorProperty, isSizeProperty };
+export { ColorProperty, SizeProperty, isColorProperty, isSizeProperty };

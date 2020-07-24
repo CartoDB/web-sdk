@@ -4,7 +4,7 @@ import { Style, getStyleValue, BasicOptionsStyle, getStyles } from '..';
 import { CartoStylingError, stylingErrorTypes } from '../../errors/styling-error';
 import { StyledLayer } from '../layer-style';
 import { sizeRangeValidation } from '../validators';
-import { SizeProperties, isSizeProperty } from './properties-by-helper';
+import { SizeProperty, isSizeProperty } from './properties-by-helper';
 
 export interface SizeCategoriesOptionsStyle extends Partial<BasicOptionsStyle> {
   // Number of categories. Default is 11. Values can range from 1 to 16.
@@ -16,7 +16,7 @@ export interface SizeCategoriesOptionsStyle extends Partial<BasicOptionsStyle> {
   // Size for null values
   nullSize: number;
   // Styling property.
-  property?: SizeProperties;
+  property?: SizeProperty;
 }
 
 function defaultOptions(
@@ -123,7 +123,7 @@ function calculateWithCategories(
         radiusUnits: 'pixels'
       };
     } else if (options.property === 'strokeWidth') {
-      obj = { getLineWidth: getSizeValue };
+      obj = { getLineWidth: getSizeValue, lineWidthUnits: 'pixels' };
     }
   } else {
     obj = {
