@@ -556,6 +556,10 @@ export class Layer extends WithEvents implements StyledLayer {
       this.emit(LayerEvent.TILES_LOADED);
     }
   }
+
+  public isReady() {
+    return this.dataState !== DATA_STATES.STARTING;
+  }
 }
 
 /**
