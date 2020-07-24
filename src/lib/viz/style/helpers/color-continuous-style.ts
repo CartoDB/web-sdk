@@ -5,7 +5,7 @@ import { StyledLayer } from '../layer-style';
 import { BasicOptionsStyle, getStyleValue, getStyles, Style } from '..';
 import { CartoStylingError, stylingErrorTypes } from '../../errors/styling-error';
 import { colorValidation } from '../validators';
-import { ColorsProperties, isColorProperty } from './properties-by-helper';
+import { ColorProperty, isColorProperty } from './properties-by-helper';
 
 const DEFAULT_PALETTE = 'BluYl';
 
@@ -19,7 +19,7 @@ export interface ColorContinuousOptionsStyle extends Partial<BasicOptionsStyle> 
   // Color applied to features which the attribute value is null.
   nullColor: string;
   // Styling property.
-  property?: ColorsProperties;
+  property?: ColorProperty;
 }
 
 function defaultOptions(

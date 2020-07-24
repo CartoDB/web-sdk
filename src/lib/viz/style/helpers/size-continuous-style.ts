@@ -4,7 +4,7 @@ import { range } from './math-utils';
 import { CartoStylingError, stylingErrorTypes } from '../../errors/styling-error';
 import { Style, BasicOptionsStyle, getStyles, getStyleValue } from '../index';
 import { sizeRangeValidation } from '../validators';
-import { SizeProperties, isSizeProperty } from './properties-by-helper';
+import { SizeProperty, isSizeProperty } from './properties-by-helper';
 
 export interface SizeContinuousOptionsStyle extends Partial<BasicOptionsStyle> {
   // The minimum value of the data range for the size ramp. Defaults to the globalMIN of the dataset.
@@ -16,7 +16,7 @@ export interface SizeContinuousOptionsStyle extends Partial<BasicOptionsStyle> {
   // Size applied to features which the attribute value is null. Default 0
   nullSize: number;
   // Styling property.
-  property?: SizeProperties;
+  property?: SizeProperty;
 }
 
 function defaultOptions(

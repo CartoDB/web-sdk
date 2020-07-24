@@ -5,7 +5,7 @@ import { CartoStylingError, stylingErrorTypes } from '../../errors/styling-error
 import { StyledLayer } from '../layer-style';
 import { getStyleValue, getStyles, BasicOptionsStyle, Style } from '..';
 import { colorValidation } from '../validators';
-import { ColorsProperties, isColorProperty } from './properties-by-helper';
+import { ColorProperty, isColorProperty } from './properties-by-helper';
 
 export const DEFAULT_PALETTE = 'bold';
 
@@ -21,7 +21,7 @@ export interface ColorCategoriesOptionsStyle extends Partial<BasicOptionsStyle> 
   // Color applied to features which the attribute value is not in the breaks.
   othersColor: string;
   // Styling property.
-  property?: ColorsProperties;
+  property?: ColorProperty;
 }
 
 function defaultOptions(
