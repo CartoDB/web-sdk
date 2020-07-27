@@ -100,8 +100,8 @@ describe('Layer', () => {
 
         await layer1.replaceDeckGLLayer();
         expect(deckInstanceMock.props.layers.length).toBe(2);
-        expect(deckInstanceMock.props.layers[0].id).toBe('layer2');
-        expect(deckInstanceMock.props.layers[1].id).toBe('layer1');
+        expect(deckInstanceMock.props.layers[0].id).toBe('layer1');
+        expect(deckInstanceMock.props.layers[1].id).toBe('layer2');
       });
 
       it('should allow adding after a layer', async () => {
@@ -116,9 +116,9 @@ describe('Layer', () => {
 
         await layer1.replaceDeckGLLayer();
         expect(deckInstanceMock.props.layers.length).toBe(3);
-        expect(deckInstanceMock.props.layers[0].id).toBe('layer2');
+        expect(deckInstanceMock.props.layers[0].id).toBe('layer1');
         expect(deckInstanceMock.props.layers[1].id).toBe('layer3');
-        expect(deckInstanceMock.props.layers[2].id).toBe('layer1');
+        expect(deckInstanceMock.props.layers[2].id).toBe('layer2');
       });
     });
   });
