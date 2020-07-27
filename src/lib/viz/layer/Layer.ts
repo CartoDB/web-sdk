@@ -557,6 +557,10 @@ export class Layer extends WithEvents implements StyledLayer {
     }
   }
 
+  /**
+   * @public
+   * This method returns true if the source layer is ready
+   */
   public isReady() {
     return this.dataState !== DATA_STATES.STARTING;
   }
