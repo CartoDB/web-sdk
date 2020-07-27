@@ -627,9 +627,9 @@ function addInTheRightPosition(deckglLayer: any, layers: any[], opts: LayerPosit
 
     if (beforeAfterLayerIdx !== -1) {
       if (beforeLayerId) {
-        layers.splice(beforeAfterLayerIdx, 0, deckglLayer);
-      } else if (afterLayerId) {
         layers.splice(beforeAfterLayerIdx + 1, 0, deckglLayer);
+      } else if (afterLayerId) {
+        layers.splice(beforeAfterLayerIdx, 0, deckglLayer);
       }
     } else {
       layers.push(deckglLayer);
