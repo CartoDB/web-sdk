@@ -623,7 +623,7 @@ function addInTheRightPosition(deckglLayer: any, layers: any[], opts: LayerPosit
   }
 
   if (beforeLayerId || afterLayerId) {
-    const beforeAfterLayerIdx = layers.findIndex(l => l.id === beforeLayerId || afterLayerId);
+    const beforeAfterLayerIdx = layers.findIndex(l => l.id === (beforeLayerId || afterLayerId));
 
     if (beforeAfterLayerIdx !== -1) {
       if (beforeLayerId) {
