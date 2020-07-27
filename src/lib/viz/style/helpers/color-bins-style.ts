@@ -81,17 +81,18 @@ export function colorBinsStyle(
     const opts = defaultOptions(meta.geometryType, options);
     const breaks = getBreaks(opts, meta, featureProperty);
     const stats = meta.stats.find(f => f.name === featureProperty) as NumericFieldStats;
-    const ranges = [stats.min, ...breaks];
+    let ranges = [...breaks, stats.max];
     const colors = getColors(opts.palette, ranges.length);
+    ranges = [stats.min, ...ranges];
     const styles = getStyles(meta.geometryType, opts) as any;
     const geometryType = meta.geometryType.toLocaleLowerCase() as LegendGeometryType;
 
-    return ranges.map((r, i) => {
+    return colors.map((c, i) => {
       return {
         type: geometryType,
-        color: colors[i],
-        label: r,
-        width: 20,
+        color: c,
+        label: `${ranges[i]} - ${ranges[i + 1]}`,
+        width: styles.getSize,
         strokeColor:
           geometryType !== 'line' && options.property !== 'strokeColor'
             ? `rgba(${styles.getLineColor.join(',')})`

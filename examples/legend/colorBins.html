@@ -83,7 +83,7 @@
         */
         const airbnbLayer = new carto.viz.Layer('listings_madrid', availabilityStyle);
         airbnbLayer.addTo(deckMap);
-        new carto.viz.Legend('#legend', airbnbLayer, {type: 'polygon'});
+        new carto.viz.Legend('#legend', airbnbLayer);
       }
 
       initialize();
