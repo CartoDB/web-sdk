@@ -19,11 +19,14 @@ export class LegendWidget {
     const domElement = queryDOMElement(element);
     validateParameters(domElement, layer, options);
     const legendWidget = domElement as any;
-    // TODO if legend class is created in another clock cycle in which the layer is created
-    // dataReady never is resolved
-    layer.on('dataReady', () => {
+
+    if (layer.isReady()) {
       legendWidget.data = layer.getLegendData(options);
-    });
+    } else {
+      layer.on('dataReady', () => {
+        legendWidget.data = layer.getLegendData(options);
+      });
+    }
   }
 }
 

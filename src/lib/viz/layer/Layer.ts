@@ -149,6 +149,7 @@ export class Layer extends WithEvents implements StyledLayer {
   }
 
   /**
+   * @public
    * Retrieves the legend data from the style of the layer
    */
   public getLegendData(options = {}) {
@@ -562,6 +563,14 @@ export class Layer extends WithEvents implements StyledLayer {
     if (referer === 'onViewportLoad') {
       this.emit(LayerEvent.TILES_LOADED);
     }
+  }
+
+  /**
+   * @public
+   * This method returns true if the source layer is ready
+   */
+  public isReady() {
+    return this.dataState !== DATA_STATES.STARTING;
   }
 }
 
