@@ -10,7 +10,7 @@ export type LegendProperties = {
   marker?: string;
   strokeColor?: string;
   strokeStyle?: string;
-  label?: string;
+  label?: string | number;
   width?: number;
 };
 
