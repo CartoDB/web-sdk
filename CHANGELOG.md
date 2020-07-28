@@ -24,6 +24,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 - New data events in Layer: `dataReady` and `dataChanged` ([#84](https://github.com/CartoDB/web-sdk/pull/84))
 - Improved aggregated calculations on dataviews
 - A better documentation, with a new set of guides & examples
+- New `isReady` method in `carto.viz.Layer` ([#101](https://github.com/CartoDB/web-sdk/pull/101))
 
 ### Changed
 
