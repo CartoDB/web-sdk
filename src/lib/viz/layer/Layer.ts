@@ -149,6 +149,7 @@ export class Layer extends WithEvents implements StyledLayer {
   }
 
   /**
+   * @public
    * Retrieves the legend data from the style of the layer
    */
   public getLegendData(options = {}) {
