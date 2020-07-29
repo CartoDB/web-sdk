@@ -360,6 +360,8 @@ export class Layer extends WithEvents implements StyledLayer {
    */
   public async replaceDeckGLLayer() {
     if (this._deckInstance) {
+      const newLayer = await this.createDeckGLLayer();
+
       const originalPosition = this._deckInstance.props.layers.findIndex(
         (layer: { id: string }) => layer.id === this._options.id
       );
@@ -369,9 +371,8 @@ export class Layer extends WithEvents implements StyledLayer {
       );
 
       const updatedLayers = [...otherDeckLayers];
-      const newLayer = await this.createDeckGLLayer();
-      updatedLayers.splice(originalPosition, 0, newLayer);
 
+      updatedLayers.splice(originalPosition, 0, newLayer);
       this._deckInstance.setProps({
         layers: updatedLayers
       });

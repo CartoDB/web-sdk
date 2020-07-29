@@ -3,16 +3,17 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 
-
 ## [Unreleased]
 
 ### Added
+
 - Aggregated data filtering in widgets ([#96](https://github.com/CartoDB/web-sdk/pull/96))
 
 ### Fixed
+
 - Fix `dataReady` event in `carto.viz.Layer` ([#99](https://github.com/CartoDB/web-sdk/pull/99/))
 - Fix GeoJSON use on `carto.viz.dataview` and `dataUpdate` event with a `Source` instance ([#97](https://github.com/CartoDB/web-sdk/pull/97/))
-
+- Fix `replaceDeckGLLayer` in `carto.viz.Layer` not considering latest layers state ([#108](https://github.com/CartoDB/web-sdk/pull/108/))
 
 ## [1.0.0-alpha.1] 2020-07-17
 
@@ -26,7 +27,6 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 - A better documentation, with a new set of guides & examples
 - New `isReady` method in `carto.viz.Layer` ([#101](https://github.com/CartoDB/web-sdk/pull/101))
 - New option to specify the visual property to use in color (`color` | `strokeColor`) and size (`size` | `strokeWidth`) style helpers ([#98](https://github.com/CartoDB/web-sdk/pull/98))
-
 
 ### Changed
 
