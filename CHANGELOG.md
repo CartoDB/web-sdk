@@ -9,6 +9,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 
 - Aggregated data filtering in widgets ([#96](https://github.com/CartoDB/web-sdk/pull/96))
 
+### Changed
+- Rename `beforeLayerId|afterLayerId` options in `carto.viz.Layer.addTo` to a more clear `overLayerId|underLayerId`. 
+
 ### Fixed
 
 - Fix `dataReady` event in `carto.viz.Layer` ([#99](https://github.com/CartoDB/web-sdk/pull/99/))

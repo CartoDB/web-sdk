@@ -68,30 +68,40 @@
           }
         });
 
-        /*
-          if order of the layers is relevant, add `await` to the `addTo` sentences and the next
-          layer will be added on top of the previous. For example, here we ensure states are
-          at the bottom, but we don't care about boundaries or ports relative ordering.
-        */
-        const states = new carto.viz.Layer('ne_50m_admin_1_states_1');
+        // CASE 1: await --> last layer is on top
+        // ORDER: from top to bottom: ports > usa > world
+        // const states = new carto.viz.Layer('ne_50m_admin_0_countries', carto.viz.style.basic({ color: "#ff0000"}), { id: 'world' });
+        // await states.addTo(deckMap);
+
+        // const boundaries = new carto.viz.Layer('ne_50m_admin_1_states_1', carto.viz.style.basic({ color: "#00ff00"}), { id: 'usa' });
+        // await boundaries.addTo(deckMap);
+
+        // const ports = new carto.viz.Layer('world_ports', carto.viz.style.basic({ color: "#0000ff"}), { id: 'ports' });
+        // await ports.addTo(deckMap);
+
+
+        // CASE 2: await, but custom order (overLayerId)
+        // ORDER: from top to bottom: usa > ports > world
+        const states = new carto.viz.Layer('ne_50m_admin_0_countries', carto.viz.style.basic({ color: "#ff0000"}), { id: 'world' });
         await states.addTo(deckMap);
 
-        const boundaries = new carto.viz.Layer('ne_50m_admin_0_boundary_lines_land');
-        boundaries.addTo(deckMap);
+        const boundaries = new carto.viz.Layer('ne_50m_admin_1_states_1', carto.viz.style.basic({ color: "#00ff00"}), { id: 'usa' });
+        await boundaries.addTo(deckMap, { overLayerId: 'world'});
 
-        const ports = new carto.viz.Layer('world_ports');
-        ports.addTo(deckMap);
+        const ports = new carto.viz.Layer('world_ports', carto.viz.style.basic({ color: "#0000ff"}), { id: 'ports' });
+        await ports.addTo(deckMap, { overLayerId: 'world'});
 
-        /*
-          Another option to control the layer order is using 'overLayerId|underLayerId' options in addTo
-          methods. See the reference for a description on how to use it.
-        */
+        // CASE 3: await, but custom order (underLayerId)
+        // ORDER: from top to bottom: world > ports > usa
+        // const states = new carto.viz.Layer('ne_50m_admin_0_countries', carto.viz.style.basic({ color: "#ff0000"}), { id: 'world' });
+        // await states.addTo(deckMap);
 
-        /*
-          A note on async/await. Modern JS code tries to use async/await pattern to better manage Promises
-          and in general asynchronous code (vs the 'callback hell'). If you are not used to id, have
-          a look at https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Asynchronous/Async_await
-        */
+        // const boundaries = new carto.viz.Layer('ne_50m_admin_1_states_1', carto.viz.style.basic({ color: "#00ff00"}), { id: 'usa' });
+        // await boundaries.addTo(deckMap, { underLayerId: 'world'});
+
+        // const ports = new carto.viz.Layer('world_ports', carto.viz.style.basic({ color: "#0000ff"}), { id: 'ports' });
+        // await ports.addTo(deckMap, { underLayerId: 'world'});
+
       }
 
       initialize();
