@@ -83,6 +83,11 @@
         ports.addTo(deckMap);
 
         /*
+          Another option to control the layer order is using 'overLayerId|underLayerId' options in addTo
+          methods. See the reference for a description on how to use it.
+        */
+
+        /*
           A note on async/await. Modern JS code tries to use async/await pattern to better manage Promises
           and in general asynchronous code (vs the 'callback hell'). If you are not used to id, have
           a look at https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Asynchronous/Async_await
