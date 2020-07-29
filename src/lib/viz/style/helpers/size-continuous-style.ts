@@ -66,12 +66,8 @@ export function sizeContinuousStyle(
     }
 
     const opts = defaultOptions(meta.geometryType, options);
-    // const colors = getColors(opts.palette);
     const stats = meta.stats.find(f => f.name === featureProperty) as NumericFieldStats;
     const styles = getStyles(meta.geometryType, opts) as any;
-    // const colorScale = chromaScale(colors)
-    //   .domain([getRangeMin(stats, opts), getRangeMax(stats, opts)])
-    //   .mode('lrgb');
     const geometryType = meta.geometryType.toLocaleLowerCase() as LegendGeometryType;
     const color = geometryType === 'line' ? styles.getLineColor : styles.getFillColor;
     // TODO samples can be an option?
@@ -132,9 +128,6 @@ function calculate(
 ) {
   const styles = getStyles(geometryType, options);
 
-  const rangeMinValue = rangeMin;
-  const rangeMaxValue = rangeMax;
-
   /**
    * @private
    * Gets the size for the feature provided by parameter
@@ -155,13 +148,7 @@ function calculate(
       featureValue = Math.sqrt(featureValue);
     }
 
-    return range(
-      rangeMinValue,
-      rangeMaxValue,
-      options.sizeRange[0],
-      options.sizeRange[1],
-      featureValue
-    );
+    return range(rangeMin, rangeMax, options.sizeRange[0], options.sizeRange[1], featureValue);
   };
 
   let obj;
