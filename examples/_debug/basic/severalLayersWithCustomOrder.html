@@ -86,7 +86,7 @@
         await states.addTo(deckMap);
 
         const boundaries = new carto.viz.Layer('ne_50m_admin_1_states_1', carto.viz.style.basic({ color: "#00ff00"}), { id: 'usa' });
-        await boundaries.addTo(deckMap, { beforeLayerId: 'world'});
+        await boundaries.addTo(deckMap, { overLayerId: 'world'});
 
         // PENDING TO ADD MORE EXAMPLES...
 

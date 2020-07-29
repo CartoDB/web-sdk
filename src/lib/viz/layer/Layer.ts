@@ -151,7 +151,7 @@ export class Layer extends WithEvents implements StyledLayer {
   /**
    * Add the current layer to a Deck map instance.
    * By default the layer will be the last positioned (on top).
-   * To achieve a custom ordering, `beforeLayerId` or `afterLayerId` options can be used (and then the
+   * To achieve a custom ordering, `overLayerId` or `underLayerId` options can be used (and then the
    * referenced layer must have an `id`)
    *
    * Example:
@@ -160,7 +160,7 @@ export class Layer extends WithEvents implements StyledLayer {
    *    await layer1.addTo(deckMap);
    *
    *    const layer2 = new Layer('dataset2', {}, { id: 'layer2' });
-   *    await layer2.addTo(deckMap, { beforeLayerId: 'layer1' });
+   *    await layer2.addTo(deckMap, { overLayerId: 'layer1' });
    *
    * // at this point, the order would be 'layer2' < 'layer1' and not the opposite
    * ```
@@ -171,7 +171,7 @@ export class Layer extends WithEvents implements StyledLayer {
    * add more layers or to use it in a `DataView` then you must use `await` for it to finish.
    *
    * @param {Deck} instance of the map to add the layer to
-   * @param {{ beforeLayerId?: string; afterLayerId?: string }} [opts={}] options to control relative layer position
+   * @param {{ overLayerId?: string; underLayerId?: string }} [opts={}] options to control relative layer position
    * @memberof Layer
    */
   public async addTo(deckInstance: Deck, opts: LayerPosition = {}) {
@@ -613,23 +613,23 @@ function ensureRelatedStyleProps(layerProps: any) {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function addInTheRightPosition(deckglLayer: any, layers: any[], opts: LayerPosition = {}) {
-  const { beforeLayerId, afterLayerId } = opts;
+  const { overLayerId, underLayerId } = opts;
 
-  if (beforeLayerId && afterLayerId) {
+  if (overLayerId && underLayerId) {
     throw new CartoLayerError(
-      'Cannot use beforeLayerId and afterLayerId at the same time',
+      'Cannot use overLayerId and underLayerId at the same time',
       layerErrorTypes.DEFAULT
     );
   }
 
-  if (beforeLayerId || afterLayerId) {
-    const beforeAfterLayerIdx = layers.findIndex(l => l.id === (beforeLayerId || afterLayerId));
+  if (overLayerId || underLayerId) {
+    const layerIdx = layers.findIndex(l => l.id === (overLayerId || underLayerId));
 
-    if (beforeAfterLayerIdx !== -1) {
-      if (beforeLayerId) {
-        layers.splice(beforeAfterLayerIdx + 1, 0, deckglLayer);
-      } else if (afterLayerId) {
-        layers.splice(beforeAfterLayerIdx, 0, deckglLayer);
+    if (layerIdx !== -1) {
+      if (overLayerId) {
+        layers.splice(layerIdx + 1, 0, deckglLayer);
+      } else if (underLayerId) {
+        layers.splice(layerIdx, 0, deckglLayer);
       }
     } else {
       layers.push(deckglLayer);
@@ -640,6 +640,6 @@ function addInTheRightPosition(deckglLayer: any, layers: any[], opts: LayerPosit
 }
 
 interface LayerPosition {
-  beforeLayerId?: string;
-  afterLayerId?: string;
+  overLayerId?: string;
+  underLayerId?: string;
 }
