@@ -622,17 +622,21 @@ function addInTheRightPosition(deckglLayer: any, layers: any[], opts: LayerPosit
     );
   }
 
-  if (overLayerId || underLayerId) {
-    const layerIdx = layers.findIndex(l => l.id === (overLayerId || underLayerId));
+  const baseLayerId = overLayerId || underLayerId;
 
-    if (layerIdx !== -1) {
+  if (baseLayerId) {
+    const layerIdx = layers.findIndex(l => l.id === baseLayerId);
+
+    const baseLayerFound = layerIdx !== -1;
+
+    if (baseLayerFound) {
       if (overLayerId) {
-        layers.splice(layerIdx + 1, 0, deckglLayer);
+        layers.splice(layerIdx + 1, 0, deckglLayer); // higher index = nearer the top
       } else if (underLayerId) {
-        layers.splice(layerIdx, 0, deckglLayer);
+        layers.splice(layerIdx, 0, deckglLayer); // lower index = nearer the bottom
       }
     } else {
-      layers.push(deckglLayer);
+      layers.push(deckglLayer); // place latest layer on top by default
     }
   } else {
     layers.push(deckglLayer);
