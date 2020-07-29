@@ -4,6 +4,7 @@ import { range } from './math-utils';
 import { CartoStylingError, stylingErrorTypes } from '../../errors/styling-error';
 import { Style, BasicOptionsStyle, getStyles, getStyleValue } from '../index';
 import { sizeRangeValidation } from '../validators';
+import { SizeProperty, isSizeProperty } from './properties-by-helper';
 
 export interface SizeContinuousOptionsStyle extends Partial<BasicOptionsStyle> {
   // The minimum value of the data range for the size ramp. Defaults to the globalMIN of the dataset.
@@ -14,6 +15,8 @@ export interface SizeContinuousOptionsStyle extends Partial<BasicOptionsStyle> {
   sizeRange: number[];
   // Size applied to features which the attribute value is null. Default 0
   nullSize: number;
+  // Styling property.
+  property?: SizeProperty;
 }
 
 function defaultOptions(
@@ -106,12 +109,16 @@ function calculate(
   let obj;
 
   if (geometryType === 'Point') {
-    obj = {
-      getRadius: getSizeValue,
-      pointRadiusMinPixels: options.sizeRange[0],
-      pointRadiusMaxPixels: options.sizeRange[1],
-      radiusUnits: 'pixels'
-    };
+    if (!options.property || options.property === 'size') {
+      obj = {
+        getRadius: getSizeValue,
+        pointRadiusMinPixels: options.sizeRange[0],
+        pointRadiusMaxPixels: options.sizeRange[1],
+        radiusUnits: 'pixels'
+      };
+    } else if (options.property === 'strokeWidth') {
+      obj = { getLineWidth: getSizeValue };
+    }
   } else {
     obj = {
       getLineWidth: getSizeValue,
@@ -171,6 +178,13 @@ function validateParameters(options: SizeContinuousOptionsStyle, geometryType?: 
   if (options.nullSize && options.nullSize < 0) {
     throw new CartoStylingError(
       'nullSize must be greater or equal to 0',
+      stylingErrorTypes.PROPERTY_MISMATCH
+    );
+  }
+
+  if (options.property && !isSizeProperty(options.property)) {
+    throw new CartoStylingError(
+      `property '${options.property}' is not valid`,
       stylingErrorTypes.PROPERTY_MISMATCH
     );
   }

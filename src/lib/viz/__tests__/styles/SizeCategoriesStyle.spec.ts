@@ -123,6 +123,15 @@ describe('SizeCategoriesStyle', () => {
         expect(error).toBeInstanceOf(CartoStylingError);
       }
     });
+
+    it('If geometryType is Point and property is strokeWidth getLineWidth should be a function', () => {
+      const style = sizeCategoriesStyle(FIELD_NAME, {
+        property: 'strokeWidth'
+      });
+      const response = style.getLayerProps(styledLayer);
+      expect(response).toHaveProperty('getLineWidth');
+      expect(response.getLineWidth).toBeInstanceOf(Function);
+    });
   });
 
   describe('Data validation', () => {
