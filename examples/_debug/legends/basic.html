@@ -45,6 +45,11 @@
                 description="A simple legend for a Layer">
                 <as-legend-color-category-polygon id="legend" slot="legends" orientation="horizontal"></as-legend-color-category-polygon>
               </as-legend>
+              <as-legend
+                heading="Basic legend"
+                description="A simple legend for a Layer">
+                <as-legend-color-category-polygon id="legend2" slot="legends" orientation="horizontal"></as-legend-color-category-polygon>
+              </as-legend>
             </div>
           </div>
         </div>
@@ -98,6 +103,9 @@
 
         new carto.viz.Legend('#legend', airbnbLayer, { label: 'ne_50m_admin_1_states_1' });
 
+        const ports = new carto.viz.Layer('world_ports');
+        ports.addTo(deckMap);
+        new carto.viz.Legend('#legend2', ports, { label: 'ports' });
       }
 
       initialize();

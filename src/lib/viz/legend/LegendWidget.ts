@@ -1,4 +1,4 @@
-import { Layer } from '@/viz/layer';
+import { Layer, LayerEvent } from '@/viz/layer';
 import { queryDOMElement } from '@/core/utils/dom';
 import { CartoError } from '@/core/errors/CartoError';
 
@@ -23,7 +23,7 @@ export class LegendWidget {
     if (layer.isReady()) {
       legendWidget.data = layer.getLegendData(options);
     } else {
-      layer.on('dataReady', () => {
+      layer.on(LayerEvent.DATA_READY, () => {
         legendWidget.data = layer.getLegendData(options);
       });
     }

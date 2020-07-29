@@ -18,12 +18,19 @@ export function basicStyle(options: Partial<BasicOptionsStyle> = {}) {
       return [];
     }
 
+    const styles = getStyles(meta.geometryType, options) as any;
+    const color = meta.geometryType === 'Line' ? styles.getLineColor : styles.getFillColor;
+
+    if (styles.opacity) {
+      color[color.length - 1] = styles.opacity;
+    }
+
     return [
       {
         type: meta.geometryType.toLocaleLowerCase() as LegendGeometryType,
-        color: options.color,
-        strokeColor: options.strokeColor,
-        width: options.size,
+        color: `rgba(${color.join(',')})`,
+        strokeColor: styles.getLineColor ? `rgba(${styles.getLineColor.join(',')})` : undefined,
+        width: styles.getSize,
         ...properties
       }
     ];
