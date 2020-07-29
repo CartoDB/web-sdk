@@ -5,6 +5,7 @@ import { CartoStylingError, stylingErrorTypes } from '../../errors/styling-error
 import { StyledLayer } from '../layer-style';
 import { getStyleValue, getStyles, BasicOptionsStyle, Style } from '..';
 import { colorValidation } from '../validators';
+import { ColorProperty, isColorProperty } from './properties-by-helper';
 
 export const DEFAULT_PALETTE = 'bold';
 
@@ -19,6 +20,8 @@ export interface ColorCategoriesOptionsStyle extends Partial<BasicOptionsStyle> 
   nullColor: string;
   // Color applied to features which the attribute value is not in the breaks.
   othersColor: string;
+  // Styling property.
+  property?: ColorProperty;
 }
 
 function defaultOptions(
@@ -98,7 +101,7 @@ function calculateWithCategories(
 
   let geomStyles;
 
-  if (geometryType === 'Line') {
+  if (geometryType === 'Line' || options.property === 'strokeColor') {
     geomStyles = {
       getLineColor: getFillColor,
       updateTriggers: getUpdateTriggers({
@@ -161,6 +164,13 @@ function validateParameters(options: ColorCategoriesOptionsStyle) {
   if (options.othersColor && !colorValidation(options.othersColor)) {
     throw new CartoStylingError(
       `othersColor '${options.color}' is not valid`,
+      stylingErrorTypes.PROPERTY_MISMATCH
+    );
+  }
+
+  if (options.property && !isColorProperty(options.property)) {
+    throw new CartoStylingError(
+      `property '${options.property}' is not valid`,
       stylingErrorTypes.PROPERTY_MISMATCH
     );
   }

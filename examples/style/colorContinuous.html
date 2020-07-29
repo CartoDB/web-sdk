@@ -42,7 +42,7 @@
             <div class="as-panel__element as-p--16 as-body">
               <h1 class="as-title">Color continuous</h1>
               <h4 class="as-subheader as-mb--12">
-                Create a thematic map with <em>carto.viz.style.colorContinuous</em>, 
+                Create a thematic map with <em>carto.viz.style.colorContinuous</em>,
                 to represent distribution of a numerical field in the dataset
                 (in this case, temperature values)
               </h4>
@@ -76,7 +76,7 @@
         const style = carto.viz.style.colorContinuous('value');
 
         /*
-          or you can set your own custom values, like in        
+          or you can set your own custom values, like in
             const style = carto.viz.style.colorContinuous('value', { rangeMin: 80, rangeMax: 100, palette: 'sunset' });
         */
         const tempLayer = new carto.viz.Layer('temps', style);
