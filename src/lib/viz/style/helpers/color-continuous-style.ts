@@ -77,9 +77,9 @@ export function colorContinuousStyle(
     const colors = getColors(opts.palette);
     const stats = meta.stats.find(f => f.name === featureProperty) as NumericFieldStats;
     const styles = getStyles(meta.geometryType, opts) as any;
-    const colorScale = chromaScale(colors)
-      .domain([getRangeMin(stats, opts), getRangeMax(stats, opts)])
-      .mode('lrgb');
+    const rangeMin = getRangeMin(stats, opts);
+    const rangeMax = getRangeMax(stats, opts);
+    const colorScale = chromaScale(colors).domain([rangeMin, rangeMax]).mode('lrgb');
     const geometryType = meta.geometryType.toLocaleLowerCase() as LegendGeometryType;
     // TODO samples can be an option?
     const samples = 10;
@@ -87,7 +87,7 @@ export function colorContinuousStyle(
     const result = [] as LegendProperties[];
 
     for (let i = 0; result.length < samples; i += INC) {
-      const value = i * (stats.max - stats.min) + stats.min;
+      const value = i * (rangeMax - rangeMin) + rangeMin;
       result.push({
         type: geometryType,
         color: `rgba(${colorScale(value).rgb().join(',')})`,
