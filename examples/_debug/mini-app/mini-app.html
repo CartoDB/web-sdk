@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html dir="ltr" lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0">
+
+    <title>Web SDK Mini-App Example</title>
+
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.css' rel='stylesheet' />
+
+    <link rel="stylesheet" href="https://libs.cartocdn.com/airship-style/v2.4.0/airship.css">
+
+</head>
+
+<body class="as-app-body as-app">
+
+    <!-- Header -->
+    <header class="as-toolbar" style="background-color: #D83426">
+        <div class="as-toolbar__group">
+            <div class="as-toolbar__item">
+                <img src="pride-logo.png" width="75px;" alt="Logo"/>
+            </div>
+            <p class="as-toolbar__item" style="font-size: 16px;">Web SDK Mini-App Example</p>
+        </div>
+    </header>
+  
+    <!-- Responsive content -->
+    <as-responsive-content>
+
+        <!-- Left sidebar -->
+        <aside class="as-sidebar as-sidebar--left" data-name="Ports">
+            <div class="as-container">
+                <section class="as-box">
+                    <as-category-widget
+                        id="widgetPortsLocal"
+                        class="as-p--16"
+                        heading="Ports by Size"
+                        description="Number of ports by size (on screen)">
+                    </as-category-widget>
+                </section>
+                <section class="as-box">
+                    <as-category-widget
+                        id="widgetPortsRemote"
+                        class="as-p--16"
+                        heading="Ports by Size"
+                        description="Number of ports by size (global)">
+                    </as-category-widget>
+                </section>
+            </div>
+        </aside>
+
+        <!-- Map area -->
+        <main class="as-main">
+            <div class="as-map-area">
+                <div id="map"></div>
+            </div>
+        </main>
+
+        <!-- Right sidebar -->
+        <aside class="as-sidebar as-sidebar--right" data-name="Commerce">
+            <div class="as-container">
+                <section class="as-box">
+                    <as-formula-widget
+                        id="widgetCommerceLocal"
+                        class="as-p--16"
+                        heading="GDP"
+                        description="Sum of GDP (countries on screen)">
+                    </as-category-widget>
+                </section>    
+                <section class="as-box">
+                    <as-formula-widget
+                        id="widgetCommerceRemote"
+                        class="as-p--16"
+                        heading="GDP"
+                        description="Sum of GDP (global)">
+                    </as-category-widget>
+                </section>    
+                <section class="as-box">
+                    <as-histogram-widget
+                        id="widgetCommerceHistogram"
+                        heading="GDP"
+                        description="Distribution of GDP for countries"
+                        show-clear>
+                    </as-histogram-widget>
+                </section>    
+            </div>
+        </aside>
+
+    </as-responsive-content>
+
+    <!-- deck.gl -->
+    <script src="https://unpkg.com/deck.gl@8.2.0/dist.min.js"></script>
+
+    <!-- Mapbox -->
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.js'></script>
+
+    <!-- Web SDK -->
+    <script src="/dist/umd/index.min.js"></script>
+
+    <!-- Airship -->
+    <script type="module" src="https://libs.cartocdn.com/airship-components/v2.4.0/airship/airship.esm.js"></script>
+    <script nomodule="" src="https://libs.cartocdn.com/airship-components/v2.4.0/airship/airship.js"></script>
+
+    <!-- D3 format -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-format/1.3.0/d3-format.min.js"></script>
+
+    <script>
+        let deckMap;
+        let portsLayer;
+        let worldCommerceLayer;
+        
+        function initialize()
+        {
+            carto.auth.setDefaultCredentials({ username: 'public' });
+        
+            deckMap = carto.viz.createMap(
+                { 
+                    view: 
+                    { 
+                        zoom: 4, 
+                        longitude: 6, 
+                        latitude: 40 
+                    } 
+                });
+        
+            addLayers();
+        }
+        
+        function addLayers()
+        {
+            addWorldCommerceLayer();
+        
+            addWorldPortsLayer(true);
+        }
+        
+        async function addWorldCommerceLayer()
+        {
+            // Using styles helpers with options
+            worldCommerceLayer = new carto.viz.Layer('world_commerce', 
+                carto.viz.style.colorBins('gdp', { palette: 'teal', method: 'stdev'}),
+                {
+                    hoverStyle: 'default',
+                    clickStyle: 'default'
+                });    
+            
+            // Add layer to the map
+            await worldCommerceLayer.addTo(deckMap);
+        
+            // Pop-ups can be added before or after the layer has been added to the map
+            await worldCommerceLayer.setPopupHover([
+                {
+                    attr: 'country',
+                    title: ''                       // How to hide the field name
+                },
+                {
+                    attr: 'gdp',
+                    title: 'GDP',
+                    format: d3.format('.4s')
+                },
+                {
+                    attr: 'imports_total',
+                    title: 'Imports',
+                    format: d3.format('.4s')                   // How to format numbers using a D3 format string
+                },  
+                {
+                    attr: 'exports_total',
+                    title: 'Exports',
+                    format: d3.format('.4s')                   // How to format numbers using a D3 format string
+                }  
+            ]);
+        
+            // Widgets must be added after the layer has been added to the map (await)
+            addCommerceWidgets();
+        }
+        
+        async function addWorldPortsLayer(useGeojson)
+        {
+            let source;
+        
+            // Add GeoJSON source or CARTO dataset directly
+            if (useGeojson)
+            {
+                const url = 'https://public.carto.com/api/v2/sql?api_key=default_public&q=select * from world_ports&format=geojson';
+                source = await fetch(url).then(response => response.json());     
+            }
+            else
+            {
+                source = "world_ports";
+            }
+        
+            // Using styles helpers with defaults
+            portsLayer = new carto.viz.Layer(source, 
+                                            carto.viz.style.colorCategories('harborsize'),
+                                            {
+                                                hoverStyle: 'default',
+                                                clickStyle: 'default'
+                                            });
+        
+            // Add layer to the map
+            await portsLayer.addTo(deckMap); 
+        
+            // Pop-ups can be added before or after the layer has been added to the map
+            await portsLayer.setPopupHover([
+                {
+                    attr: 'port_name',
+                    title: ''                        // How to hide the field name
+                },
+                {
+                    attr: 'harborsize',
+                    title: 'Harbor Size',
+                    format: formatHarborSize         // How to format/rename the field values
+                },
+                {
+                    attr: 'harbortype',
+                    title: 'Harbor Type',
+                    format: formatHarborType         // How to format/rename the field values
+                }  
+            ]);
+        
+            // Widgets must be added after the layer has been added to the map (await)
+            addPortsCategoryWidgets();
+        }
+        
+        function formatHarborSize(harborSize)
+        {
+            switch (harborSize)
+            {
+                case 'L': return("Large");
+                case 'M': return("Medium");
+                case 'S': return("Small");
+                case 'V': return("Very Small");
+                default: return("Unknown");
+            }
+        }
+        
+        function formatHarborType(harborType)
+        {
+            switch (harborType)
+            {
+                case 'CB': return("Coastal Breakwater");
+                case 'CN': return("Coastal Natural");
+                case 'CT': return("Coastal Tide Gate");
+                case 'LC': return("Lake or Canal");
+                case 'OR': return("Open Roadstead");
+                case 'RB': return("River Basin");
+                case 'RN': return("River Natural");
+                case 'RT': return("River Tide Gate");
+                case 'TH': return("Typhoon Harbor");
+                default: return("Unknown");
+            }
+        }
+        
+        function addPortsCategoryWidgets()
+        {
+            // Local dataview + widget
+            const dataviewPortsLocal = new carto.viz.dataview.Category(
+                portsLayer, 
+                'harborsize', 
+                {
+                    operation: 'count',
+                    spatialFilter: 'viewport'
+                }
+            );
+            new carto.viz.widget.Category("#widgetPortsLocal", dataviewPortsLocal);
+        
+            // Remote dataview + widget
+            const dataviewPortsRemote = new carto.viz.dataview.Category(
+                portsLayer.source,   
+                'harborsize', 
+                {
+                    operation: 'count'
+                }
+            );
+            new carto.viz.widget.Category("#widgetPortsRemote", dataviewPortsRemote);
+            
+        }
+        
+        async function addCommerceWidgets()
+        {
+            // Local dataview + widget
+            const dataviewGDPLocal = new carto.viz.dataview.Formula(
+                worldCommerceLayer, 
+                'gdp', 
+                {
+                    operation: 'sum',
+                    spatialFilter: 'viewport'
+                }
+            );
+            new carto.viz.widget.Formula("#widgetCommerceLocal", dataviewGDPLocal);
+        
+            // Remote dataview + widget
+            const dataviewGDPRemote = new carto.viz.dataview.Formula(
+                worldCommerceLayer, 
+                'gdp', 
+                {
+                    operation: 'sum'
+                }
+            );
+            new carto.viz.widget.Formula("#widgetCommerceRemote", dataviewGDPRemote);
+        
+            // Histogram (default mode is remote/source)
+            const dataviewGDPHistogram = new carto.viz.dataview.Histogram(
+                worldCommerceLayer,
+                'gdp'
+            );
+            new carto.viz.widget.Histogram("#widgetCommerceHistogram", dataviewGDPHistogram);
+        }
+
+        initialize();
+    </script>
+
+</body>
+
+</html>
