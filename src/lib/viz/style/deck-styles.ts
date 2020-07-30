@@ -1,5 +1,5 @@
+import { hexToRgb, isFunction } from './helpers/utils';
 import { GeometryType } from '@/viz/source';
-import { hexToRgb } from './helpers/utils';
 import { defaultStyles } from './default-styles';
 import { colorValidation } from './validators';
 import { CartoStylingError, stylingErrorTypes } from '../errors/styling-error';
@@ -38,18 +38,28 @@ function lineStyles(opts: any) {
 }
 
 function polygonStyles(opts: any) {
-  return {
+  const styles: any = {
     opacity: getStyleValue('opacity', 'Polygon', opts),
 
-    getFillColor: hexToRgb(getStyleValue('color', 'Polygon', opts)),
+    getFillColor: isFunction(opts.color) ? opts.color : hexToRgb(getStyleValue('color', 'Polygon', opts)),
     filled: true,
 
     stroked: true,
-    getLineColor: hexToRgb(getStyleValue('strokeColor', 'Polygon', opts)),
+    getLineColor: isFunction(opts.strokeColor) ? opts.strokeColor : hexToRgb(getStyleValue('strokeColor', 'Polygon', opts)),
     getLineWidth: getStyleValue('strokeWidth', 'Polygon', opts),
-    lineWidthMinPixels: 0,
-    lineWidthUnits: 'pixels'
+    lineWidthScale: getStyleValue('strokeWidthScale', 'Polygon', opts),
+    lineWidthMinPixels: getStyleValue('strokeWidthMin', 'Polygon', opts),
+    lineWidthMaxPixels: getStyleValue('strokeWidthMax', 'Polygon', opts),
+    lineWidthUnits: 'pixels',
+    maxZoom: getStyleValue('maxZoom', 'Polygon', opts),
+    minZoom: getStyleValue('minZoom', 'Polygon', opts)
   };
+  /* eslint-disable no-param-reassign */
+  return Object.keys(styles).filter((k: string) => styles[k] !== undefined && styles[k] !== null).reduce((total: any, k: string) => {
+    total[k] = styles[k];
+    return total;
+  }, {});
+  /* eslint-enable no-param-reassign */
 }
 
 export function getStyleValue(
@@ -109,7 +119,7 @@ export function getStyles(geometryType?: GeometryType, options: Partial<BasicOpt
 }
 
 function validateBasicParameters(options: Partial<BasicOptionsStyle>) {
-  if (options.color && !colorValidation(options.color)) {
+  if (options.color && !isFunction(options.color) && !colorValidation(options.color)) {
     throw new CartoStylingError(
       `color '${options.color}' is not valid`,
       stylingErrorTypes.PROPERTY_MISMATCH
@@ -130,7 +140,7 @@ function validateBasicParameters(options: Partial<BasicOptionsStyle>) {
     );
   }
 
-  if (options.strokeColor && !colorValidation(options.strokeColor)) {
+  if (options.strokeColor && !isFunction(options.strokeColor) && !colorValidation(options.strokeColor)) {
     throw new CartoStylingError(
       `strokeColor '${options.strokeColor}' is not valid`,
       stylingErrorTypes.PROPERTY_MISMATCH

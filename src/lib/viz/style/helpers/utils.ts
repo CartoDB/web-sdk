@@ -92,3 +92,7 @@ export function calculateSizeBins(nBreaks: number, sizeRange: number[]) {
   };
   return [sizeRange[0], ...new Classifier(classObj).breaks(nBreaks - 1, 'equal'), sizeRange[1]];
 }
+
+export function isFunction(fun: any) {
+  return typeof fun === 'function';
+}
