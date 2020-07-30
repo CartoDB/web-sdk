@@ -156,6 +156,7 @@ describe('SourceMetadata', () => {
       stats: [
         {
           name: 'number',
+          type: 'number',
           min: 10,
           max: 70,
           avg: 100 / 3,
@@ -190,6 +191,7 @@ describe('SourceMetadata', () => {
       stats: [
         {
           name: 'number',
+          type: 'number',
           min: 10,
           max: 70,
           avg: 100 / 3,
