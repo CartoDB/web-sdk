@@ -38,6 +38,12 @@ export class Animation extends WithEvents {
   }
 
   async start() {
+    if (!this.layer.isReady()) {
+      this.layer.on('tilesLoaded', () => this.start());
+      return;
+    }
+
+    await this.layer.addAnimation(this);
     await this.init();
     this.play();
     this.emit('animationStart');
@@ -69,8 +75,8 @@ export class Animation extends WithEvents {
   setCurrent(value: number) {
     if (value > this.originalAnimationRange.max || value < this.originalAnimationRange.min) {
       throw new CartoError({
-        type: '',
-        message: ''
+        type: '[Animation]',
+        message: `Value should be between ${this.originalAnimationRange.min} and ${this.originalAnimationRange.max}`
       });
     }
 
@@ -80,8 +86,8 @@ export class Animation extends WithEvents {
   setProgressPct(progress: number) {
     if (progress > 1 || progress < 0) {
       throw new CartoError({
-        type: '',
-        message: ''
+        type: '[Animation]',
+        message: `Value should be between 0 and 1`
       });
     }
 
@@ -90,10 +96,6 @@ export class Animation extends WithEvents {
   }
 
   getLayerProperties() {
-    if (this.animationCurrentValue > this.animationRange.max) {
-      this.reset();
-    }
-
     const animationRangeStart = this.animationCurrentValue;
     const animationRangeEnd = Math.min(
       this.animationCurrentValue + this.animationStep,
@@ -111,7 +113,7 @@ export class Animation extends WithEvents {
     // features are at max opacity and size
     const filterSoftRange = [animationRangeStart, animationRangeEnd];
 
-    const layerProperties = {
+    return {
       extensions: [new DataFilterExtension({ filterSize: 1 })],
       getFilterValue: (feature: GeoJSON.Feature) => {
         if (!feature) {
@@ -123,9 +125,6 @@ export class Animation extends WithEvents {
       filterRange,
       filterSoftRange
     };
-
-    this.animationCurrentValue += this.animationStep;
-    return layerProperties;
   }
 
   private async init() {
@@ -144,7 +143,12 @@ export class Animation extends WithEvents {
       return;
     }
 
+    if (this.animationCurrentValue > this.animationRange.max) {
+      this.reset();
+    }
+
     requestAnimationFrame(() => {
+      this.animationCurrentValue += this.animationStep;
       this.onAnimationFrame();
     });
 
@@ -159,8 +163,8 @@ export class Animation extends WithEvents {
 
     if (!columnStats || columnStats.type !== 'number') {
       throw new CartoError({
-        message: '',
-        type: ''
+        message: 'Specified column is not present or does not contain timestamps or dates',
+        type: '[Animation]'
       });
     }
 
