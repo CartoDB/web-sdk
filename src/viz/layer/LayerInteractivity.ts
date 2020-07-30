@@ -42,6 +42,7 @@ export class LayerInteractivity {
 
     if (this._clickStyle) {
       this._layerOnFn(InteractivityEvent.CLICK, () => {
+        console.log('click');
         const interactiveStyle = this._wrapInteractiveStyle2();
         this._layerSetStyleFn(interactiveStyle);
       });
@@ -49,6 +50,7 @@ export class LayerInteractivity {
 
     if (this._hoverStyle) {
       this._layerOnFn(InteractivityEvent.HOVER, () => {
+        console.log('hover');
         const interactiveStyle = this._wrapInteractiveStyle2();
         this._layerSetStyleFn(interactiveStyle);
       });
@@ -66,10 +68,6 @@ export class LayerInteractivity {
   }
 
   public fireOnEvent(eventType: InteractivityEvent, info: any, event: HammerInput) {
-    console.log('EVENT', eventType)
-    if (eventType === 'click') {
-      debugger;
-    }
     const features = [];
     const { coordinate, object } = info;
 
@@ -84,7 +82,11 @@ export class LayerInteractivity {
       this._setStyleCursor(info);
     }
 
-    if ((this._clickStyle && eventType === InteractivityEvent.CLICK) || (this._hoverStyle && eventType === InteractivityEvent.HOVER)) {
+    if (
+      (this._clickStyle && eventType === InteractivityEvent.CLICK) ||
+      (this._hoverStyle && eventType === InteractivityEvent.HOVER)
+    ) {
+      console.log('fire event', eventType);
       const interactiveStyle = this._wrapInteractiveStyle2();
       this._layerSetStyleFn(interactiveStyle);
     }
@@ -173,27 +175,37 @@ export class LayerInteractivity {
     const styleProps = currentStyle.getLayerProps(this._layer);
 
     const getIconProps = styleProps.getIcon();
+    const { url } = getIconProps;
 
-    const iconFn = (f: any) => {
-      console.log('icon f', !!f)
-
-      return {
-        ...getIconProps,
-        mask: f && this._clickFeature && f.properties.cartodb_id === this._clickFeature.properties.cartodb_id
+    const iconFn = (f: Record<string, any>) => {
+      if (
+        f &&
+        this._clickFeature &&
+        f.properties.cartodb_id === this._clickFeature.properties.cartodb_id
+      ) {
+        return {
+          ...getIconProps,
+          url: `${url} `,
+          mask: true
+        };
       }
-    }
 
-    const colorFn = (f: any) => {
-      console.log('color f', !!f)
+      return getIconProps;
+    };
 
-      if (f && this._clickFeature && f.properties.cartodb_id === this._clickFeature.properties.cartodb_id) {
+    const colorFn = (f: Record<string, any>) => {
+      if (
+        f &&
+        this._clickFeature &&
+        f.properties.cartodb_id === this._clickFeature.properties.cartodb_id
+      ) {
         return defaultHighlightStyle.getFillColor;
       }
 
-      return [0, 0, 0]
-    }
+      return [];
+    };
 
-    styleProps.getIcon = iconFn
+    styleProps.getIcon = iconFn;
     styleProps.getColor = colorFn;
     styleProps.updateTriggers = {
       getIcon: iconFn,
@@ -257,8 +269,6 @@ export class LayerInteractivity {
       const interactionStyleFn = (feature: Record<string, any>) => {
         let styleValue;
 
-        console.log(!!feature)
-
         if (
           this._clickFeature &&
           feature.properties.cartodb_id === this._clickFeature.properties.cartodb_id
@@ -321,14 +331,14 @@ export class LayerInteractivity {
     //   defaultHighlightProps.getColor = f => defaultHighlightStyle.getFillColor;
     // // if (styleProps._isIconLayer) {
     // //   defaultHighlightProps.sizeScale = 2;
-      
+
     // } else
     if (styleProps.getFillColor) {
       // polygon or points
       defaultHighlightProps.getFillColor = defaultHighlightStyle.getFillColor;
       defaultHighlightProps.getLineWidth = defaultHighlightStyle.getLineWidth;
       defaultHighlightProps.getLineColor = defaultHighlightStyle.getLineColor;
-    } else  {
+    } else {
       // lines: for lines we just set the line color as fill color in points and polygons
       defaultHighlightProps.getLineColor = defaultHighlightStyle.getFillColor;
     }
