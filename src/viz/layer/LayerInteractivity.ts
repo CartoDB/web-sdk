@@ -272,9 +272,11 @@ export class LayerInteractivity {
     const defaultHighlightProps: StyleProperties = {};
     const styleProps = this._layerGetStyleFn().getLayerProps(this._layer);
 
+    /* eslint-disable @typescript-eslint/ban-ts-comment */
     // @ts-ignore
     if (styleProps._isIconLayer) {
-      // icon layer
+      // icons
+
       // @ts-ignore
       const getIconProps = styleProps.getIcon();
       const { url } = getIconProps;
@@ -286,8 +288,9 @@ export class LayerInteractivity {
       };
       // @ts-ignore
       defaultHighlightProps.getColor = defaultHighlightStyle.getFillColor;
+      /* eslint-enable @typescript-eslint/ban-ts-comment */
     } else if (styleProps.getFillColor) {
-      // polygon or points
+      // polygons or points
       defaultHighlightProps.getFillColor = defaultHighlightStyle.getFillColor;
       defaultHighlightProps.getLineWidth = defaultHighlightStyle.getLineWidth;
       defaultHighlightProps.getLineColor = defaultHighlightStyle.getLineColor;
