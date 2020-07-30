@@ -14,6 +14,7 @@ export class Animation extends WithEvents {
 
   private isAnimationPaused = true;
   private animationRange: AnimationRange = { min: Infinity, max: -Infinity };
+  private originalAnimationRange: AnimationRange = { min: Infinity, max: -Infinity };
   private animationCurrentValue = 0;
   private animationStep = 0;
   private animationFadeDuration = 0;
@@ -60,14 +61,14 @@ export class Animation extends WithEvents {
   }
 
   setCurrent(value: number) {
-    if (value > this.animationRange.max || value < this.animationRange.min) {
+    if (value > this.originalAnimationRange.max || value < this.originalAnimationRange.min) {
       throw new CartoError({
         type: '',
         message: ''
       });
     }
 
-    this.animationCurrentValue = value;
+    this.animationCurrentValue = value - this.originalAnimationRange.min;
   }
 
   setProgressPct(progress: number) {
@@ -111,7 +112,7 @@ export class Animation extends WithEvents {
           return null;
         }
 
-        return (feature.properties || {})[this.column];
+        return (feature.properties || {})[this.column] - this.originalAnimationRange.min;
       },
       filterRange,
       filterSoftRange
@@ -122,7 +123,9 @@ export class Animation extends WithEvents {
   }
 
   private async init() {
-    this.animationRange = this.getAnimationRange();
+    const ranges = this.getAnimationRange();
+    this.animationRange = ranges.transformedRange;
+    this.originalAnimationRange = ranges.originalRange;
     this.animationCurrentValue = this.animationRange.min;
 
     const animationRange = this.animationRange.max - this.animationRange.min;
@@ -156,8 +159,8 @@ export class Animation extends WithEvents {
     }
 
     return {
-      min: columnStats.min,
-      max: columnStats.max
+      originalRange: { min: columnStats.min, max: columnStats.max },
+      transformedRange: { min: 0, max: columnStats.max - columnStats.min }
     };
   }
 }
