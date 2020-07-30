@@ -1,1 +1,1 @@
-export { Layer } from './Layer';
+export { Layer, LayerEvent } from './Layer';

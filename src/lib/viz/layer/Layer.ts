@@ -149,6 +149,14 @@ export class Layer extends WithEvents implements StyledLayer {
   }
 
   /**
+   * @public
+   * Retrieves the legend data from the style of the layer
+   */
+  public getLegendData(options = {}) {
+    return this._style.getLegendProps(this, options);
+  }
+
+  /**
    * Add the current layer to a Deck map instance.
    * By default the layer will be the last positioned (on top).
    * To achieve a custom ordering, `overLayerId` or `underLayerId` options can be used (and then the

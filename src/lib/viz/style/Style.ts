@@ -1,4 +1,5 @@
 import { GeoJsonLayerProps } from '@deck.gl/layers/geojson-layer/geojson-layer';
+import { LegendProperties } from '@/viz/legend';
 import { CartoStylingError, stylingErrorTypes } from '../errors/styling-error';
 import { StyledLayer } from './layer-style';
 
@@ -6,13 +7,21 @@ export type StyleProperties =
   | GeoJsonLayerProps<any>
   | ((layerStyle: StyledLayer) => GeoJsonLayerProps<any>);
 
+type LegendPropertiesFunction = (layerStyle: StyledLayer, options: any) => LegendProperties[];
+
 export class Style {
   private _styleProperties: StyleProperties;
   private _field?: string;
+  private _legendProperties?: LegendPropertiesFunction;
 
-  constructor(styleProperties: StyleProperties, field?: string) {
+  constructor(
+    styleProperties: StyleProperties,
+    field?: string,
+    legendProperties?: LegendPropertiesFunction
+  ) {
     this._styleProperties = styleProperties;
     this._field = field;
+    this._legendProperties = legendProperties;
   }
 
   public getLayerProps(layerStyle?: StyledLayer) {
@@ -32,5 +41,13 @@ export class Style {
 
   public get field() {
     return this._field;
+  }
+
+  public getLegendProps(layerStyle: StyledLayer, options = {}) {
+    if (this._legendProperties) {
+      return this._legendProperties(layerStyle, options);
+    }
+
+    return undefined;
   }
 }

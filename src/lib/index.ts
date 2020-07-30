@@ -34,6 +34,9 @@ import { CategoryDataView, FormulaDataView, HistogramDataView } from './viz/data
 // Widgets
 import { CategoryWidget, FormulaWidget, HistogramWidget } from './viz/widget';
 
+// Legend
+import { LegendWidget as Legend } from './viz/legend';
+
 /*
  * --- Public API ---
  */
@@ -93,6 +96,7 @@ export const viz = {
   dataview,
   widget,
   style,
+  Legend,
   ...basemaps,
   ...basics
 };
