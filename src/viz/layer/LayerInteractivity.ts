@@ -42,16 +42,14 @@ export class LayerInteractivity {
 
     if (this._clickStyle) {
       this._layerOnFn(InteractivityEvent.CLICK, () => {
-        console.log('click');
-        const interactiveStyle = this._wrapInteractiveStyle2();
+        const interactiveStyle = this._wrapInteractiveStyle();
         this._layerSetStyleFn(interactiveStyle);
       });
     }
 
     if (this._hoverStyle) {
       this._layerOnFn(InteractivityEvent.HOVER, () => {
-        console.log('hover');
-        const interactiveStyle = this._wrapInteractiveStyle2();
+        const interactiveStyle = this._wrapInteractiveStyle();
         this._layerSetStyleFn(interactiveStyle);
       });
     }
@@ -86,8 +84,7 @@ export class LayerInteractivity {
       (this._clickStyle && eventType === InteractivityEvent.CLICK) ||
       (this._hoverStyle && eventType === InteractivityEvent.HOVER)
     ) {
-      console.log('fire event', eventType);
-      const interactiveStyle = this._wrapInteractiveStyle2();
+      const interactiveStyle = this._wrapInteractiveStyle();
       this._layerSetStyleFn(interactiveStyle);
     }
 
@@ -170,53 +167,6 @@ export class LayerInteractivity {
     }
   }
 
-  private _wrapInteractiveStyle2() {
-    const currentStyle = this._layerGetStyleFn();
-    const styleProps = currentStyle.getLayerProps(this._layer);
-
-    const getIconProps = styleProps.getIcon();
-    const { url } = getIconProps;
-
-    const iconFn = (f: Record<string, any>) => {
-      if (
-        f &&
-        this._clickFeature &&
-        f.properties.cartodb_id === this._clickFeature.properties.cartodb_id
-      ) {
-        return {
-          ...getIconProps,
-          url: `${url} `,
-          mask: true
-        };
-      }
-
-      return getIconProps;
-    };
-
-    const colorFn = (f: Record<string, any>) => {
-      if (
-        f &&
-        this._clickFeature &&
-        f.properties.cartodb_id === this._clickFeature.properties.cartodb_id
-      ) {
-        return defaultHighlightStyle.getFillColor;
-      }
-
-      return [];
-    };
-
-    styleProps.getIcon = iconFn;
-    styleProps.getColor = colorFn;
-    styleProps.updateTriggers = {
-      getIcon: iconFn,
-      getColor: colorFn
-    };
-
-    return new Style({
-      ...styleProps
-    });
-  }
-
   /**
    * Wraps the style defined by the user with new functions
    * to check if the feature received by paramter has been clicked
@@ -254,9 +204,9 @@ export class LayerInteractivity {
       // @ts-ignore
       const defaultStyleValue = styleProps[styleProp];
       // @ts-ignore
-      const hoverStyleValue = hoverStyleProps[styleProp];
-      // @ts-ignore
       const clickStyleValue = clickStyleProps[styleProp];
+      // @ts-ignore
+      const hoverStyleValue = hoverStyleProps[styleProp];
       /* eslint-enable @typescript-eslint/ban-ts-comment */
 
       /**
@@ -269,16 +219,18 @@ export class LayerInteractivity {
       const interactionStyleFn = (feature: Record<string, any>) => {
         let styleValue;
 
-        if (
-          this._clickFeature &&
-          feature.properties.cartodb_id === this._clickFeature.properties.cartodb_id
-        ) {
-          styleValue = clickStyleValue;
-        } else if (
-          this._hoverFeature &&
-          feature.properties.cartodb_id === this._hoverFeature.properties.cartodb_id
-        ) {
-          styleValue = hoverStyleValue;
+        if (feature) {
+          if (
+            this._clickFeature &&
+            feature.properties.cartodb_id === this._clickFeature.properties.cartodb_id
+          ) {
+            styleValue = clickStyleValue;
+          } else if (
+            this._hoverFeature &&
+            feature.properties.cartodb_id === this._hoverFeature.properties.cartodb_id
+          ) {
+            styleValue = hoverStyleValue;
+          }
         }
 
         if (!styleValue) {
@@ -320,20 +272,21 @@ export class LayerInteractivity {
     const defaultHighlightProps: StyleProperties = {};
     const styleProps = this._layerGetStyleFn().getLayerProps(this._layer);
 
-    // if (styleProps.getIcon) {
-    //   // icon layer
-    //   const getIconProps = styleProps.getIcon();
-    //   defaultHighlightProps.getIcon = f => ({
-    //     ...getIconProps,
-    //     mask: true
-    //   });
-
-    //   defaultHighlightProps.getColor = f => defaultHighlightStyle.getFillColor;
-    // // if (styleProps._isIconLayer) {
-    // //   defaultHighlightProps.sizeScale = 2;
-
-    // } else
-    if (styleProps.getFillColor) {
+    // @ts-ignore
+    if (styleProps._isIconLayer) {
+      // icon layer
+      // @ts-ignore
+      const getIconProps = styleProps.getIcon();
+      const { url } = getIconProps;
+      // @ts-ignore
+      defaultHighlightProps.getIcon = {
+        ...getIconProps,
+        url: `${url}?v=highlight`,
+        mask: true
+      };
+      // @ts-ignore
+      defaultHighlightProps.getColor = defaultHighlightStyle.getFillColor;
+    } else if (styleProps.getFillColor) {
       // polygon or points
       defaultHighlightProps.getFillColor = defaultHighlightStyle.getFillColor;
       defaultHighlightProps.getLineWidth = defaultHighlightStyle.getLineWidth;
