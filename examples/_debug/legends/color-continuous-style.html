@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GeoJSON Layer with CARTO Tiles Example</title>
+
+    <!-- Custom CSS -->
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.css"
+    />
+    <link
+     rel="stylesheet"
+     type="text/css"
+     href="https://libs.cartocdn.com/airship-style/v2.4/airship.min.css"
+   />
+
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+      }
+
+      #map {
+        width: 100vw;
+        height: 100vh;
+      }
+    </style>
+  </head>
+
+  <body>
+    <section id="map"></section>
+    <div class="as-map-panels">
+      <div class="as-panel as-panel--top as-panel--left">
+        <as-legend>
+          <as-legend-color-continuous id="legend" slot="legends"></as-legend-color-continuous>
+        </as-legend>
+      </div>
+    </div>
+
+    <!-- Map libraries-->
+    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.js"></script>
+    <script src="https://libs.cartocdn.com/airship-components/v2.4/airship.js"></script>
+    <script src="https://unpkg.com/deck.gl@8.2.0/dist.min.js"></script>
+
+    <script src="/dist/umd/index.min.js"></script>
+
+    <script>
+      async function initialize() {
+        carto.auth.setDefaultCredentials({ username: 'cartoframes' });
+
+        const deckMap = carto.viz.createMap({
+          basemap: 'voyager',
+          view: {
+            longitude: -116.846099,
+            latitude: 50.2672297,
+            zoom: 2.5
+          }
+        });
+
+        const style = carto.viz.style.colorContinuous('value', {});
+        const tempLayer = new carto.viz.Layer('temps', style);
+        tempLayer.addTo(deckMap);
+        new carto.viz.Legend('#legend', tempLayer);
+      }
+
+      async function initializePolygons() {
+        carto.auth.setDefaultCredentials({ username: 'josemacarto' });
+
+        const deckMap = carto.viz.createMap({
+          basemap: 'voyager',
+          view: {
+            longitude: -122.45292663574217,
+            latitude: 37.760944207425965,
+            zoom: 11
+          }
+        });
+
+        const style = carto.viz.style.colorContinuous('businesses', {});
+        const tempLayer = new carto.viz.Layer('sf_businesses_neighborhoods', style);
+        tempLayer.addTo(deckMap);
+        new carto.viz.Legend('#legend', tempLayer);
+      }
+
+      initialize();
+      // initializePolygons();
+    </script>
+  </body>
+</html>

@@ -1,4 +1,5 @@
 import { NumericFieldStats, GeometryType } from '@/viz/source';
+import { LegendProperties, LegendGeometryType } from '@/viz/legend';
 import { StyledLayer } from '../layer-style';
 import { range } from './math-utils';
 import { CartoStylingError, stylingErrorTypes } from '../../errors/styling-error';
@@ -52,12 +53,70 @@ export function sizeContinuousStyle(
       featureProperty,
       meta.geometryType,
       opts,
-      opts.rangeMin === undefined ? stats.min : opts.rangeMin,
-      opts.rangeMax === undefined ? stats.max : opts.rangeMax
+      getRangeMin(stats, opts, meta.geometryType),
+      getRangeMax(stats, opts, meta.geometryType)
     );
   };
 
-  return new Style(evalFN, featureProperty);
+  const evalFNLegend = (layer: StyledLayer, properties = {}): LegendProperties[] => {
+    const meta = layer.source.getMetadata();
+
+    if (!meta.geometryType) {
+      return [];
+    }
+
+    const opts = defaultOptions(meta.geometryType, options);
+    const stats = meta.stats.find(f => f.name === featureProperty) as NumericFieldStats;
+    const styles = getStyles(meta.geometryType, opts) as any;
+    const geometryType = meta.geometryType.toLocaleLowerCase() as LegendGeometryType;
+    const color = geometryType === 'line' ? styles.getLineColor : styles.getFillColor;
+    // TODO samples can be an option?
+    const samples = 4;
+    const INC = 1 / (samples - 1);
+    const result = [] as LegendProperties[];
+    const min = opts.rangeMin !== undefined ? opts.rangeMin : stats.min;
+    const max = opts.rangeMax !== undefined ? opts.rangeMax : stats.max;
+
+    for (let i = 0; result.length < samples; i += INC) {
+      const value = i * (max - min) + min;
+      result.push({
+        type: geometryType,
+        color: `rgba(${color.join(',')})`,
+        label: value,
+        width: range(
+          getRangeMin(stats, opts, meta.geometryType),
+          getRangeMax(stats, opts, meta.geometryType),
+          opts.sizeRange[0],
+          opts.sizeRange[1],
+          meta.geometryType === 'Point' ? Math.sqrt(value) : value
+        ),
+        strokeColor: `rgba(${styles.getLineColor.join(',')})`,
+        ...properties
+      });
+    }
+
+    return result;
+  };
+
+  return new Style(evalFN, featureProperty, evalFNLegend);
+}
+
+function getRangeMin(
+  stats: NumericFieldStats,
+  opts: SizeContinuousOptionsStyle,
+  geometryType: GeometryType | undefined
+) {
+  const rangeMin = opts.rangeMin === undefined ? stats.min : opts.rangeMin;
+  return geometryType === 'Point' ? Math.sqrt(rangeMin) : rangeMin;
+}
+
+function getRangeMax(
+  stats: NumericFieldStats,
+  opts: SizeContinuousOptionsStyle,
+  geometryType: GeometryType | undefined
+) {
+  const rangeMax = opts.rangeMax === undefined ? stats.max : opts.rangeMax;
+  return geometryType === 'Point' ? Math.sqrt(rangeMax) : rangeMax;
 }
 
 function calculate(
@@ -68,14 +127,6 @@ function calculate(
   rangeMax: number
 ) {
   const styles = getStyles(geometryType, options);
-
-  let rangeMinValue = rangeMin;
-  let rangeMaxValue = rangeMax;
-
-  if (geometryType === 'Point') {
-    rangeMinValue = Math.sqrt(rangeMin);
-    rangeMaxValue = Math.sqrt(rangeMax);
-  }
 
   /**
    * @private
@@ -97,13 +148,7 @@ function calculate(
       featureValue = Math.sqrt(featureValue);
     }
 
-    return range(
-      rangeMinValue,
-      rangeMaxValue,
-      options.sizeRange[0],
-      options.sizeRange[1],
-      featureValue
-    );
+    return range(rangeMin, rangeMax, options.sizeRange[0], options.sizeRange[1], featureValue);
   };
 
   let obj;

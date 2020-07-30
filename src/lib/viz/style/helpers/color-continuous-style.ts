@@ -1,4 +1,5 @@
 import { NumericFieldStats, GeometryType } from '@/viz/source';
+import { LegendProperties, LegendGeometryType } from '@/viz/legend';
 import { scale as chromaScale } from 'chroma-js';
 import { getColors, getUpdateTriggers, hexToRgb } from './utils';
 import { StyledLayer } from '../layer-style';
@@ -60,12 +61,59 @@ export function colorContinuousStyle(
       featureProperty,
       meta.geometryType,
       opts,
-      opts.rangeMin === undefined ? stats.min : opts.rangeMin,
-      opts.rangeMax === undefined ? stats.max : opts.rangeMax
+      getRangeMin(stats, opts),
+      getRangeMax(stats, opts)
     );
   };
 
-  return new Style(evalFN, featureProperty);
+  const evalFNLegend = (layer: StyledLayer, properties = {}): LegendProperties[] => {
+    const meta = layer.source.getMetadata();
+
+    if (!meta.geometryType) {
+      return [];
+    }
+
+    const opts = defaultOptions(meta.geometryType, options);
+    const colors = getColors(opts.palette);
+    const stats = meta.stats.find(f => f.name === featureProperty) as NumericFieldStats;
+    const styles = getStyles(meta.geometryType, opts) as any;
+    const rangeMin = getRangeMin(stats, opts);
+    const rangeMax = getRangeMax(stats, opts);
+    const colorScale = chromaScale(colors).domain([rangeMin, rangeMax]).mode('lrgb');
+    const geometryType = meta.geometryType.toLocaleLowerCase() as LegendGeometryType;
+    // TODO samples can be an option?
+    const samples = 10;
+    const INC = 1 / (samples - 1);
+    const result = [] as LegendProperties[];
+
+    for (let i = 0; result.length < samples; i += INC) {
+      const value = i * (rangeMax - rangeMin) + rangeMin;
+      result.push({
+        type: geometryType,
+        color: `rgba(${colorScale(value).rgb().join(',')})`,
+        label: value || '',
+        width: styles.getSize,
+        strokeColor:
+          geometryType !== 'line' && options.property !== 'strokeColor'
+            ? `rgba(${styles.getLineColor.join(',')})`
+            : undefined,
+        ...properties
+      });
+    }
+
+    // TODO we need a default format function.
+    return result;
+  };
+
+  return new Style(evalFN, featureProperty, evalFNLegend);
+}
+
+function getRangeMin(stats: NumericFieldStats, opts: ColorContinuousOptionsStyle) {
+  return opts.rangeMin === undefined ? stats.min : opts.rangeMin;
+}
+
+function getRangeMax(stats: NumericFieldStats, opts: ColorContinuousOptionsStyle) {
+  return opts.rangeMax === undefined ? stats.max : opts.rangeMax;
 }
 
 function calculate(

@@ -9,5 +9,6 @@ export {
   Category,
   NumericFieldStats,
   Source,
-  AggregatedColumn
+  AggregatedColumn,
+  SourceMetadata
 } from './Source';

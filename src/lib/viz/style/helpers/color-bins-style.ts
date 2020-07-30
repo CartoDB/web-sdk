@@ -1,4 +1,5 @@
-import { NumericFieldStats, GeometryType } from '@/viz/source';
+import { NumericFieldStats, GeometryType, SourceMetadata } from '@/viz/source';
+import { LegendProperties, LegendGeometryType } from '@/viz/legend';
 import { getColors, getUpdateTriggers, hexToRgb, findIndexForBinBuckets } from './utils';
 import { Classifier, ClassificationMethod } from '../../utils/Classifier';
 import { CartoStylingError, stylingErrorTypes } from '../../errors/styling-error';
@@ -62,17 +63,57 @@ export function colorBinsStyle(
 
     validateParameters(opts);
 
-    if (!opts.breaks.length) {
-      const stats = meta.stats.find(f => f.name === featureProperty) as NumericFieldStats;
-      const classifier = new Classifier(stats);
-      const breaks = classifier.breaks(opts.bins - 1, opts.method);
-      return calculateWithBreaks(featureProperty, breaks, meta.geometryType, opts);
-    }
-
-    return calculateWithBreaks(featureProperty, opts.breaks, meta.geometryType, opts);
+    return calculateWithBreaks(
+      featureProperty,
+      getBreaks(opts, meta, featureProperty),
+      meta.geometryType,
+      opts
+    );
   };
 
-  return new Style(evalFN, featureProperty);
+  const evalFNLegend = (layer: StyledLayer, properties = {}): LegendProperties[] => {
+    const meta = layer.source.getMetadata();
+
+    if (!meta.geometryType) {
+      return [];
+    }
+
+    const opts = defaultOptions(meta.geometryType, options);
+    const breaks = getBreaks(opts, meta, featureProperty);
+    const stats = meta.stats.find(f => f.name === featureProperty) as NumericFieldStats;
+    let ranges = [...breaks, stats.max];
+    const colors = getColors(opts.palette, ranges.length);
+    ranges = [stats.min, ...ranges];
+    const styles = getStyles(meta.geometryType, opts) as any;
+    const geometryType = meta.geometryType.toLocaleLowerCase() as LegendGeometryType;
+
+    return colors.map((c, i) => {
+      return {
+        type: geometryType,
+        color: c,
+        label: `${ranges[i]} - ${ranges[i + 1]}`,
+        width: styles.getSize,
+        strokeColor:
+          geometryType !== 'line' && options.property !== 'strokeColor'
+            ? `rgba(${styles.getLineColor.join(',')})`
+            : undefined,
+        ...properties
+      };
+    });
+  };
+
+  return new Style(evalFN, featureProperty, evalFNLegend);
+}
+
+function getBreaks(opts: ColorBinsOptionsStyle, meta: SourceMetadata, featureProperty: string) {
+  if (!opts.breaks.length) {
+    const stats = meta.stats.find(f => f.name === featureProperty) as NumericFieldStats;
+    const classifier = new Classifier(stats);
+    const breaks = classifier.breaks(opts.bins - 1, opts.method);
+    return breaks;
+  }
+
+  return opts.breaks;
 }
 
 function calculateWithBreaks(
