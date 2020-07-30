@@ -22,6 +22,12 @@ export interface Stats {
 
 export interface NumericFieldStats extends Stats {
   name: string;
+  sample: number[];
+  type: string;
+  min: number;
+  max: number;
+  avg: number;
+  sum: number;
 }
 
 export interface Category {

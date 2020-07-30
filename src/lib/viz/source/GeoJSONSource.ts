@@ -196,6 +196,7 @@ export class GeoJSONSource extends Source {
       const sample = createSample(values);
 
       numericStats.push({
+        type: 'number',
         name: propName,
         min,
         max,
