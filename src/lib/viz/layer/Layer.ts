@@ -4,6 +4,7 @@ import { GeoJsonLayer, IconLayer } from '@deck.gl/layers';
 import { MVTLayer } from '@deck.gl/geo-layers';
 import ViewState from '@deck.gl/core/controllers/view-state';
 import mitt from 'mitt';
+import { DataFilterExtension } from '@deck.gl/extensions';
 import deepmerge from 'deepmerge';
 import { GeoJSON } from 'geojson';
 import { uuidv4 } from '@/core/utils/uuid';
@@ -22,6 +23,7 @@ import { FiltersCollection } from '../filters/FiltersCollection';
 import { FunctionFilterApplicator } from '../filters/FunctionFilterApplicator';
 import { ColumnFilters } from '../filters/types';
 import { basicStyle } from '../style/helpers/basic-style';
+import { Animation } from '../animation/Animation';
 
 export enum LayerEvent {
   DATA_READY = 'dataReady',
@@ -62,6 +64,8 @@ export class Layer extends WithEvents implements StyledLayer {
     FunctionFilterApplicator
   );
   private dataState: DATA_STATES = DATA_STATES.STARTING;
+
+  private animationTest: Animation | undefined;
 
   constructor(
     source: string | Source,
@@ -314,6 +318,19 @@ export class Layer extends WithEvents implements StyledLayer {
     return this._source.getFeatures(excludedFilters);
   }
 
+  async addAnimation(animationInstance: Animation) {
+    this.animationTest = animationInstance;
+    this.animationTest.on('animationStep', () => {
+      if (this._deckLayer) {
+        this.replaceDeckGLLayer();
+      }
+    });
+
+    if (this._deckLayer) {
+      await this.replaceDeckGLLayer();
+    }
+  }
+
   private _getLayerProperties() {
     const props = this._source.getProps();
     const styleProps = this.getStyle().getLayerProps(this);
@@ -336,12 +353,28 @@ export class Layer extends WithEvents implements StyledLayer {
       onHover: this._interactivity.onHover.bind(this._interactivity)
     };
 
+    filters.getOptions();
     const layerProps = {
       ...this._options,
       ...props,
       ...styleProps,
       ...events,
-      ...filters.getOptions()
+      ...(this.animationTest
+        ? this.animationTest.getLayerProperties()
+        : {
+            filterEnabled: false,
+            extensions: [new DataFilterExtension({ filterSize: 1 })],
+            getFilterValue(feature: GeoJSON.Feature) {
+              if (!feature) {
+                return 0;
+              }
+
+              const { properties = {} } = feature;
+              return (properties as Record<string, unknown>).incdate;
+            },
+            filterRange: [0, 0],
+            filterSoftRange: [0, 0]
+          })
     };
 
     // Merge Update Triggers to avoid overriding
@@ -349,7 +382,11 @@ export class Layer extends WithEvents implements StyledLayer {
     // updateTriggers
     layerProps.updateTriggers = deepmerge.all([
       layerProps.updateTriggers || {},
-      this.filtersCollection.getUpdateTriggers()
+      {
+        getFilterValue: [Math.trunc(Math.random() * 1000)],
+        filterRange: [Math.trunc(Math.random() * 1000)],
+        filterSoftRange: [Math.trunc(Math.random() * 1000)]
+      }
     ]);
 
     return ensureRelatedStyleProps(layerProps);

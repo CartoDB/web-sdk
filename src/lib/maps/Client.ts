@@ -46,7 +46,8 @@ export class Client {
             vector_extent: vectorExtent,
             vector_simplify_extent: vectorSimplifyExtent,
             metadata,
-            aggregation
+            aggregation,
+            dates_as_numbers: true
           }
         }
       ]
