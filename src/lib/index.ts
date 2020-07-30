@@ -34,6 +34,8 @@ import { CategoryDataView, FormulaDataView, HistogramDataView } from './viz/data
 // Widgets
 import { CategoryWidget, FormulaWidget, HistogramWidget } from './viz/widget';
 
+import { Animation } from './viz/animation/Animation';
+
 /*
  * --- Public API ---
  */
@@ -94,5 +96,6 @@ export const viz = {
   widget,
   style,
   ...basemaps,
-  ...basics
+  ...basics,
+  Animation
 };
