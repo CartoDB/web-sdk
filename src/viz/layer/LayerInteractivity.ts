@@ -42,14 +42,14 @@ export class LayerInteractivity {
 
     if (this._clickStyle) {
       this._layerOnFn(InteractivityEvent.CLICK, () => {
-        const interactiveStyle = this._wrapInteractiveStyle();
+        const interactiveStyle = this._wrapInteractiveStyle2();
         this._layerSetStyleFn(interactiveStyle);
       });
     }
 
     if (this._hoverStyle) {
       this._layerOnFn(InteractivityEvent.HOVER, () => {
-        const interactiveStyle = this._wrapInteractiveStyle();
+        const interactiveStyle = this._wrapInteractiveStyle2();
         this._layerSetStyleFn(interactiveStyle);
       });
     }
@@ -66,6 +66,10 @@ export class LayerInteractivity {
   }
 
   public fireOnEvent(eventType: InteractivityEvent, info: any, event: HammerInput) {
+    console.log('EVENT', eventType)
+    if (eventType === 'click') {
+      debugger;
+    }
     const features = [];
     const { coordinate, object } = info;
 
@@ -80,8 +84,8 @@ export class LayerInteractivity {
       this._setStyleCursor(info);
     }
 
-    if (this._clickStyle || this._hoverStyle) {
-      const interactiveStyle = this._wrapInteractiveStyle();
+    if ((this._clickStyle && eventType === InteractivityEvent.CLICK) || (this._hoverStyle && eventType === InteractivityEvent.HOVER)) {
+      const interactiveStyle = this._wrapInteractiveStyle2();
       this._layerSetStyleFn(interactiveStyle);
     }
 
@@ -164,6 +168,43 @@ export class LayerInteractivity {
     }
   }
 
+  private _wrapInteractiveStyle2() {
+    const currentStyle = this._layerGetStyleFn();
+    const styleProps = currentStyle.getLayerProps(this._layer);
+
+    const getIconProps = styleProps.getIcon();
+
+    const iconFn = (f: any) => {
+      console.log('icon f', !!f)
+
+      return {
+        ...getIconProps,
+        mask: f && this._clickFeature && f.properties.cartodb_id === this._clickFeature.properties.cartodb_id
+      }
+    }
+
+    const colorFn = (f: any) => {
+      console.log('color f', !!f)
+
+      if (f && this._clickFeature && f.properties.cartodb_id === this._clickFeature.properties.cartodb_id) {
+        return defaultHighlightStyle.getFillColor;
+      }
+
+      return [0, 0, 0]
+    }
+
+    styleProps.getIcon = iconFn
+    styleProps.getColor = colorFn;
+    styleProps.updateTriggers = {
+      getIcon: iconFn,
+      getColor: colorFn
+    };
+
+    return new Style({
+      ...styleProps
+    });
+  }
+
   /**
    * Wraps the style defined by the user with new functions
    * to check if the feature received by paramter has been clicked
@@ -216,6 +257,8 @@ export class LayerInteractivity {
       const interactionStyleFn = (feature: Record<string, any>) => {
         let styleValue;
 
+        console.log(!!feature)
+
         if (
           this._clickFeature &&
           feature.properties.cartodb_id === this._clickFeature.properties.cartodb_id
@@ -267,17 +310,26 @@ export class LayerInteractivity {
     const defaultHighlightProps: StyleProperties = {};
     const styleProps = this._layerGetStyleFn().getLayerProps(this._layer);
 
-    // for points & polygons we set:
-    // - fill color
-    // - stroke color
-    // - stroke width
+    // if (styleProps.getIcon) {
+    //   // icon layer
+    //   const getIconProps = styleProps.getIcon();
+    //   defaultHighlightProps.getIcon = f => ({
+    //     ...getIconProps,
+    //     mask: true
+    //   });
+
+    //   defaultHighlightProps.getColor = f => defaultHighlightStyle.getFillColor;
+    // // if (styleProps._isIconLayer) {
+    // //   defaultHighlightProps.sizeScale = 2;
+      
+    // } else
     if (styleProps.getFillColor) {
+      // polygon or points
       defaultHighlightProps.getFillColor = defaultHighlightStyle.getFillColor;
       defaultHighlightProps.getLineWidth = defaultHighlightStyle.getLineWidth;
-
       defaultHighlightProps.getLineColor = defaultHighlightStyle.getLineColor;
-    } else {
-      // for lines we just set the line color as fill color in points and polygons
+    } else  {
+      // lines: for lines we just set the line color as fill color in points and polygons
       defaultHighlightProps.getLineColor = defaultHighlightStyle.getFillColor;
     }
 
