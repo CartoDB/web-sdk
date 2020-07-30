@@ -51,26 +51,6 @@
         // const data = geoJSON.features.filter(d => d.properties.cartodb_id === 3)
         const data = geoJSON.features
 
-        // const ICON_MAPPING = {
-        //   marker: {x: 0, y: 0, width: 128, height: 128, mask: true}
-        // };
-
-        // const iconLayer = new window.deck.IconLayer({
-        //   id: 'icon-layer',
-        //   data,
-        //   pickable: true,
-        //   // iconAtlas and iconMapping are required
-        //   // getIcon: return a string
-        //   iconAtlas: 'https://raw.githubusercontent.com/visgl/deck.gl-data/master/website/icon-atlas.png',
-        //   iconMapping: ICON_MAPPING,
-        //   getIcon: d => 'marker',
-
-        //   sizeScale: 15,
-        //   getPosition: d => d.geometry.coordinates,
-        //   getSize: d => 5,
-        //   getColor: d => [255, 140, 0]
-        // });
-
         const layerBase = {
           data,
           pickable: true,
@@ -84,7 +64,7 @@
           ...layerBase,
           getIcon: d => {
             return {
-              url: 'https://raw.githubusercontent.com/visgl/deck.gl-data/master/website/icon-atlas.png',
+              url: '../interactivity/marker.png',
               width: 128,
               height: 128
             }
@@ -103,6 +83,8 @@
             }
 
             if (d.properties.cartodb_id === 3) {
+              // the final space is on purpose, you need to use a different icon string
+              p.url = 'https://raw.githubusercontent.com/visgl/deck.gl-data/master/website/icon-atlas.png '
               p.mask = true
             }
 
@@ -113,31 +95,8 @@
               return [255, 0, 0];
             }
 
-            return [0, 255, 0]
+            return []
           },
-          updateTriggers: {
-            getIcon: d => {
-              const p = {
-                url: 'https://raw.githubusercontent.com/visgl/deck.gl-data/master/website/icon-atlas.png',
-                width: 128,
-                height: 128,
-                mask: false
-              }
-
-              if (d.properties.cartodb_id === 3) {
-                p.mask = true
-              }
-
-              return p 
-            },
-            getColor: d => {
-              if (d.properties.cartodb_id === 3) {
-                return [255, 0, 0];
-              }
-
-              return [0, 255, 0]
-            }
-          }
         });
 
         const deckInstance = new window.deck.DeckGL({
