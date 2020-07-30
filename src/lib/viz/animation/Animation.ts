@@ -40,7 +40,12 @@ export class Animation extends WithEvents {
   async start() {
     await this.init();
     this.play();
+    this.emit('animationStart');
     this.onAnimationFrame();
+  }
+
+  public get isPlaying() {
+    return !this.isAnimationPaused;
   }
 
   play() {
@@ -58,6 +63,7 @@ export class Animation extends WithEvents {
   stop() {
     this.pause();
     this.reset();
+    this.emit('animationEnd');
   }
 
   setCurrent(value: number) {
