@@ -80,10 +80,7 @@ export class LayerInteractivity {
       this._setStyleCursor(info);
     }
 
-    if (
-      (this._clickStyle && eventType === InteractivityEvent.CLICK) ||
-      (this._hoverStyle && eventType === InteractivityEvent.HOVER)
-    ) {
+    if (this._clickStyle || this._hoverStyle) {
       const interactiveStyle = this._wrapInteractiveStyle();
       this._layerSetStyleFn(interactiveStyle);
     }
@@ -272,23 +269,17 @@ export class LayerInteractivity {
     const defaultHighlightProps: StyleProperties = {};
     const styleProps = this._layerGetStyleFn().getLayerProps(this._layer);
 
-    /* eslint-disable @typescript-eslint/ban-ts-comment */
-    // @ts-ignore
-    if (styleProps._isIconLayer) {
+    if (styleProps.getIcon) {
       // icons
-
-      // @ts-ignore
-      const getIconProps = styleProps.getIcon();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const getIconProps: any = styleProps.getIcon(null);
       const { url } = getIconProps;
-      // @ts-ignore
       defaultHighlightProps.getIcon = {
         ...getIconProps,
         url: `${url}?v=highlight`,
         mask: true
       };
-      // @ts-ignore
       defaultHighlightProps.getColor = defaultHighlightStyle.getFillColor;
-      /* eslint-enable @typescript-eslint/ban-ts-comment */
     } else if (styleProps.getFillColor) {
       // polygons or points
       defaultHighlightProps.getFillColor = defaultHighlightStyle.getFillColor;
