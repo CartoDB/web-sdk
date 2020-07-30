@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Deck.gl Icon Layer Example</title>
+
+    <!-- Custom CSS -->
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.css"
+    />
+
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+      }
+
+      #map {
+        width: 100vw;
+        height: 100vh;
+      }
+    </style>
+  </head>
+
+  <body>
+    <section id="map"></section>
+    <div
+      id="tooltip"
+      style="
+        position: absolute;
+        z-index: 1;
+        pointer-events: none;
+        background-color: #fff;
+        padding: 8px;
+      "
+    ></div>
+
+    <!-- Map libraries-->
+    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.js"></script>
+    <script src="https://unpkg.com/deck.gl@8.2.0/dist.min.js"></script>
+
+    <script>
+      async function initialize() {
+        const geoJSON = await fetch(
+          'https://cartoframes.carto.com/api/v2/sql?api_key=default_public&q=select* from sf_nbhd_crime&format=geojson'
+        ).then(response => response.json());
+
+        const data = geoJSON.features
+
+        // const ICON_MAPPING = {
+        //   marker: {x: 0, y: 0, width: 128, height: 128, mask: true}
+        // };
+
+        // const iconLayer = new window.deck.IconLayer({
+        //   id: 'icon-layer',
+        //   data,
+        //   pickable: true,
+        //   // iconAtlas and iconMapping are required
+        //   // getIcon: return a string
+        //   iconAtlas: 'https://raw.githubusercontent.com/visgl/deck.gl-data/master/website/icon-atlas.png',
+        //   iconMapping: ICON_MAPPING,
+        //   getIcon: d => 'marker',
+
+        //   sizeScale: 15,
+        //   getPosition: d => d.geometry.coordinates,
+        //   getSize: d => 5,
+        //   getColor: d => [255, 140, 0]
+        // });
+
+        const iconLayer = new window.deck.IconLayer({
+          id: 'icon-layer',
+          data,
+          pickable: true,
+          getIcon: d => {
+            console.log('icon', d)
+            return {
+              url: 'https://raw.githubusercontent.com/visgl/deck.gl-data/master/website/icon-atlas.png',
+              width: 128,
+              height: 128,
+              mask: true
+            }
+          },
+
+          sizeScale: 15,
+          getPosition: d => d.geometry.coordinates,
+          getSize: d => 5,
+          getColor: d => {
+            console.log('color', d)
+            return [0, 0, 255]
+          } 
+        });
+
+        const deckInstance = new window.deck.DeckGL({
+          container: 'map',
+          mapStyle: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
+          initialViewState: {
+            longitude: -122.45292663574217,
+            latitude: 37.760944207425965,
+            zoom: 11
+          },
+          controller: true,
+          layers: [iconLayer]
+        });
+
+        // Debug
+        deckInstance.getMapboxMap().showTileBoundaries = true;
+        window.deckInstance = deckInstance;
+      }
+
+      initialize();
+    </script>
+  </body>
+</html>

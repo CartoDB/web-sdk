@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Interactive based default styling example</title>
+
+    <!-- Custom CSS -->
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.css"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://libs.cartocdn.com/airship-style/v2.4/airship.min.css"
+    />
+
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+      }
+
+      #map {
+        width: 100vw;
+        height: 100vh;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="as-app" style="height: 100vh;">
+      <div class="as-content">
+        <main class="as-main">
+          <div class="as-map-area">
+            <section id="map"></section>
+            <div class="as-map-panels">
+              <div class="as-panel as-panel--top as-panel--right as-bg--ui-01">
+                <div class="as-container">
+                  <section class="as-box">
+                    <h1 class="as-title">Interactive based auto styling</h1>
+                    <p class="as-body">
+                      Style 'default' a feature based on type of interactivity
+                    </p>
+                  </section>
+                </div>
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <!-- Map libraries-->
+    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.js"></script>
+    <script src="https://unpkg.com/deck.gl@8.2.0/dist.min.js"></script>
+
+    <!-- CARTO Deck.gl's Tile Layer -->
+    <script src="/dist/umd/index.min.js"></script>
+
+    <script>
+      let selectedLayer, points, lines, polygons, deckMap;
+
+      async function initialize() {
+        carto.auth.setDefaultCredentials({
+          username: 'cartovl',
+          apiKey: 'default_public'
+        });
+
+        deckMap = carto.viz.createMap({
+          basemap: 'voyager',
+          view: {
+            longitude: 0,
+            latitude: 30,
+            zoom: 1.5
+          }
+        });
+
+        const style = carto.viz.style.icon('marker.png', {
+          height: 40,
+          width: 40
+        });
+        
+        points = new carto.viz.Layer('select * FROM world_population_2015 LIMIT 5', style, {
+          hoverStyle: 'default',
+          clickStyle: 'default'
+        });
+        
+        await points.addTo(deckMap);
+      }
+
+      
+      initialize();
+    </script>
+  </body>
+</html>
