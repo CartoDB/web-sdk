@@ -1,4 +1,5 @@
-import { CategoryFieldStats, Category, GeometryType } from '@/viz/source';
+import { CategoryFieldStats, Category, GeometryType, SourceMetadata } from '@/viz/source';
+import { LegendProperties, LegendGeometryType } from '@/viz/legend';
 import { calculateSizeBins } from './utils';
 import { Style, getStyleValue, BasicOptionsStyle, getStyles } from '..';
 import { CartoStylingError, stylingErrorTypes } from '../../errors/styling-error';
@@ -56,27 +57,68 @@ export function sizeCategoriesStyle(
     const opts = defaultOptions(meta.geometryType, options);
     validateParameters(opts, meta.geometryType);
 
-    let categories;
-
-    if (opts.categories.length) {
-      categories = opts.categories;
-    } else {
-      const stats = meta.stats.find(c => c.name === featureProperty) as CategoryFieldStats;
-
-      if (!stats.categories || !stats.categories.length) {
-        throw new CartoStylingError(`Current dataset has not categories for '${featureProperty}'`);
-      }
-
-      categories = stats.categories.map((c: Category) => c.category);
-    }
-
-    // Apply top
-    categories = categories.slice(0, opts.top);
+    const categories = getCategories(opts, meta, featureProperty).slice(0, opts.top);
 
     return calculateWithCategories(featureProperty, categories, meta.geometryType, opts);
   };
 
-  return new Style(evalFN, featureProperty);
+  const evalFNLegend = (layer: StyledLayer, properties = {}): LegendProperties[] => {
+    const meta = layer.source.getMetadata();
+
+    if (!meta.geometryType) {
+      return [];
+    }
+
+    const opts = defaultOptions(meta.geometryType, options);
+    const categories = getCategories(opts, meta, featureProperty);
+    const categoriesTop = categories.slice(0, opts.top);
+    const sizes = calculateSizeBins(categoriesTop.length - 1, opts.sizeRange);
+
+    // TODO Others label could be an option
+    if (categories.length > opts.top) {
+      sizes.push(sizes[0]);
+      categoriesTop.push('Others');
+    }
+
+    const styles = getStyles(meta.geometryType, opts) as any;
+    const geometryType = meta.geometryType.toLocaleLowerCase() as LegendGeometryType;
+    const color = geometryType === 'line' ? styles.getLineColor : styles.getFillColor;
+
+    return categoriesTop.map((c, i) => {
+      return {
+        type: geometryType,
+        color: `rgba(${color.join(',')})`,
+        label: c,
+        width: sizes[i],
+        strokeColor: `rgba(${styles.getLineColor.join(',')})`,
+        ...properties
+      };
+    });
+  };
+
+  return new Style(evalFN, featureProperty, evalFNLegend);
+}
+
+function getCategories(
+  opts: SizeCategoriesOptionsStyle,
+  meta: SourceMetadata,
+  featureProperty: string
+) {
+  let categories;
+
+  if (opts.categories.length) {
+    categories = opts.categories;
+  } else {
+    const stats = meta.stats.find(c => c.name === featureProperty) as CategoryFieldStats;
+
+    if (!stats.categories || !stats.categories.length) {
+      throw new CartoStylingError(`Current dataset has not categories for '${featureProperty}'`);
+    }
+
+    categories = stats.categories.map((c: Category) => c.category);
+  }
+
+  return categories;
 }
 
 function calculateWithCategories(
