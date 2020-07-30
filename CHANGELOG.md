@@ -10,13 +10,15 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 - Aggregated data filtering in widgets ([#96](https://github.com/CartoDB/web-sdk/pull/96))
 
 ### Changed
-- Rename `beforeLayerId|afterLayerId` options in `carto.viz.Layer.addTo` to a more clear `overLayerId|underLayerId`. 
+
+- Rename `beforeLayerId | afterLayerId` options in `carto.viz.Layer.addTo` to a more clear `overLayerId | underLayerId`. ([#103](https://github.com/CartoDB/web-sdk/pull/103/))
 
 ### Fixed
 
 - Fix `dataReady` event in `carto.viz.Layer` ([#99](https://github.com/CartoDB/web-sdk/pull/99/))
 - Fix GeoJSON use on `carto.viz.dataview` and `dataUpdate` event with a `Source` instance ([#97](https://github.com/CartoDB/web-sdk/pull/97/))
 - Fix `replaceDeckGLLayer` in `carto.viz.Layer` not considering latest layers state ([#108](https://github.com/CartoDB/web-sdk/pull/108/))
+- Fix path for .cjs & .esm module distributions ([#112](https://github.com/CartoDB/web-sdk/pull/112/))
 
 ## [1.0.0-alpha.1] 2020-07-17
 
