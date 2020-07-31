@@ -48,6 +48,11 @@
                         description="Number of ports by size (global)">
                     </as-category-widget>
                 </section>
+                <section class="as-box">
+                    <as-legend heading="Port by Size" description="Legend with symbol per type">
+                        <as-legend-color-category-point id="portsLegend" slot="legends" orientation="horizontal"></as-legend-color-category-point>
+                    </as-legend>
+                </section>
             </div>
         </aside>
 
@@ -274,6 +279,9 @@
                 }
             );
             new carto.viz.widget.Category("#widgetPortsRemote", dataviewPortsRemote);
+
+            // Legend
+            new carto.viz.Legend('#portsLegend', portsLayer);
             
         }
         
