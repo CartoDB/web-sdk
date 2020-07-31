@@ -1,13 +1,13 @@
 const COMMON_CONFIG = {
   comments: false,
-  ignore: ["./declarations"]
+  ignore: ['./declarations']
 };
 
 const ESM_CONFIG = {
   presets: [
-    ["@babel/preset-typescript"],
+    ['@babel/preset-typescript'],
     [
-      "@babel/env",
+      '@babel/env',
       {
         forceAllTransforms: true,
         modules: false,
@@ -16,25 +16,43 @@ const ESM_CONFIG = {
     ]
   ],
   plugins: [
-    ["@babel/plugin-proposal-class-properties"],
-    ["@babel/transform-runtime", { useESModules: true }]
+    ['@babel/plugin-proposal-class-properties'],
+    ['@babel/transform-runtime', { useESModules: true }],
+    [
+      'module-resolver',
+      {
+        root: ['.'],
+        alias: {
+          '@': './src/'
+        }
+      }
+    ]
   ]
 };
 
 const COMMONJS_CONFIG = {
   presets: [
-    ["@babel/preset-typescript"],
+    ['@babel/preset-typescript'],
     [
-      "@babel/env",
+      '@babel/env',
       {
         forceAllTransforms: true,
-        modules: "commonjs"
+        modules: 'commonjs'
       }
     ]
   ],
   plugins: [
-    ["@babel/plugin-proposal-class-properties"],
-    ["@babel/transform-runtime"]
+    ['@babel/plugin-proposal-class-properties'],
+    ['@babel/transform-runtime'],
+    [
+      'module-resolver',
+      {
+        root: ['.'],
+        alias: {
+          '@': './src/'
+        }
+      }
+    ]
   ]
 };
 
@@ -43,9 +61,9 @@ const CONFIGURATIONS = {
   COMMONJS: COMMONJS_CONFIG
 };
 
-module.exports = (babelApi) => {
+module.exports = babelApi => {
   // eslint-disable-next-line no-console
-  console.log("Bundling", babelApi.env());
+  console.log('Bundling', babelApi.env());
 
   // Cache Babel config by environment
   // Not needed but useful if we add more envs
