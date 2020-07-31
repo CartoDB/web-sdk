@@ -17,7 +17,7 @@ module.exports = {
 
   devtool: 'source-map',
 
-  entry: './src/lib/index.ts',
+  entry: './src/index.ts',
 
   output: {
     path: path.resolve(__dirname, 'dist/umd'),
@@ -66,7 +66,7 @@ module.exports = {
   resolve: {
     extensions: ['.ts', '.mjs', '.js'],
     alias: {
-      '@': path.resolve(__dirname, 'src/lib/')
+      '@': path.resolve(__dirname, 'src/')
     }
   },
 

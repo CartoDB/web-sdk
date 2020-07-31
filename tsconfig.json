@@ -9,11 +9,7 @@
     "diagnostics": true,
     "sourceMap": true,
     "experimentalDecorators": true,
-    "lib": [
-      "dom",
-      "es2015",
-      "es2019"
-    ],
+    "lib": ["dom", "es2015", "es2019"],
     "module": "ESNext",
     "moduleResolution": "node",
     "target": "ES2019",
@@ -23,15 +19,9 @@
     "resolveJsonModule": true,
     "baseUrl": "./",
     "paths": {
-      "@/*": [
-        "src/lib/*"
-      ]
+      "@/*": ["src/*"]
     }
   },
-  "include": [
-    "src"
-  ],
-  "exclude": [
-    "node_modules"
-  ]
+  "include": ["src"],
+  "exclude": ["node_modules"]
 }

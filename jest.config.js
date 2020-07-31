@@ -3,6 +3,6 @@ module.exports = {
   modulePathIgnorePatterns: ['__tests__/.*/cases/', 'dist'],
   rootDir: './',
   moduleNameMapper: {
-    '^@/(.*)$': '<rootDir>/src/lib/$1'
+    '^@/(.*)$': '<rootDir>/src/$1'
   }
 };
