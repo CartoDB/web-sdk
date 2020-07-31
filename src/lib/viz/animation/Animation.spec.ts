@@ -22,13 +22,13 @@ describe('Animation', () => {
       expect(animationLayer.addSourceField).toHaveBeenCalledWith(animationColumn);
     });
 
-    it.skip('should throw is column is not present or not numeric', () => {
+    it('should throw is column is not present or not numeric', async () => {
       const animationLayer = createLayer();
       const animation = new Animation(animationLayer, { column: 'fake_column' });
 
       expect(async () => {
         await animation.start();
-      }).toThrow(
+      }).rejects.toEqual(
         new CartoError({
           type: 'maltype',
           message: 'asasdasd'
