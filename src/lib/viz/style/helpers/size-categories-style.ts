@@ -1,5 +1,5 @@
 import { CategoryFieldStats, Category, GeometryType, SourceMetadata } from '@/viz/source';
-import { LegendProperties, LegendGeometryType } from '@/viz/legend';
+import { LegendProperties, LegendGeometryType, LegendWidgetOptions } from '@/viz/legend';
 import { calculateSizeBins } from './utils';
 import { Style, getStyleValue, BasicOptionsStyle, getStyles } from '..';
 import { CartoStylingError, stylingErrorTypes } from '../../errors/styling-error';
@@ -62,7 +62,10 @@ export function sizeCategoriesStyle(
     return calculateWithCategories(featureProperty, categories, meta.geometryType, opts);
   };
 
-  const evalFNLegend = (layer: StyledLayer, properties = {}): LegendProperties[] => {
+  const evalFNLegend = (
+    layer: StyledLayer,
+    legendWidgetOptions: LegendWidgetOptions = { config: {} }
+  ): LegendProperties[] => {
     const meta = layer.source.getMetadata();
 
     if (!meta.geometryType) {
@@ -74,10 +77,9 @@ export function sizeCategoriesStyle(
     const categoriesTop = categories.slice(0, opts.top);
     const sizes = calculateSizeBins(categoriesTop.length - 1, opts.sizeRange);
 
-    // TODO Others label could be an option
     if (categories.length > opts.top) {
       sizes.push(sizes[0]);
-      categoriesTop.push('Others');
+      categoriesTop.push(legendWidgetOptions.config.othersLabel || 'Others');
     }
 
     const styles = getStyles(meta.geometryType, opts) as any;
@@ -90,8 +92,7 @@ export function sizeCategoriesStyle(
         color: `rgba(${color.join(',')})`,
         label: c,
         width: sizes[i],
-        strokeColor: `rgba(${styles.getLineColor.join(',')})`,
-        ...properties
+        strokeColor: `rgba(${styles.getLineColor.join(',')})`
       };
     });
   };

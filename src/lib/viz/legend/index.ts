@@ -1,1 +1,6 @@
-export { LegendProperties, LegendWidget, LegendGeometryType } from './LegendWidget';
+export {
+  LegendProperties,
+  LegendWidget,
+  LegendGeometryType,
+  LegendWidgetOptions
+} from './LegendWidget';

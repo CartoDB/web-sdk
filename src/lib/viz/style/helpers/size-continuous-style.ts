@@ -1,5 +1,5 @@
 import { NumericFieldStats, GeometryType } from '@/viz/source';
-import { LegendProperties, LegendGeometryType } from '@/viz/legend';
+import { LegendProperties, LegendGeometryType, LegendWidgetOptions } from '@/viz/legend';
 import { StyledLayer } from '../layer-style';
 import { range } from './math-utils';
 import { CartoStylingError, stylingErrorTypes } from '../../errors/styling-error';
@@ -58,7 +58,10 @@ export function sizeContinuousStyle(
     );
   };
 
-  const evalFNLegend = (layer: StyledLayer, properties = {}): LegendProperties[] => {
+  const evalFNLegend = (
+    layer: StyledLayer,
+    legendWidgetOptions: LegendWidgetOptions = { config: {} }
+  ): LegendProperties[] => {
     const meta = layer.source.getMetadata();
 
     if (!meta.geometryType) {
@@ -70,8 +73,7 @@ export function sizeContinuousStyle(
     const styles = getStyles(meta.geometryType, opts) as any;
     const geometryType = meta.geometryType.toLocaleLowerCase() as LegendGeometryType;
     const color = geometryType === 'line' ? styles.getLineColor : styles.getFillColor;
-    // TODO samples can be an option?
-    const samples = 4;
+    const samples = legendWidgetOptions.config.samples || 4;
     const INC = 1 / (samples - 1);
     const result = [] as LegendProperties[];
     const min = opts.rangeMin !== undefined ? opts.rangeMin : stats.min;
@@ -90,8 +92,7 @@ export function sizeContinuousStyle(
           opts.sizeRange[1],
           meta.geometryType === 'Point' ? Math.sqrt(value) : value
         ),
-        strokeColor: `rgba(${styles.getLineColor.join(',')})`,
-        ...properties
+        strokeColor: `rgba(${styles.getLineColor.join(',')})`
       });
     }
 

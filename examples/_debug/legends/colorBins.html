@@ -108,7 +108,7 @@
         });
         const layer = new carto.viz.Layer('eng_wales_pop', style);
         layer.addTo(deckMap);
-        new carto.viz.Legend('#legend', layer);
+        new carto.viz.Legend('#legend', layer, {config: {order:'DESC'}});
       }
 
       // initializePoints();

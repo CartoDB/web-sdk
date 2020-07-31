@@ -86,7 +86,7 @@
         });
         const layer = new carto.viz.Layer('roads', style);
         layer.addTo(deckMap);
-        new carto.viz.Legend('#legend', layer);
+        new carto.viz.Legend('#legend', layer, {config: {order: 'DESC'}});
       }
 
       // initializePoints();

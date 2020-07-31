@@ -101,11 +101,11 @@
         const airbnbLayer = new carto.viz.Layer('ne_50m_admin_1_states_1', basicStyle);
         airbnbLayer.addTo(deckMap);
 
-        new carto.viz.Legend('#legend', airbnbLayer, { label: 'ne_50m_admin_1_states_1' });
+        new carto.viz.Legend('#legend', airbnbLayer, { format: () => { return 'ne_50m_admin_1_states_1' } });
 
         const ports = new carto.viz.Layer('world_ports');
         ports.addTo(deckMap);
-        new carto.viz.Legend('#legend2', ports, { label: 'ports' });
+        new carto.viz.Legend('#legend2', ports, { format: () => { return 'ports' } });
       }
 
       initialize();

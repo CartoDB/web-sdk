@@ -1,5 +1,5 @@
 import { NumericFieldStats, GeometryType, SourceMetadata } from '@/viz/source';
-import { LegendProperties, LegendGeometryType } from '@/viz/legend';
+import { LegendProperties, LegendGeometryType, LegendWidgetOptions } from '@/viz/legend';
 import { findIndexForBinBuckets, calculateSizeBins } from './utils';
 import { Classifier, ClassificationMethod } from '../../utils/Classifier';
 import { CartoStylingError, stylingErrorTypes } from '../../errors/styling-error';
@@ -73,7 +73,10 @@ export function sizeBinsStyle(
     );
   };
 
-  const evalFNLegend = (layer: StyledLayer, properties = {}): LegendProperties[] => {
+  const evalFNLegend = (
+    layer: StyledLayer,
+    legendWidgetOptions: LegendWidgetOptions = { config: {} }
+  ): LegendProperties[] => {
     const meta = layer.source.getMetadata();
 
     if (!meta.geometryType) {
@@ -90,16 +93,17 @@ export function sizeBinsStyle(
     const geometryType = meta.geometryType.toLocaleLowerCase() as LegendGeometryType;
     const color = geometryType === 'line' ? styles.getLineColor : styles.getFillColor;
 
-    return sizes.map((s, i) => {
+    const result = sizes.map((s, i) => {
       return {
         type: geometryType,
         color: `rgba(${color.join(',')})`,
         label: `${ranges[i]} - ${ranges[i + 1]}`,
         width: s,
-        strokeColor: `rgba(${styles.getLineColor.join(',')})`,
-        ...properties
+        strokeColor: `rgba(${styles.getLineColor.join(',')})`
       };
     });
+
+    return legendWidgetOptions.config.order === 'DESC' ? result.reverse() : result;
   };
 
   return new Style(evalFN, featureProperty, evalFNLegend);

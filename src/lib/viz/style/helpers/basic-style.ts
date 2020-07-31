@@ -1,4 +1,4 @@
-import { LegendProperties, LegendGeometryType } from '@/viz/legend';
+import { LegendProperties, LegendGeometryType, LegendWidgetOptions } from '@/viz/legend';
 import { StyledLayer } from '../layer-style';
 import { Style, getStyles, BasicOptionsStyle } from '..';
 
@@ -8,7 +8,10 @@ export function basicStyle(options: Partial<BasicOptionsStyle> = {}) {
     return getStyles(meta.geometryType, options);
   };
 
-  const evalFNLegend = (layer: StyledLayer, properties = {}): LegendProperties[] => {
+  const evalFNLegend = (
+    layer: StyledLayer,
+    legendWidgetOptions: LegendWidgetOptions = { config: {} }
+  ): LegendProperties[] => {
     // TODO getMetadata throws an exception if source is empty. It could happen
     // if the user calls getLegendData layer method before ready event has been sent
 
@@ -30,8 +33,7 @@ export function basicStyle(options: Partial<BasicOptionsStyle> = {}) {
         type: meta.geometryType.toLocaleLowerCase() as LegendGeometryType,
         color: `rgba(${color.join(',')})`,
         strokeColor: styles.getLineColor ? `rgba(${styles.getLineColor.join(',')})` : undefined,
-        width: styles.getSize,
-        ...properties
+        width: styles.getSize
       }
     ];
   };

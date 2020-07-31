@@ -1,5 +1,5 @@
 import { CategoryFieldStats, Category, GeometryType, SourceMetadata } from '@/viz/source';
-import { LegendProperties, LegendGeometryType } from '@/viz/legend';
+import { LegendProperties, LegendGeometryType, LegendWidgetOptions } from '@/viz/legend';
 import { convertArrayToObjectWithValues } from '../../utils/object';
 import { getColors, getUpdateTriggers, hexToRgb } from './utils';
 import { CartoStylingError, stylingErrorTypes } from '../../errors/styling-error';
@@ -59,7 +59,10 @@ export function colorCategoriesStyle(
     return calculateWithCategories(featureProperty, categories, meta.geometryType, opts);
   };
 
-  const evalFNLegend = (layer: StyledLayer, properties = {}): LegendProperties[] => {
+  const evalFNLegend = (
+    layer: StyledLayer,
+    legendWidgetOptions: LegendWidgetOptions = { config: {} }
+  ): LegendProperties[] => {
     const meta = layer.source.getMetadata();
 
     if (!meta.geometryType) {
@@ -73,7 +76,9 @@ export function colorCategoriesStyle(
     const categoriesWithColors = convertArrayToObjectWithValues(categoriesTop, colors);
 
     if (categories.length > opts.top) {
-      categoriesWithColors.Others = hexToRgb(opts.othersColor);
+      categoriesWithColors[legendWidgetOptions.config.othersLabel || 'Others'] = hexToRgb(
+        opts.othersColor
+      );
     }
 
     const styles = getStyles(meta.geometryType, opts) as any;
@@ -88,8 +93,7 @@ export function colorCategoriesStyle(
         strokeColor:
           geometryType !== 'line' && options.property !== 'strokeColor'
             ? `rgba(${styles.getLineColor.join(',')})`
-            : undefined,
-        ...properties
+            : undefined
       };
     });
   };

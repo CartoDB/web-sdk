@@ -1,5 +1,5 @@
 import { GeoJsonLayerProps } from '@deck.gl/layers/geojson-layer/geojson-layer';
-import { LegendProperties } from '@/viz/legend';
+import { LegendProperties, LegendWidgetOptions } from '@/viz/legend';
 import { CartoStylingError, stylingErrorTypes } from '../errors/styling-error';
 import { StyledLayer } from './layer-style';
 
@@ -43,7 +43,7 @@ export class Style {
     return this._field;
   }
 
-  public getLegendProps(layerStyle: StyledLayer, options = {}) {
+  public getLegendProps(layerStyle: StyledLayer, options: LegendWidgetOptions = { config: {} }) {
     if (this._legendProperties) {
       return this._legendProperties(layerStyle, options);
     }

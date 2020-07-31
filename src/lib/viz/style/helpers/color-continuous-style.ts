@@ -1,5 +1,5 @@
 import { NumericFieldStats, GeometryType } from '@/viz/source';
-import { LegendProperties, LegendGeometryType } from '@/viz/legend';
+import { LegendProperties, LegendGeometryType, LegendWidgetOptions } from '@/viz/legend';
 import { scale as chromaScale } from 'chroma-js';
 import { getColors, getUpdateTriggers, hexToRgb } from './utils';
 import { StyledLayer } from '../layer-style';
@@ -66,7 +66,10 @@ export function colorContinuousStyle(
     );
   };
 
-  const evalFNLegend = (layer: StyledLayer, properties = {}): LegendProperties[] => {
+  const evalFNLegend = (
+    layer: StyledLayer,
+    legendWidgetOptions: LegendWidgetOptions = { config: {} }
+  ): LegendProperties[] => {
     const meta = layer.source.getMetadata();
 
     if (!meta.geometryType) {
@@ -81,8 +84,7 @@ export function colorContinuousStyle(
     const rangeMax = getRangeMax(stats, opts);
     const colorScale = chromaScale(colors).domain([rangeMin, rangeMax]).mode('lrgb');
     const geometryType = meta.geometryType.toLocaleLowerCase() as LegendGeometryType;
-    // TODO samples can be an option?
-    const samples = 10;
+    const samples = legendWidgetOptions.config.samples || 10;
     const INC = 1 / (samples - 1);
     const result = [] as LegendProperties[];
 
@@ -96,13 +98,11 @@ export function colorContinuousStyle(
         strokeColor:
           geometryType !== 'line' && options.property !== 'strokeColor'
             ? `rgba(${styles.getLineColor.join(',')})`
-            : undefined,
-        ...properties
+            : undefined
       });
     }
 
-    // TODO we need a default format function.
-    return result;
+    return legendWidgetOptions.config.order === 'DESC' ? result.reverse() : result;
   };
 
   return new Style(evalFN, featureProperty, evalFNLegend);
