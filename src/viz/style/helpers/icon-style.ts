@@ -37,6 +37,7 @@ function getIconStyles(icon: string, options: IconOptionsStyleValidated) {
 
   return {
     getIcon: () => getIconProps,
+    getColor: () => [],
     getSize: options.height,
     sizeScale: options.sizeScale,
     sizeUnits: 'pixels'

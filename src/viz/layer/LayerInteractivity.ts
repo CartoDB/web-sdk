@@ -201,9 +201,9 @@ export class LayerInteractivity {
       // @ts-ignore
       const defaultStyleValue = styleProps[styleProp];
       // @ts-ignore
-      const hoverStyleValue = hoverStyleProps[styleProp];
-      // @ts-ignore
       const clickStyleValue = clickStyleProps[styleProp];
+      // @ts-ignore
+      const hoverStyleValue = hoverStyleProps[styleProp];
       /* eslint-enable @typescript-eslint/ban-ts-comment */
 
       /**
@@ -216,16 +216,18 @@ export class LayerInteractivity {
       const interactionStyleFn = (feature: Record<string, any>) => {
         let styleValue;
 
-        if (
-          this._clickFeature &&
-          feature.properties.cartodb_id === this._clickFeature.properties.cartodb_id
-        ) {
-          styleValue = clickStyleValue;
-        } else if (
-          this._hoverFeature &&
-          feature.properties.cartodb_id === this._hoverFeature.properties.cartodb_id
-        ) {
-          styleValue = hoverStyleValue;
+        if (feature) {
+          if (
+            this._clickFeature &&
+            feature.properties.cartodb_id === this._clickFeature.properties.cartodb_id
+          ) {
+            styleValue = clickStyleValue;
+          } else if (
+            this._hoverFeature &&
+            feature.properties.cartodb_id === this._hoverFeature.properties.cartodb_id
+          ) {
+            styleValue = hoverStyleValue;
+          }
         }
 
         if (!styleValue) {
@@ -267,17 +269,24 @@ export class LayerInteractivity {
     const defaultHighlightProps: StyleProperties = {};
     const styleProps = this._layerGetStyleFn().getLayerProps(this._layer);
 
-    // for points & polygons we set:
-    // - fill color
-    // - stroke color
-    // - stroke width
-    if (styleProps.getFillColor) {
+    if (styleProps.getIcon) {
+      // icons
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const getIconProps: any = styleProps.getIcon(null);
+      const { url } = getIconProps;
+      defaultHighlightProps.getIcon = {
+        ...getIconProps,
+        url: `${url}?v=highlight`,
+        mask: true
+      };
+      defaultHighlightProps.getColor = defaultHighlightStyle.getFillColor;
+    } else if (styleProps.getFillColor) {
+      // polygons or points
       defaultHighlightProps.getFillColor = defaultHighlightStyle.getFillColor;
       defaultHighlightProps.getLineWidth = defaultHighlightStyle.getLineWidth;
-
       defaultHighlightProps.getLineColor = defaultHighlightStyle.getLineColor;
     } else {
-      // for lines we just set the line color as fill color in points and polygons
+      // lines: for lines we just set the line color as fill color in points and polygons
       defaultHighlightProps.getLineColor = defaultHighlightStyle.getFillColor;
     }
 
