@@ -147,12 +147,13 @@ export class Animation extends WithEvents {
       this.reset();
     }
 
+
+    this.emit('animationStep');
+
     requestAnimationFrame(() => {
       this.animationCurrentValue += this.animationStep;
       this.onAnimationFrame();
     });
-
-    this.emit('animationStep');
   }
 
   private getAnimationRange() {
