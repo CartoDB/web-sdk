@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 ### Added
 
 - Aggregated data filtering in widgets ([#96](https://github.com/CartoDB/web-sdk/pull/96))
+- Add interactivity styles to `carto.viz.style.icon` helper ([#110](https://github.com/CartoDB/web-sdk/pull/110/))
 
 ### Changed
 
