@@ -12,10 +12,10 @@
       href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.css"
     />
     <link
-     rel="stylesheet"
-     type="text/css"
-     href="https://libs.cartocdn.com/airship-style/v2.4/airship.min.css"
-   />
+      rel="stylesheet"
+      type="text/css"
+      href="https://libs.cartocdn.com/airship-style/v2.4/airship.min.css"
+    />
 
     <style>
       body {
@@ -44,6 +44,7 @@
     <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.js"></script>
     <script src="https://libs.cartocdn.com/airship-components/v2.4/airship.js"></script>
     <script src="https://unpkg.com/deck.gl@8.2.0/dist.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-format/1.3.0/d3-format.min.js"></script>
 
     <script src="/dist/umd/index.min.js"></script>
 
@@ -63,7 +64,16 @@
         const style = carto.viz.style.colorContinuous('value', {});
         const tempLayer = new carto.viz.Layer('temps', style);
         tempLayer.addTo(deckMap);
-        new carto.viz.Legend('#legend', tempLayer);
+        new carto.viz.Legend('#legend', tempLayer, {
+          /*
+              The attribute format accepts a function, so for example you can use a D3 format (see
+              https://github.com/d3/d3-format) or any other arbitrary function.
+            */
+          format: d3.format('.2f'),
+          config: {
+            samples: 5
+          }
+        });
       }
 
       async function initializePolygons() {
