@@ -1,11 +1,12 @@
 import { GeoJsonLayerProps } from '@deck.gl/layers/geojson-layer/geojson-layer';
 import { LegendProperties, LegendWidgetOptions } from '@/viz/legend';
+import { IconLayerProps } from '@deck.gl/layers/icon-layer/icon-layer';
 import { CartoStylingError, stylingErrorTypes } from '../errors/styling-error';
 import { StyledLayer } from './layer-style';
 
 export type StyleProperties =
-  | GeoJsonLayerProps<any>
-  | ((layerStyle: StyledLayer) => GeoJsonLayerProps<any>);
+  | (GeoJsonLayerProps<any> & IconLayerProps<any>)
+  | ((layerStyle: StyledLayer) => GeoJsonLayerProps<any> & IconLayerProps<any>);
 
 type LegendPropertiesFunction = (layerStyle: StyledLayer, options: any) => LegendProperties[];
 
