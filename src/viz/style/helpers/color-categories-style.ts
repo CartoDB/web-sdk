@@ -61,7 +61,7 @@ export function colorCategoriesStyle(
 
   const evalFNLegend = (
     layer: StyledLayer,
-    legendWidgetOptions: LegendWidgetOptions = { config: {} }
+    legendWidgetOptions: LegendWidgetOptions = {}
   ): LegendProperties[] => {
     const meta = layer.source.getMetadata();
 
@@ -76,9 +76,13 @@ export function colorCategoriesStyle(
     const categoriesWithColors = convertArrayToObjectWithValues(categoriesTop, colors);
 
     if (categories.length > opts.top) {
-      categoriesWithColors[legendWidgetOptions.config.othersLabel || 'Others'] = hexToRgb(
-        opts.othersColor
-      );
+      let othersLabel = 'Others';
+
+      if (legendWidgetOptions.config && legendWidgetOptions.config.othersLabel) {
+        othersLabel = legendWidgetOptions.config.othersLabel;
+      }
+
+      categoriesWithColors[othersLabel] = hexToRgb(opts.othersColor);
     }
 
     const styles = getStyles(meta.geometryType, opts) as any;

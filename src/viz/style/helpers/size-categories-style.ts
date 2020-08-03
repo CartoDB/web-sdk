@@ -79,7 +79,13 @@ export function sizeCategoriesStyle(
 
     if (categories.length > opts.top) {
       sizes.push(sizes[0]);
-      categoriesTop.push(legendWidgetOptions.config.othersLabel || 'Others');
+      let othersLabel = 'Others';
+
+      if (legendWidgetOptions.config && legendWidgetOptions.config.othersLabel) {
+        othersLabel = legendWidgetOptions.config.othersLabel;
+      }
+
+      categoriesTop.push(othersLabel);
     }
 
     const styles = getStyles(meta.geometryType, opts) as any;
