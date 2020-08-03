@@ -68,7 +68,7 @@ export function colorContinuousStyle(
 
   const evalFNLegend = (
     layer: StyledLayer,
-    legendWidgetOptions: LegendWidgetOptions = { config: {} }
+    legendWidgetOptions: LegendWidgetOptions = {}
   ): LegendProperties[] => {
     const meta = layer.source.getMetadata();
 
@@ -76,6 +76,7 @@ export function colorContinuousStyle(
       return [];
     }
 
+    const { format, config } = legendWidgetOptions;
     const opts = defaultOptions(meta.geometryType, options);
     const colors = getColors(opts.palette);
     const stats = meta.stats.find(f => f.name === featureProperty) as NumericFieldStats;
@@ -84,7 +85,7 @@ export function colorContinuousStyle(
     const rangeMax = getRangeMax(stats, opts);
     const colorScale = chromaScale(colors).domain([rangeMin, rangeMax]).mode('lrgb');
     const geometryType = meta.geometryType.toLocaleLowerCase() as LegendGeometryType;
-    const samples = legendWidgetOptions.config.samples || 10;
+    const samples = config?.samples || 10;
     const INC = 1 / (samples - 1);
     const result = [] as LegendProperties[];
 
@@ -93,7 +94,7 @@ export function colorContinuousStyle(
       result.push({
         type: geometryType,
         color: `rgba(${colorScale(value).rgb().join(',')})`,
-        label: value || '',
+        label: format ? format(value) : value,
         width: styles.getSize,
         strokeColor:
           geometryType !== 'line' && options.property !== 'strokeColor'
@@ -102,7 +103,7 @@ export function colorContinuousStyle(
       });
     }
 
-    return legendWidgetOptions.config.order === 'DESC' ? result.reverse() : result;
+    return config?.order === 'ASC' ? result : result.reverse();
   };
 
   return new Style(evalFN, featureProperty, evalFNLegend);

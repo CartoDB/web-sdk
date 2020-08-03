@@ -81,6 +81,7 @@ export function colorBinsStyle(
       return [];
     }
 
+    const { format, config } = legendWidgetOptions;
     const opts = defaultOptions(meta.geometryType, options);
     const breaks = getBreaks(opts, meta, featureProperty);
     const stats = meta.stats.find(f => f.name === featureProperty) as NumericFieldStats;
@@ -91,10 +92,12 @@ export function colorBinsStyle(
     const geometryType = meta.geometryType.toLocaleLowerCase() as LegendGeometryType;
 
     const result = colors.map((c, i) => {
+      const rangeValIni = format ? format(ranges[i]) : ranges[i];
+      const rangeValEnd = format ? format(ranges[i + 1]) : ranges[i + 1];
       return {
         type: geometryType,
         color: c,
-        label: `${ranges[i]} - ${ranges[i + 1]}`,
+        label: `${rangeValIni} - ${rangeValEnd}`,
         width: styles.getSize,
         strokeColor:
           geometryType !== 'line' && options.property !== 'strokeColor'
@@ -103,7 +106,7 @@ export function colorBinsStyle(
       };
     });
 
-    return legendWidgetOptions.config.order === 'DESC' ? result.reverse() : result;
+    return config?.order === 'ASC' ? result : result.reverse();
   };
 
   return new Style(evalFN, featureProperty, evalFNLegend);

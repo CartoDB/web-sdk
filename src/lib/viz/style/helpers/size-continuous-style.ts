@@ -68,12 +68,13 @@ export function sizeContinuousStyle(
       return [];
     }
 
+    const { format, config } = legendWidgetOptions;
     const opts = defaultOptions(meta.geometryType, options);
     const stats = meta.stats.find(f => f.name === featureProperty) as NumericFieldStats;
     const styles = getStyles(meta.geometryType, opts) as any;
     const geometryType = meta.geometryType.toLocaleLowerCase() as LegendGeometryType;
     const color = geometryType === 'line' ? styles.getLineColor : styles.getFillColor;
-    const samples = legendWidgetOptions.config.samples || 4;
+    const samples = config?.samples || 4;
     const INC = 1 / (samples - 1);
     const result = [] as LegendProperties[];
     const min = opts.rangeMin !== undefined ? opts.rangeMin : stats.min;
@@ -84,7 +85,7 @@ export function sizeContinuousStyle(
       result.push({
         type: geometryType,
         color: `rgba(${color.join(',')})`,
-        label: value,
+        label: format ? format(value) : value,
         width: range(
           getRangeMin(stats, opts, meta.geometryType),
           getRangeMax(stats, opts, meta.geometryType),

@@ -83,6 +83,7 @@ export function sizeBinsStyle(
       return [];
     }
 
+    const { format, config } = legendWidgetOptions;
     const opts = defaultOptions(meta.geometryType, options);
     const breaks = getBreaks(opts, meta, featureProperty);
     const stats = meta.stats.find(f => f.name === featureProperty) as NumericFieldStats;
@@ -94,16 +95,18 @@ export function sizeBinsStyle(
     const color = geometryType === 'line' ? styles.getLineColor : styles.getFillColor;
 
     const result = sizes.map((s, i) => {
+      const rangeValIni = format ? format(ranges[i]) : ranges[i];
+      const rangeValEnd = format ? format(ranges[i + 1]) : ranges[i + 1];
       return {
         type: geometryType,
         color: `rgba(${color.join(',')})`,
-        label: `${ranges[i]} - ${ranges[i + 1]}`,
+        label: `${rangeValIni} - ${rangeValEnd}`,
         width: s,
         strokeColor: `rgba(${styles.getLineColor.join(',')})`
       };
     });
 
-    return legendWidgetOptions.config.order === 'DESC' ? result.reverse() : result;
+    return config?.order === 'ASC' ? result : result.reverse();
   };
 
   return new Style(evalFN, featureProperty, evalFNLegend);

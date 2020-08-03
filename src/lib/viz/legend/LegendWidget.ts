@@ -17,7 +17,7 @@ export type LegendProperties = {
 export type LegendWidgetOptions = {
   format?: (value: string | number | undefined) => string | number;
   dynamic?: boolean;
-  config: {
+  config?: {
     othersLabel?: string;
     order?: 'ASC' | 'DESC';
     samples?: number;
@@ -25,7 +25,7 @@ export type LegendWidgetOptions = {
 };
 
 export class LegendWidget {
-  constructor(element: string | HTMLElement, layer: Layer, options?: LegendWidgetOptions) {
+  constructor(element: string | HTMLElement, layer: Layer, options: LegendWidgetOptions = {}) {
     const domElement = queryDOMElement(element);
     validateParameters(domElement, layer, options);
     const legendWidget = domElement as any;
@@ -43,7 +43,7 @@ export class LegendWidget {
 function validateParameters(
   element: HTMLElement | null,
   layer: Layer,
-  options: LegendWidgetOptions = { config: {} }
+  options: LegendWidgetOptions
 ) {
   if (!element) {
     throw new CartoError({
