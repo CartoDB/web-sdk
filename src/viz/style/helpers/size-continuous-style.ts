@@ -97,7 +97,7 @@ export function sizeContinuousStyle(
       });
     }
 
-    return result;
+    return config?.order === 'ASC' ? result : result.reverse();
   };
 
   return new Style(evalFN, featureProperty, evalFNLegend);
