@@ -2,6 +2,8 @@ import { Deck } from '@deck.gl/core';
 import { CartoPopupError, popupErrorTypes } from '../errors/popup-error';
 import { getMapContainer } from '../utils/map-utils';
 
+const CLOSE_BUTTON_WIDTH = '17px';
+
 /**
  * Default options for the Popup
  */
@@ -110,13 +112,6 @@ export class Popup {
   public open() {
     if (this._parentElement && !this._isOpen) {
       this._parentElement.appendChild(this._container);
-
-      // adjust width to content
-      const contentWrapper = this._container.querySelector('div.as-infowindow') as HTMLElement;
-
-      if (contentWrapper) {
-        contentWrapper.style.width = 'calc(100% + 17px)';
-      }
     }
 
     this._isOpen = true;
@@ -205,6 +200,7 @@ export class Popup {
     containerElem.style.cssText = 'position: absolute; z-index: 1; pointer-events: none';
 
     if (this._options.closeButton) {
+      containerElem.setAttribute('width', `calc(100% + ${CLOSE_BUTTON_WIDTH})`);
       // enable pointer events
       containerElem.style.pointerEvents = 'inherit';
       // create the close button
