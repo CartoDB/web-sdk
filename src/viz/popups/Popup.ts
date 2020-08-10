@@ -159,18 +159,15 @@ export class Popup {
         const popupContent: string = generatePopupContent(elements, features);
         this.open();
         this.setContent(popupContent);
+        let popupCoordinates = coordinates;
 
         // to be more accurate on points we use the feature
         // coordinates instead of the coordinates where the user clicked
-        // if (features[0].geometry.type === 'Point') {
-        //   const featureCoordinates = pixels2coordinates(
-        //     features[0].geometry.coordinates,
-        //     this._deckInstance
-        //   );
-        //   this.setCoordinates(featureCoordinates);
-        // } else {
-        this.setCoordinates(coordinates);
-        // }
+        if (features[0].geometry.type === 'Point') {
+          popupCoordinates = features[0].geometry.coordinates;
+        }
+
+        this.setCoordinates(popupCoordinates);
       } else {
         this.close();
       }
