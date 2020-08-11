@@ -90,7 +90,7 @@ export function colorContinuousStyle(
     const result = [] as LegendProperties[];
 
     for (let i = 0; result.length < samples; i += INC) {
-      const value = i * (rangeMax - rangeMin) + rangeMin;
+      const value = result.length === samples - 1 ? rangeMax : i * (rangeMax - rangeMin) + rangeMin;
       result.push({
         type: geometryType,
         color: `rgba(${colorScale(value).rgb().join(',')})`,

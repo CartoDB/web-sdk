@@ -22,7 +22,7 @@ export function basicStyle(options: Partial<BasicOptionsStyle> = {}) {
     const color = meta.geometryType === 'Line' ? styles.getLineColor : styles.getFillColor;
 
     if (styles.opacity) {
-      color[color.length - 1] = styles.opacity;
+      color[color.length - 1] = styles.opacity * 255;
     }
 
     return [

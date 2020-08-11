@@ -94,8 +94,8 @@ function validateParameters(
   if (
     options.config &&
     options.config.order &&
-    typeof options.config.order !== 'string' &&
-    (options.config.order === 'ASC' || options.config.order === 'DESC')
+    (typeof options.config.order !== 'string' ||
+      (options.config.order !== 'ASC' && options.config.order !== 'DESC'))
   ) {
     throw new CartoError({
       type: '[Legend]',
