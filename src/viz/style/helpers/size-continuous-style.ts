@@ -1,5 +1,6 @@
-import { NumericFieldStats, GeometryType } from '@/viz/source';
+import { NumericFieldStats, GeometryType, SourceMetadata } from '@/viz/source';
 import { LegendProperties, LegendGeometryType } from '@/viz/legend';
+import { Layer } from '@/viz';
 import { StyledLayer } from '../layer-style';
 import { range } from './math-utils';
 import { CartoStylingError, stylingErrorTypes } from '../../errors/styling-error';
@@ -29,6 +30,7 @@ function defaultOptions(
     sizeRange: getDefaultSizeRange(geometryType),
     nullSize: getStyleValue('nullSize', geometryType, options),
     opacity: 0.7,
+    viewport: options.viewport || false,
     ...options
   };
 }
@@ -37,7 +39,7 @@ export function sizeContinuousStyle(
   featureProperty: string,
   options: Partial<SizeContinuousOptionsStyle> = {}
 ) {
-  const evalFN = (layer: StyledLayer) => {
+  const evalFN = async (layer: StyledLayer) => {
     const meta = layer.source.getMetadata();
 
     if (layer.source.isEmpty()) {
@@ -47,15 +49,30 @@ export function sizeContinuousStyle(
     const opts = defaultOptions(meta.geometryType, options);
     validateParameters(opts, meta.geometryType);
 
-    const stats = meta.stats.find(f => f.name === featureProperty) as NumericFieldStats;
+    const dataOrigin = opts.viewport ? (layer as Layer) : meta;
 
-    return calculate(
-      featureProperty,
-      meta.geometryType,
-      opts,
-      getRangeMin(stats, opts, meta.geometryType),
-      getRangeMax(stats, opts, meta.geometryType)
-    );
+    let stats;
+
+    try {
+      stats = await getMinMax(dataOrigin, featureProperty, options.viewport);
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.warn(err);
+    }
+
+    let styleObj = {};
+
+    if (stats && stats.min && stats.max) {
+      styleObj = calculate(
+        featureProperty,
+        meta.geometryType,
+        opts,
+        getRangeMin(stats, opts, meta.geometryType),
+        getRangeMax(stats, opts, meta.geometryType)
+      );
+    }
+
+    return styleObj;
   };
 
   const evalFNLegend = (layer: StyledLayer, properties = {}): LegendProperties[] => {
@@ -98,7 +115,32 @@ export function sizeContinuousStyle(
     return result;
   };
 
-  return new Style(evalFN, featureProperty, evalFNLegend);
+  return new Style(evalFN, featureProperty, evalFNLegend, options.viewport);
+}
+
+async function getMinMax(
+  dataOrigin: Layer | SourceMetadata,
+  featureProperty: string,
+  viewport = false
+) {
+  let stats: NumericFieldStats;
+
+  if (viewport) {
+    const data = (await (dataOrigin as Layer).getViewportFeatures())
+      .filter(f => f[featureProperty])
+      .map(f => f[featureProperty] as number);
+    stats = {
+      name: featureProperty,
+      min: Math.min(...data),
+      max: Math.max(...data)
+    };
+  } else {
+    stats = (dataOrigin as SourceMetadata).stats.find(
+      f => f.name === featureProperty
+    ) as NumericFieldStats;
+  }
+
+  return stats;
 }
 
 function getRangeMin(

@@ -1,6 +1,7 @@
-import { NumericFieldStats, GeometryType } from '@/viz/source';
+import { NumericFieldStats, GeometryType, SourceMetadata } from '@/viz/source';
 import { LegendProperties, LegendGeometryType } from '@/viz/legend';
 import { scale as chromaScale } from 'chroma-js';
+import { Layer } from '@/viz';
 import { getColors, getUpdateTriggers, hexToRgb } from './utils';
 import { StyledLayer } from '../layer-style';
 import { BasicOptionsStyle, getStyleValue, getStyles, Style } from '..';
@@ -32,6 +33,7 @@ function defaultOptions(
     size: 6,
     palette: DEFAULT_PALETTE,
     nullColor: getStyleValue('nullColor', geometryType, options),
+    viewport: options.viewport || false,
     ...options
   };
 }
@@ -40,7 +42,7 @@ export function colorContinuousStyle(
   featureProperty: string,
   options: Partial<ColorContinuousOptionsStyle> = {}
 ) {
-  const evalFN = (layer: StyledLayer) => {
+  const evalFN = async (layer: StyledLayer) => {
     const meta = layer.source.getMetadata();
 
     if (layer.source.isEmpty()) {
@@ -51,19 +53,30 @@ export function colorContinuousStyle(
 
     validateParameters(opts);
 
-    const stats = meta.stats.find(f => f.name === featureProperty) as NumericFieldStats;
+    const dataOrigin = opts.viewport ? (layer as Layer) : meta;
 
-    if (stats.min === undefined || stats.max === undefined) {
-      throw new Error('Need max/min');
+    let stats;
+
+    try {
+      stats = await getMinMax(dataOrigin, featureProperty, options.viewport);
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.warn(err);
     }
 
-    return calculate(
-      featureProperty,
-      meta.geometryType,
-      opts,
-      getRangeMin(stats, opts),
-      getRangeMax(stats, opts)
-    );
+    let styleObj = {};
+
+    if (stats && stats.min && stats.max) {
+      styleObj = calculate(
+        featureProperty,
+        meta.geometryType,
+        opts,
+        getRangeMin(stats, opts),
+        getRangeMax(stats, opts)
+      );
+    }
+
+    return styleObj;
   };
 
   const evalFNLegend = (layer: StyledLayer, properties = {}): LegendProperties[] => {
@@ -105,7 +118,32 @@ export function colorContinuousStyle(
     return result;
   };
 
-  return new Style(evalFN, featureProperty, evalFNLegend);
+  return new Style(evalFN, featureProperty, evalFNLegend, options.viewport);
+}
+
+async function getMinMax(
+  dataOrigin: Layer | SourceMetadata,
+  featureProperty: string,
+  viewport = false
+) {
+  let stats: NumericFieldStats;
+
+  if (viewport) {
+    const data = (await (dataOrigin as Layer).getViewportFeatures())
+      .filter(f => f[featureProperty])
+      .map(f => f[featureProperty] as number);
+    stats = {
+      name: featureProperty,
+      min: Math.min(...data),
+      max: Math.max(...data)
+    };
+  } else {
+    stats = (dataOrigin as SourceMetadata).stats.find(
+      f => f.name === featureProperty
+    ) as NumericFieldStats;
+  }
+
+  return stats;
 }
 
 function getRangeMin(stats: NumericFieldStats, opts: ColorContinuousOptionsStyle) {
@@ -132,7 +170,7 @@ function calculate(
   const getFillColor = (feature: Record<string, Record<string, number | string>>) => {
     const featureValue = Number(feature.properties[featureProperty]);
 
-    if (!featureValue) {
+    if (!featureValue || featureValue < rangeMin || featureValue > rangeMax) {
       return nullColor;
     }
 

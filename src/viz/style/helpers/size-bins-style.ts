@@ -1,4 +1,5 @@
 import { NumericFieldStats, GeometryType, SourceMetadata } from '@/viz/source';
+import { Layer } from '@/viz';
 import { LegendProperties, LegendGeometryType } from '@/viz/legend';
 import { findIndexForBinBuckets, calculateSizeBins } from './utils';
 import { Classifier, ClassificationMethod } from '../../utils/Classifier';
@@ -40,6 +41,7 @@ function defaultOptions(
     sizeRange: getStyleValue('sizeRange', geometryType, options),
     nullSize: 0,
     opacity: 0.7,
+    viewport: options.viewport || false,
     ...options
   };
 }
@@ -48,7 +50,7 @@ export function sizeBinsStyle(
   featureProperty: string,
   options: Partial<SizeBinsOptionsStyle> = {}
 ) {
-  const evalFN = (layer: StyledLayer) => {
+  const evalFN = async (layer: StyledLayer) => {
     const meta = layer.source.getMetadata();
 
     if (layer.source.isEmpty()) {
@@ -65,15 +67,12 @@ export function sizeBinsStyle(
       );
     }
 
-    return calculateWithBreaks(
-      featureProperty,
-      getBreaks(opts, meta, featureProperty),
-      meta.geometryType,
-      opts
-    );
+    const dataOrigin = opts.viewport ? (layer as Layer) : meta;
+    const breaks = await getBreaks(opts, dataOrigin, featureProperty);
+    return calculateWithBreaks(featureProperty, breaks, meta.geometryType, opts);
   };
 
-  const evalFNLegend = (layer: StyledLayer, properties = {}): LegendProperties[] => {
+  const evalFNLegend = async (layer: StyledLayer, properties = {}): Promise<LegendProperties[]> => {
     const meta = layer.source.getMetadata();
 
     if (!meta.geometryType) {
@@ -81,10 +80,11 @@ export function sizeBinsStyle(
     }
 
     const opts = defaultOptions(meta.geometryType, options);
-    const breaks = getBreaks(opts, meta, featureProperty);
+    const dataOrigin = opts.viewport ? (layer as Layer) : meta;
+    const breaks = await getBreaks(opts, dataOrigin, featureProperty);
     const stats = meta.stats.find(f => f.name === featureProperty) as NumericFieldStats;
     let ranges = [...breaks, stats.max];
-    const sizes = calculateSizeBins(breaks.length, opts.sizeRange);
+    const sizes = await calculateSizeBins(breaks.length, opts.sizeRange);
     const styles = getStyles(meta.geometryType, options) as any;
     ranges = [stats.min, ...ranges];
     const geometryType = meta.geometryType.toLocaleLowerCase() as LegendGeometryType;
@@ -102,21 +102,29 @@ export function sizeBinsStyle(
     });
   };
 
-  return new Style(evalFN, featureProperty, evalFNLegend);
+  return new Style(evalFN, featureProperty, evalFNLegend, options.viewport);
 }
 
-function getBreaks(opts: SizeBinsOptionsStyle, meta: SourceMetadata, featureProperty: string) {
+async function getBreaks(
+  opts: SizeBinsOptionsStyle,
+  dataOrigin: Layer | SourceMetadata,
+  featureProperty: string
+) {
   if (!opts.breaks.length) {
-    const stats = meta.stats.find(f => f.name === featureProperty) as NumericFieldStats;
-    const classifier = new Classifier(stats);
-    const breaks = classifier.breaks(opts.bins - 1, opts.method);
+    const data = (dataOrigin as SourceMetadata).stats
+      ? ((dataOrigin as SourceMetadata).stats.find(
+          f => f.name === featureProperty
+        ) as NumericFieldStats)
+      : (dataOrigin as Layer);
+    const classifier = new Classifier(data, featureProperty);
+    const breaks = await classifier.breaks(opts.bins - 1, opts.method, opts.viewport);
     return breaks;
   }
 
   return opts.breaks;
 }
 
-function calculateWithBreaks(
+async function calculateWithBreaks(
   featureProperty: string,
   breaks: number[],
   geometryType: GeometryType | undefined,
@@ -133,7 +141,7 @@ function calculateWithBreaks(
   const ranges = [...breaks, Number.MAX_SAFE_INTEGER];
 
   // calculate sizes based on breaks and sizeRanges.
-  const sizes = calculateSizeBins(breaks.length, options.sizeRange);
+  const sizes = await calculateSizeBins(breaks.length, options.sizeRange);
 
   /**
    * @private

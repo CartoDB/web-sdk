@@ -1,5 +1,6 @@
 import { CategoryFieldStats, Category, GeometryType, SourceMetadata } from '@/viz/source';
 import { LegendProperties, LegendGeometryType } from '@/viz/legend';
+import { Layer } from '@/viz';
 import { convertArrayToObjectWithValues } from '../../utils/object';
 import { getColors, getUpdateTriggers, hexToRgb } from './utils';
 import { CartoStylingError, stylingErrorTypes } from '../../errors/styling-error';
@@ -35,6 +36,7 @@ function defaultOptions(
     palette: DEFAULT_PALETTE,
     nullColor: getStyleValue('nullColor', geometryType, options),
     othersColor: getStyleValue('othersColor', geometryType, options),
+    viewport: options.viewport || false,
     ...options
   };
 }
@@ -43,7 +45,7 @@ export function colorCategoriesStyle(
   featureProperty: string,
   options: Partial<ColorCategoriesOptionsStyle> = {}
 ) {
-  const evalFN = (layer: StyledLayer) => {
+  const evalFN = async (layer: StyledLayer) => {
     const meta = layer.source.getMetadata();
 
     if (layer.source.isEmpty()) {
@@ -54,12 +56,13 @@ export function colorCategoriesStyle(
 
     validateParameters(opts);
 
-    const categories = getCategories(opts, meta, featureProperty).slice(0, opts.top);
+    const dataOrigin = opts.viewport ? (layer as Layer) : meta;
+    const categories = (await getCategories(opts, dataOrigin, featureProperty)).slice(0, opts.top);
 
     return calculateWithCategories(featureProperty, categories, meta.geometryType, opts);
   };
 
-  const evalFNLegend = (layer: StyledLayer, properties = {}): LegendProperties[] => {
+  const evalFNLegend = async (layer: StyledLayer, properties = {}): Promise<LegendProperties[]> => {
     const meta = layer.source.getMetadata();
 
     if (!meta.geometryType) {
@@ -67,7 +70,7 @@ export function colorCategoriesStyle(
     }
 
     const opts = defaultOptions(meta.geometryType, options);
-    const categories = getCategories(opts, meta, featureProperty);
+    const categories = await getCategories(opts, meta, featureProperty);
     const categoriesTop = categories.slice(0, opts.top);
     const colors = getColors(opts.palette, categoriesTop.length).map(hexToRgb);
     const categoriesWithColors = convertArrayToObjectWithValues(categoriesTop, colors);
@@ -94,26 +97,44 @@ export function colorCategoriesStyle(
     });
   };
 
-  return new Style(evalFN, featureProperty, evalFNLegend);
+  return new Style(evalFN, featureProperty, evalFNLegend, options.viewport);
 }
 
-function getCategories(
+async function getCategories(
   opts: ColorCategoriesOptionsStyle,
-  meta: SourceMetadata,
+  dataOrigin: Layer | SourceMetadata,
   featureProperty: string
 ) {
-  let categories;
+  let categories: string[] = [];
 
   if (opts.categories.length) {
     categories = opts.categories;
   } else {
-    const stats = meta.stats.find(c => c.name === featureProperty) as CategoryFieldStats;
+    const layer = dataOrigin as Layer;
+    const meta = dataOrigin as SourceMetadata;
 
-    if (!stats.categories || !stats.categories.length) {
-      throw new CartoStylingError(`Current dataset has not categories for '${featureProperty}'`);
+    if (opts.viewport) {
+      try {
+        categories = [
+          ...new Set(
+            (await layer.getViewportFeatures())
+              .filter(f => f[featureProperty])
+              .map(f => f[featureProperty] as string)
+          )
+        ];
+      } catch (err) {
+        // eslint-disable-next-line no-console
+        console.warn(err);
+      }
+    } else {
+      const stats = meta.stats.find(c => c.name === featureProperty) as CategoryFieldStats;
+
+      if (!stats.categories || !stats.categories.length) {
+        throw new CartoStylingError(`Current dataset has not categories for '${featureProperty}'`);
+      }
+
+      categories = stats.categories.map((c: Category) => c.category);
     }
-
-    categories = stats.categories.map((c: Category) => c.category);
   }
 
   return categories;

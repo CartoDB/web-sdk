@@ -79,6 +79,9 @@ export interface BasicOptionsStyle {
   strokeColor: string;
   // Size of the stroke
   strokeWidth: number;
+  // If true the style is applied only for the viewport features.
+  // Default is false.
+  viewport: boolean;
 }
 
 export function getStyles(geometryType?: GeometryType, options: Partial<BasicOptionsStyle> = {}) {
