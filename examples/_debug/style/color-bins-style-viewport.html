@@ -62,11 +62,8 @@
         });
 
         const style = carto.viz.style.colorBins('availability_365', {
-          bins: 5,
           method: 'quantiles',
           viewport: true
-          // breaks: [],
-          // palette:
         });
         const layer = new carto.viz.Layer('listings_madrid', style);
         layer.addTo(deckMap);
@@ -103,8 +100,8 @@
 
         const style = carto.viz.style.colorBins('pop_sq_km', {
           viewport: true,
-          // method: 'quantiles'
-          method: 'stdev'
+          method: 'quantiles'
+          // method: 'stdev'
           // method: 'equal'
           // color: '#0000FF',
           // size: 5
