@@ -175,7 +175,7 @@ export class LayerInteractivity {
     const wrapInteractiveStyle = { updateTriggers: {} };
 
     const currentStyle = await this._layerGetStyleFn();
-    const styleProps = currentStyle.getLayerProps(this._layer);
+    const styleProps = await currentStyle.getLayerProps(this._layer);
 
     let clickStyleProps = {};
 
@@ -183,7 +183,7 @@ export class LayerInteractivity {
       const defaultHighlightStyle = await this._getDefaultHighlightStyle();
       clickStyleProps = await defaultHighlightStyle.getLayerProps(this._layer);
     } else if (this._clickStyle instanceof Style) {
-      clickStyleProps = this._clickStyle.getLayerProps(this._layer);
+      clickStyleProps = await this._clickStyle.getLayerProps(this._layer);
     }
 
     let hoverStyleProps = {};
@@ -192,7 +192,7 @@ export class LayerInteractivity {
       const defaultHighlightStyle = await this._getDefaultHighlightStyle();
       hoverStyleProps = await defaultHighlightStyle.getLayerProps(this._layer);
     } else if (this._hoverStyle instanceof Style) {
-      hoverStyleProps = this._hoverStyle.getLayerProps(this._layer);
+      hoverStyleProps = await this._hoverStyle.getLayerProps(this._layer);
     }
 
     Object.keys({
