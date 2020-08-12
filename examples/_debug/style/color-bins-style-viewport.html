@@ -12,6 +12,12 @@
       href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.css"
     />
 
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://libs.cartocdn.com/airship-style/v2.4/airship.min.css"
+    />
+
     <style>
       body {
         margin: 0;
@@ -27,9 +33,17 @@
 
   <body>
     <section id="map"></section>
+    <div class="as-map-panels">
+      <div class="as-panel as-panel--top as-panel--left">
+        <as-legend>
+          <as-legend-color-bins id="legend" slot="legends"></as-legend-color-bins>
+        </as-legend>
+      </div>
+    </div>
 
     <!-- Map libraries-->
     <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.js"></script>
+    <script src="https://libs.cartocdn.com/airship-components/v2.4/airship.js"></script>
     <script src="https://unpkg.com/deck.gl@8.2.0/dist.min.js"></script>
 
     <script src="/dist/umd/index.min.js"></script>
@@ -97,6 +111,7 @@
         });
         const layer = new carto.viz.Layer('eng_wales_pop', style);
         layer.addTo(deckMap);
+        new carto.viz.Legend('#legend', layer);
       }
 
       // initializePoints();
