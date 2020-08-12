@@ -6,12 +6,12 @@ import { StyledLayer } from './layer-style';
 
 export type StyleProperties =
   | (GeoJsonLayerProps<any> & IconLayerProps<any>)
-  | ((layerStyle: StyledLayer) => GeoJsonLayerProps<any> & IconLayerProps<any>)
   | ((layerStyle: StyledLayer) => Promise<GeoJsonLayerProps<any>> & Promise<IconLayerProps<any>>);
 
-type LegendPropertiesFunction =
-  | ((layerStyle: StyledLayer, options: any) => LegendProperties[])
-  | ((layerStyle: StyledLayer, options: any) => Promise<LegendProperties[]>);
+export type LegendPropertiesFunction = (
+  layerStyle: StyledLayer,
+  options: any
+) => Promise<LegendProperties[]>;
 
 export class Style {
   private _styleProperties: StyleProperties;

@@ -72,8 +72,10 @@ export function sizeCategoriesStyle(
       return [];
     }
 
+    let legendProperties: LegendProperties[] = [];
     const opts = defaultOptions(meta.geometryType, options);
-    const categories = await getCategories(opts, meta, featureProperty);
+    const dataOrigin = opts.viewport ? (layer as Layer) : meta;
+    const categories = await getCategories(opts, dataOrigin, featureProperty);
     const categoriesTop = categories.slice(0, opts.top);
     const sizes = await calculateSizeBins(categoriesTop.length - 1, opts.sizeRange);
 
@@ -87,16 +89,36 @@ export function sizeCategoriesStyle(
     const geometryType = meta.geometryType.toLocaleLowerCase() as LegendGeometryType;
     const color = geometryType === 'line' ? styles.getLineColor : styles.getFillColor;
 
-    return categoriesTop.map((c, i) => {
-      return {
-        type: geometryType,
-        color: `rgba(${color.join(',')})`,
-        label: c,
-        width: sizes[i],
-        strokeColor: `rgba(${styles.getLineColor.join(',')})`,
-        ...properties
-      };
-    });
+    if (categoriesTop.length) {
+      legendProperties = categoriesTop.map((c, i) => {
+        return {
+          type: geometryType,
+          color: `rgba(${color.join(',')})`,
+          label: c,
+          width: sizes[i],
+          strokeColor: `rgba(${styles.getLineColor.join(',')})`,
+          ...properties
+        };
+      });
+    } else {
+      // creates categories with no data
+      legendProperties = [
+        {
+          type: geometryType,
+          color: '#ccc',
+          label: 'no data',
+          width: sizes[0]
+        },
+        {
+          type: geometryType,
+          color: '#ccc',
+          label: 'no data',
+          width: sizes[1]
+        }
+      ];
+    }
+
+    return legendProperties;
   };
 
   return new Style(evalFN, featureProperty, evalFNLegend, options.viewport);

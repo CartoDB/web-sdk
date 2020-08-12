@@ -79,27 +79,57 @@ export function sizeBinsStyle(
       return [];
     }
 
+    let legendProperties: LegendProperties[] = [];
     const opts = defaultOptions(meta.geometryType, options);
     const dataOrigin = opts.viewport ? (layer as Layer) : meta;
     const breaks = await getBreaks(opts, dataOrigin, featureProperty);
-    const stats = meta.stats.find(f => f.name === featureProperty) as NumericFieldStats;
-    let ranges = [...breaks, stats.max];
-    const sizes = await calculateSizeBins(breaks.length, opts.sizeRange);
-    const styles = getStyles(meta.geometryType, options) as any;
-    ranges = [stats.min, ...ranges];
-    const geometryType = meta.geometryType.toLocaleLowerCase() as LegendGeometryType;
-    const color = geometryType === 'line' ? styles.getLineColor : styles.getFillColor;
+    let stats;
 
-    return sizes.map((s, i) => {
-      return {
-        type: geometryType,
-        color: `rgba(${color.join(',')})`,
-        label: `${ranges[i]} - ${ranges[i + 1]}`,
-        width: s,
-        strokeColor: `rgba(${styles.getLineColor.join(',')})`,
-        ...properties
-      };
-    });
+    try {
+      stats = await getMinMax(dataOrigin, featureProperty, options.viewport);
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.warn(err);
+    }
+
+    const geometryType = meta.geometryType.toLocaleLowerCase() as LegendGeometryType;
+
+    if (stats) {
+      let ranges = [...breaks, stats.max];
+      const sizes = await calculateSizeBins(breaks.length, opts.sizeRange);
+      const styles = getStyles(meta.geometryType, options) as any;
+      ranges = [stats.min, ...ranges];
+      const color = geometryType === 'line' ? styles.getLineColor : styles.getFillColor;
+
+      legendProperties = sizes.map((s, i) => {
+        return {
+          type: geometryType,
+          color: `rgba(${color.join(',')})`,
+          label: `${ranges[i]} - ${ranges[i + 1]}`,
+          width: s,
+          strokeColor: `rgba(${styles.getLineColor.join(',')})`,
+          ...properties
+        };
+      });
+    } else {
+      // creates categories with no data
+      legendProperties = [
+        {
+          type: geometryType,
+          color: '#ccc',
+          label: 'no data',
+          width: opts.sizeRange[0]
+        },
+        {
+          type: geometryType,
+          color: '#ccc',
+          label: 'no data',
+          width: opts.sizeRange[1]
+        }
+      ];
+    }
+
+    return legendProperties;
   };
 
   return new Style(evalFN, featureProperty, evalFNLegend, options.viewport);
@@ -122,6 +152,34 @@ async function getBreaks(
   }
 
   return opts.breaks;
+}
+
+async function getMinMax(
+  dataOrigin: Layer | SourceMetadata,
+  featureProperty: string,
+  viewport = false
+) {
+  let stats: NumericFieldStats | undefined;
+
+  if (viewport) {
+    const data = (await (dataOrigin as Layer).getViewportFeatures())
+      .filter(f => f[featureProperty])
+      .map(f => f[featureProperty] as number);
+
+    if (data.length) {
+      stats = {
+        name: featureProperty,
+        min: Math.min(...data),
+        max: Math.max(...data)
+      };
+    }
+  } else {
+    stats = (dataOrigin as SourceMetadata).stats.find(
+      f => f.name === featureProperty
+    ) as NumericFieldStats;
+  }
+
+  return stats;
 }
 
 async function calculateWithBreaks(

@@ -21,16 +21,35 @@ export class LegendWidget {
     const legendWidget = domElement as any;
 
     if (layer.isReady()) {
-      layer.getLegendData(options).then(legendData => {
-        legendWidget.data = legendData;
+      layer.getStyle().then(style => {
+        if (style.viewport) {
+          layer.on(LayerEvent.TILES_LOADED, () => applyLegendData(legendWidget, layer, options));
+        }
       });
+      applyLegendData(legendWidget, layer, options);
     } else {
       layer.on(LayerEvent.DATA_READY, () => {
-        layer.getLegendData(options).then(legendData => {
-          legendWidget.data = legendData;
+        layer.getStyle().then(style => {
+          if (style.viewport) {
+            layer.on(LayerEvent.TILES_LOADED, () => applyLegendData(legendWidget, layer, options));
+          }
         });
+        applyLegendData(legendWidget, layer, options);
       });
     }
+  }
+}
+
+async function applyLegendData(
+  legendWidget: { data: LegendProperties[] },
+  layer: Layer,
+  options: any
+) {
+  const legendData = await layer.getLegendData(options);
+
+  if (legendData) {
+    // eslint-disable-next-line no-param-reassign
+    legendWidget.data = legendData;
   }
 }
 

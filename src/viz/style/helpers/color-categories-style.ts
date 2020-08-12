@@ -69,8 +69,10 @@ export function colorCategoriesStyle(
       return [];
     }
 
+    let legendProperties: LegendProperties[] = [];
     const opts = defaultOptions(meta.geometryType, options);
-    const categories = await getCategories(opts, meta, featureProperty);
+    const dataOrigin = opts.viewport ? (layer as Layer) : meta;
+    const categories = await getCategories(opts, dataOrigin, featureProperty);
     const categoriesTop = categories.slice(0, opts.top);
     const colors = getColors(opts.palette, categoriesTop.length).map(hexToRgb);
     const categoriesWithColors = convertArrayToObjectWithValues(categoriesTop, colors);
@@ -82,19 +84,32 @@ export function colorCategoriesStyle(
     const styles = getStyles(meta.geometryType, opts) as any;
     const geometryType = meta.geometryType.toLocaleLowerCase() as LegendGeometryType;
 
-    return Object.keys(categoriesWithColors).map(c => {
-      return {
-        type: geometryType,
-        color: `rgba(${categoriesWithColors[c].join(',')})`,
-        label: c,
-        width: styles.getSize,
-        strokeColor:
-          geometryType !== 'line' && options.property !== 'strokeColor'
-            ? `rgba(${styles.getLineColor.join(',')})`
-            : undefined,
-        ...properties
-      };
-    });
+    if (Object.keys(categoriesWithColors).length) {
+      legendProperties = Object.keys(categoriesWithColors).map(c => {
+        return {
+          type: geometryType,
+          color: `rgba(${categoriesWithColors[c].join(',')})`,
+          label: c,
+          width: styles.getSize,
+          strokeColor:
+            geometryType !== 'line' && options.property !== 'strokeColor'
+              ? `rgba(${styles.getLineColor.join(',')})`
+              : undefined,
+          ...properties
+        };
+      });
+    } else {
+      legendProperties = [
+        {
+          type: geometryType,
+          color: '#ccc',
+          label: 'no data',
+          width: 2
+        }
+      ];
+    }
+
+    return legendProperties;
   };
 
   return new Style(evalFN, featureProperty, evalFNLegend, options.viewport);

@@ -40,10 +40,9 @@ export class Classifier {
 
     if (data.length > 0) {
       const sortedSample = [...data].sort((x, y) => x - y);
-      const minNBreaks = Math.min(sortedSample.length, nBreaks);
 
-      for (let i = 1; i <= minNBreaks; i += 1) {
-        const p = i / (minNBreaks + 1);
+      for (let i = 1; i <= nBreaks; i += 1) {
+        const p = i / (nBreaks + 1);
         const index = Math.max(0, Math.floor(p * sortedSample.length) - 1);
         breaks.push(sortedSample[index]);
       }
@@ -81,15 +80,16 @@ export class Classifier {
       const under = [];
       const isEven = (nBreaks + 1) % 2 === 0;
       let factor = isEven ? 0.0 : 1.0; // if odd, central class is double sized
+      let step;
 
       do {
-        const step = factor * (stdev * classSize);
+        step = factor * (stdev * classSize);
         over.push(avg + step);
         under.push(avg - step);
         breaks = [...new Set(over.concat(under))];
         breaks.sort((a, b) => a - b);
         factor += 1;
-      } while (breaks.length < nBreaks);
+      } while (breaks.length < nBreaks && step !== 0);
     }
 
     return breaks;
@@ -130,7 +130,7 @@ export class Classifier {
         min = Math.min(...data);
         max = Math.max(...data);
       }
-    } else if (stats.sample) {
+    } else {
       min = stats.min;
       max = stats.max;
     }

@@ -54,7 +54,6 @@ export function colorContinuousStyle(
     validateParameters(opts);
 
     const dataOrigin = opts.viewport ? (layer as Layer) : meta;
-
     let stats;
 
     try {
@@ -79,7 +78,7 @@ export function colorContinuousStyle(
     return styleObj;
   };
 
-  const evalFNLegend = (layer: StyledLayer, properties = {}): LegendProperties[] => {
+  const evalFNLegend = async (layer: StyledLayer, properties = {}): Promise<LegendProperties[]> => {
     const meta = layer.source.getMetadata();
 
     if (!meta.geometryType) {
@@ -88,30 +87,42 @@ export function colorContinuousStyle(
 
     const opts = defaultOptions(meta.geometryType, options);
     const colors = getColors(opts.palette);
-    const stats = meta.stats.find(f => f.name === featureProperty) as NumericFieldStats;
-    const styles = getStyles(meta.geometryType, opts) as any;
-    const rangeMin = getRangeMin(stats, opts);
-    const rangeMax = getRangeMax(stats, opts);
-    const colorScale = chromaScale(colors).domain([rangeMin, rangeMax]).mode('lrgb');
-    const geometryType = meta.geometryType.toLocaleLowerCase() as LegendGeometryType;
-    // TODO samples can be an option?
-    const samples = 10;
-    const INC = 1 / (samples - 1);
+    const dataOrigin = opts.viewport ? (layer as Layer) : meta;
+    let stats;
+
+    try {
+      stats = await getMinMax(dataOrigin, featureProperty, options.viewport);
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.warn(err);
+    }
+
     const result = [] as LegendProperties[];
 
-    for (let i = 0; result.length < samples; i += INC) {
-      const value = i * (rangeMax - rangeMin) + rangeMin;
-      result.push({
-        type: geometryType,
-        color: `rgba(${colorScale(value).rgb().join(',')})`,
-        label: value || '',
-        width: styles.getSize,
-        strokeColor:
-          geometryType !== 'line' && options.property !== 'strokeColor'
-            ? `rgba(${styles.getLineColor.join(',')})`
-            : undefined,
-        ...properties
-      });
+    if (stats && stats.min && stats.max) {
+      const styles = getStyles(meta.geometryType, opts) as any;
+      const rangeMin = getRangeMin(stats, opts);
+      const rangeMax = getRangeMax(stats, opts);
+      const colorScale = chromaScale(colors).domain([rangeMin, rangeMax]).mode('lrgb');
+      const geometryType = meta.geometryType.toLocaleLowerCase() as LegendGeometryType;
+      // TODO samples can be an option?
+      const samples = 10;
+      const INC = 1 / (samples - 1);
+
+      for (let i = 0; result.length < samples; i += INC) {
+        const value = i * (rangeMax - rangeMin) + rangeMin;
+        result.push({
+          type: geometryType,
+          color: `rgba(${colorScale(value).rgb().join(',')})`,
+          label: value || 'no data',
+          width: styles.getSize,
+          strokeColor:
+            geometryType !== 'line' && options.property !== 'strokeColor'
+              ? `rgba(${styles.getLineColor.join(',')})`
+              : undefined,
+          ...properties
+        });
+      }
     }
 
     // TODO we need a default format function.

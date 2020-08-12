@@ -134,18 +134,25 @@ export class Layer extends WithEvents implements StyledLayer {
    */
   public async getStyle() {
     let styleProps;
+    let viewport;
 
     if (this._style) {
       styleProps = await this._style.getLayerProps(this);
+      viewport = this._style.viewport;
     }
 
     const metadata = this._source.getMetadata();
     const defaultStyleProps = getStyles(metadata.geometryType);
 
-    return new Style({
-      ...defaultStyleProps,
-      ...styleProps
-    });
+    return new Style(
+      {
+        ...defaultStyleProps,
+        ...styleProps
+      },
+      undefined,
+      undefined,
+      viewport
+    );
   }
 
   /**

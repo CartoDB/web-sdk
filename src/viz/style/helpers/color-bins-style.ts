@@ -77,29 +77,54 @@ export function colorBinsStyle(
       return [];
     }
 
+    let legendProperties: LegendProperties[] = [];
     const opts = defaultOptions(meta.geometryType, options);
     const dataOrigin = opts.viewport ? (layer as Layer) : meta;
     const breaks = await getBreaks(opts, dataOrigin, featureProperty);
-    const stats = meta.stats.find(f => f.name === featureProperty) as NumericFieldStats;
-    let ranges = [...breaks, stats.max];
-    const colors = getColors(opts.palette, ranges.length);
-    ranges = [stats.min, ...ranges];
-    const styles = getStyles(meta.geometryType, opts) as any;
+    let stats;
+
+    try {
+      stats = await getMinMax(dataOrigin, featureProperty, options.viewport);
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.warn(err);
+    }
+
     const geometryType = meta.geometryType.toLocaleLowerCase() as LegendGeometryType;
 
-    return colors.map((c, i) => {
-      return {
-        type: geometryType,
-        color: c,
-        label: `${ranges[i]} - ${ranges[i + 1]}`,
-        width: styles.getSize,
-        strokeColor:
-          geometryType !== 'line' && options.property !== 'strokeColor'
-            ? `rgba(${styles.getLineColor.join(',')})`
-            : undefined,
-        ...properties
-      };
-    });
+    if (stats) {
+      let ranges = [...breaks, stats.max];
+      const colors = getColors(opts.palette, ranges.length);
+      ranges = [stats.min, ...ranges];
+
+      const styles = getStyles(meta.geometryType, opts) as any;
+
+      legendProperties = colors.map((c, i) => {
+        return {
+          type: geometryType,
+          color: c,
+          label: `${ranges[i]} - ${ranges[i + 1]}`,
+          width: styles.getSize,
+          strokeColor:
+            geometryType !== 'line' && options.property !== 'strokeColor'
+              ? `rgba(${styles.getLineColor.join(',')})`
+              : undefined,
+          ...properties
+        };
+      });
+    } else {
+      // creates categories with no data
+      for (let i = 0; i < opts.bins; i += 1) {
+        legendProperties.push({
+          type: geometryType,
+          color: '#ccc',
+          label: 'no data',
+          width: 2
+        });
+      }
+    }
+
+    return legendProperties;
   };
 
   return new Style(evalFN, featureProperty, evalFNLegend, options.viewport);
@@ -122,6 +147,34 @@ async function getBreaks(
   }
 
   return opts.breaks;
+}
+
+async function getMinMax(
+  dataOrigin: Layer | SourceMetadata,
+  featureProperty: string,
+  viewport = false
+) {
+  let stats: NumericFieldStats | undefined;
+
+  if (viewport) {
+    const data = (await (dataOrigin as Layer).getViewportFeatures())
+      .filter(f => f[featureProperty])
+      .map(f => f[featureProperty] as number);
+
+    if (data.length) {
+      stats = {
+        name: featureProperty,
+        min: Math.min(...data),
+        max: Math.max(...data)
+      };
+    }
+  } else {
+    stats = (dataOrigin as SourceMetadata).stats.find(
+      f => f.name === featureProperty
+    ) as NumericFieldStats;
+  }
+
+  return stats;
 }
 
 function calculateWithBreaks(
