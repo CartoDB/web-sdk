@@ -36,9 +36,9 @@ describe('SizeContinuousStyle', () => {
       expect(() => sizeContinuousStyle(FIELD_NAME)).not.toThrow();
     });
 
-    it('should always return the right propertie for points', () => {
+    it('should always return the right propertie for points', async () => {
       const style = sizeContinuousStyle(FIELD_NAME);
-      const response = style.getLayerProps(styledLayer);
+      const response = await style.getLayerProps(styledLayer);
       expect(response).toHaveProperty('getRadius');
       expect(response.getRadius).toBeInstanceOf(Function);
       expect(response).toHaveProperty('radiusUnits', 'pixels');
@@ -112,23 +112,23 @@ describe('SizeContinuousStyle', () => {
       }
     });
 
-    it('If geometryType is Point and property is strokeWidth getLineWidth should be a function', () => {
+    it('If geometryType is Point and property is strokeWidth getLineWidth should be a function', async () => {
       const style = sizeContinuousStyle(FIELD_NAME, {
         property: 'strokeWidth'
       });
-      const response = style.getLayerProps(styledLayer);
+      const response = await style.getLayerProps(styledLayer);
       expect(response).toHaveProperty('getLineWidth');
       expect(response.getLineWidth).toBeInstanceOf(Function);
     });
   });
 
-  describe('Data validation', () => {
+  describe('Data validation', async () => {
     const opts = {
       sizeRange: [2, 14]
     };
 
     const style = sizeContinuousStyle(FIELD_NAME, opts);
-    let getRadius = style.getLayerProps(styledLayer).getRadius as (d: any) => any;
+    let getRadius = (await style.getLayerProps(styledLayer)).getRadius as (d: any) => any;
 
     it('should assign the right size to a feature', () => {
       let r = getRadius({ properties: { [FIELD_NAME]: stats.max } });
@@ -146,7 +146,7 @@ describe('SizeContinuousStyle', () => {
       expect(r).toEqual(0);
     });
 
-    it('should assign the right color to a feature using ranges', () => {
+    it('should assign the right color to a feature using ranges', async () => {
       const rangeMin = 0;
       const rangeMax = 100;
       const featureValue = 30;
@@ -155,7 +155,7 @@ describe('SizeContinuousStyle', () => {
         rangeMin,
         rangeMax
       });
-      getRadius = s.getLayerProps(styledLayer).getRadius as (d: any) => any;
+      getRadius = (await s.getLayerProps(styledLayer)).getRadius as (d: any) => any;
 
       const r = getRadius({ properties: { [FIELD_NAME]: featureValue } });
       expect(r).toBeCloseTo(8.5726);
