@@ -152,8 +152,9 @@ export class Layer extends WithEvents implements StyledLayer {
    * @public
    * Retrieves the legend data from the style of the layer
    */
-  public getLegendData(options = {}) {
-    return this._style.getLegendProps(this, options);
+  public async getLegendData(options = {}) {
+    const legendProps = await this._style.getLegendProps(this, options);
+    return legendProps;
   }
 
   /**

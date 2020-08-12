@@ -21,10 +21,14 @@ export class LegendWidget {
     const legendWidget = domElement as any;
 
     if (layer.isReady()) {
-      legendWidget.data = layer.getLegendData(options);
+      layer.getLegendData(options).then(legendData => {
+        legendWidget.data = legendData;
+      });
     } else {
       layer.on(LayerEvent.DATA_READY, () => {
-        legendWidget.data = layer.getLegendData(options);
+        layer.getLegendData(options).then(legendData => {
+          legendWidget.data = legendData;
+        });
       });
     }
   }
