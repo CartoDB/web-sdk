@@ -1,5 +1,5 @@
 import { NumericFieldStats, GeometryType, SourceMetadata } from '@/viz/source';
-import { LegendProperties, LegendGeometryType } from '@/viz/legend';
+import { LegendProperties, LegendGeometryType, LegendWidgetOptions } from '@/viz/legend';
 import { scale as chromaScale } from 'chroma-js';
 import { Layer } from '@/viz';
 import { getColors, getUpdateTriggers, hexToRgb } from './utils';
@@ -78,13 +78,17 @@ export function colorContinuousStyle(
     return styleObj;
   };
 
-  const evalFNLegend = async (layer: StyledLayer, properties = {}): Promise<LegendProperties[]> => {
+  const evalFNLegend = async (
+    layer: StyledLayer,
+    legendWidgetOptions: LegendWidgetOptions = {}
+  ): Promise<LegendProperties[]> => {
     const meta = layer.source.getMetadata();
 
     if (!meta.geometryType) {
       return [];
     }
 
+    const { format, config } = legendWidgetOptions;
     const opts = defaultOptions(meta.geometryType, options);
     const colors = getColors(opts.palette);
     const dataOrigin = opts.viewport ? (layer as Layer) : meta;
@@ -110,23 +114,30 @@ export function colorContinuousStyle(
       const INC = 1 / (samples - 1);
 
       for (let i = 0; result.length < samples; i += INC) {
+        let label;
         const value = i * (rangeMax - rangeMin) + rangeMin;
+
+        if (value) {
+          label = format ? format(value) : value;
+        } else {
+          label = 'no data';
+        }
+
         result.push({
           type: geometryType,
           color: `rgba(${colorScale(value).rgb().join(',')})`,
-          label: value || 'no data',
+          label,
           width: styles.getSize,
           strokeColor:
             geometryType !== 'line' && options.property !== 'strokeColor'
               ? `rgba(${styles.getLineColor.join(',')})`
               : undefined,
-          ...properties
+          ...legendWidgetOptions
         });
       }
     }
 
-    // TODO we need a default format function.
-    return result;
+    return config?.order === 'ASC' ? result : result.reverse();
   };
 
   return new Style(evalFN, featureProperty, evalFNLegend, options.viewport);

@@ -14,8 +14,18 @@ export type LegendProperties = {
   width?: number;
 };
 
+export type LegendWidgetOptions = {
+  format?: (value: string | number | undefined) => string | number;
+  dynamic?: boolean;
+  config?: {
+    othersLabel?: string;
+    order?: 'ASC' | 'DESC';
+    samples?: number;
+  };
+};
+
 export class LegendWidget {
-  constructor(element: string | HTMLElement, layer: Layer, options = {}) {
+  constructor(element: string | HTMLElement, layer: Layer, options: LegendWidgetOptions = {}) {
     const domElement = queryDOMElement(element);
     validateParameters(domElement, layer, options);
     const legendWidget = domElement as any;
@@ -53,7 +63,11 @@ async function applyLegendData(
   }
 }
 
-function validateParameters(element: HTMLElement | null, layer: Layer, options = {}) {
+function validateParameters(
+  element: HTMLElement | null,
+  layer: Layer,
+  options: LegendWidgetOptions
+) {
   if (!element) {
     throw new CartoError({
       type: '[Legend]',
@@ -68,13 +82,54 @@ function validateParameters(element: HTMLElement | null, layer: Layer, options =
     });
   }
 
-  const validOptions = ['type', 'color', 'marker', 'strokeColor', 'strokeStyle', 'label', 'width'];
-  const diffOptions = Object.keys(options).filter(opt => !validOptions.includes(opt));
-
-  if (diffOptions.length > 0) {
+  if (options.format && typeof options.format !== 'function') {
     throw new CartoError({
       type: '[Legend]',
-      message: `Options passed to Legend are not valid, valid values are ${validOptions.join(',')}`
+      message: `Options passed to Legend are not valid, format must be a function`
+    });
+  }
+
+  if (options.dynamic && typeof options.dynamic !== 'boolean') {
+    throw new CartoError({
+      type: '[Legend]',
+      message: `Options passed to Legend are not valid, dynamic must be a boolean`
+    });
+  }
+
+  if (options.config && typeof options.config !== 'object') {
+    throw new CartoError({
+      type: '[Legend]',
+      message: `Options passed to Legend are not valid, config must be an object`
+    });
+  }
+
+  if (
+    options.config &&
+    options.config.othersLabel &&
+    typeof options.config.othersLabel !== 'string'
+  ) {
+    throw new CartoError({
+      type: '[Legend]',
+      message: `Options passed to Legend are not valid, othersLabel must be a string`
+    });
+  }
+
+  if (
+    options.config &&
+    options.config.order &&
+    (typeof options.config.order !== 'string' ||
+      (options.config.order !== 'ASC' && options.config.order !== 'DESC'))
+  ) {
+    throw new CartoError({
+      type: '[Legend]',
+      message: `Options passed to Legend are not valid, order must be ASC or DESC`
+    });
+  }
+
+  if (options.config && options.config.samples && typeof options.config.samples !== 'number') {
+    throw new CartoError({
+      type: '[Legend]',
+      message: `Options passed to Legend are not valid, samples must be a number`
     });
   }
 }

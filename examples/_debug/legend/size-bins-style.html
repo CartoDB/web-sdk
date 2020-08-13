@@ -12,10 +12,10 @@
       href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.css"
     />
     <link
-     rel="stylesheet"
-     type="text/css"
-     href="https://libs.cartocdn.com/airship-style/v2.4/airship.min.css"
-   />
+      rel="stylesheet"
+      type="text/css"
+      href="https://libs.cartocdn.com/airship-style/v2.4/airship.min.css"
+    />
 
     <style>
       body {
@@ -86,7 +86,10 @@
         });
         const layer = new carto.viz.Layer('roads', style);
         layer.addTo(deckMap);
-        new carto.viz.Legend('#legend', layer);
+        new carto.viz.Legend('#legend', layer, {
+          format: v => `${v} km`,
+          config: { order: 'ASC' }
+        });
       }
 
       // initializePoints();

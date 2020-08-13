@@ -1,6 +1,6 @@
 import { CategoryFieldStats, Category, GeometryType, SourceMetadata } from '@/viz/source';
-import { LegendProperties, LegendGeometryType } from '@/viz/legend';
 import { Layer } from '@/viz';
+import { LegendProperties, LegendGeometryType, LegendWidgetOptions } from '@/viz/legend';
 import { convertArrayToObjectWithValues } from '../../utils/object';
 import { getColors, getUpdateTriggers, hexToRgb } from './utils';
 import { CartoStylingError, stylingErrorTypes } from '../../errors/styling-error';
@@ -62,7 +62,10 @@ export function colorCategoriesStyle(
     return calculateWithCategories(featureProperty, categories, meta.geometryType, opts);
   };
 
-  const evalFNLegend = async (layer: StyledLayer, properties = {}): Promise<LegendProperties[]> => {
+  const evalFNLegend = async (
+    layer: StyledLayer,
+    legendWidgetOptions: LegendWidgetOptions = {}
+  ): Promise<LegendProperties[]> => {
     const meta = layer.source.getMetadata();
 
     if (!meta.geometryType) {
@@ -78,7 +81,13 @@ export function colorCategoriesStyle(
     const categoriesWithColors = convertArrayToObjectWithValues(categoriesTop, colors);
 
     if (categories.length > opts.top) {
-      categoriesWithColors.Others = hexToRgb(opts.othersColor);
+      let othersLabel = 'Others';
+
+      if (legendWidgetOptions.config && legendWidgetOptions.config.othersLabel) {
+        othersLabel = legendWidgetOptions.config.othersLabel;
+      }
+
+      categoriesWithColors[othersLabel] = hexToRgb(opts.othersColor);
     }
 
     const styles = getStyles(meta.geometryType, opts) as any;
@@ -95,7 +104,7 @@ export function colorCategoriesStyle(
             geometryType !== 'line' && options.property !== 'strokeColor'
               ? `rgba(${styles.getLineColor.join(',')})`
               : undefined,
-          ...properties
+          ...legendWidgetOptions
         };
       });
     } else {

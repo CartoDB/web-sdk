@@ -9,6 +9,7 @@ import { GeoJSON } from 'geojson';
 import { uuidv4 } from '@/core/utils/uuid';
 import { WithEvents } from '@/core/mixins/WithEvents';
 import { DatasetSource, SQLSource, GeoJSONSource, Source } from '@/viz';
+import { LegendWidgetOptions } from '@/viz/legend';
 import { AggregatedColumn } from '../source/Source';
 import { DOLayer } from '../deck/DOLayer';
 import { getStyles, StyleProperties, Style } from '../style';
@@ -159,7 +160,7 @@ export class Layer extends WithEvents implements StyledLayer {
    * @public
    * Retrieves the legend data from the style of the layer
    */
-  public async getLegendData(options = {}) {
+  public async getLegendData(options: LegendWidgetOptions = { config: {} }) {
     const legendProps = await this._style.getLegendProps(this, options);
     return legendProps;
   }

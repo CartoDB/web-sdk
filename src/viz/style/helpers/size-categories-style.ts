@@ -1,6 +1,6 @@
 import { CategoryFieldStats, Category, GeometryType, SourceMetadata } from '@/viz/source';
-import { LegendProperties, LegendGeometryType } from '@/viz/legend';
 import { Layer } from '@/viz';
+import { LegendProperties, LegendGeometryType, LegendWidgetOptions } from '@/viz/legend';
 import { calculateSizeBins } from './utils';
 import { Style, getStyleValue, BasicOptionsStyle, getStyles } from '..';
 import { CartoStylingError, stylingErrorTypes } from '../../errors/styling-error';
@@ -65,7 +65,10 @@ export function sizeCategoriesStyle(
     return calculateWithCategories(featureProperty, categories, meta.geometryType, opts);
   };
 
-  const evalFNLegend = async (layer: StyledLayer, properties = {}): Promise<LegendProperties[]> => {
+  const evalFNLegend = async (
+    layer: StyledLayer,
+    legendWidgetOptions: LegendWidgetOptions = { config: {} }
+  ): Promise<LegendProperties[]> => {
     const meta = layer.source.getMetadata();
 
     if (!meta.geometryType) {
@@ -79,10 +82,15 @@ export function sizeCategoriesStyle(
     const categoriesTop = categories.slice(0, opts.top);
     const sizes = await calculateSizeBins(categoriesTop.length - 1, opts.sizeRange);
 
-    // TODO Others label could be an option
     if (categories.length > opts.top) {
       sizes.push(sizes[0]);
-      categoriesTop.push('Others');
+      let othersLabel = 'Others';
+
+      if (legendWidgetOptions.config && legendWidgetOptions.config.othersLabel) {
+        othersLabel = legendWidgetOptions.config.othersLabel;
+      }
+
+      categoriesTop.push(othersLabel);
     }
 
     const styles = getStyles(meta.geometryType, opts) as any;
@@ -97,7 +105,7 @@ export function sizeCategoriesStyle(
           label: c,
           width: sizes[i],
           strokeColor: `rgba(${styles.getLineColor.join(',')})`,
-          ...properties
+          ...legendWidgetOptions
         };
       });
     } else {

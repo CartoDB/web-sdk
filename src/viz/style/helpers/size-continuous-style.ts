@@ -1,6 +1,6 @@
 import { NumericFieldStats, GeometryType, SourceMetadata } from '@/viz/source';
-import { LegendProperties, LegendGeometryType } from '@/viz/legend';
 import { Layer } from '@/viz';
+import { LegendProperties, LegendGeometryType, LegendWidgetOptions } from '@/viz/legend';
 import { StyledLayer } from '../layer-style';
 import { range } from './math-utils';
 import { CartoStylingError, stylingErrorTypes } from '../../errors/styling-error';
@@ -75,13 +75,17 @@ export function sizeContinuousStyle(
     return styleObj;
   };
 
-  const evalFNLegend = async (layer: StyledLayer, properties = {}): Promise<LegendProperties[]> => {
+  const evalFNLegend = async (
+    layer: StyledLayer,
+    legendWidgetOptions: LegendWidgetOptions = { config: {} }
+  ): Promise<LegendProperties[]> => {
     const meta = layer.source.getMetadata();
 
     if (!meta.geometryType) {
       return [];
     }
 
+    const { format, config } = legendWidgetOptions;
     const opts = defaultOptions(meta.geometryType, options);
     const dataOrigin = opts.viewport ? (layer as Layer) : meta;
     let stats;
@@ -99,18 +103,25 @@ export function sizeContinuousStyle(
       const styles = getStyles(meta.geometryType, opts) as any;
       const geometryType = meta.geometryType.toLocaleLowerCase() as LegendGeometryType;
       const color = geometryType === 'line' ? styles.getLineColor : styles.getFillColor;
-      // TODO samples can be an option?
-      const samples = 4;
+      const samples = config?.samples || 4;
       const INC = 1 / (samples - 1);
       const min = opts.rangeMin !== undefined ? opts.rangeMin : stats.min;
       const max = opts.rangeMax !== undefined ? opts.rangeMax : stats.max;
 
       for (let i = 0; result.length < samples; i += INC) {
+        let label;
         const value = i * (max - min) + min;
+
+        if (Number.isNaN(value)) {
+          label = 'no data';
+        } else {
+          label = format ? format(value) : value;
+        }
+
         result.push({
           type: geometryType,
           color: Number.isNaN(value) ? '#ccc' : `rgba(${color.join(',')})`,
-          label: Number.isNaN(value) ? 'no data' : value,
+          label,
           width: range(
             getRangeMin(stats, opts, meta.geometryType),
             getRangeMax(stats, opts, meta.geometryType),
@@ -119,12 +130,12 @@ export function sizeContinuousStyle(
             meta.geometryType === 'Point' ? Math.sqrt(value) : value
           ),
           strokeColor: `rgba(${styles.getLineColor.join(',')})`,
-          ...properties
+          ...legendWidgetOptions
         });
       }
     }
 
-    return result;
+    return config?.order === 'ASC' ? result : result.reverse();
   };
 
   return new Style(evalFN, featureProperty, evalFNLegend, options.viewport);

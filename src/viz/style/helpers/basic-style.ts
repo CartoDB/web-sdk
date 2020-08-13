@@ -8,7 +8,7 @@ export function basicStyle(options: Partial<BasicOptionsStyle> = {}) {
     return getStyles(meta.geometryType, options);
   };
 
-  const evalFNLegend = async (layer: StyledLayer, properties = {}): Promise<LegendProperties[]> => {
+  const evalFNLegend = async (layer: StyledLayer): Promise<LegendProperties[]> => {
     // TODO getMetadata throws an exception if source is empty. It could happen
     // if the user calls getLegendData layer method before ready event has been sent
 
@@ -22,7 +22,7 @@ export function basicStyle(options: Partial<BasicOptionsStyle> = {}) {
     const color = meta.geometryType === 'Line' ? styles.getLineColor : styles.getFillColor;
 
     if (styles.opacity) {
-      color[color.length - 1] = styles.opacity;
+      color[color.length - 1] = styles.opacity * 255;
     }
 
     return [
@@ -30,8 +30,7 @@ export function basicStyle(options: Partial<BasicOptionsStyle> = {}) {
         type: meta.geometryType.toLocaleLowerCase() as LegendGeometryType,
         color: `rgba(${color.join(',')})`,
         strokeColor: styles.getLineColor ? `rgba(${styles.getLineColor.join(',')})` : undefined,
-        width: styles.getSize,
-        ...properties
+        width: styles.getSize
       }
     ];
   };

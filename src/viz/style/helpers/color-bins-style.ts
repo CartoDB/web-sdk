@@ -1,6 +1,6 @@
 import { NumericFieldStats, GeometryType, SourceMetadata } from '@/viz/source';
-import { LegendProperties, LegendGeometryType } from '@/viz/legend';
 import { Layer } from '@/viz';
+import { LegendProperties, LegendGeometryType, LegendWidgetOptions } from '@/viz/legend';
 import { getColors, getUpdateTriggers, hexToRgb, findIndexForBinBuckets } from './utils';
 import { Classifier, ClassificationMethod } from '../../utils/Classifier';
 import { CartoStylingError, stylingErrorTypes } from '../../errors/styling-error';
@@ -70,7 +70,10 @@ export function colorBinsStyle(
     return calculateWithBreaks(featureProperty, breaks, meta.geometryType, opts);
   };
 
-  const evalFNLegend = async (layer: StyledLayer, properties = {}): Promise<LegendProperties[]> => {
+  const evalFNLegend = async (
+    layer: StyledLayer,
+    legendWidgetOptions: LegendWidgetOptions = { config: {} }
+  ): Promise<LegendProperties[]> => {
     const meta = layer.source.getMetadata();
 
     if (!meta.geometryType) {
@@ -78,6 +81,7 @@ export function colorBinsStyle(
     }
 
     let legendProperties: LegendProperties[] = [];
+    const { format, config } = legendWidgetOptions;
     const opts = defaultOptions(meta.geometryType, options);
     const dataOrigin = opts.viewport ? (layer as Layer) : meta;
     const breaks = await getBreaks(opts, dataOrigin, featureProperty);
@@ -100,18 +104,22 @@ export function colorBinsStyle(
       const styles = getStyles(meta.geometryType, opts) as any;
 
       legendProperties = colors.map((c, i) => {
+        const rangeValIni = format ? format(ranges[i]) : ranges[i];
+        const rangeValEnd = format ? format(ranges[i + 1]) : ranges[i + 1];
         return {
           type: geometryType,
           color: c,
-          label: `${ranges[i]} - ${ranges[i + 1]}`,
+          label: `${rangeValIni} - ${rangeValEnd}`,
           width: styles.getSize,
           strokeColor:
             geometryType !== 'line' && options.property !== 'strokeColor'
               ? `rgba(${styles.getLineColor.join(',')})`
               : undefined,
-          ...properties
+          ...legendWidgetOptions
         };
       });
+
+      legendProperties = config?.order === 'ASC' ? legendProperties : legendProperties.reverse();
     } else {
       // creates categories with no data
       for (let i = 0; i < opts.bins; i += 1) {
