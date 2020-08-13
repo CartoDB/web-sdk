@@ -109,15 +109,14 @@ export function colorContinuousStyle(
       const rangeMax = getRangeMax(stats, opts);
       const colorScale = chromaScale(colors).domain([rangeMin, rangeMax]).mode('lrgb');
       const geometryType = meta.geometryType.toLocaleLowerCase() as LegendGeometryType;
-      // TODO samples can be an option?
-      const samples = 10;
+      const samples = config?.samples || 4;
       const INC = 1 / (samples - 1);
 
       for (let i = 0; result.length < samples; i += INC) {
         let label;
         const value = i * (rangeMax - rangeMin) + rangeMin;
 
-        if (value === undefined) {
+        if (value === undefined || Number.isNaN(value)) {
           label = 'no data';
         } else {
           label = format ? format(value) : value;
