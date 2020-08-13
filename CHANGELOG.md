@@ -5,6 +5,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+### Added
+
+- Dynamic styles changing with viewport
+- Legend for styles.
+
 ### Fixed
 
 - Fix WEBSDK VERSION for .cjs & .esm module distributions ([#115](https://github.com/CartoDB/web-sdk/pull/115/))
