@@ -1,4 +1,5 @@
-import { NumericFieldStats, GeometryType } from '@/viz/source';
+import { NumericFieldStats, GeometryType, SourceMetadata } from '@/viz/source';
+import { Layer } from '@/viz';
 import { LegendProperties, LegendGeometryType, LegendWidgetOptions } from '@/viz/legend';
 import { StyledLayer } from '../layer-style';
 import { range } from './math-utils';
@@ -29,6 +30,7 @@ function defaultOptions(
     sizeRange: getDefaultSizeRange(geometryType),
     nullSize: getStyleValue('nullSize', geometryType, options),
     opacity: 0.7,
+    viewport: options.viewport || false,
     ...options
   };
 }
@@ -37,7 +39,7 @@ export function sizeContinuousStyle(
   featureProperty: string,
   options: Partial<SizeContinuousOptionsStyle> = {}
 ) {
-  const evalFN = (layer: StyledLayer) => {
+  const evalFN = async (layer: StyledLayer) => {
     const meta = layer.source.getMetadata();
 
     if (layer.source.isEmpty()) {
@@ -47,21 +49,36 @@ export function sizeContinuousStyle(
     const opts = defaultOptions(meta.geometryType, options);
     validateParameters(opts, meta.geometryType);
 
-    const stats = meta.stats.find(f => f.name === featureProperty) as NumericFieldStats;
+    const dataOrigin = opts.viewport ? (layer as Layer) : meta;
 
-    return calculate(
-      featureProperty,
-      meta.geometryType,
-      opts,
-      getRangeMin(stats, opts, meta.geometryType),
-      getRangeMax(stats, opts, meta.geometryType)
-    );
+    let stats;
+
+    try {
+      stats = await getMinMax(dataOrigin, featureProperty, options.viewport);
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.warn(err);
+    }
+
+    let styleObj = {};
+
+    if (stats && stats.min && stats.max) {
+      styleObj = calculate(
+        featureProperty,
+        meta.geometryType,
+        opts,
+        getRangeMin(stats, opts, meta.geometryType),
+        getRangeMax(stats, opts, meta.geometryType)
+      );
+    }
+
+    return styleObj;
   };
 
-  const evalFNLegend = (
+  const evalFNLegend = async (
     layer: StyledLayer,
     legendWidgetOptions: LegendWidgetOptions = { config: {} }
-  ): LegendProperties[] => {
+  ): Promise<LegendProperties[]> => {
     const meta = layer.source.getMetadata();
 
     if (!meta.geometryType) {
@@ -70,37 +87,83 @@ export function sizeContinuousStyle(
 
     const { format, config } = legendWidgetOptions;
     const opts = defaultOptions(meta.geometryType, options);
-    const stats = meta.stats.find(f => f.name === featureProperty) as NumericFieldStats;
-    const styles = getStyles(meta.geometryType, opts) as any;
-    const geometryType = meta.geometryType.toLocaleLowerCase() as LegendGeometryType;
-    const color = geometryType === 'line' ? styles.getLineColor : styles.getFillColor;
-    const samples = config?.samples || 4;
-    const INC = 1 / (samples - 1);
-    const result = [] as LegendProperties[];
-    const min = opts.rangeMin !== undefined ? opts.rangeMin : stats.min;
-    const max = opts.rangeMax !== undefined ? opts.rangeMax : stats.max;
+    const dataOrigin = opts.viewport ? (layer as Layer) : meta;
+    let stats;
 
-    for (let i = 0; result.length < samples; i += INC) {
-      const value = i * (max - min) + min;
-      result.push({
-        type: geometryType,
-        color: `rgba(${color.join(',')})`,
-        label: format ? format(value) : value,
-        width: range(
-          getRangeMin(stats, opts, meta.geometryType),
-          getRangeMax(stats, opts, meta.geometryType),
-          opts.sizeRange[0],
-          opts.sizeRange[1],
-          meta.geometryType === 'Point' ? Math.sqrt(value) : value
-        ),
-        strokeColor: `rgba(${styles.getLineColor.join(',')})`
-      });
+    try {
+      stats = await getMinMax(dataOrigin, featureProperty, options.viewport);
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.warn(err);
+    }
+
+    const result = [] as LegendProperties[];
+
+    if (stats && stats.min && stats.max) {
+      const styles = getStyles(meta.geometryType, opts) as any;
+      const geometryType = meta.geometryType.toLocaleLowerCase() as LegendGeometryType;
+      const color = geometryType === 'line' ? styles.getLineColor : styles.getFillColor;
+      const samples = config?.samples || 4;
+      const INC = 1 / (samples - 1);
+      const min = opts.rangeMin !== undefined ? opts.rangeMin : stats.min;
+      const max = opts.rangeMax !== undefined ? opts.rangeMax : stats.max;
+
+      for (let i = 0; result.length < samples; i += INC) {
+        let label;
+        const value = i * (max - min) + min;
+
+        if (Number.isNaN(value)) {
+          label = 'no data';
+        } else {
+          label = format ? format(value) : value;
+        }
+
+        result.push({
+          type: geometryType,
+          color: Number.isNaN(value) ? '#ccc' : `rgba(${color.join(',')})`,
+          label,
+          width: range(
+            getRangeMin(stats, opts, meta.geometryType),
+            getRangeMax(stats, opts, meta.geometryType),
+            opts.sizeRange[0],
+            opts.sizeRange[1],
+            meta.geometryType === 'Point' ? Math.sqrt(value) : value
+          ),
+          strokeColor: `rgba(${styles.getLineColor.join(',')})`,
+          ...legendWidgetOptions
+        });
+      }
     }
 
     return config?.order === 'ASC' ? result : result.reverse();
   };
 
-  return new Style(evalFN, featureProperty, evalFNLegend);
+  return new Style(evalFN, featureProperty, evalFNLegend, options.viewport);
+}
+
+async function getMinMax(
+  dataOrigin: Layer | SourceMetadata,
+  featureProperty: string,
+  viewport = false
+) {
+  let stats: NumericFieldStats;
+
+  if (viewport) {
+    const data = (await (dataOrigin as Layer).getViewportFeatures())
+      .filter(f => f[featureProperty])
+      .map(f => f[featureProperty] as number);
+    stats = {
+      name: featureProperty,
+      min: Math.min(...data),
+      max: Math.max(...data)
+    };
+  } else {
+    stats = (dataOrigin as SourceMetadata).stats.find(
+      f => f.name === featureProperty
+    ) as NumericFieldStats;
+  }
+
+  return stats;
 }
 
 function getRangeMin(

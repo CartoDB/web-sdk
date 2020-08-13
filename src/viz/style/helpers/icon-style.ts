@@ -54,7 +54,7 @@ function defaultOptions(options: Partial<IconOptionsStyle>) {
 }
 
 export function iconStyle(icon: string, options: Partial<IconOptionsStyle> = {}) {
-  const evalFN = (layer: StyledLayer) => {
+  const evalFN = async (layer: StyledLayer) => {
     const meta = layer.source.getMetadata();
 
     if (layer.source.isEmpty()) {

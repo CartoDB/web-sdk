@@ -71,9 +71,6 @@ export class Layer extends WithEvents implements StyledLayer {
   ) {
     super();
 
-    this._source = buildSource(source);
-    this._style = buildStyle(style);
-
     this.registerAvailableEvents([
       LayerEvent.DATA_READY,
       LayerEvent.DATA_CHANGED,
@@ -82,6 +79,9 @@ export class Layer extends WithEvents implements StyledLayer {
       InteractivityEvent.CLICK,
       InteractivityEvent.HOVER
     ]);
+
+    this._source = buildSource(source);
+    this._style = this.buildStyle(style);
 
     this._options = {
       id: `${this._source.id}-${uuidv4()}`,
@@ -123,7 +123,7 @@ export class Layer extends WithEvents implements StyledLayer {
    * @param style style to be set
    */
   public async setStyle(style: Style) {
-    this._style = buildStyle(style);
+    this._style = this.buildStyle(style);
 
     if (this._deckLayer) {
       await this.replaceDeckGLLayer();
@@ -133,28 +133,36 @@ export class Layer extends WithEvents implements StyledLayer {
   /**
    * Retrieves the current style of the layer
    */
-  public getStyle() {
+  public async getStyle() {
     let styleProps;
+    let viewport;
 
     if (this._style) {
-      styleProps = this._style.getLayerProps(this);
+      styleProps = await this._style.getLayerProps(this);
+      viewport = this._style.viewport;
     }
 
     const metadata = this._source.getMetadata();
     const defaultStyleProps = getStyles(metadata.geometryType);
 
-    return new Style({
-      ...defaultStyleProps,
-      ...styleProps
-    });
+    return new Style(
+      {
+        ...defaultStyleProps,
+        ...styleProps
+      },
+      undefined,
+      undefined,
+      viewport
+    );
   }
 
   /**
    * @public
    * Retrieves the legend data from the style of the layer
    */
-  public getLegendData(options: LegendWidgetOptions = { config: {} }) {
-    return this._style.getLegendProps(this, options);
+  public async getLegendData(options: LegendWidgetOptions = { config: {} }) {
+    const legendProps = await this._style.getLegendProps(this, options);
+    return legendProps;
   }
 
   /**
@@ -323,9 +331,9 @@ export class Layer extends WithEvents implements StyledLayer {
     return this._source.getFeatures(excludedFilters);
   }
 
-  private _getLayerProperties() {
+  private async _getLayerProperties() {
     const props = this._source.getProps();
-    const styleProps = this.getStyle().getLayerProps(this);
+    const styleProps = await (await this.getStyle()).getLayerProps(this);
     const filters = this.filtersCollection.getApplicatorInstance();
 
     const events = {
@@ -441,7 +449,7 @@ export class Layer extends WithEvents implements StyledLayer {
       hoverStyle =
         typeof options.hoverStyle === 'string'
           ? options.hoverStyle
-          : buildStyle(options.hoverStyle as Style | StyleProperties);
+          : this.buildStyle(options.hoverStyle as Style | StyleProperties);
     }
 
     let clickStyle;
@@ -450,7 +458,7 @@ export class Layer extends WithEvents implements StyledLayer {
       clickStyle =
         typeof options.clickStyle === 'string'
           ? options.clickStyle
-          : buildStyle(options.clickStyle as Style | StyleProperties);
+          : this.buildStyle(options.clickStyle as Style | StyleProperties);
     }
 
     const layerGetStyleFn = this.getStyle.bind(this);
@@ -574,6 +582,16 @@ export class Layer extends WithEvents implements StyledLayer {
   public isReady() {
     return this.dataState !== DATA_STATES.STARTING;
   }
+
+  private buildStyle(style: Style | StyleProperties) {
+    const builtStyle = style instanceof Style ? style : new Style(style);
+
+    if (builtStyle.viewport) {
+      this.on(LayerEvent.TILES_LOADED, async () => this.replaceDeckGLLayer());
+    }
+
+    return builtStyle;
+  }
 }
 
 /**
@@ -598,10 +616,6 @@ function buildSource(source: string | Source | GeoJSON): Source {
   }
 
   throw new CartoLayerError('Unsupported source type', layerErrorTypes.UNKNOWN_SOURCE);
-}
-
-function buildStyle(style: Style | StyleProperties) {
-  return style instanceof Style ? style : new Style(style);
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

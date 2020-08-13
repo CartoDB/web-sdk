@@ -1,4 +1,5 @@
 import { CategoryFieldStats, Category, GeometryType, SourceMetadata } from '@/viz/source';
+import { Layer } from '@/viz';
 import { LegendProperties, LegendGeometryType, LegendWidgetOptions } from '@/viz/legend';
 import { convertArrayToObjectWithValues } from '../../utils/object';
 import { getColors, getUpdateTriggers, hexToRgb } from './utils';
@@ -35,6 +36,7 @@ function defaultOptions(
     palette: DEFAULT_PALETTE,
     nullColor: getStyleValue('nullColor', geometryType, options),
     othersColor: getStyleValue('othersColor', geometryType, options),
+    viewport: options.viewport || false,
     ...options
   };
 }
@@ -43,7 +45,7 @@ export function colorCategoriesStyle(
   featureProperty: string,
   options: Partial<ColorCategoriesOptionsStyle> = {}
 ) {
-  const evalFN = (layer: StyledLayer) => {
+  const evalFN = async (layer: StyledLayer) => {
     const meta = layer.source.getMetadata();
 
     if (layer.source.isEmpty()) {
@@ -54,23 +56,26 @@ export function colorCategoriesStyle(
 
     validateParameters(opts);
 
-    const categories = getCategories(opts, meta, featureProperty).slice(0, opts.top);
+    const dataOrigin = opts.viewport ? (layer as Layer) : meta;
+    const categories = (await getCategories(opts, dataOrigin, featureProperty)).slice(0, opts.top);
 
     return calculateWithCategories(featureProperty, categories, meta.geometryType, opts);
   };
 
-  const evalFNLegend = (
+  const evalFNLegend = async (
     layer: StyledLayer,
     legendWidgetOptions: LegendWidgetOptions = {}
-  ): LegendProperties[] => {
+  ): Promise<LegendProperties[]> => {
     const meta = layer.source.getMetadata();
 
     if (!meta.geometryType) {
       return [];
     }
 
+    let legendProperties: LegendProperties[] = [];
     const opts = defaultOptions(meta.geometryType, options);
-    const categories = getCategories(opts, meta, featureProperty);
+    const dataOrigin = opts.viewport ? (layer as Layer) : meta;
+    const categories = await getCategories(opts, dataOrigin, featureProperty);
     const categoriesTop = categories.slice(0, opts.top);
     const colors = getColors(opts.palette, categoriesTop.length).map(hexToRgb);
     const categoriesWithColors = convertArrayToObjectWithValues(categoriesTop, colors);
@@ -88,40 +93,72 @@ export function colorCategoriesStyle(
     const styles = getStyles(meta.geometryType, opts) as any;
     const geometryType = meta.geometryType.toLocaleLowerCase() as LegendGeometryType;
 
-    return Object.keys(categoriesWithColors).map(c => {
-      return {
-        type: geometryType,
-        color: `rgba(${categoriesWithColors[c].join(',')})`,
-        label: c,
-        width: styles.getSize,
-        strokeColor:
-          geometryType !== 'line' && options.property !== 'strokeColor'
-            ? `rgba(${styles.getLineColor.join(',')})`
-            : undefined
-      };
-    });
+    if (Object.keys(categoriesWithColors).length) {
+      legendProperties = Object.keys(categoriesWithColors).map(c => {
+        return {
+          type: geometryType,
+          color: `rgba(${categoriesWithColors[c].join(',')})`,
+          label: c,
+          width: styles.getSize,
+          strokeColor:
+            geometryType !== 'line' && options.property !== 'strokeColor'
+              ? `rgba(${styles.getLineColor.join(',')})`
+              : undefined,
+          ...legendWidgetOptions
+        };
+      });
+    } else {
+      legendProperties = [
+        {
+          type: geometryType,
+          color: '#ccc',
+          label: 'no data',
+          width: 2
+        }
+      ];
+    }
+
+    return legendProperties;
   };
 
-  return new Style(evalFN, featureProperty, evalFNLegend);
+  return new Style(evalFN, featureProperty, evalFNLegend, options.viewport);
 }
 
-function getCategories(
+async function getCategories(
   opts: ColorCategoriesOptionsStyle,
-  meta: SourceMetadata,
+  dataOrigin: Layer | SourceMetadata,
   featureProperty: string
 ) {
-  let categories;
+  let categories: string[] = [];
 
   if (opts.categories.length) {
     categories = opts.categories;
   } else {
-    const stats = meta.stats.find(c => c.name === featureProperty) as CategoryFieldStats;
+    const layer = dataOrigin as Layer;
+    const meta = dataOrigin as SourceMetadata;
 
-    if (!stats.categories || !stats.categories.length) {
-      throw new CartoStylingError(`Current dataset has not categories for '${featureProperty}'`);
+    if (opts.viewport) {
+      try {
+        categories = [
+          ...new Set(
+            (await layer.getViewportFeatures())
+              .filter(f => f[featureProperty])
+              .map(f => f[featureProperty] as string)
+          )
+        ];
+      } catch (err) {
+        // eslint-disable-next-line no-console
+        console.warn(err);
+      }
+    } else {
+      const stats = meta.stats.find(c => c.name === featureProperty) as CategoryFieldStats;
+
+      if (!stats.categories || !stats.categories.length) {
+        throw new CartoStylingError(`Current dataset has not categories for '${featureProperty}'`);
+      }
+
+      categories = stats.categories.map((c: Category) => c.category);
     }
-
-    categories = stats.categories.map((c: Category) => c.category);
   }
 
   return categories;

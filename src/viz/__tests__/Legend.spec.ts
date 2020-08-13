@@ -232,7 +232,7 @@ describe('Legend', () => {
       it('should have the default properties', async () => {
         const colorBins = colorBinsStyle(POINT_NUMERIC_FIELD);
         await pointLayer.setStyle(colorBins);
-        const colorBinsStyleProps = colorBins.getLayerProps(pointLayer);
+        const colorBinsStyleProps = await colorBins.getLayerProps(pointLayer);
         const maxVal = (pointLayer.source.getMetadata().stats[0] as NumericFieldStats).max;
         const minVal = (pointLayer.source.getMetadata().stats[0] as NumericFieldStats).min;
         const maxColor = (colorBinsStyleProps.getFillColor as (d: any) => RGBAColor)({
@@ -263,7 +263,7 @@ describe('Legend', () => {
       it('should have the provided properties', async () => {
         const colorBins = colorBinsStyle(POINT_NUMERIC_FIELD);
         await pointLayer.setStyle(colorBins);
-        const colorBinsStyleProps = colorBins.getLayerProps(pointLayer);
+        const colorBinsStyleProps = await colorBins.getLayerProps(pointLayer);
         const maxVal = (pointLayer.source.getMetadata().stats[0] as NumericFieldStats).max;
         const minVal = (pointLayer.source.getMetadata().stats[0] as NumericFieldStats).min;
         const maxColor = (colorBinsStyleProps.getFillColor as (d: any) => RGBAColor)({
@@ -305,7 +305,7 @@ describe('Legend', () => {
         const categoryFeature = {
           properties: { [CATEGORY_FIELD]: 'KR' }
         };
-        const colorCategoriesStyleProps = colorCategories.getLayerProps(pointLayer);
+        const colorCategoriesStyleProps = await colorCategories.getLayerProps(pointLayer);
         const categoryColor = (colorCategoriesStyleProps.getFillColor as (d: any) => RGBAColor)(
           categoryFeature
         );
@@ -332,7 +332,7 @@ describe('Legend', () => {
         const categoryFeature = {
           properties: { [CATEGORY_FIELD]: 'KR' }
         };
-        const colorCategoriesStyleProps = colorCategories.getLayerProps(pointLayer);
+        const colorCategoriesStyleProps = await colorCategories.getLayerProps(pointLayer);
         const categoryColor = (colorCategoriesStyleProps.getFillColor as (d: any) => RGBAColor)(
           categoryFeature
         );
@@ -364,7 +364,7 @@ describe('Legend', () => {
       it('should have the default properties', async () => {
         const colorContinuous = colorContinuousStyle(POLYGON_NUMERIC_FIELD);
         await polygonLayer.setStyle(colorContinuous);
-        const colorContinuousStyleProps = colorContinuous.getLayerProps(polygonLayer);
+        const colorContinuousStyleProps = await colorContinuous.getLayerProps(polygonLayer);
         const maxVal = (polygonLayer.source.getMetadata().stats[0] as NumericFieldStats).max;
         const maxColor = (colorContinuousStyleProps.getFillColor as (d: any) => RGBAColor)({
           properties: { [POLYGON_NUMERIC_FIELD]: maxVal }
@@ -396,7 +396,7 @@ describe('Legend', () => {
       it('should have the provided properties', async () => {
         const colorContinuous = colorContinuousStyle(POLYGON_NUMERIC_FIELD);
         await polygonLayer.setStyle(colorContinuous);
-        const colorContinuousStyleProps = colorContinuous.getLayerProps(polygonLayer);
+        const colorContinuousStyleProps = await colorContinuous.getLayerProps(polygonLayer);
         const minVal = (polygonLayer.source.getMetadata().stats[0] as NumericFieldStats).min;
         const minColor = (colorContinuousStyleProps.getFillColor as (d: any) => RGBAColor)({
           properties: { [POLYGON_NUMERIC_FIELD]: minVal }
@@ -437,7 +437,7 @@ describe('Legend', () => {
       it('should have the default properties', async () => {
         const sizeBins = sizeBinsStyle(POINT_NUMERIC_FIELD);
         await pointLayer.setStyle(sizeBins);
-        const sizeBinsStyleProps = sizeBins.getLayerProps(pointLayer);
+        const sizeBinsStyleProps = await sizeBins.getLayerProps(pointLayer);
         const maxVal = (pointLayer.source.getMetadata().stats[0] as NumericFieldStats).max;
         const maxRadius = (sizeBinsStyleProps.getRadius as (d: any) => number)({
           properties: { [POINT_NUMERIC_FIELD]: maxVal }
@@ -466,7 +466,7 @@ describe('Legend', () => {
       it('should have the provided properties', async () => {
         const sizeBins = sizeBinsStyle(POINT_NUMERIC_FIELD);
         await pointLayer.setStyle(sizeBins);
-        const sizeBinsStyleProps = sizeBins.getLayerProps(pointLayer);
+        const sizeBinsStyleProps = await sizeBins.getLayerProps(pointLayer);
         const minVal = (pointLayer.source.getMetadata().stats[0] as NumericFieldStats).min;
         const minRadius = (sizeBinsStyleProps.getRadius as (d: any) => number)({
           properties: { [POINT_NUMERIC_FIELD]: minVal }
@@ -506,7 +506,7 @@ describe('Legend', () => {
         const categoryFeature = {
           properties: { [CATEGORY_FIELD]: 'KR' }
         };
-        const sizeCategoriesStyleProps = sizeCategories.getLayerProps(pointLayer);
+        const sizeCategoriesStyleProps = await sizeCategories.getLayerProps(pointLayer);
         const maxRadius = (sizeCategoriesStyleProps.getRadius as (d: any) => number)(
           categoryFeature
         );
@@ -535,7 +535,7 @@ describe('Legend', () => {
         const categoryFeature = {
           properties: { [CATEGORY_FIELD]: 'KR' }
         };
-        const sizeCategoriesStyleProps = sizeCategories.getLayerProps(pointLayer);
+        const sizeCategoriesStyleProps = await sizeCategories.getLayerProps(pointLayer);
         const maxRadius = (sizeCategoriesStyleProps.getRadius as (d: any) => number)(
           categoryFeature
         );
@@ -569,7 +569,7 @@ describe('Legend', () => {
       it('should have the default properties', async () => {
         const sizeContinuous = sizeContinuousStyle(POINT_NUMERIC_FIELD);
         await pointLayer.setStyle(sizeContinuous);
-        const sizeContinuousStyleProps = sizeContinuous.getLayerProps(pointLayer);
+        const sizeContinuousStyleProps = await sizeContinuous.getLayerProps(pointLayer);
         const maxVal = (pointLayer.source.getMetadata().stats[0] as NumericFieldStats).max;
         const maxRadius = (sizeContinuousStyleProps.getRadius as (d: any) => number)({
           properties: { [POINT_NUMERIC_FIELD]: maxVal }
@@ -602,7 +602,7 @@ describe('Legend', () => {
       it('should have the provided properties', async () => {
         const sizeContinuous = sizeContinuousStyle(POINT_NUMERIC_FIELD);
         await pointLayer.setStyle(sizeContinuous);
-        const sizeContinuousStyleProps = sizeContinuous.getLayerProps(pointLayer);
+        const sizeContinuousStyleProps = await sizeContinuous.getLayerProps(pointLayer);
         const minVal = (pointLayer.source.getMetadata().stats[0] as NumericFieldStats).min;
         const minRadius = (sizeContinuousStyleProps.getRadius as (d: any) => number)({
           properties: { [POINT_NUMERIC_FIELD]: minVal }

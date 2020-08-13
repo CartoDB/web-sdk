@@ -1,4 +1,5 @@
 import { NumericFieldStats, GeometryType, SourceMetadata } from '@/viz/source';
+import { Layer } from '@/viz';
 import { LegendProperties, LegendGeometryType, LegendWidgetOptions } from '@/viz/legend';
 import { getColors, getUpdateTriggers, hexToRgb, findIndexForBinBuckets } from './utils';
 import { Classifier, ClassificationMethod } from '../../utils/Classifier';
@@ -44,6 +45,7 @@ function defaultOptions(
     palette: getPalette(options.method || DEFAULT_METHOD),
     nullColor: getStyleValue('nullColor', geometryType, options),
     othersColor: getStyleValue('othersColor', geometryType, options),
+    viewport: options.viewport || false,
     ...options
   };
 }
@@ -52,7 +54,7 @@ export function colorBinsStyle(
   featureProperty: string,
   options: Partial<ColorBinsOptionsStyle> = {}
 ) {
-  const evalFN = (layer: StyledLayer) => {
+  const evalFN = async (layer: StyledLayer) => {
     const meta = layer.source.getMetadata();
 
     if (layer.source.isEmpty()) {
@@ -63,64 +65,124 @@ export function colorBinsStyle(
 
     validateParameters(opts);
 
-    return calculateWithBreaks(
-      featureProperty,
-      getBreaks(opts, meta, featureProperty),
-      meta.geometryType,
-      opts
-    );
+    const dataOrigin = opts.viewport ? (layer as Layer) : meta;
+    const breaks = await getBreaks(opts, dataOrigin, featureProperty);
+    return calculateWithBreaks(featureProperty, breaks, meta.geometryType, opts);
   };
 
-  const evalFNLegend = (
+  const evalFNLegend = async (
     layer: StyledLayer,
     legendWidgetOptions: LegendWidgetOptions = { config: {} }
-  ): LegendProperties[] => {
+  ): Promise<LegendProperties[]> => {
     const meta = layer.source.getMetadata();
 
     if (!meta.geometryType) {
       return [];
     }
 
+    let legendProperties: LegendProperties[] = [];
     const { format, config } = legendWidgetOptions;
     const opts = defaultOptions(meta.geometryType, options);
-    const breaks = getBreaks(opts, meta, featureProperty);
-    const stats = meta.stats.find(f => f.name === featureProperty) as NumericFieldStats;
-    let ranges = [...breaks, stats.max];
-    const colors = getColors(opts.palette, ranges.length);
-    ranges = [stats.min, ...ranges];
-    const styles = getStyles(meta.geometryType, opts) as any;
+    const dataOrigin = opts.viewport ? (layer as Layer) : meta;
+    const breaks = await getBreaks(opts, dataOrigin, featureProperty);
+    let stats;
+
+    try {
+      stats = await getMinMax(dataOrigin, featureProperty, options.viewport);
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.warn(err);
+    }
+
     const geometryType = meta.geometryType.toLocaleLowerCase() as LegendGeometryType;
 
-    const result = colors.map((c, i) => {
-      const rangeValIni = format ? format(ranges[i]) : ranges[i];
-      const rangeValEnd = format ? format(ranges[i + 1]) : ranges[i + 1];
-      return {
-        type: geometryType,
-        color: c,
-        label: `${rangeValIni} - ${rangeValEnd}`,
-        width: styles.getSize,
-        strokeColor:
-          geometryType !== 'line' && options.property !== 'strokeColor'
-            ? `rgba(${styles.getLineColor.join(',')})`
-            : undefined
-      };
-    });
+    if (stats) {
+      let ranges = [...breaks, stats.max];
+      const colors = getColors(opts.palette, ranges.length);
+      ranges = [stats.min, ...ranges];
 
-    return config?.order === 'ASC' ? result : result.reverse();
+      const styles = getStyles(meta.geometryType, opts) as any;
+
+      legendProperties = colors.map((c, i) => {
+        const rangeValIni = format ? format(ranges[i]) : ranges[i];
+        const rangeValEnd = format ? format(ranges[i + 1]) : ranges[i + 1];
+        return {
+          type: geometryType,
+          color: c,
+          label: `${rangeValIni} - ${rangeValEnd}`,
+          width: styles.getSize,
+          strokeColor:
+            geometryType !== 'line' && options.property !== 'strokeColor'
+              ? `rgba(${styles.getLineColor.join(',')})`
+              : undefined,
+          ...legendWidgetOptions
+        };
+      });
+
+      legendProperties = config?.order === 'ASC' ? legendProperties : legendProperties.reverse();
+    } else {
+      // creates categories with no data
+      for (let i = 0; i < opts.bins; i += 1) {
+        legendProperties.push({
+          type: geometryType,
+          color: '#ccc',
+          label: 'no data',
+          width: 2
+        });
+      }
+    }
+
+    return legendProperties;
   };
 
-  return new Style(evalFN, featureProperty, evalFNLegend);
+  return new Style(evalFN, featureProperty, evalFNLegend, options.viewport);
 }
 
-function getBreaks(opts: ColorBinsOptionsStyle, meta: SourceMetadata, featureProperty: string) {
+async function getBreaks(
+  opts: ColorBinsOptionsStyle,
+  dataOrigin: Layer | SourceMetadata,
+  featureProperty: string
+) {
   if (!opts.breaks.length) {
-    const stats = meta.stats.find(f => f.name === featureProperty) as NumericFieldStats;
-    const classifier = new Classifier(stats);
-    const breaks = classifier.breaks(opts.bins - 1, opts.method);
+    const data = (dataOrigin as SourceMetadata).stats
+      ? ((dataOrigin as SourceMetadata).stats.find(
+          f => f.name === featureProperty
+        ) as NumericFieldStats)
+      : (dataOrigin as Layer);
+    const classifier = new Classifier(data, featureProperty);
+    const breaks = await classifier.breaks(opts.bins - 1, opts.method, opts.viewport);
     return breaks;
   }
 
   return opts.breaks;
+}
+
+async function getMinMax(
+  dataOrigin: Layer | SourceMetadata,
+  featureProperty: string,
+  viewport = false
+) {
+  let stats: NumericFieldStats | undefined;
+
+  if (viewport) {
+    const data = (await (dataOrigin as Layer).getViewportFeatures())
+      .filter(f => f[featureProperty])
+      .map(f => f[featureProperty] as number);
+
+    if (data.length) {
+      stats = {
+        name: featureProperty,
+        min: Math.min(...data),
+        max: Math.max(...data)
+      };
+    }
+  } else {
+    stats = (dataOrigin as SourceMetadata).stats.find(
+      f => f.name === featureProperty
+    ) as NumericFieldStats;
+  }
+
+  return stats;
 }
 
 function calculateWithBreaks(

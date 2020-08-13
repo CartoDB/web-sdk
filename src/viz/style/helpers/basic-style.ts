@@ -3,12 +3,12 @@ import { StyledLayer } from '../layer-style';
 import { Style, getStyles, BasicOptionsStyle } from '..';
 
 export function basicStyle(options: Partial<BasicOptionsStyle> = {}) {
-  const evalFN = (layer: StyledLayer) => {
+  const evalFN = async (layer: StyledLayer) => {
     const meta = layer.source.getMetadata();
     return getStyles(meta.geometryType, options);
   };
 
-  const evalFNLegend = (layer: StyledLayer): LegendProperties[] => {
+  const evalFNLegend = async (layer: StyledLayer): Promise<LegendProperties[]> => {
     // TODO getMetadata throws an exception if source is empty. It could happen
     // if the user calls getLegendData layer method before ready event has been sent
 

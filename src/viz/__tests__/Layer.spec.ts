@@ -186,7 +186,7 @@ describe('Layer', () => {
       DatasetSource.prototype.getProps = mockSourceGetProps;
       DatasetSource.prototype.getMetadata = mockSourceGetMetadata;
       Layer.prototype.getStyle = jest.fn().mockImplementation(() => {
-        return new Style({});
+        return new Promise(complete => complete(new Style({})));
       });
     });
 

@@ -1,4 +1,5 @@
 import { CategoryFieldStats, Category, GeometryType, SourceMetadata } from '@/viz/source';
+import { Layer } from '@/viz';
 import { LegendProperties, LegendGeometryType, LegendWidgetOptions } from '@/viz/legend';
 import { calculateSizeBins } from './utils';
 import { Style, getStyleValue, BasicOptionsStyle, getStyles } from '..';
@@ -31,6 +32,7 @@ function defaultOptions(
     color: getDefaultColor(geometryType, options),
     sizeRange: getDefaultSizeRange(geometryType, options),
     nullSize: getStyleValue('nullSize', geometryType, options),
+    viewport: options.viewport || false,
     ...options
   };
 }
@@ -47,7 +49,7 @@ export function sizeCategoriesStyle(
   featureProperty: string,
   options: Partial<SizeCategoriesOptionsStyle> = {}
 ) {
-  const evalFN = (layer: StyledLayer) => {
+  const evalFN = async (layer: StyledLayer) => {
     const meta = layer.source.getMetadata();
 
     if (layer.source.isEmpty()) {
@@ -57,25 +59,28 @@ export function sizeCategoriesStyle(
     const opts = defaultOptions(meta.geometryType, options);
     validateParameters(opts, meta.geometryType);
 
-    const categories = getCategories(opts, meta, featureProperty).slice(0, opts.top);
+    const dataOrigin = opts.viewport ? (layer as Layer) : meta;
+    const categories = (await getCategories(opts, dataOrigin, featureProperty)).slice(0, opts.top);
 
     return calculateWithCategories(featureProperty, categories, meta.geometryType, opts);
   };
 
-  const evalFNLegend = (
+  const evalFNLegend = async (
     layer: StyledLayer,
     legendWidgetOptions: LegendWidgetOptions = { config: {} }
-  ): LegendProperties[] => {
+  ): Promise<LegendProperties[]> => {
     const meta = layer.source.getMetadata();
 
     if (!meta.geometryType) {
       return [];
     }
 
+    let legendProperties: LegendProperties[] = [];
     const opts = defaultOptions(meta.geometryType, options);
-    const categories = getCategories(opts, meta, featureProperty);
+    const dataOrigin = opts.viewport ? (layer as Layer) : meta;
+    const categories = await getCategories(opts, dataOrigin, featureProperty);
     const categoriesTop = categories.slice(0, opts.top);
-    const sizes = calculateSizeBins(categoriesTop.length - 1, opts.sizeRange);
+    const sizes = await calculateSizeBins(categoriesTop.length - 1, opts.sizeRange);
 
     if (categories.length > opts.top) {
       sizes.push(sizes[0]);
@@ -92,43 +97,82 @@ export function sizeCategoriesStyle(
     const geometryType = meta.geometryType.toLocaleLowerCase() as LegendGeometryType;
     const color = geometryType === 'line' ? styles.getLineColor : styles.getFillColor;
 
-    return categoriesTop.map((c, i) => {
-      return {
-        type: geometryType,
-        color: `rgba(${color.join(',')})`,
-        label: c,
-        width: sizes[i],
-        strokeColor: `rgba(${styles.getLineColor.join(',')})`
-      };
-    });
+    if (categoriesTop.length) {
+      legendProperties = categoriesTop.map((c, i) => {
+        return {
+          type: geometryType,
+          color: `rgba(${color.join(',')})`,
+          label: c,
+          width: sizes[i],
+          strokeColor: `rgba(${styles.getLineColor.join(',')})`,
+          ...legendWidgetOptions
+        };
+      });
+    } else {
+      // creates categories with no data
+      legendProperties = [
+        {
+          type: geometryType,
+          color: '#ccc',
+          label: 'no data',
+          width: sizes[0]
+        },
+        {
+          type: geometryType,
+          color: '#ccc',
+          label: 'no data',
+          width: sizes[1]
+        }
+      ];
+    }
+
+    return legendProperties;
   };
 
-  return new Style(evalFN, featureProperty, evalFNLegend);
+  return new Style(evalFN, featureProperty, evalFNLegend, options.viewport);
 }
 
-function getCategories(
+async function getCategories(
   opts: SizeCategoriesOptionsStyle,
-  meta: SourceMetadata,
+  dataOrigin: Layer | SourceMetadata,
   featureProperty: string
 ) {
-  let categories;
+  let categories: string[] = [];
 
   if (opts.categories.length) {
     categories = opts.categories;
   } else {
-    const stats = meta.stats.find(c => c.name === featureProperty) as CategoryFieldStats;
+    const layer = dataOrigin as Layer;
+    const meta = dataOrigin as SourceMetadata;
 
-    if (!stats.categories || !stats.categories.length) {
-      throw new CartoStylingError(`Current dataset has not categories for '${featureProperty}'`);
+    if (opts.viewport) {
+      try {
+        categories = [
+          ...new Set(
+            (await layer.getViewportFeatures())
+              .filter(f => f[featureProperty])
+              .map(f => f[featureProperty] as string)
+          )
+        ];
+      } catch (err) {
+        // eslint-disable-next-line no-console
+        console.warn(err);
+      }
+    } else {
+      const stats = meta.stats.find(c => c.name === featureProperty) as CategoryFieldStats;
+
+      if (!stats.categories || !stats.categories.length) {
+        throw new CartoStylingError(`Current dataset has not categories for '${featureProperty}'`);
+      }
+
+      categories = stats.categories.map((c: Category) => c.category);
     }
-
-    categories = stats.categories.map((c: Category) => c.category);
   }
 
   return categories;
 }
 
-function calculateWithCategories(
+async function calculateWithCategories(
   featureProperty: string,
   categories: string[],
   geometryType: GeometryType | undefined,
@@ -136,7 +180,7 @@ function calculateWithCategories(
 ) {
   const styles = getStyles(geometryType, options);
 
-  const sizes = calculateSizeBins(categories.length - 1, options.sizeRange);
+  const sizes = await calculateSizeBins(categories.length - 1, options.sizeRange);
 
   /**
    * @private
