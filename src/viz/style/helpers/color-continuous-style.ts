@@ -65,7 +65,7 @@ export function colorContinuousStyle(
 
     let styleObj = {};
 
-    if (stats && stats.min && stats.max) {
+    if (stats && stats.min !== undefined && stats.max !== undefined) {
       styleObj = calculate(
         featureProperty,
         meta.geometryType,
@@ -103,7 +103,7 @@ export function colorContinuousStyle(
 
     const result = [] as LegendProperties[];
 
-    if (stats && stats.min && stats.max) {
+    if (stats && stats.min !== undefined && stats.max !== undefined) {
       const styles = getStyles(meta.geometryType, opts) as any;
       const rangeMin = getRangeMin(stats, opts);
       const rangeMax = getRangeMax(stats, opts);
@@ -117,10 +117,10 @@ export function colorContinuousStyle(
         let label;
         const value = i * (rangeMax - rangeMin) + rangeMin;
 
-        if (value) {
-          label = format ? format(value) : value;
-        } else {
+        if (value === undefined) {
           label = 'no data';
+        } else {
+          label = format ? format(value) : value;
         }
 
         result.push({

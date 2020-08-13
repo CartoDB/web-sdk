@@ -62,7 +62,7 @@ export function sizeContinuousStyle(
 
     let styleObj = {};
 
-    if (stats && stats.min && stats.max) {
+    if (stats && stats.min !== undefined && stats.max !== undefined) {
       styleObj = calculate(
         featureProperty,
         meta.geometryType,
@@ -99,7 +99,7 @@ export function sizeContinuousStyle(
 
     const result = [] as LegendProperties[];
 
-    if (stats && stats.min && stats.max) {
+    if (stats && stats.min !== undefined && stats.max !== undefined) {
       const styles = getStyles(meta.geometryType, opts) as any;
       const geometryType = meta.geometryType.toLocaleLowerCase() as LegendGeometryType;
       const color = geometryType === 'line' ? styles.getLineColor : styles.getFillColor;
