@@ -260,7 +260,7 @@ This is the complete example with feature highlighting and pop-ups both for hove
     <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.js'></script>
 
     <!-- Include Web SDK from the CARTO CDN -->
-    <script src="https://libs.cartocdn.com/web-sdk/v1.0.0-alpha/index.min.js"></script>
+    <script src="https://libs.cartocdn.com/web-sdk/%VERSION%/index.min.js"></script>
 
     <!-- Include Airship from the CARTO CDN -->
     <script type="module" src="https://libs.cartocdn.com/airship-components/v2.4.0/airship/airship.esm.js"></script>
