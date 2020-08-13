@@ -129,8 +129,7 @@ export function sizeContinuousStyle(
             opts.sizeRange[1],
             meta.geometryType === 'Point' ? Math.sqrt(value) : value
           ),
-          strokeColor: `rgba(${styles.getLineColor.join(',')})`,
-          ...legendWidgetOptions
+          strokeColor: `rgba(${styles.getLineColor.join(',')})`
         });
       }
     }

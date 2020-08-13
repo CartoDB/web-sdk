@@ -43,8 +43,9 @@ export class LegendWidget {
           if (style.viewport) {
             layer.on(LayerEvent.TILES_LOADED, () => applyLegendData(legendWidget, layer, options));
           }
+
+          applyLegendData(legendWidget, layer, options);
         });
-        applyLegendData(legendWidget, layer, options);
       });
     }
   }

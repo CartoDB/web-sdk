@@ -113,8 +113,7 @@ export function sizeBinsStyle(
           color: `rgba(${color.join(',')})`,
           label: `${rangeValIni} - ${rangeValEnd}`,
           width: s,
-          strokeColor: `rgba(${styles.getLineColor.join(',')})`,
-          ...legendWidgetOptions
+          strokeColor: `rgba(${styles.getLineColor.join(',')})`
         };
       });
 

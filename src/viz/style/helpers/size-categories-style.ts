@@ -104,8 +104,7 @@ export function sizeCategoriesStyle(
           color: `rgba(${color.join(',')})`,
           label: c,
           width: sizes[i],
-          strokeColor: `rgba(${styles.getLineColor.join(',')})`,
-          ...legendWidgetOptions
+          strokeColor: `rgba(${styles.getLineColor.join(',')})`
         };
       });
     } else {

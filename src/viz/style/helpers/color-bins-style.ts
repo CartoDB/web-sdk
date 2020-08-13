@@ -114,8 +114,7 @@ export function colorBinsStyle(
           strokeColor:
             geometryType !== 'line' && options.property !== 'strokeColor'
               ? `rgba(${styles.getLineColor.join(',')})`
-              : undefined,
-          ...legendWidgetOptions
+              : undefined
         };
       });
 
