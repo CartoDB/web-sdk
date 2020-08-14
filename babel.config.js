@@ -1,3 +1,5 @@
+const packagejson = require('./package.json');
+
 const COMMON_CONFIG = {
   comments: false,
   ignore: ['./declarations']
@@ -26,6 +28,12 @@ const ESM_CONFIG = {
           '@': './src/'
         }
       }
+    ],
+    [
+      'global-define',
+      {
+        WEBSDK_VERSION: packagejson.version
+      }
     ]
   ]
 };
@@ -51,6 +59,12 @@ const COMMONJS_CONFIG = {
         alias: {
           '@': './src/'
         }
+      }
+    ],
+    [
+      'global-define',
+      {
+        WEBSDK_VERSION: packagejson.version
       }
     ]
   ]

@@ -168,21 +168,23 @@ export class SQLSource extends Source {
   }
 
   private buildMapConfig(mapOptions: MapOptions) {
-    const defaultMapOptionsCopy = JSON.parse(JSON.stringify(defaultMapOptions));
-
-    return {
-      ...defaultMapOptionsCopy,
+    const mapConfig = {
+      ...defaultMapOptions,
       ...mapOptions,
       metadata: {
-        ...defaultMapOptionsCopy.metadata,
+        ...defaultMapOptions.metadata,
         ...mapOptions.metadata
       },
       aggregation: {
-        ...defaultMapOptionsCopy.aggregation,
+        ...defaultMapOptions.aggregation,
         ...mapOptions.aggregation
       },
       sql: this._value
     };
+
+    // returns a clone in order to prevent modify
+    // default values by reference
+    return JSON.parse(JSON.stringify(mapConfig));
   }
 
   private getMapConfig() {

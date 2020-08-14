@@ -1,0 +1,538 @@
+<html lang="en">
+  <head>
+    <title>None</title>
+    <meta name="description" content="None" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8" />
+
+    <!-- Include Web-SDK -->
+    <script src="https://unpkg.com/deck.gl@8.2.0/dist.min.js"></script>
+    <script src="/dist/umd/index.min.js"></script>
+
+    <!-- Include Mapbox -->
+    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.js"></script>
+    <link
+      href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.css"
+      rel="stylesheet"
+      type="text/css"
+    />
+
+    <!-- Include Airship -->
+    <script
+      nomodule=""
+      src="https://libs.cartocdn.com/airship-components/v2.4.0/airship.js"
+    ></script>
+    <script
+      type="module"
+      src="https://libs.cartocdn.com/airship-components/v2.4.0/airship/airship.esm.js"
+    ></script>
+    <script src="https://libs.cartocdn.com/airship-bridge/v2.4.0/asbridge.min.js"></script>
+    <link href="https://libs.cartocdn.com/airship-style/v2.4.0/airship.min.css" rel="stylesheet" />
+    <link href="https://libs.cartocdn.com/airship-icons/v2.4.0/icons.css" rel="stylesheet" />
+
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet" type="text/css" />
+
+    <!-- External libraries -->
+
+    <!-- pako -->
+    <script src="https://libs.cartocdn.com/cartoframes/dependencies/pako_inflate.min.js"></script>
+
+    <!-- d3 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-format/1.3.0/d3-format.min.js"></script>
+
+    <!-- html2canvas -->
+
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+      }
+
+      aside.as-sidebar {
+        min-width: 300px;
+      }
+
+      .map-image {
+        display: none;
+        max-width: 100%;
+        height: auto;
+      }
+
+      as-layer-selector-slot .as-layer-selector-slot--wrapper .as-caption {
+        // FIXME
+        font-size: 14px;
+        line-height: 14px;
+      }
+    </style>
+    <style>
+      .map {
+        position: absolute;
+        height: 100%;
+        width: 100%;
+      }
+
+      .map-info {
+        position: absolute;
+        bottom: 0;
+        padding: 0 5px;
+        background-color: rgba(255, 255, 255, 0.5);
+        margin: 0;
+        color: rgba(0, 0, 0, 0.75);
+        font-size: 12px;
+        width: auto;
+        height: 18px;
+        font-family: 'Open Sans';
+      }
+
+      .map-footer {
+        background: #f2f6f9;
+        font-family: Roboto;
+        font-size: 12px;
+        line-height: 24px;
+        color: #162945;
+        text-align: center;
+        z-index: 2;
+      }
+
+      .map-footer a {
+        text-decoration: none;
+      }
+
+      .map-footer a:hover {
+        text-decoration: underline;
+      }
+    </style>
+    <style>
+      #error-container {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background-color: white;
+        visibility: hidden;
+        padding: 1em;
+        font-family: 'Courier New', Courier, monospace;
+        margin: 0 auto;
+        font-size: 14px;
+        overflow: auto;
+        z-index: 1000;
+        color: black;
+      }
+
+      .error-section {
+        padding: 1em;
+        border-radius: 5px;
+        background-color: #fee;
+      }
+
+      #error-container #error-highlight {
+        font-weight: bold;
+        color: inherit;
+      }
+
+      #error-container #error-type {
+        color: #008000;
+      }
+
+      #error-container #error-name {
+        color: #ba2121;
+      }
+
+      #error-container #error-content {
+        margin-top: 0.4em;
+      }
+
+      .error-details {
+        margin-top: 1em;
+      }
+
+      #error-stacktrace {
+        list-style: none;
+      }
+    </style>
+    <style>
+      .popup-content {
+        display: flex;
+        flex-direction: column;
+        padding: 8px;
+      }
+
+      .popup-name {
+        font-size: 12px;
+        font-weight: 400;
+        line-height: 20px;
+        margin-bottom: 4px;
+      }
+
+      .popup-value {
+        font-size: 16px;
+        font-weight: 600;
+        line-height: 20px;
+      }
+
+      .popup-value:not(:last-of-type) {
+        margin-bottom: 16px;
+      }
+    </style>
+    <style>
+      as-widget-header .as-widget-header__header {
+        margin-bottom: 8px;
+        overflow-wrap: break-word;
+      }
+
+      as-widget-header .as-widget-header__subheader {
+        margin-bottom: 12px;
+      }
+
+      as-category-widget {
+        max-height: 250px;
+      }
+    </style>
+  </head>
+
+  <body class="as-app-body as-app">
+    <img id="map-image" class="map-image" alt="Static map image" />
+    <as-responsive-content id="main-container">
+      <aside class="as-sidebar as-sidebar--right" id="widgets" data-name="Widgets">
+        <div class="as-box">
+          <section class="as-body">
+            <div>
+              <as-category-widget
+                id="layer0_widget0"
+                description="Select a category number to filter"
+                heading="Number of category businesses"
+              >
+              </as-category-widget>
+            </div>
+          </section>
+        </div>
+
+        <div class="as-box">
+          <section class="as-body">
+            <div>
+              <as-category-widget
+                id="layer1_widget0"
+                description="Select a collision type to filter"
+                heading="Type of collision"
+              >
+              </as-category-widget>
+            </div>
+          </section>
+        </div>
+
+        <div class="as-box">
+          <section class="as-body">
+            <div>
+              <as-category-widget
+                id="layer1_widget1"
+                description="Select an address type to filter"
+                heading="Type of address"
+              >
+              </as-category-widget>
+            </div>
+          </section>
+        </div>
+      </aside>
+
+      <main class="as-main">
+        <div class="as-map-area">
+          <div id="map" class="map"></div>
+        </div>
+        <!-- as-map-area -->
+      </main>
+      <!-- as-main -->
+    </as-responsive-content>
+
+    <div id="error-container" class="error">
+      <section class="error-section">
+        <span class="errors" id="error-name"></span>:
+        <section id="error-content">
+          <span class="errors" id="error-type"></span>
+          <span class="errors" id="error-message"></span>
+        </section>
+      </section>
+
+      <details class="error-details">
+        <summary>StackTrace</summary>
+        <ul id="error-stacktrace"></ul>
+      </details>
+    </div>
+  </body>
+
+  <script>
+    const GLOBAL_FILTER = 'global';
+    const GLOBAL_MODE = 'remote';
+    const LOCAL_FILTER = 'viewport';
+    const LOCAL_MODE = 'fast';
+
+    function cleanStyleName(name) {
+      return name.replace('Style', '');
+    }
+
+    function decodeJSONData(data, encodeData) {
+      try {
+        if (encodeData) {
+          const decodedJSON = pako.inflate(atob(data), { to: 'string' });
+          return JSON.parse(decodedJSON);
+        } else {
+          return JSON.parse(data);
+        }
+      } catch (error) {
+        throw new Error(`
+    Error: "${error}". CARTOframes is not able to parse your local data because it is too large.
+    Please, disable the data compresion with encode_data=False in your Layer class.
+  `);
+      }
+    }
+
+    async function initialize() {
+      const basemap = 'Positron';
+      const bounds = [
+        [-122.514897232, 37.708089209],
+        [-122.238951209297, 47.7341365013854]
+      ];
+      const camera = null;
+      const layersDef = [
+        {
+          credentials: {
+            api_key: 'default_public',
+            base_url: 'https://cartoframes.carto.com',
+            username: 'cartoframes'
+          },
+          data: 'SELECT * FROM "cartoframes"."seattle_collisions"',
+          encode_data: true,
+          has_legend_list: true,
+          interactivity: {
+            click: null,
+            hover: null
+          },
+          legends: [],
+          map_index: 0,
+          options: {},
+          source: 'SELECT * FROM "cartoframes"."seattle_collisions"',
+          title: null,
+          type: 'Query',
+          viz: null,
+          widgets: [
+            {
+              description: 'Select a collision type to filter',
+              footer: '',
+              has_bridge: true,
+              is_global: false,
+              operation: null,
+              options: {
+                autoplay: true,
+                buckets: 20,
+                format: null,
+                readOnly: true,
+                weight: 1
+              },
+              prop: '',
+              title: 'Type of collision',
+              type: 'category',
+              value: 'collisiontype',
+              variable_name: 'v118f1c'
+            },
+            {
+              description: 'Select an address type to filter',
+              footer: '',
+              has_bridge: true,
+              is_global: false,
+              operation: null,
+              options: {
+                autoplay: true,
+                buckets: 20,
+                format: null,
+                readOnly: false,
+                weight: 1
+              },
+              prop: '',
+              title: 'Type of address',
+              type: 'category',
+              value: 'addrtype',
+              variable_name: 'vb25da0'
+            }
+          ]
+        },
+        {
+          credentials: {
+            api_key: 'default_public',
+            base_url: 'https://josemacarto.carto.com',
+            username: 'josemacarto'
+          },
+          data: 'SELECT * FROM "josemacarto"."sf_businesses_neighborhoods"',
+          encode_data: true,
+          has_legend_list: true,
+          interactivity: {
+            click: null,
+            hover: null
+          },
+          legends: [],
+          map_index: 0,
+          options: {},
+          source: 'SELECT * FROM "josemacarto"."sf_businesses_neighborhoods"',
+          title: null,
+          type: 'Query',
+          viz: null,
+          widgets: [
+            {
+              description: 'Select a category number to filter',
+              footer: '',
+              has_bridge: true,
+              is_global: false,
+              operation: null,
+              options: {
+                autoplay: true,
+                buckets: 20,
+                format: null,
+                readOnly: false,
+                weight: 1
+              },
+              prop: '',
+              title: 'Number of category businesses',
+              type: 'category',
+              value: 'category',
+              variable_name: 'v5ccbf9'
+            }
+          ]
+        }
+      ];
+
+      let credentials = null;
+      let dataview = null;
+      let layer = null;
+      let source = null;
+      let style = null;
+      let styleName = null;
+      let widgetMode = null;
+
+      const deckMap = carto.viz.createMap({
+        basemap: basemap,
+        viewState: camera
+      });
+
+      let layerI = layersDef.length - 1; // Their "IDs" are reversed
+      for (const layerDef of layersDef) {
+        if (layerDef.type === 'Query') {
+          credentials = new carto.auth.Credentials(
+            layerDef.credentials.username,
+            layerDef.credentials.api_key,
+            layerDef.credentials.base_url
+          );
+          source = new carto.viz.source.SQL(layerDef.data, { credentials });
+        } else {
+          source = new carto.viz.source.GeoJSON(
+            decodeJSONData(layerDef.data, layerDef.encode_data)
+          );
+        }
+
+        if (!!layerDef.viz && !!layerDef.viz.value) {
+          style = carto.viz.style[cleanStyleName(layerDef.viz.name)](
+            layerDef.viz.value,
+            layerDef.viz.options
+          );
+        } else if (!!layerDef.viz) {
+          style = carto.viz.style[cleanStyleName(layerDef.viz.name)](layerDef.viz.options);
+        }
+
+        layer = new carto.viz.Layer(source, style);
+
+        if (!!layerDef.interactivity.hover) {
+          for (const hover of layerDef.interactivity.hover) {
+            if (typeof hover.format === 'string') {
+              hover.format = d3.format(hover.format);
+            }
+          }
+
+          await layer.setPopupHover(layerDef.interactivity.hover);
+        }
+
+        if (!!layerDef.interactivity.click) {
+          for (const hover of layerDef.interactivity.hover) {
+            if (typeof hover.format === 'string') {
+              hover.format = d3.format(hover.format);
+            }
+          }
+
+          await layer.setPopupClick(layerDef.interactivity.click);
+        }
+
+        await layer.addTo(deckMap);
+
+        let widgetI = 0;
+        for (const widgetDef of layerDef.widgets) {
+          widgetMode = widgetDef.is_global
+            ? {
+                spatialFilter: 'global'
+              }
+            : {
+                spatialFilter: 'viewport',
+                mode: 'fast'
+              };
+
+          if (typeof widgetDef.options.format === 'string') {
+            widgetDef.options.format = d3.format(widgetDef.options.format);
+          }
+
+          if (widgetDef.type === 'category') {
+            dataview = new carto.viz.dataview.Category(layer, widgetDef.value, {
+              operation: 'count',
+              ...widgetMode
+            });
+
+            new carto.viz.widget.Category(
+              `as-category-widget#layer${layerI}_widget${widgetI}`,
+              dataview,
+              {
+                showClearButton: true,
+                disableInteractivity: widgetDef.options.readOnly,
+                format: widgetDef.options.format
+              }
+            );
+          } else if (widgetDef.type === 'formula') {
+            dataview = new carto.viz.dataview.Formula(layer, widgetDef.value, {
+              operation: widgetDef.operation,
+              ...widgetMode
+            });
+
+            new carto.viz.widget.Formula(
+              `as-formula-widget#layer${layerI}_widget${widgetI}`,
+              dataview,
+              {
+                format: widgetDef.options.format
+              }
+            );
+          } else if (widgetDef.type === 'histogram') {
+            dataview = new carto.viz.dataview.Histogram(layer, widgetDef.value, {
+              bins: widgetDef.options.buckets,
+              ...widgetMode
+            });
+
+            new carto.viz.widget.Histogram(
+              `as-histogram-widget#layer${layerI}_widget${widgetI}`,
+              dataview,
+              {
+                showClear: true,
+                disableInteractivity: widgetDef.options.readOnly,
+                format: widgetDef.options.format
+              }
+            );
+          }
+
+          widgetI++;
+        }
+
+        layerI--;
+      }
+
+      const viewport = deckMap.getViewports()[0];
+      const { longitude, latitude, zoom } = viewport.fitBounds(bounds);
+      const viewState = Object.assign({}, { longitude, latitude, zoom }, camera);
+
+      deckMap.setProps({
+        viewState: viewState
+      });
+    }
+
+    initialize();
+  </script>
+</html>
