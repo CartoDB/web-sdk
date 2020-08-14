@@ -2,6 +2,7 @@ import { Credentials, defaultCredentials } from '@/auth';
 import { MapInstance, MapOptions, Client } from '@/maps/Client';
 import { uuidv4 } from '@/core/utils/uuid';
 import { SQLFilterApplicator } from '@/viz/filters/SQLFilterApplicator';
+import { SQLClient, GEOMETRY_WKT_ALIAS } from '@/sql/SQLClient';
 import {
   Source,
   SourceProps,
@@ -21,7 +22,7 @@ export interface SourceOptions {
   mapOptions?: MapOptions;
 }
 
-const DEFAULT_ID_PROPERTY = 'cartodb_id';
+export const DEFAULT_ID_PROPERTY = 'cartodb_id';
 
 export const defaultMapOptions: MapOptions = {
   vectorExtent: 2048,
@@ -91,6 +92,20 @@ export class SQLSource extends Source {
     const sql = sqlApplicator.getSQL();
     const whereClause = sql ? `WHERE ${sql}` : '';
     return `SELECT * FROM (${this._value}) as originalQuery ${whereClause}`.trim();
+  }
+
+  public async getRemoteFeatureCoordinates(feature: Record<string, unknown>): Promise<number[]> {
+    const sqlClient = new SQLClient(this._credentials);
+    const id = (feature.properties as any)[DEFAULT_ID_PROPERTY] as string;
+    const element = await sqlClient.getRowById(id, this._value);
+    const remoteFeature = (element as any).rows[0];
+    const remoteCoordinatesWkt = remoteFeature[GEOMETRY_WKT_ALIAS] as string;
+    const remoteCoords = remoteCoordinatesWkt
+      .replace(/POINT\s*\(([^\s]+)\s([^\s]+)\)/gi, '$1,$2')
+      .split(',')
+      .map(coordStr => Number.parseFloat(coordStr));
+
+    return remoteCoords;
   }
 
   /**

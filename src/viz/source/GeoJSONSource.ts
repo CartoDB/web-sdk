@@ -71,6 +71,11 @@ export class GeoJSONSource extends Source {
       .flat();
   }
 
+  // eslint-disable-next-line class-methods-use-this
+  public getRemoteFeatureCoordinates(feature: Record<string, unknown>): Promise<number[]> {
+    return new Promise(resolve => resolve((feature.geometry as any).coordinates));
+  }
+
   public async init(): Promise<boolean> {
     if (!this.needsInitialization) {
       return true;

@@ -75,6 +75,8 @@ export abstract class Source extends WithEvents {
 
   abstract getFeatures(excludedFilters: string[]): Record<string, unknown>[];
 
+  abstract getRemoteFeatureCoordinates(feature: Record<string, unknown>): Promise<number[]>;
+
   // eslint-disable-next-line @typescript-eslint/no-unused-vars, class-methods-use-this
   addFilter(_filterId: string, _filter: ColumnFilters) {
     throw new Error(`Method not implemented`);

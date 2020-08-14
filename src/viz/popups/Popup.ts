@@ -153,21 +153,24 @@ export class Popup {
    * @param elements popup elements to generate popup
    * content.
    */
-  public createHandler(elements: PopupElement[] | string[] | null = []) {
-    return ([features, coordinates]: [Record<string, any>[], number[], HammerInput]) => {
+  public createHandler(
+    elements: PopupElement[] | string[] | null = [],
+    getRemoteFeatureCoordinatesFn?: (feature: Record<string, unknown>) => Promise<number[]>
+  ) {
+    return async ([features, coordinates]: [Record<string, any>[], number[], HammerInput]) => {
       if (features.length > 0) {
         const popupContent: string = generatePopupContent(elements, features);
         this.open();
         this.setContent(popupContent);
-        let popupCoordinates = coordinates;
+        this.setCoordinates(coordinates);
 
-        // to be more accurate on points we use the feature
+        // to be more accurate on points we use the real feature
         // coordinates instead of the coordinates where the user clicked
-        if (features[0].geometry.type === 'Point') {
-          popupCoordinates = features[0].geometry.coordinates;
+        if (features[0].geometry.type === 'Point' && getRemoteFeatureCoordinatesFn) {
+          getRemoteFeatureCoordinatesFn(features[0]).then(remoteCoordinates =>
+            this.setCoordinates(remoteCoordinates)
+          );
         }
-
-        this.setCoordinates(popupCoordinates);
       } else {
         this.close();
       }

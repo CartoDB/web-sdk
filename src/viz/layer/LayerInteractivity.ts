@@ -140,7 +140,10 @@ export class LayerInteractivity {
 
     if (eventType === InteractivityEvent.CLICK) {
       if (!this._clickPopupHandler) {
-        this._clickPopupHandler = popup.createHandler(elements);
+        this._clickPopupHandler = popup.createHandler(
+          elements,
+          this._layer.source.getRemoteFeatureCoordinates.bind(this._layer.source)
+        );
       }
 
       handlerFn = this._clickPopupHandler;

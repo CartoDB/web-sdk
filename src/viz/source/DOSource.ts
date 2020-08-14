@@ -158,6 +158,11 @@ export class DOSource extends Source {
     return this._credentials;
   }
 
+  // eslint-disable-next-line class-methods-use-this, @typescript-eslint/no-unused-vars
+  public getRemoteFeatureCoordinates(_feature: Record<string, unknown>): Promise<number[]> {
+    throw new Error('Method not implemented.');
+  }
+
   public async init(): Promise<boolean> {
     // Get geography from metadata
     const variable = await this._getVariable(this._variable);
