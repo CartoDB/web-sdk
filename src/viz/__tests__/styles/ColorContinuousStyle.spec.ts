@@ -1,6 +1,7 @@
 import { Deck } from '@deck.gl/core';
 import { scale as chromaScale } from 'chroma-js';
 import { DatasetSource } from '@/viz';
+import { uuidv4 } from '@/core/utils/uuid';
 import { colorContinuousStyle } from '../../style';
 import * as mapsResponse from '../data-mocks/maps.number.json';
 import { hexToRgb } from '../../style/helpers/utils';
@@ -27,6 +28,7 @@ jest.mock('../../source/DatasetSource', () => ({
 }));
 
 const styledLayer = {
+  getId: () => uuidv4(),
   getMapInstance: () => ({} as Deck),
   source: new DatasetSource('table')
 };

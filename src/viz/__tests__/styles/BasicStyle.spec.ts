@@ -1,6 +1,7 @@
 import { Deck } from '@deck.gl/core';
 import { DatasetSource } from '@/viz';
 import { NumericFieldStats } from '@/viz/source';
+import { uuidv4 } from '@/core/utils/uuid';
 import { basicStyle, defaultStyles } from '../../style';
 import { hexToRgb } from '../../style/helpers/utils';
 
@@ -16,6 +17,7 @@ jest.mock('../../source/DatasetSource', () => ({
 }));
 
 const styledLayer = {
+  getId: () => uuidv4(),
   getMapInstance: () => ({} as Deck),
   source: new DatasetSource('table')
 };

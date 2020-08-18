@@ -1,5 +1,6 @@
 import { Deck } from '@deck.gl/core';
 import { DatasetSource } from '@/viz';
+import { uuidv4 } from '@/core/utils/uuid';
 import * as mapsResponse from '../data-mocks/maps.category.json';
 import { sizeCategoriesStyle } from '../../style';
 import { defaultStyles } from '../../style/default-styles';
@@ -27,6 +28,7 @@ jest.mock('../../source/DatasetSource', () => ({
 }));
 
 const styledLayer = {
+  getId: () => uuidv4(),
   getMapInstance: () => ({} as Deck),
   source: new DatasetSource('table')
 };
