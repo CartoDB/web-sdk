@@ -19,11 +19,12 @@ export function isVariableDefined(value: unknown): boolean {
  * @returns {boolean}
  */
 export function isEmpty(value: any): boolean {
-  const isNotDefined = !isVariableDefined(value);
-  const isArrayAndEmpty =
-    Object.prototype.hasOwnProperty.call(value, 'length') && value.length === 0;
-
-  const isObjectAndNoKeys = value.constructor === Object && Object.keys(value).length === 0;
-
-  return isNotDefined || isArrayAndEmpty || isObjectAndNoKeys;
+  return (
+    // is not defined
+    value == null ||
+    // array and it's empty
+    (Object.prototype.hasOwnProperty.call(value, 'length') && value.length === 0) ||
+    // object and it has no keys
+    (value.constructor === Object && Object.keys(value).length === 0)
+  );
 }
