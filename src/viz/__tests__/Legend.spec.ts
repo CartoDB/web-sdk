@@ -222,7 +222,8 @@ describe('Legend', () => {
             expect(color).toBe(hexToRgba(defaultStyles.Point.color));
             expect(strokeColor).toBe(hexToRgba(defaultStyles.Point.strokeColor));
             expect(width).toBe(defaultStyles.Point.size);
-          }
+          },
+          configurable: true
         });
         new LegendWidget('#colorBinsEl', pointLayer);
       });
@@ -255,7 +256,8 @@ describe('Legend', () => {
               rgbaArrayToString(colorBinsStyleProps.getLineColor as RGBAColor)
             );
             expect(width).toBe(colorBinsStyleProps.getRadius);
-          }
+          },
+          configurable: true
         });
         new LegendWidget('#colorBinsEl', pointLayer);
       });
@@ -287,7 +289,8 @@ describe('Legend', () => {
               rgbaArrayToString(colorBinsStyleProps.getLineColor as RGBAColor)
             );
             expect(width).toBe(colorBinsStyleProps.getRadius);
-          }
+          },
+          configurable: true
         });
         new LegendWidget('#colorBinsEl', pointLayer, {
           format: () => 'x',
