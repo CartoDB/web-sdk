@@ -40,15 +40,19 @@
           <!-- panel -->
           <div class="as-map-panels">
             <div class="as-panel as-panel--top as-panel--left">
-              <as-legend
-                heading="Basic legend"
-                description="A simple legend for a Layer">
-                <as-legend-color-category-polygon id="legend" slot="legends" orientation="horizontal"></as-legend-color-category-polygon>
+              <as-legend heading="Basic legend" description="A simple legend for a Layer">
+                <as-legend-color-category-polygon
+                  id="legend"
+                  slot="legends"
+                  orientation="horizontal"
+                ></as-legend-color-category-polygon>
               </as-legend>
-              <as-legend
-                heading="Basic legend"
-                description="A simple legend for a Layer">
-                <as-legend-color-category-polygon id="legend2" slot="legends" orientation="horizontal"></as-legend-color-category-polygon>
+              <as-legend heading="Basic legend" description="A simple legend for a Layer">
+                <as-legend-color-category-polygon
+                  id="legend2"
+                  slot="legends"
+                  orientation="horizontal"
+                ></as-legend-color-category-polygon>
               </as-legend>
             </div>
           </div>
@@ -74,38 +78,23 @@
           }
         });
 
+        // Basic style
         const basicStyle = carto.viz.style.basic({
-          /*
-            Color as a HEX value.
-            Defaults are points: '#EE4D5A', lines: '#4CC8A3' and polygons: '#826DBA'
-          */
           color: '#831123',
-          /*
-            Opacity value
-            (1 = 100% visible and 0 = transparent)
-          */
           opacity: 0.7,
-          /*
-            Color of the stroke
-          */
           strokeColor: '#fff',
-          /*
-            Size of the stroke
-          */
           strokeWidth: 2
-          /*
-            In a point layer, you would have available the 'size' property...
-          */
         });
-
         const airbnbLayer = new carto.viz.Layer('ne_50m_admin_1_states_1', basicStyle);
         airbnbLayer.addTo(deckMap);
+        new carto.viz.Legend('#legend', airbnbLayer, {
+          label: 'ne_50m_admin_1_states_1'
+        });
 
-        new carto.viz.Legend('#legend', airbnbLayer, { format: () => { return 'ne_50m_admin_1_states_1' } });
-
+        // Default style
         const ports = new carto.viz.Layer('world_ports');
         ports.addTo(deckMap);
-        new carto.viz.Legend('#legend2', ports, { format: () => { return 'ports' } });
+        new carto.viz.Legend('#legend2', ports);
       }
 
       initialize();
