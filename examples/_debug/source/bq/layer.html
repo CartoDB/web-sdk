@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Add BQ layer</title>
+
+    <!-- mapbox-gl css ia required by Mapbox GL JS library (which provides the basemaps tech) -->
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.css"
+    />
+
+    <!-- airship provides CARTO styles used, for example, in the panel -->
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://libs.cartocdn.com/airship-style/v2.4/airship.min.css"
+    />
+
+    <!-- css styles to get a 'full-screen' map -->
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+      }
+
+      #map {
+        width: 100vw;
+        height: 100vh;
+      }
+
+      strong {
+        color: 
+      }
+    </style>
+  </head>
+
+  <!-- 'as- classes come from Airship, and they provide help for the layout and basic styles -->
+  <body class="as-app-body as-app">
+    <div class="as-content">
+      <main class="as-main">
+        <div class="as-map-area">
+          <!-- map component will be instantiated here -->
+          <div id="map"></div>
+
+          <!-- panel with title and description -->
+          <div class="as-panel as-panel--top as-panel--right as-bg--ui-01">
+            <div class="as-panel__element as-p--16 as-body">
+              <h1 class="as-title">Carto BQ - Add layer</h1>
+              <h4 class="as-subheader as-mb--12">
+                Add one tileset with default style
+              </h4>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- mapbox-gl js, the corresponding JavaScript for the Mapbox GL library -->
+    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.js"></script>
+
+    <!-- deck.gl library -->
+    <script src="https://unpkg.com/deck.gl@8.2.0/dist.min.js"></script>
+
+    <!-- CARTO Web SDK library -->
+    <script src="/dist/umd/index.min.js"></script>
+
+    <script>
+      function initialize() {
+        const deckMap = carto.viz.createMap();
+        const bq = new carto.viz.source.BQ('cartobq.maps.ais_tileset');
+        const countriesLayer = new carto.viz.Layer(bq);
+        countriesLayer.addTo(deckMap);
+      }
+
+      initialize();
+    </script>
+  </body>
+</html>
