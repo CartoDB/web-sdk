@@ -542,7 +542,11 @@ export class Layer extends WithEvents implements StyledLayer {
     const layerProperties = await this._getLayerProps();
 
     // Create the Deck.gl instance
-    if (this._source.sourceType === 'SQLSource' || this._source.sourceType === 'DatasetSource') {
+    if (
+      this._source.sourceType === 'SQLSource' ||
+      this._source.sourceType === 'DatasetSource' ||
+      this._source.sourceType === 'BQSource'
+    ) {
       this._deckLayer = new MVTLayer(layerProperties);
     } else if (this._source.sourceType === 'GeoJSONSource') {
       if (layerProperties._isIconLayer) {
