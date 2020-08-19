@@ -106,7 +106,7 @@ export class BQSource extends Source {
 
   // #region Private
   private _extractMetadataFrom(tilejson: TileJsonInstance) {
-    console.error(`NOT IMPLEMENTED ${tilejson}`);
+    console.error(`METADATA FOR BQSOURCE NOT IMPLEMENTED YET`);
 
     let geometryType: GeometryType | undefined;
 
