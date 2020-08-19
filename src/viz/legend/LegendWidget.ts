@@ -15,6 +15,7 @@ export type LegendProperties = {
 };
 
 export type LegendWidgetOptions = {
+  label?: string;
   format?: (value: string | number | undefined) => string | number;
   dynamic?: boolean;
   config?: {
