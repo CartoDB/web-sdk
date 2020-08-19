@@ -35,7 +35,7 @@
     <div class="as-map-panels">
       <div class="as-panel as-panel--top as-panel--left">
         <as-legend>
-          <as-legend-size-bins id="legend" slot="legends"></as-legend-size-bins>
+          <as-legend-color-continuous id="legend" slot="legends"></as-legend-color-continuous>
         </as-legend>
       </div>
     </div>
@@ -48,52 +48,43 @@
     <script src="/dist/umd/index.min.js"></script>
 
     <script>
-      function initializePoints() {
+      async function initialize() {
         carto.auth.setDefaultCredentials({ username: 'cartoframes' });
 
         const deckMap = carto.viz.createMap({
           basemap: 'voyager',
           view: {
-            longitude: -81.6830062866211,
-            latitude: 41.49057783237735,
+            longitude: -116.846099,
+            latitude: 50.2672297,
+            zoom: 2.5
+          }
+        });
+
+        const style = carto.viz.style.colorContinuous('value', { viewport: true });
+        const tempLayer = new carto.viz.Layer('temps', style);
+        tempLayer.addTo(deckMap);
+        new carto.viz.Legend('#legend', tempLayer);
+      }
+
+      async function initializePolygons() {
+        carto.auth.setDefaultCredentials({ username: 'josemacarto' });
+
+        const deckMap = carto.viz.createMap({
+          basemap: 'voyager',
+          view: {
+            longitude: -122.45292663574217,
+            latitude: 37.760944207425965,
             zoom: 11
           }
         });
 
-        const style = carto.viz.style.sizeBins('sale_price', {
-          // bins: 3
-        });
-        const layer = new carto.viz.Layer('clev_sales', style);
-        layer.addTo(deckMap);
-        new carto.viz.Legend('#legend', layer);
+        const style = carto.viz.style.colorContinuous('businesses', { viewport: true });
+        const tempLayer = new carto.viz.Layer('sf_businesses_neighborhoods', style);
+        tempLayer.addTo(deckMap);
       }
 
-      function initializeLines() {
-        carto.auth.setDefaultCredentials({ username: 'cartoframes' });
-
-        const deckMap = carto.viz.createMap({
-          basemap: 'voyager',
-          view: {
-            longitude: 135.7,
-            latitude: -25.48,
-            zoom: 3
-          }
-        });
-
-        const style = carto.viz.style.sizeBins('length_km', {
-          // bins: 3,
-          // sizeRange: [1, 5]
-        });
-        const layer = new carto.viz.Layer('roads', style);
-        layer.addTo(deckMap);
-        new carto.viz.Legend('#legend', layer, {
-          format: v => `${v} km`,
-          config: { order: 'ASC' }
-        });
-      }
-
-      // initializePoints();
-      initializeLines();
+      initialize();
+      // initializePolygons();
     </script>
   </body>
 </html>

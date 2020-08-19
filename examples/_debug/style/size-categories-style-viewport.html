@@ -11,7 +11,6 @@
       type="text/css"
       href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.css"
     />
-
     <link
       rel="stylesheet"
       type="text/css"
@@ -36,7 +35,7 @@
     <div class="as-map-panels">
       <div class="as-panel as-panel--top as-panel--left">
         <as-legend>
-          <as-legend-color-bins id="legend" slot="legends"></as-legend-color-bins>
+          <as-legend-size-category id="legend" slot="legends"></as-legend-size-category>
         </as-legend>
       </div>
     </div>
@@ -45,30 +44,24 @@
     <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.js"></script>
     <script src="https://libs.cartocdn.com/airship-components/v2.4/airship.js"></script>
     <script src="https://unpkg.com/deck.gl@8.2.0/dist.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-format/1.3.0/d3-format.min.js"></script>
 
     <script src="/dist/umd/index.min.js"></script>
 
     <script>
       function initializePoints() {
-        carto.auth.setDefaultCredentials({ username: 'public' });
+        carto.auth.setDefaultCredentials({ username: 'josemacarto' });
 
         const deckMap = carto.viz.createMap({
           basemap: 'voyager',
           view: {
-            longitude: -3.7003859,
-            latitude: 40.4153265,
-            zoom: 12
+            longitude: -122.45292663574217,
+            latitude: 37.760944207425965,
+            zoom: 11
           }
         });
 
-        const style = carto.viz.style.colorBins('availability_365', {
-          // bins: 5,
-          // method: 'quantiles'
-          // breaks: [],
-          // palette:
-        });
-        const layer = new carto.viz.Layer('listings_madrid', style);
+        const style = carto.viz.style.sizeCategories('incident_day_of_week', { viewport: true });
+        const layer = new carto.viz.Layer('sf_incidents', style);
         layer.addTo(deckMap);
         new carto.viz.Legend('#legend', layer);
       }
@@ -85,43 +78,21 @@
           }
         });
 
-        const style = carto.viz.style.colorBins('length_km');
-        const layer = new carto.viz.Layer('roads', style);
-        layer.addTo(deckMap);
-        new carto.viz.Legend('#legend', layer);
-      }
+        const style = carto.viz.style.sizeCategories('type', { viewport: true });
 
-      function initializePolygons() {
-        carto.auth.setDefaultCredentials({ username: 'cartoframes' });
-
-        const deckMap = carto.viz.createMap({
-          basemap: 'voyager',
-          view: {
-            longitude: -2.6806640625,
-            latitude: 53.48804553605622,
-            zoom: 6
+        const source = new carto.viz.source.Dataset('roads', {
+          mapOptions: {
+            bufferSize: {
+              mvt: 30
+            }
           }
         });
-
-        const style = carto.viz.style.colorBins('pop_sq_km', {
-          // color: '#0000FF',
-          // size: 5
-        });
-        const layer = new carto.viz.Layer('eng_wales_pop', style);
+        const layer = new carto.viz.Layer(source, style);
         layer.addTo(deckMap);
-        new carto.viz.Legend('#legend', layer, {
-          /*
-              The attribute format accepts a function, so for example you can use a D3 format (see
-              https://github.com/d3/d3-format) or any other arbitrary function.
-            */
-          format: d3.format('.3f'),
-          config: { order: 'ASC' }
-        });
       }
 
-      // initializePoints();
+      initializePoints();
       // initializeLines();
-      initializePolygons();
     </script>
   </body>
 </html>

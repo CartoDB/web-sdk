@@ -15,7 +15,7 @@ export class LayerInteractivity {
   private _hoverStyle?: Style | string;
   private _clickStyle?: Style | string;
 
-  private _layerGetStyleFn: () => Style;
+  private _layerGetStyleFn: () => Promise<Style>;
   private _layerSetStyleFn: (style: Style) => Promise<void>;
 
   private _layerOnFn: EventHandler;
@@ -42,15 +42,17 @@ export class LayerInteractivity {
 
     if (this._clickStyle) {
       this._layerOnFn(InteractivityEvent.CLICK, () => {
-        const interactiveStyle = this._wrapInteractiveStyle();
-        this._layerSetStyleFn(interactiveStyle);
+        this._wrapInteractiveStyle().then(interactiveStyle =>
+          this._layerSetStyleFn(interactiveStyle)
+        );
       });
     }
 
     if (this._hoverStyle) {
       this._layerOnFn(InteractivityEvent.HOVER, () => {
-        const interactiveStyle = this._wrapInteractiveStyle();
-        this._layerSetStyleFn(interactiveStyle);
+        this._wrapInteractiveStyle().then(interactiveStyle =>
+          this._layerSetStyleFn(interactiveStyle)
+        );
       });
     }
 
@@ -65,7 +67,7 @@ export class LayerInteractivity {
     this.fireOnEvent(InteractivityEvent.HOVER, info, event);
   }
 
-  public fireOnEvent(eventType: InteractivityEvent, info: any, event: HammerInput) {
+  public async fireOnEvent(eventType: InteractivityEvent, info: any, event: HammerInput) {
     const features = [];
     const { coordinate, object } = info;
 
@@ -81,7 +83,7 @@ export class LayerInteractivity {
     }
 
     if (this._clickStyle || this._hoverStyle) {
-      const interactiveStyle = this._wrapInteractiveStyle();
+      const interactiveStyle = await this._wrapInteractiveStyle();
       this._layerSetStyleFn(interactiveStyle);
     }
 
@@ -169,28 +171,28 @@ export class LayerInteractivity {
    * to check if the feature received by paramter has been clicked
    * or hovered by the user in order to apply the interaction style
    */
-  private _wrapInteractiveStyle() {
+  private async _wrapInteractiveStyle() {
     const wrapInteractiveStyle = { updateTriggers: {} };
 
-    const currentStyle = this._layerGetStyleFn();
-    const styleProps = currentStyle.getLayerProps(this._layer);
+    const currentStyle = await this._layerGetStyleFn();
+    const styleProps = await currentStyle.getLayerProps(this._layer);
 
     let clickStyleProps = {};
 
     if (this._clickStyle === 'default') {
-      const defaultHighlightStyle = this._getDefaultHighlightStyle();
-      clickStyleProps = defaultHighlightStyle.getLayerProps(this._layer);
+      const defaultHighlightStyle = await this._getDefaultHighlightStyle();
+      clickStyleProps = await defaultHighlightStyle.getLayerProps(this._layer);
     } else if (this._clickStyle instanceof Style) {
-      clickStyleProps = this._clickStyle.getLayerProps(this._layer);
+      clickStyleProps = await this._clickStyle.getLayerProps(this._layer);
     }
 
     let hoverStyleProps = {};
 
     if (this._hoverStyle === 'default') {
-      const defaultHighlightStyle = this._getDefaultHighlightStyle();
-      hoverStyleProps = defaultHighlightStyle.getLayerProps(this._layer);
+      const defaultHighlightStyle = await this._getDefaultHighlightStyle();
+      hoverStyleProps = await defaultHighlightStyle.getLayerProps(this._layer);
     } else if (this._hoverStyle instanceof Style) {
-      hoverStyleProps = this._hoverStyle.getLayerProps(this._layer);
+      hoverStyleProps = await this._hoverStyle.getLayerProps(this._layer);
     }
 
     Object.keys({
@@ -265,9 +267,9 @@ export class LayerInteractivity {
     }
   }
 
-  private _getDefaultHighlightStyle() {
+  private async _getDefaultHighlightStyle() {
     const defaultHighlightProps: StyleProperties = {};
-    const styleProps = this._layerGetStyleFn().getLayerProps(this._layer);
+    const styleProps = await (await this._layerGetStyleFn()).getLayerProps(this._layer);
 
     if (styleProps.getIcon) {
       // icons
@@ -307,7 +309,7 @@ export interface LayerInteractivityOptions {
   /**
    * getStyle method of the layer
    */
-  layerGetStyleFn: () => Style;
+  layerGetStyleFn: () => Promise<Style>;
 
   /**
    * setStyle method of the layer

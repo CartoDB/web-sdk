@@ -1,5 +1,6 @@
 import { Deck } from '@deck.gl/core';
 import { DatasetSource } from '@/viz';
+import { uuidv4 } from '@/core/utils/uuid';
 import { sizeBinsStyle, defaultStyles } from '../../style';
 import * as mapsResponse from '../data-mocks/maps.number.json';
 import { ClassificationMethod } from '../../utils/Classifier';
@@ -27,6 +28,7 @@ jest.mock('../../source/DatasetSource', () => ({
 }));
 
 const styledLayer = {
+  getId: () => uuidv4(),
   getMapInstance: () => ({} as Deck),
   source: new DatasetSource('table')
 };
@@ -37,9 +39,9 @@ describe('SizeBinsStyle', () => {
       expect(() => sizeBinsStyle('attributeName')).not.toThrow();
     });
 
-    it('should always return the right propertie for points', () => {
+    it('should always return the right propertie for points', async () => {
       const style = sizeBinsStyle(FIELD_NAME);
-      const response = style.getLayerProps(styledLayer);
+      const response = await style.getLayerProps(styledLayer);
       expect(response).toHaveProperty('getRadius');
       expect(response.getRadius).toBeInstanceOf(Function);
       expect(response).toHaveProperty('radiusUnits', 'pixels');
@@ -138,24 +140,24 @@ describe('SizeBinsStyle', () => {
       }
     });
 
-    it('If geometryType is Point and property is strokeWidth getLineWidth should be a function', () => {
+    it('If geometryType is Point and property is strokeWidth getLineWidth should be a function', async () => {
       const style = sizeBinsStyle(FIELD_NAME, {
         property: 'strokeWidth'
       });
-      const response = style.getLayerProps(styledLayer);
+      const response = await style.getLayerProps(styledLayer);
       expect(response).toHaveProperty('getLineWidth');
       expect(response.getLineWidth).toBeInstanceOf(Function);
     });
   });
 
-  describe('Data validation', () => {
+  describe('Data validation', async () => {
     const opts = {
       breaks: [2, 4, 8, 10, 12],
       method: 'equal' as ClassificationMethod,
       sizeRange: [2, 12]
     };
     const style = sizeBinsStyle(FIELD_NAME, opts);
-    const getRadius = style.getLayerProps(styledLayer).getRadius as (d: any) => any;
+    const getRadius = (await style.getLayerProps(styledLayer)).getRadius as (d: any) => any;
 
     it('should assign the maximum size to a value at the upper limit', () => {
       const fv = opts.sizeRange[1];
@@ -194,10 +196,10 @@ describe('SizeBinsStyle', () => {
       expect(r).toEqual(opts.sizeRange[0]);
     });
 
-    it('should assign the right size to feature using dynamic breaks', () => {
+    it('should assign the right size to feature using dynamic breaks', async () => {
       const s = sizeBinsStyle(FIELD_NAME);
 
-      const getRadiusFn = s.getLayerProps(styledLayer).getRadius as (d: any) => any;
+      const getRadiusFn = (await s.getLayerProps(styledLayer)).getRadius as (d: any) => any;
 
       let r = getRadiusFn({ properties: { [FIELD_NAME]: stats.max } });
       expect(r).toEqual(defaultStyles.Point.sizeRange[1]);

@@ -1,6 +1,7 @@
 import { Deck } from '@deck.gl/core';
 import { DatasetSource } from '@/viz';
 import { NumericFieldStats } from '@/viz/source';
+import { uuidv4 } from '@/core/utils/uuid';
 import { basicStyle, defaultStyles } from '../../style';
 import { hexToRgb } from '../../style/helpers/utils';
 
@@ -16,6 +17,7 @@ jest.mock('../../source/DatasetSource', () => ({
 }));
 
 const styledLayer = {
+  getId: () => uuidv4(),
   getMapInstance: () => ({} as Deck),
   source: new DatasetSource('table')
 };
@@ -28,13 +30,13 @@ describe('BasicStyle', () => {
   });
 
   describe('Parameters', () => {
-    it('should assign defaultsStyles', () => {
+    it('should assign defaultsStyles', async () => {
       const style = basicStyle();
-      const r = style.getLayerProps(styledLayer);
+      const r = await style.getLayerProps(styledLayer);
       expect(r.getFillColor).toEqual(hexToRgb(defaultStyles.Polygon.color));
     });
 
-    it('should assign provided varaiables', () => {
+    it('should assign provided varaiables', async () => {
       const opts = {
         color: '#123',
         strokeColor: '#456',
@@ -42,7 +44,7 @@ describe('BasicStyle', () => {
         strokeWidth: 2
       };
       const style = basicStyle(opts);
-      const r = style.getLayerProps(styledLayer);
+      const r = await style.getLayerProps(styledLayer);
       expect(r.getFillColor).toEqual(hexToRgb(opts.color));
       expect(r.getLineColor).toEqual(hexToRgb(opts.strokeColor));
       expect(r.getLineWidth).toEqual(opts.strokeWidth);

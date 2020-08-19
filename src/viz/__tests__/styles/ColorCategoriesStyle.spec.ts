@@ -1,5 +1,6 @@
 import { Deck } from '@deck.gl/core';
 import { DatasetSource } from '@/viz';
+import { uuidv4 } from '@/core/utils/uuid';
 import { colorCategoriesStyle } from '../../style';
 import * as mapsResponse from '../data-mocks/maps.category.json';
 import { CartoStylingError } from '../../errors/styling-error';
@@ -28,6 +29,7 @@ jest.mock('../../source/DatasetSource', () => ({
 }));
 
 const styledLayer = {
+  getId: () => uuidv4(),
   getMapInstance: () => ({} as Deck),
   source: new DatasetSource('table')
 };
@@ -38,9 +40,9 @@ describe('ColorCategoriesStyle', () => {
       expect(() => colorCategoriesStyle('attributeName')).not.toThrow();
     });
 
-    it('should always return a getFillColor function', () => {
+    it('should always return a getFillColor function', async () => {
       const style = colorCategoriesStyle(FIELD_NAME);
-      const response = style.getLayerProps(styledLayer);
+      const response = await style.getLayerProps(styledLayer);
       expect(response).toHaveProperty('getFillColor');
       expect(response.getFillColor).toBeInstanceOf(Function);
     });
@@ -128,7 +130,7 @@ describe('ColorCategoriesStyle', () => {
       }
     });
 
-    it('If geometryType is Polygon and property is strokeColor getLineColor should be a function', () => {
+    it('If geometryType is Polygon and property is strokeColor getLineColor should be a function', async () => {
       const style = colorCategoriesStyle(FIELD_NAME, {
         property: 'strokeColor'
       });
@@ -144,22 +146,22 @@ describe('ColorCategoriesStyle', () => {
           ]
         };
       });
-      const response = style.getLayerProps(styledLayer);
+      const response = await style.getLayerProps(styledLayer);
       expect(response).toHaveProperty('getLineColor');
       expect(response.getLineColor).toBeInstanceOf(Function);
     });
 
-    it('If geometryType is Point and property is strokeColor getLineColor should be a function', () => {
+    it('If geometryType is Point and property is strokeColor getLineColor should be a function', async () => {
       const style = colorCategoriesStyle(FIELD_NAME, {
         property: 'strokeColor'
       });
-      const response = style.getLayerProps(styledLayer);
+      const response = await style.getLayerProps(styledLayer);
       expect(response).toHaveProperty('getLineColor');
       expect(response.getLineColor).toBeInstanceOf(Function);
     });
   });
 
-  describe('Data validation', () => {
+  describe('Data validation', async () => {
     const opts = {
       categories: ['Moda y calzado', 'Bares y restaurantes', 'Salud'],
       palette: ['#000', '#111', '#222'],
@@ -169,7 +171,7 @@ describe('ColorCategoriesStyle', () => {
 
     const style = colorCategoriesStyle(FIELD_NAME, opts);
 
-    let getFillColor = style.getLayerProps(styledLayer).getFillColor as (d: any) => any;
+    let getFillColor = (await style.getLayerProps(styledLayer)).getFillColor as (d: any) => any;
 
     it('should assign the right color to a category', () => {
       const r = getFillColor({
@@ -190,11 +192,11 @@ describe('ColorCategoriesStyle', () => {
       expect(r).toEqual(hexToRgb(opts.nullColor));
     });
 
-    it('should assign the right color when top defined', () => {
+    it('should assign the right color when top defined', async () => {
       const top = 1;
       const s = colorCategoriesStyle(FIELD_NAME, { ...opts, top });
 
-      getFillColor = s.getLayerProps(styledLayer).getFillColor as (d: any) => any;
+      getFillColor = (await s.getLayerProps(styledLayer)).getFillColor as (d: any) => any;
 
       const r = getFillColor({
         properties: { [FIELD_NAME]: 'Bares y restaurantes' }
@@ -202,9 +204,9 @@ describe('ColorCategoriesStyle', () => {
       expect(r).toEqual(hexToRgb(opts.othersColor));
     });
 
-    it('should assign the right color to feature using dynamic categories', () => {
+    it('should assign the right color to feature using dynamic categories', async () => {
       const colors = getColors(DEFAULT_PALETTE, 5);
-      const response = colorCategoriesStyle(FIELD_NAME).getLayerProps(styledLayer);
+      const response = await colorCategoriesStyle(FIELD_NAME).getLayerProps(styledLayer);
       getFillColor = response.getFillColor as (d: any) => any;
       const r = getFillColor({
         properties: { [FIELD_NAME]: 'Moda y calzado' }

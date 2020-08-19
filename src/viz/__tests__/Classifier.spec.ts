@@ -19,8 +19,8 @@ describe('Classifier', () => {
   describe('Classifier methods', () => {
     const classifier = new Classifier(stats);
 
-    it('Quantiles', () => {
-      const breaks = classifier.breaks(4, 'quantiles');
+    it('Quantiles', async () => {
+      const breaks = await classifier.breaks(4, 'quantiles');
       const expectedBreaks = [
         40.6120458424774,
         46.377123199312,
@@ -30,8 +30,8 @@ describe('Classifier', () => {
       expect(breaks).toMatchObject(expectedBreaks);
     });
 
-    it('Equal', () => {
-      const breaks = classifier.breaks(4, 'equal');
+    it('Equal', async () => {
+      const breaks = await classifier.breaks(4, 'equal');
       const expectedBreaks = [
         34.65714291396062,
         47.96506670056654,
@@ -41,8 +41,8 @@ describe('Classifier', () => {
       expect(breaks).toMatchObject(expectedBreaks);
     });
 
-    it('StandardDev', () => {
-      const breaks = classifier.breaks(4, 'stdev');
+    it('StandardDev', async () => {
+      const breaks = await classifier.breaks(4, 'stdev');
       const expectedBreaks = [
         28.762902879178785,
         39.44729714406859,

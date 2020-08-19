@@ -1,6 +1,6 @@
 import { Credentials, defaultCredentials, setDefaultCredentials } from '@/auth';
 import { Client } from '@/maps/Client';
-import { SQLSource } from '../SQLSource';
+import { SQLSource } from '..';
 
 const TEST_CREDENTIALS = {
   username: 'test_username',
