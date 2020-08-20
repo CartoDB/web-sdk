@@ -11,6 +11,7 @@ interface BQSourceProps extends SourceProps {
   data: string | Array<string>;
 }
 
+// https://bq1.cartocdn.com/tilesjson?t={project}.{dataset}.{tileset_table_name}
 const baseURL = 'https://bq1.cartocdn.com/tilesjson';
 
 export class BQSource extends Source {
@@ -37,7 +38,7 @@ export class BQSource extends Source {
     }
 
     this.needsInitialization = false;
-
+    // https://bq1.cartocdn.com/tilesjson?t={project}.{dataset}.{tileset_table_name}
     const url = `${baseURL}?t=${this._dataset}`;
     const tilejsonClient = new TileJsonClient();
     const tilejsonInstance: TileJsonInstance = await tilejsonClient.getTilesetInfoFrom(url);

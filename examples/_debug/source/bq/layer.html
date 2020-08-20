@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Add BQ layer</title>
+    <title>BQ - Add layer</title>
 
     <!-- mapbox-gl css ia required by Mapbox GL JS library (which provides the basemaps tech) -->
     <link
@@ -68,10 +68,12 @@
 
     <script>
       function initialize() {
-        const deckMap = carto.viz.createMap();
-        const bq = new carto.viz.source.BQ('cartobq.maps.ais_tileset');
-        const countriesLayer = new carto.viz.Layer(bq);
-        countriesLayer.addTo(deckMap);
+        const map = carto.viz.createMap();
+        const bqSource = new carto.viz.source.BQ('cartobq.maps.ais_tileset');
+        // const bq = new carto.viz.source.BQ('cartobq.maps.osm_buildings');
+        
+        const layer = new carto.viz.Layer(bqSource);
+        layer.addTo(map);
       }
 
       initialize();
