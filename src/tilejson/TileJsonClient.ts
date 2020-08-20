@@ -5,10 +5,7 @@ import { TileJsonInstance } from './TileJsonInstance';
 export class TileJsonClient {
   public async getTilesetInfoFrom(url: string): Promise<TileJsonInstance> {
     // eg: https://bq1.cartocdn.com/tilesjson?t=cartobq.maps.ais_tileset
-    const r = await fetch(url, {
-      method: 'GET',
-      mode: 'cors'
-    });
+    const r = await fetch(url);
     return parseFetchJSON(r);
 
     // return {
