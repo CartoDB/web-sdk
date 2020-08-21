@@ -1,6 +1,6 @@
 import { Stats } from '@/viz/source';
 import { CartoStylingError, stylingErrorTypes } from '../errors/styling-error';
-import { Layer } from '../layer';
+import { Layer, LayerEvent } from '../layer';
 
 export type ClassificationMethod = 'quantiles' | 'stdev' | 'equal';
 
@@ -13,7 +13,22 @@ export class Classifier {
     this.featureProperty = featureProperty;
   }
 
-  public breaks(nBreaks: number, method: ClassificationMethod, viewport = false) {
+  /**
+   * Calculate the number of required breaks, using the indicated method.
+   * Global metadata of the layer will be used, except if viewport mode is selected;
+   * in that case, the metadatada will be dynamically extracted from the current viewport
+   *
+   * @param {number} nBreaks
+   * @param {ClassificationMethod} method
+   * @param {boolean} [viewport=false]
+   * @returns {Promise<number[]}
+   * @memberof Classifier
+   */
+  public async breaks(
+    nBreaks: number,
+    method: ClassificationMethod,
+    viewport = false
+  ): Promise<number[]> {
     validateParameters(this.dataOrigin, this.featureProperty, viewport, method);
 
     if (nBreaks === 0) {
@@ -95,7 +110,7 @@ export class Classifier {
     return breaks;
   }
 
-  private async getData(viewport: boolean) {
+  private async getData(viewport: boolean): Promise<number[]> {
     let data: number[] = [];
 
     const { featureProperty } = this;
@@ -104,11 +119,13 @@ export class Classifier {
 
     if (viewport && featureProperty) {
       try {
-        const features = await layer.getViewportFeatures();
-        data = features.filter(f => !!f[featureProperty]).map(f => f[featureProperty] as number);
+        data = await getDataFromViewport(layer, featureProperty);
       } catch (err) {
         // eslint-disable-next-line no-console
         console.warn(err);
+        layer.on(LayerEvent.DATA_READY, function () {
+          layer.replaceDeckLayer();
+        });
       }
     } else if (stats.sample) {
       data = stats.sample;
@@ -221,4 +238,14 @@ function average(values: number[]): number {
   }
 
   return sum / values.length;
+}
+
+async function getDataFromViewport(layer: Layer, featureProperty: string): Promise<number[]> {
+  // if (!layer.isReady()) {
+  //   await waitForEventWithTimeout(layer, LayerEvent.DATA_READY);
+  // }
+
+  const features = await layer.getViewportFeatures();
+  const data = features.filter(f => !!f[featureProperty]).map(f => f[featureProperty] as number);
+  return data;
 }
