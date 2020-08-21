@@ -28,7 +28,7 @@ jest.mock('../../source/DatasetSource', () => ({
 
 const styledLayer = {
   getId: () => uuidv4(),
-  getMapInstance: () => ({} as Deck),
+  getMap: () => ({} as Deck),
   source: new DatasetSource('table')
 };
 
