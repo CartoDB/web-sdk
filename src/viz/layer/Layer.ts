@@ -9,7 +9,7 @@ import { GeoJSON } from 'geojson';
 import { uuidv4 } from '@/core/utils/uuid';
 import { WithEvents } from '@/core/mixins/WithEvents';
 import { DatasetSource, SQLSource, GeoJSONSource, Source } from '@/viz';
-import { LegendWidgetOptions } from '@/viz/legend';
+import { LegendWidgetOptions, LegendProperties } from '@/viz/legend';
 import { AggregatedColumn } from '../source/Source';
 import { DOLayer } from '../deck/DOLayer';
 import { getStyles, StyleProperties, Style } from '../style';
@@ -31,13 +31,8 @@ export enum LayerEvent {
   FILTER_CHANGE = 'filterChange' // must be the same value as GenericDataSourceEvent.FILTER_CHANGE
 }
 
-enum DATA_STATES {
-  STARTING,
-  READY,
-  UPDATING
-}
-
 export class Layer extends WithEvents implements StyledLayer {
+  // #region Private props
   private _source: Source;
   private _style: Style;
   private _options: LayerOptions;
@@ -51,6 +46,7 @@ export class Layer extends WithEvents implements StyledLayer {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private _deckLayer?: any;
 
+  // Helper class to manage interactivity
   private _interactivity: LayerInteractivity;
 
   // Viewport Features Generator instance to get current features within viewport
@@ -59,11 +55,16 @@ export class Layer extends WithEvents implements StyledLayer {
   // pickable events count
   private _pickableEventsCount = 0;
 
+  // set of filters to apply
   private filtersCollection = new FiltersCollection<ColumnFilters, FunctionFilterApplicator>(
     FunctionFilterApplicator
   );
+
   private dataState: DATA_STATES = DATA_STATES.STARTING;
 
+  // #endregion
+
+  // #region Public methods
   constructor(
     source: string | Source,
     style: Style | StyleProperties = basicStyle(),
@@ -81,19 +82,19 @@ export class Layer extends WithEvents implements StyledLayer {
     ]);
 
     this._source = buildSource(source);
-    this._style = this.buildStyle(style);
+    this._style = this._buildStyle(style);
 
     this._options = {
       id: `${this._source.id}-${uuidv4()}`,
       ...options
     };
 
-    this._interactivity = this._buildInteractivity(options);
+    this._interactivity = this._buildInteractivityHelper(options);
     this.dataState = DATA_STATES.STARTING;
   }
 
   /**
-   * Get the layer `id` that identifies the layer. That id is explicitly set during construction or
+   * Get the `id` that identifies the layer. That id is explicitly set during construction (or
    * an automatically created one).
    */
   public getId(): string {
@@ -114,37 +115,43 @@ export class Layer extends WithEvents implements StyledLayer {
     return this._deckInstance;
   }
 
+  // /**
+  //  * Get the data Source assigned to the layer
+  //  *
+  //  * @readonly
+  //  * @type {Source}
+  //  * @memberof Layer
+  //  */
+  // public getSource(): Source {
+  //   return this._source;
+  // }
+
+  public get source() {
+    return this._source;
+  }
+
   /**
    * Change the data Source for the layer.
-   * A new map instantion (if required) and a replacement of the internal deckgl layer will be fired transparentelly
-   * @param source new source to be set
+   * A new map instantion and a replacement of the internal deckgl layer will be fired transparentely, if required
+   * @param {(string | Source)} source to be set
+   * @memberof Layer
    */
   public async setSource(source: string | Source) {
     this._source = buildSource(source);
 
     if (this._deckLayer) {
-      await this.replaceDeckGLLayer();
+      await this.replaceDeckLayer();
       this.dataState = DATA_STATES.STARTING;
     }
   }
 
   /**
-   * Change the Style of the current layer.
-   * A new map instantion and a replace of the layer will be fired
-   * @param style style to be set
+   * Retrieve the current Style, considering the latest updates
+   *
+   * @returns {Promise<Style>}
+   * @memberof Layer
    */
-  public async setStyle(style: Style) {
-    this._style = this.buildStyle(style);
-
-    if (this._deckLayer) {
-      await this.replaceDeckGLLayer();
-    }
-  }
-
-  /**
-   * Retrieves the current style of the layer
-   */
-  public async getStyle() {
+  public async getStyle(): Promise<Style> {
     let styleProps;
     let viewport;
 
@@ -168,12 +175,17 @@ export class Layer extends WithEvents implements StyledLayer {
   }
 
   /**
-   * @public
-   * Retrieves the legend data from the style of the layer
+   * Change the Style of the current layer.
+   * A new map instantion and a replacement of the internal deckgl layer will be fired transparentely, if required
+   * @param {Style} style to be set
+   * @memberof Layer
    */
-  public async getLegendData(options: LegendWidgetOptions = { config: {} }) {
-    const legendProps = await this._style.getLegendProps(this, options);
-    return legendProps;
+  public async setStyle(style: Style) {
+    this._style = this._buildStyle(style);
+
+    if (this._deckLayer) {
+      await this.replaceDeckLayer();
+    }
   }
 
   /**
@@ -198,12 +210,12 @@ export class Layer extends WithEvents implements StyledLayer {
    * the layer for rendering. So if you want to ensure it has been effectively added (for example to
    * add more layers or to use it in a `DataView` then you must use `await` for it to finish.
    *
-   * @param {Deck} instance of the map to add the layer to
-   * @param {{ overLayerId?: string; underLayerId?: string }} [opts={}] options to control relative layer position
+   * @param {Deck} deckInstance of the map to add the layer to
+   * @param {LayerPosition} [opts={}] options to control relative layer position
    * @memberof Layer
    */
   public async addTo(deckInstance: Deck, opts: LayerPosition = {}) {
-    const createdDeckGLLayer = await this.createDeckGLLayer();
+    const createdDeckGLLayer = await this._createDeckLayer();
 
     // collection may have changed during instantiation...
     const layers = [...deckInstance.props.layers];
@@ -217,14 +229,14 @@ export class Layer extends WithEvents implements StyledLayer {
         const { interactionState, viewState } = args;
 
         const { isPanning, isZooming, isRotating } = interactionState;
-        this.saveDataState(!!isPanning || !!isZooming || !!isRotating, viewState);
+        this._saveDataState(!!isPanning || !!isZooming || !!isRotating, viewState);
 
         if (onViewStateChange) {
           onViewStateChange(args); // keep stateless view management, if set up initially
         }
       },
       onAfterRender: () => {
-        this.sendDataEvent('onAfterRender');
+        this._sendDataEvent('onAfterRender');
       }
     });
 
@@ -237,10 +249,88 @@ export class Layer extends WithEvents implements StyledLayer {
   }
 
   /**
-   * Sets the layer as pickable and relay on the event manager
+   * Remove the current layer from the Deck map instance where it was added to
    *
-   * @param eventType - Event type
-   * @param eventHandler - Event handler defined by the user
+   * @memberof Layer
+   */
+  public remove() {
+    if (this._deckInstance === undefined) {
+      throw new CartoLayerError(
+        'This layer cannot be removed because it is not added to a map',
+        layerErrorTypes.DECK_MAP_NOT_FOUND
+      );
+    }
+
+    const deckLayers = this._deckInstance.props.layers.filter(
+      (layer: { id: string }) => layer.id !== this._options.id
+    );
+
+    this._deckInstance.setProps({
+      layers: deckLayers
+    });
+  }
+
+  /**
+   * Check if the layer source is ready
+   *
+   * @returns {boolean}
+   * @memberof Layer
+   */
+  public isReady(): boolean {
+    return this.dataState !== DATA_STATES.STARTING;
+  }
+
+  /**
+   * TODO private?
+   * Get the current deck layer.
+   * If it doesn't exist yet, a new instance will be created
+   *
+   * @returns
+   * @memberof Layer
+   */
+  public async getDeckLayer(): Promise<any> {
+    if (this._deckLayer === undefined) {
+      this._deckLayer = await this._createDeckLayer();
+    }
+
+    return this._deckLayer;
+  }
+
+  /**
+   * Replace the deck layer with a fresh new one, considering latest updates.
+   * It keeps the original order
+   *
+   * @memberof Layer
+   */
+  public async replaceDeckLayer() {
+    if (this._deckInstance) {
+      const newLayer = await this._createDeckLayer();
+
+      const originalPosition = this._deckInstance.props.layers.findIndex(
+        (layer: { id: string }) => layer.id === this._options.id
+      );
+
+      const otherDeckLayers = this._deckInstance.props.layers.filter(
+        (layer: { id: string }) => layer.id !== this._options.id
+      );
+
+      const updatedLayers = [...otherDeckLayers];
+
+      updatedLayers.splice(originalPosition, 0, newLayer);
+      this._deckInstance.setProps({
+        layers: updatedLayers
+      });
+
+      this._viewportFeaturesGenerator.setDeckLayer(newLayer);
+    }
+  }
+
+  /**
+   * Manage an interactivity event with a handler. It also sets the layer as pickable
+   *
+   * @param {(InteractivityEvent | string)} eventType
+   * @param {mitt.Handler} eventHandler - callback defined on response
+   * @memberof Layer
    */
   public async on(eventType: InteractivityEvent | string, eventHandler: mitt.Handler) {
     // mark the layer as pickable
@@ -252,7 +342,7 @@ export class Layer extends WithEvents implements StyledLayer {
       }
 
       if (this._deckLayer) {
-        await this.replaceDeckGLLayer();
+        await this.replaceDeckLayer();
       }
     }
 
@@ -260,11 +350,12 @@ export class Layer extends WithEvents implements StyledLayer {
   }
 
   /**
-   * Sets the layer as non-pickable if there are no events
-   * attached to it and relay on the event manager
+   * Stop managing an interactivity event with a handler.
+   * It also sets the layer as non pickable if there are no more events
    *
-   * @param eventType - Event type
-   * @param eventHandler - Event handler defined by the user
+   * @param {(InteractivityEvent | string)} eventType
+   * @param {mitt.Handler} eventHandler - callback defined on response
+   * @memberof Layer
    */
   public async off(eventType: InteractivityEvent | string, eventHandler: mitt.Handler) {
     // mark the layer as non-pickable
@@ -278,7 +369,7 @@ export class Layer extends WithEvents implements StyledLayer {
         this._options.pickable = false;
 
         if (this._deckLayer) {
-          await this.replaceDeckGLLayer();
+          await this.replaceDeckLayer();
         }
       }
     }
@@ -287,15 +378,174 @@ export class Layer extends WithEvents implements StyledLayer {
   }
 
   /**
-   * Method to create the Deck.gl layer
+   * Display a popup every time the user clicks on a feature
+   *
+   * @param {(PopupElement[] | string[] | null)} [elements=[]]
+   * @memberof Layer
    */
-  private async createDeckGLLayer() {
+  public async setPopupClick(elements: PopupElement[] | string[] | null = []) {
+    this._addPopupFields(elements);
+    await this._interactivity.setPopupClick(elements);
+  }
+
+  /**
+   * Display a popup every time the user hovers over a feature
+   *
+   * @param {(PopupElement[] | string[] | null)} [elements=[]]
+   * @memberof Layer
+   */
+  public async setPopupHover(elements: PopupElement[] | string[] | null = []) {
+    this._addPopupFields(elements);
+    await this._interactivity.setPopupHover(elements);
+  }
+
+  /**
+   * TODO review if exposed?
+   * Add a filter to the layer
+   *
+   * @param {string} filterId
+   * @param {ColumnFilters} filter
+   * @returns
+   * @memberof Layer
+   */
+  public async addFilter(filterId: string, filter: ColumnFilters) {
+    this.filtersCollection.addFilter(filterId, filter);
+    this.emit(LayerEvent.FILTER_CHANGE);
+
+    if (this._deckLayer) {
+      return this.replaceDeckLayer();
+    }
+
+    return Promise.resolve();
+  }
+
+  /**
+   * TODO review if exposed?
+   * Remove a filter from the layer
+   *
+   * @param {string} filterId
+   * @returns
+   * @memberof Layer
+   */
+  public async removeFilter(filterId: string) {
+    this.filtersCollection.removeFilter(filterId);
+    this.emit(LayerEvent.FILTER_CHANGE);
+
+    if (this._deckLayer) {
+      return this.replaceDeckLayer();
+    }
+
+    return Promise.resolve();
+  }
+
+  /**
+   * TODO review if exposed?
+   * Add a set of filters to the layer, resetting the previpu
+   *
+   * @param {ColumnFilters} filters
+   * @returns
+   * @memberof Layer
+   */
+  public async setFilters(filters: ColumnFilters) {
+    this.filtersCollection.clear();
+    this.filtersCollection.addFilter(uuidv4(), filters);
+    this.emit(LayerEvent.FILTER_CHANGE);
+
+    if (this._deckLayer) {
+      return this.replaceDeckLayer();
+    }
+
+    return Promise.resolve();
+  }
+
+  // TODO not public ?
+  addAggregationOptions(columns: AggregatedColumn[] = [], dimensions: string[] = []) {
+    dimensions.forEach(dimension => this._source.addField(dimension));
+    columns.forEach(aggregatedColumn => this._source.addAggregatedColumn(aggregatedColumn));
+
+    return this.replaceDeckLayer();
+  }
+
+  // TODO not public ?
+  addSourceField(field: string) {
+    this._source.addField(field);
+    return this.replaceDeckLayer();
+  }
+
+  /**
+   * Retrieve the data from the style required to build a legend
+   *
+   * @param {LegendWidgetOptions} [options={ config: {} }]
+   * @returns {(Promise<LegendProperties[] | undefined>)}
+   * @memberof Layer
+   */
+  public async getLegendData(
+    options: LegendWidgetOptions = { config: {} }
+  ): Promise<LegendProperties[] | undefined> {
+    const legendProps = await this._style.getLegendProps(this, options);
+    return legendProps;
+  }
+
+  /**
+   * Get the features visible on the viewport, with optional exclusion filters
+   *
+   * @param {string[]} [excludedFilters=[]]
+   * @returns {Promise<Record<string, unknown>[]>} an array of records ('features'), with properties and values
+   * @memberof Layer
+   */
+  public async getViewportFeatures(
+    excludedFilters: string[] = []
+  ): Promise<Record<string, unknown>[]> {
+    if (!this._viewportFeaturesGenerator.isReady()) {
+      throw new CartoError({
+        type: 'Layer',
+        message:
+          'Cannot retrieve viewport features because this layer has not been added to a map yet'
+      });
+    }
+
+    let features = await this._viewportFeaturesGenerator.getFeatures();
+    const filters = this.filtersCollection.getApplicatorInstance(excludedFilters);
+
+    if (this.filtersCollection.hasFilters()) {
+      features = features.filter(feature => filters.applicator(feature));
+    }
+
+    return features;
+  }
+
+  /**
+   * TODO: REVIEW (private?)
+   *
+   * Get the whole set of features, with optional exclusion filters.
+   * For a tiled source (eg. SQLSource) that's not feasible, so just its viewportFeatures are returned
+   *
+   * @param {string[]} [excludedFilters=[]]
+   * @returns {Promise<Record<string, unknown>[]>}
+   * @memberof Layer
+   */
+  public async getFeatures(excludedFilters: string[] = []): Promise<Record<string, unknown>[]> {
+    if (this._source instanceof SQLSource) {
+      return this.getViewportFeatures(excludedFilters);
+    }
+
+    return this._source.getFeatures(excludedFilters);
+  }
+
+  // #endregion
+
+  // #region Private methods
+
+  /**
+   * Create the deckgl layer, considering the source and type of visualization required
+   */
+  private async _createDeckLayer(): Promise<any> {
     this._addStyleFields();
 
     // The first step is to initialize the source to get the geometryType and the stats
     await this._source.init();
 
-    const layerProperties = await this._getLayerProperties();
+    const layerProperties = await this._getLayerProps();
 
     // Create the Deck.gl instance
     if (this._source.sourceType === 'SQLSource' || this._source.sourceType === 'DatasetSource') {
@@ -315,34 +565,10 @@ export class Layer extends WithEvents implements StyledLayer {
     return this._deckLayer;
   }
 
-  public async getViewportFeatures(excludedFilters: string[] = []) {
-    if (!this._viewportFeaturesGenerator.isReady()) {
-      throw new CartoError({
-        type: 'Layer',
-        message:
-          'Cannot retrieve viewport features because this layer has not been added to a map yet'
-      });
-    }
-
-    let features = await this._viewportFeaturesGenerator.getFeatures();
-    const filters = this.filtersCollection.getApplicatorInstance(excludedFilters);
-
-    if (this.filtersCollection.hasFilters()) {
-      features = features.filter(feature => filters.applicator(feature));
-    }
-
-    return features;
-  }
-
-  public async getFeatures(excludedFilters: string[] = []) {
-    if (this._source instanceof SQLSource) {
-      return this.getViewportFeatures(excludedFilters);
-    }
-
-    return this._source.getFeatures(excludedFilters);
-  }
-
-  private async _getLayerProperties() {
+  /**
+   * Get the props to build a deck layer
+   */
+  private async _getLayerProps(): Promise<any> {
     const props = this._source.getProps();
     const styleProps = await (await this.getStyle()).getLayerProps(this);
     const filters = this.filtersCollection.getApplicatorInstance();
@@ -358,7 +584,7 @@ export class Layer extends WithEvents implements StyledLayer {
           styleProperties.onViewportLoad(...args);
         }
 
-        this.sendDataEvent('onViewportLoad');
+        this._sendDataEvent('onViewportLoad');
       },
       onClick: this._interactivity.onClick.bind(this._interactivity),
       onHover: this._interactivity.onHover.bind(this._interactivity)
@@ -384,83 +610,16 @@ export class Layer extends WithEvents implements StyledLayer {
   }
 
   /**
-   * Replace the deck layer with a fresh new one, keeping its order
+   * Create a LayerInteractivity helper to deal with styles and events
    */
-  public async replaceDeckGLLayer() {
-    if (this._deckInstance) {
-      const newLayer = await this.createDeckGLLayer();
-
-      const originalPosition = this._deckInstance.props.layers.findIndex(
-        (layer: { id: string }) => layer.id === this._options.id
-      );
-
-      const otherDeckLayers = this._deckInstance.props.layers.filter(
-        (layer: { id: string }) => layer.id !== this._options.id
-      );
-
-      const updatedLayers = [...otherDeckLayers];
-
-      updatedLayers.splice(originalPosition, 0, newLayer);
-      this._deckInstance.setProps({
-        layers: updatedLayers
-      });
-
-      this._viewportFeaturesGenerator.setDeckLayer(newLayer);
-    }
-  }
-
-  public async getDeckGLLayer() {
-    if (this._deckLayer === undefined) {
-      this._deckLayer = await this.createDeckGLLayer();
-    }
-
-    return this._deckLayer;
-  }
-
-  public get source() {
-    return this._source;
-  }
-
-  /**
-   * @public
-   * This method creates popups every time the
-   * user clicks on one or more features of the layer.
-   */
-  public async setPopupClick(elements: PopupElement[] | string[] | null = []) {
-    this._addPopupFields(elements);
-    await this._interactivity.setPopupClick(elements);
-  }
-
-  public async setPopupHover(elements: PopupElement[] | string[] | null = []) {
-    this._addPopupFields(elements);
-    await this._interactivity.setPopupHover(elements);
-  }
-
-  public remove() {
-    if (this._deckInstance === undefined) {
-      throw new CartoLayerError(
-        'This layer cannot be removed because it is not added to a map',
-        layerErrorTypes.DECK_MAP_NOT_FOUND
-      );
-    }
-
-    const deckLayers = this._deckInstance.props.layers.filter(
-      (layer: { id: string }) => layer.id !== this._options.id
-    );
-
-    this._deckInstance.setProps({
-      layers: deckLayers
-    });
-  }
-
-  private _buildInteractivity(options: Partial<LayerOptions> = {}) {
+  private _buildInteractivityHelper(options: Partial<LayerOptions> = {}) {
     let hoverStyle;
 
     if (options.hoverStyle) {
       hoverStyle =
         typeof options.hoverStyle === 'string'
           ? options.hoverStyle
-          : this.buildStyle(options.hoverStyle as Style | StyleProperties);
+          : this._buildStyle(options.hoverStyle as Style | StyleProperties);
     }
 
     let clickStyle;
@@ -469,7 +628,7 @@ export class Layer extends WithEvents implements StyledLayer {
       clickStyle =
         typeof options.clickStyle === 'string'
           ? options.clickStyle
-          : this.buildStyle(options.clickStyle as Style | StyleProperties);
+          : this._buildStyle(options.clickStyle as Style | StyleProperties);
     }
 
     const layerGetStyleFn = this.getStyle.bind(this);
@@ -490,58 +649,18 @@ export class Layer extends WithEvents implements StyledLayer {
     });
   }
 
-  addFilter(filterId: string, filter: ColumnFilters) {
-    this.filtersCollection.addFilter(filterId, filter);
-    this.emit(LayerEvent.FILTER_CHANGE);
-
-    if (this._deckLayer) {
-      return this.replaceDeckGLLayer();
-    }
-
-    return Promise.resolve();
-  }
-
-  removeFilter(filterId: string) {
-    this.filtersCollection.removeFilter(filterId);
-    this.emit(LayerEvent.FILTER_CHANGE);
-
-    if (this._deckLayer) {
-      return this.replaceDeckGLLayer();
-    }
-
-    return Promise.resolve();
-  }
-
-  public setFilters(filters: ColumnFilters) {
-    this.filtersCollection.clear();
-    this.filtersCollection.addFilter(uuidv4(), filters);
-    this.emit(LayerEvent.FILTER_CHANGE);
-
-    if (this._deckLayer) {
-      return this.replaceDeckGLLayer();
-    }
-
-    return Promise.resolve();
-  }
-
-  addAggregationOptions(columns: AggregatedColumn[] = [], dimensions: string[] = []) {
-    dimensions.forEach(dimension => this._source.addField(dimension));
-    columns.forEach(aggregatedColumn => this._source.addAggregatedColumn(aggregatedColumn));
-
-    return this.replaceDeckGLLayer();
-  }
-
-  addSourceField(field: string) {
-    this._source.addField(field);
-    return this.replaceDeckGLLayer();
-  }
-
+  /**
+   * Add style fields to the source
+   */
   private _addStyleFields() {
     if (this._style && this._style.field) {
       this._source.addField(this._style.field);
     }
   }
 
+  /**
+   * Add popup fields to the source
+   */
   private _addPopupFields(elements: PopupElement[] | string[] | null = []) {
     if (elements) {
       elements.forEach((e: PopupElement | string) => {
@@ -551,7 +670,10 @@ export class Layer extends WithEvents implements StyledLayer {
     }
   }
 
-  private saveDataState(isChanging: boolean, viewState: ViewState) {
+  /**
+   * Change the data state, if required, including the viewport for viewportFeatures
+   */
+  private _saveDataState(isChanging: boolean, viewState: ViewState) {
     if (isChanging) {
       this.dataState = DATA_STATES.UPDATING;
 
@@ -564,7 +686,10 @@ export class Layer extends WithEvents implements StyledLayer {
     }
   }
 
-  private sendDataEvent(referer: 'onViewportLoad' | 'onAfterRender') {
+  /**
+   * Manage data state and asociated events
+   */
+  private _sendDataEvent(referer: 'onViewportLoad' | 'onAfterRender') {
     const isGeoJsonLayer = this._source.sourceType === 'GeoJSONSource';
 
     if (
@@ -587,22 +712,27 @@ export class Layer extends WithEvents implements StyledLayer {
   }
 
   /**
-   * @public
-   * This method returns true if the source layer is ready
+   * Build a new style
    */
-  public isReady() {
-    return this.dataState !== DATA_STATES.STARTING;
-  }
-
-  private buildStyle(style: Style | StyleProperties) {
+  private _buildStyle(style: Style | StyleProperties) {
     const builtStyle = style instanceof Style ? style : new Style(style);
 
     if (builtStyle.viewport) {
-      this.on(LayerEvent.TILES_LOADED, async () => this.replaceDeckGLLayer());
+      this.on(LayerEvent.TILES_LOADED, async () => this.replaceDeckLayer());
     }
 
     return builtStyle;
   }
+
+  // #endregion
+}
+
+// #region Private complements
+
+enum DATA_STATES {
+  STARTING,
+  READY,
+  UPDATING
 }
 
 /**
@@ -681,3 +811,5 @@ interface LayerPosition {
   overLayerId?: string;
   underLayerId?: string;
 }
+
+// #endregion Complement
