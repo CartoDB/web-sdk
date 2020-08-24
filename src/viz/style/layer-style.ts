@@ -3,6 +3,6 @@ import { Source } from '@/viz';
 
 export interface StyledLayer {
   getId(): string;
-  getMapInstance(): Deck;
-  source: Source;
+  getMap(): Deck | undefined;
+  getSource(): Source;
 }
