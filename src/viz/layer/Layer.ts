@@ -257,6 +257,8 @@ export class Layer extends WithEvents implements StyledLayer {
     this._deckInstance.setProps({
       layers: deckLayers
     });
+
+    this._deckInstance = undefined;
   }
 
   /**

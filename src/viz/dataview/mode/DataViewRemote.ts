@@ -76,9 +76,11 @@ export class DataViewRemote extends DataViewMode {
 
     this.dataOrigin.on(LayerEvent.TILES_LOADED, () => {
       const deckInstance = (this.dataOrigin as Layer).getMap();
+
       if (deckInstance === undefined) {
         throw new CartoDataViewError("Layer doesn't have a map innstance");
       }
+
       const viewport = deckInstance.getViewports(undefined)[0];
 
       if (viewport) {
