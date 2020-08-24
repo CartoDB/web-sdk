@@ -155,7 +155,7 @@ export function getCredentialsFrom(dataOrigin: Layer | Source): Credentials | un
   let source = dataOrigin;
 
   if (source instanceof Layer) {
-    source = source.source;
+    source = source.getSource();
   }
 
   let credentials;

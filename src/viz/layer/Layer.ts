@@ -102,31 +102,20 @@ export class Layer extends WithEvents implements StyledLayer {
   }
 
   /**
-   * Get the Deck `map` instance where the layer is included
+   * Get the Deck `map` instance where the layer was included or undefined if it wasn't
    */
-  public getMap(): Deck {
-    if (this._deckInstance === undefined) {
-      throw new CartoLayerError(
-        'Cannot return map instance because the layer has not been added to a map yet',
-        layerErrorTypes.DECK_MAP_NOT_FOUND
-      );
-    }
-
+  public getMap(): Deck | undefined {
     return this._deckInstance;
   }
 
-  // /**
-  //  * Get the data Source assigned to the layer
-  //  *
-  //  * @readonly
-  //  * @type {Source}
-  //  * @memberof Layer
-  //  */
-  // public getSource(): Source {
-  //   return this._source;
-  // }
-
-  public get source() {
+  /**
+   * Get the data Source assigned to the layer
+   *
+   * @readonly
+   * @type {Source}
+   * @memberof Layer
+   */
+  public getSource(): Source {
     return this._source;
   }
 

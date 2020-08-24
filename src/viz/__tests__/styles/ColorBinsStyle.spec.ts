@@ -30,7 +30,7 @@ jest.mock('../../source/DatasetSource', () => ({
 const styledLayer = {
   getId: () => uuidv4(),
   getMap: () => ({} as Deck),
-  source: new DatasetSource('table')
+  getSource: () => new DatasetSource('table')
 };
 
 describe('ColorBinsStyle', () => {
@@ -148,7 +148,7 @@ describe('ColorBinsStyle', () => {
         property: 'strokeColor'
       });
       const styleLayerPoint = { ...styledLayer };
-      styleLayerPoint.source.getMetadata = jest.fn().mockImplementation(() => {
+      styleLayerPoint.getSource().getMetadata = jest.fn().mockImplementation(() => {
         return {
           geometryType: 'Point',
           stats: [stats]

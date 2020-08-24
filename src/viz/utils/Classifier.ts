@@ -241,10 +241,6 @@ function average(values: number[]): number {
 }
 
 async function getDataFromViewport(layer: Layer, featureProperty: string): Promise<number[]> {
-  // if (!layer.isReady()) {
-  //   await waitForEventWithTimeout(layer, LayerEvent.DATA_READY);
-  // }
-
   const features = await layer.getViewportFeatures();
   const data = features.filter(f => !!f[featureProperty]).map(f => f[featureProperty] as number);
   return data;

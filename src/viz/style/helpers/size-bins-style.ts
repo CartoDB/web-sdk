@@ -51,9 +51,9 @@ export function sizeBinsStyle(
   options: Partial<SizeBinsOptionsStyle> = {}
 ) {
   const evalFN = async (layer: StyledLayer) => {
-    const meta = layer.source.getMetadata();
+    const meta = layer.getSource().getMetadata();
 
-    if (layer.source.isEmpty()) {
+    if (layer.getSource().isEmpty()) {
       return {};
     }
 
@@ -76,7 +76,7 @@ export function sizeBinsStyle(
     layer: StyledLayer,
     legendWidgetOptions: LegendWidgetOptions = { config: {} }
   ): Promise<LegendProperties[]> => {
-    const meta = layer.source.getMetadata();
+    const meta = layer.getSource().getMetadata();
 
     if (!meta.geometryType) {
       return [];
