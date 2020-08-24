@@ -3,6 +3,7 @@ import { MVTLayer } from '@deck.gl/geo-layers';
 import { Matrix4 } from '@math.gl/core';
 import { GeoJSON, Feature } from 'geojson';
 import { GeoJsonLayer, IconLayer } from '@deck.gl/layers';
+import { SourceError } from '@/viz/errors/source-error';
 import { selectPropertiesFrom } from '../../utils/object';
 import { ViewportTile } from '../../declarations/deckgl';
 import { GeometryData, ViewportFrustumPlanes } from './geometry/types';
@@ -16,6 +17,8 @@ import {
 const DEFAULT_OPTIONS = {
   uniqueIdProperty: 'cartodb_id'
 };
+
+const FALLBACK_ID_PROPERTY = 'id';
 
 export class ViewportFeaturesGenerator {
   private deckInstance: Deck | undefined;
@@ -94,7 +97,7 @@ export class ViewportFeaturesGenerator {
 
   private getMVTViewportFilteredFeatures(selectedTiles: ViewportTile[], properties: string[]) {
     const currentFrustumPlanes = this.getViewport().getFrustumPlanes();
-    const featureCache = new Set<number>();
+    const featureCache = new Set<string>(); // don't assume just number (the most common use case, eg cartodb_id)
 
     return selectedTiles
       .map(tile => {
@@ -123,7 +126,7 @@ export class ViewportFeaturesGenerator {
       return false;
     }
 
-    const featureId: number = feature.properties[this.uniqueIdProperty] || feature.id;
+    const featureId: string = this.getFeatureId(feature);
 
     if (featureCache.has(featureId)) {
       // Prevent checking feature across tiles
@@ -144,6 +147,26 @@ export class ViewportFeaturesGenerator {
     }
 
     return isInside;
+  }
+
+  private getFeatureId(feature: GeoJSON.Feature): string {
+    if (!feature.properties) {
+      throw new SourceError(`The feature has no properties: ${feature}`);
+    }
+
+    let id = feature.properties[this.uniqueIdProperty] || feature[FALLBACK_ID_PROPERTY];
+
+    if (typeof id === 'number') {
+      id = id.toString(); // it should be safe to assume an integer here as key...
+    }
+
+    if (typeof id !== 'string') {
+      throw new SourceError(
+        `Just an Integer or a String value is allowed for the id field in the feature (found: ${id})`
+      );
+    }
+
+    return id;
   }
 
   private getSelectedTiles(): ViewportTile[] {
@@ -190,7 +213,7 @@ interface ViewportFeaturesGeneratorOptions {
 }
 
 interface InsideViewportCheckOptions {
-  featureCache: Set<number>;
+  featureCache: Set<string>;
   transformationMatrix: Matrix4;
   currentFrustumPlanes: ViewportFrustumPlanes;
 }
