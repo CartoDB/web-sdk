@@ -70,7 +70,7 @@ describe('Layer', () => {
         const layer = new Layer(DEFAULT_DATASET);
         await layer.addTo(deckInstanceMock);
 
-        const deckGLLayer = await layer.getDeckGLLayer();
+        const deckGLLayer = await layer.getDeckLayer();
         expect(deckInstanceMock.setProps).toHaveBeenCalledWith(
           expect.objectContaining({
             layers: expect.arrayContaining([deckGLLayer])
@@ -85,7 +85,7 @@ describe('Layer', () => {
         const layer2 = new Layer(DEFAULT_DATASET, {}, { id: 'layer2' });
         await layer2.addTo(deckInstanceMock);
 
-        await layer1.replaceDeckGLLayer();
+        await layer1.replaceDeckLayer();
         expect(deckInstanceMock.props.layers.length).toBe(2);
         expect(deckInstanceMock.props.layers[0].id).toBe('layer1');
         expect(deckInstanceMock.props.layers[1].id).toBe('layer2');
@@ -98,7 +98,7 @@ describe('Layer', () => {
         const layer2 = new Layer(DEFAULT_DATASET, {}, { id: 'layer2' });
         await layer2.addTo(deckInstanceMock, { overLayerId: 'layer1' });
 
-        await layer1.replaceDeckGLLayer();
+        await layer1.replaceDeckLayer();
         expect(deckInstanceMock.props.layers.length).toBe(2);
         expect(deckInstanceMock.props.layers[0].id).toBe('layer1');
         expect(deckInstanceMock.props.layers[1].id).toBe('layer2');
@@ -114,7 +114,7 @@ describe('Layer', () => {
         const layer3 = new Layer(DEFAULT_DATASET, {}, { id: 'layer3' });
         await layer3.addTo(deckInstanceMock, { underLayerId: 'layer2' });
 
-        await layer1.replaceDeckGLLayer();
+        await layer1.replaceDeckLayer();
         expect(deckInstanceMock.props.layers.length).toBe(3);
         expect(deckInstanceMock.props.layers[0].id).toBe('layer1');
         expect(deckInstanceMock.props.layers[1].id).toBe('layer3');
@@ -123,7 +123,7 @@ describe('Layer', () => {
     });
   });
 
-  describe('.getDeckGLLayer', () => {
+  describe('.getDeckLayer', () => {
     const data = [
       'https://a.cartocdn.net/username/api/v1/map/map_id/layer0/{z}/{x}/{y}.mvt?api_key=default_public',
       'https://b.cartocdn.net/username/api/v1/map/map_id/layer0/{z}/{x}/{y}.mvt?api_key=default_public',
@@ -137,7 +137,7 @@ describe('Layer', () => {
       };
 
       const layer = new Layer(DEFAULT_DATASET);
-      const deckGLLayer = await layer.getDeckGLLayer();
+      const deckGLLayer = await layer.getDeckLayer();
       expect(deckGLLayer.props).toMatchObject(defaultProperties);
     });
 
@@ -152,7 +152,7 @@ describe('Layer', () => {
         getFillColor: [128, 128, 128]
       });
 
-      const deckGLLayer = await layer.getDeckGLLayer();
+      const deckGLLayer = await layer.getDeckLayer();
       expect(deckGLLayer.props).toMatchObject(layerProperties);
     });
   });

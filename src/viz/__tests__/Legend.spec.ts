@@ -234,8 +234,8 @@ describe('Legend', () => {
         const colorBins = colorBinsStyle(POINT_NUMERIC_FIELD);
         await pointLayer.setStyle(colorBins);
         const colorBinsStyleProps = await colorBins.getLayerProps(pointLayer);
-        const maxVal = (pointLayer.source.getMetadata().stats[0] as NumericFieldStats).max;
-        const minVal = (pointLayer.source.getMetadata().stats[0] as NumericFieldStats).min;
+        const maxVal = (pointLayer.getSource().getMetadata().stats[0] as NumericFieldStats).max;
+        const minVal = (pointLayer.getSource().getMetadata().stats[0] as NumericFieldStats).min;
         const maxColor = (colorBinsStyleProps.getFillColor as (d: any) => RGBAColor)({
           properties: { [POINT_NUMERIC_FIELD]: maxVal }
         });
@@ -266,8 +266,8 @@ describe('Legend', () => {
         const colorBins = colorBinsStyle(POINT_NUMERIC_FIELD);
         await pointLayer.setStyle(colorBins);
         const colorBinsStyleProps = await colorBins.getLayerProps(pointLayer);
-        const maxVal = (pointLayer.source.getMetadata().stats[0] as NumericFieldStats).max;
-        const minVal = (pointLayer.source.getMetadata().stats[0] as NumericFieldStats).min;
+        const maxVal = (pointLayer.getSource().getMetadata().stats[0] as NumericFieldStats).max;
+        const minVal = (pointLayer.getSource().getMetadata().stats[0] as NumericFieldStats).min;
         const maxColor = (colorBinsStyleProps.getFillColor as (d: any) => RGBAColor)({
           properties: { [POINT_NUMERIC_FIELD]: maxVal }
         });
@@ -368,11 +368,11 @@ describe('Legend', () => {
         const colorContinuous = colorContinuousStyle(POLYGON_NUMERIC_FIELD);
         await polygonLayer.setStyle(colorContinuous);
         const colorContinuousStyleProps = await colorContinuous.getLayerProps(polygonLayer);
-        const maxVal = (polygonLayer.source.getMetadata().stats[0] as NumericFieldStats).max;
+        const maxVal = (polygonLayer.getSource().getMetadata().stats[0] as NumericFieldStats).max;
         const maxColor = (colorContinuousStyleProps.getFillColor as (d: any) => RGBAColor)({
           properties: { [POLYGON_NUMERIC_FIELD]: maxVal }
         });
-        const minVal = (polygonLayer.source.getMetadata().stats[0] as NumericFieldStats).min;
+        const minVal = (polygonLayer.getSource().getMetadata().stats[0] as NumericFieldStats).min;
         const minColor = (colorContinuousStyleProps.getFillColor as (d: any) => RGBAColor)({
           properties: { [POLYGON_NUMERIC_FIELD]: minVal }
         });
@@ -400,11 +400,11 @@ describe('Legend', () => {
         const colorContinuous = colorContinuousStyle(POLYGON_NUMERIC_FIELD);
         await polygonLayer.setStyle(colorContinuous);
         const colorContinuousStyleProps = await colorContinuous.getLayerProps(polygonLayer);
-        const minVal = (polygonLayer.source.getMetadata().stats[0] as NumericFieldStats).min;
+        const minVal = (polygonLayer.getSource().getMetadata().stats[0] as NumericFieldStats).min;
         const minColor = (colorContinuousStyleProps.getFillColor as (d: any) => RGBAColor)({
           properties: { [POLYGON_NUMERIC_FIELD]: minVal }
         });
-        const maxVal = (polygonLayer.source.getMetadata().stats[0] as NumericFieldStats).max;
+        const maxVal = (polygonLayer.getSource().getMetadata().stats[0] as NumericFieldStats).max;
         const maxColor = (colorContinuousStyleProps.getFillColor as (d: any) => RGBAColor)({
           properties: { [POLYGON_NUMERIC_FIELD]: maxVal }
         });
@@ -441,11 +441,11 @@ describe('Legend', () => {
         const sizeBins = sizeBinsStyle(POINT_NUMERIC_FIELD);
         await pointLayer.setStyle(sizeBins);
         const sizeBinsStyleProps = await sizeBins.getLayerProps(pointLayer);
-        const maxVal = (pointLayer.source.getMetadata().stats[0] as NumericFieldStats).max;
+        const maxVal = (pointLayer.getSource().getMetadata().stats[0] as NumericFieldStats).max;
         const maxRadius = (sizeBinsStyleProps.getRadius as (d: any) => number)({
           properties: { [POINT_NUMERIC_FIELD]: maxVal }
         });
-        const minVal = (pointLayer.source.getMetadata().stats[0] as NumericFieldStats).min;
+        const minVal = (pointLayer.getSource().getMetadata().stats[0] as NumericFieldStats).min;
         const minRadius = (sizeBinsStyleProps.getRadius as (d: any) => number)({
           properties: { [POINT_NUMERIC_FIELD]: minVal }
         });
@@ -470,11 +470,11 @@ describe('Legend', () => {
         const sizeBins = sizeBinsStyle(POINT_NUMERIC_FIELD);
         await pointLayer.setStyle(sizeBins);
         const sizeBinsStyleProps = await sizeBins.getLayerProps(pointLayer);
-        const minVal = (pointLayer.source.getMetadata().stats[0] as NumericFieldStats).min;
+        const minVal = (pointLayer.getSource().getMetadata().stats[0] as NumericFieldStats).min;
         const minRadius = (sizeBinsStyleProps.getRadius as (d: any) => number)({
           properties: { [POINT_NUMERIC_FIELD]: minVal }
         });
-        const maxVal = (pointLayer.source.getMetadata().stats[0] as NumericFieldStats).max;
+        const maxVal = (pointLayer.getSource().getMetadata().stats[0] as NumericFieldStats).max;
         const maxRadius = (sizeBinsStyleProps.getRadius as (d: any) => number)({
           properties: { [POINT_NUMERIC_FIELD]: maxVal }
         });
@@ -573,11 +573,11 @@ describe('Legend', () => {
         const sizeContinuous = sizeContinuousStyle(POINT_NUMERIC_FIELD);
         await pointLayer.setStyle(sizeContinuous);
         const sizeContinuousStyleProps = await sizeContinuous.getLayerProps(pointLayer);
-        const maxVal = (pointLayer.source.getMetadata().stats[0] as NumericFieldStats).max;
+        const maxVal = (pointLayer.getSource().getMetadata().stats[0] as NumericFieldStats).max;
         const maxRadius = (sizeContinuousStyleProps.getRadius as (d: any) => number)({
           properties: { [POINT_NUMERIC_FIELD]: maxVal }
         });
-        const minVal = (pointLayer.source.getMetadata().stats[0] as NumericFieldStats).min;
+        const minVal = (pointLayer.getSource().getMetadata().stats[0] as NumericFieldStats).min;
         const minRadius = (sizeContinuousStyleProps.getRadius as (d: any) => number)({
           properties: { [POINT_NUMERIC_FIELD]: minVal }
         });
@@ -606,11 +606,11 @@ describe('Legend', () => {
         const sizeContinuous = sizeContinuousStyle(POINT_NUMERIC_FIELD);
         await pointLayer.setStyle(sizeContinuous);
         const sizeContinuousStyleProps = await sizeContinuous.getLayerProps(pointLayer);
-        const minVal = (pointLayer.source.getMetadata().stats[0] as NumericFieldStats).min;
+        const minVal = (pointLayer.getSource().getMetadata().stats[0] as NumericFieldStats).min;
         const minRadius = (sizeContinuousStyleProps.getRadius as (d: any) => number)({
           properties: { [POINT_NUMERIC_FIELD]: minVal }
         });
-        const maxVal = (pointLayer.source.getMetadata().stats[0] as NumericFieldStats).max;
+        const maxVal = (pointLayer.getSource().getMetadata().stats[0] as NumericFieldStats).max;
         const maxRadius = (sizeContinuousStyleProps.getRadius as (d: any) => number)({
           properties: { [POINT_NUMERIC_FIELD]: maxVal }
         });

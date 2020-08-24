@@ -29,8 +29,8 @@ jest.mock('../../source/DatasetSource', () => ({
 
 const styledLayer = {
   getId: () => uuidv4(),
-  getMapInstance: () => ({} as Deck),
-  source: new DatasetSource('table')
+  getMap: () => ({} as Deck),
+  getSource: () => new DatasetSource('table')
 };
 
 describe('SizeCategoriesStyle', () => {

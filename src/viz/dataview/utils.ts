@@ -28,7 +28,7 @@ export function debounce(
 
 export function isGeoJSONSource(dataOrigin: Layer | Source) {
   return (
-    (dataOrigin instanceof Layer && dataOrigin.source instanceof GeoJSONSource) ||
+    (dataOrigin instanceof Layer && dataOrigin.getSource() instanceof GeoJSONSource) ||
     dataOrigin instanceof GeoJSONSource
   );
 }
