@@ -10,6 +10,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 - Add new `Legend` widget for layers, working for these styles: basic, colorBins, colorCategories, colorContinuous, sizeBins, sizeCategories and sizeContinuous (#100, #102, #104, #105, #106, #107, #109 and #113)
 - New `getId` method in `carto.viz.Layer` ([#113](https://github.com/CartoDB/web-sdk/pull/113/))
 
+### Changed
+
+- Rename several public members in `carto.viz.Layer`: methods `replaceDeckGLLayer`, `getDeckGLLayer`, `getMapInstance` and property `source` to `replaceDeckLayer`, `getDeckLayer`, `getMap` and `getSource` ([#124](https://github.com/CartoDB/web-sdk/pull/124/))
+
 ### Fixed
 
 - Fix WEBSDK VERSION for .cjs & .esm module distributions ([#115](https://github.com/CartoDB/web-sdk/pull/115/))
