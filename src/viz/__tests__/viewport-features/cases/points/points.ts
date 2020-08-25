@@ -8,6 +8,7 @@ export {
   viewportFeaturesColumns,
   viewportFeaturesResult,
   viewportFeaturesCount,
+  viewportFeaturesCountWithCustomId,
   frustumPlanes
 };
 
@@ -39,6 +40,8 @@ const viewportFeaturesResult = [
   }
 ];
 const viewportFeaturesCount = 3;
+const viewportFeaturesCountWithCustomId = 4;
+// :top there is a "fake duplicated record" (Madrid), to test custom_id
 
 const frustumPlanes: ViewportFrustumPlanes = {
   near: {

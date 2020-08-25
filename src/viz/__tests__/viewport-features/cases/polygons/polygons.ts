@@ -8,6 +8,7 @@ export {
   viewportFeaturesColumns,
   viewportFeaturesResult,
   viewportFeaturesCount,
+  viewportFeaturesCountWithCustomId,
   frustumPlanes
 };
 
@@ -22,6 +23,8 @@ const viewportFeaturesResult = [
   }
 ];
 const viewportFeaturesCount = 1;
+const viewportFeaturesCountWithCustomId = 3;
+// :top fake 3 different features (same cartodb_id 166 for different portions but different custom_id)
 
 const frustumPlanes: ViewportFrustumPlanes = {
   near: {
