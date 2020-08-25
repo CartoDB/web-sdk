@@ -20,7 +20,7 @@
     <header class="as-toolbar" style="background-color: #D83426">
         <div class="as-toolbar__group">
             <div class="as-toolbar__item">
-                <img src="../../mini-app/pride-logo.png" width="75px;" alt="Logo"/>
+                <img src="../mini-app/pride-logo.png" width="75px;" alt="Logo"/>
             </div>
             <p class="as-toolbar__item" style="font-size: 16px;">Web SDK Mini-App Example</p>
         </div>
@@ -116,7 +116,7 @@
             legend.data = palette.map((p,i) => ({
               type: 'point',
               color: p,
-              label: `${legendBreaks[i]} - ${legendBreaks[i + 1]}`,
+              label: i !== palette.length - 1 ? `${legendBreaks[i]} - ${legendBreaks[i + 1]}` : legendBreaks[i + 1],
               'width': 5,
             }));
 
