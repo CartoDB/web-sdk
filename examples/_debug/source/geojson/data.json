@@ -8,7 +8,7 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "America", "value": 10 },
+      "properties": { "name": "America", "value": 15 },
       "geometry": { "type": "Point", "coordinates": [-97.3828125, 25.460669951495305] }
     },
     {
