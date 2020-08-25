@@ -1,23 +1,29 @@
 export { defaultStyles } from './default-styles';
 
-export { Style, StyleProperties } from './Style';
+export { Style } from './Style';
+export type { StyleProperties } from './Style';
 
 export {
   basicStyle,
   colorBinsStyle,
-  ColorBinsOptionsStyle,
   colorCategoriesStyle,
-  ColorCategoriesOptionsStyle,
   colorContinuousStyle,
-  ColorContinuousOptionsStyle,
   sizeBinsStyle,
-  SizeBinsOptionsStyle,
   sizeCategoriesStyle,
-  SizeCategoriesOptionsStyle,
   sizeContinuousStyle,
+  iconStyle
+} from './helpers';
+
+export type {
+  ColorBinsOptionsStyle,
+  ColorCategoriesOptionsStyle,
+  ColorContinuousOptionsStyle,
+  SizeBinsOptionsStyle,
+  SizeCategoriesOptionsStyle,
   SizeContinuousOptionsStyle,
-  iconStyle,
   IconOptionsStyle
 } from './helpers';
 
-export { getStyles, getStyleValue, BasicOptionsStyle } from './deck-styles';
+export { getStyles, getStyleValue } from './deck-styles';
+
+export type { BasicOptionsStyle } from './deck-styles';
