@@ -20,12 +20,25 @@ const DEFAULT_OPTIONS = {
 
 const FALLBACK_ID_PROPERTY = 'id';
 
+/**
+ * Class to obtain features from the current viewport.
+ * It works with MVTLayer and GeoJson layer.
+ *
+ * It allows declaring the properties included in the returned features, and also to
+ * specify a uniqueIdProperty for a MVTLayer (if not included, it will assume default: cartodb_id || id, in that order).
+ *
+ * @export
+ * @class ViewportFeaturesGenerator
+ */
 export class ViewportFeaturesGenerator {
-  private deckInstance: Deck | undefined;
-  private deckLayer: MVTLayer<string> | GeoJsonLayer<GeoJSON> | undefined;
-  private uniqueIdProperty: string;
-  private viewport: WebMercatorViewport | undefined;
+  // #region Private props
+  private _deckInstance: Deck | undefined;
+  private _deckLayer: MVTLayer<string> | GeoJsonLayer<GeoJSON> | undefined;
+  private _uniqueIdProperty: string;
+  private _viewport: WebMercatorViewport | undefined;
+  // #endregion
 
+  // #region Public methods
   constructor(
     deckInstance?: Deck,
     deckLayer?: MVTLayer<string> | GeoJsonLayer<GeoJSON>,
@@ -33,23 +46,86 @@ export class ViewportFeaturesGenerator {
   ) {
     const { uniqueIdProperty = DEFAULT_OPTIONS.uniqueIdProperty } = options;
 
-    this.deckInstance = deckInstance;
-    this.deckLayer = deckLayer;
-    this.uniqueIdProperty = uniqueIdProperty;
+    this._deckInstance = deckInstance;
+    this._deckLayer = deckLayer;
+    this._uniqueIdProperty = uniqueIdProperty;
   }
 
-  isReady() {
-    return Boolean(this.deckInstance) && Boolean(this.deckLayer);
+  /**
+   * Check if features can be returned
+   *
+   * @returns {boolean}
+   * @memberof ViewportFeaturesGenerator
+   */
+  public isReady(): boolean {
+    return Boolean(this._deckInstance) && Boolean(this._deckLayer);
   }
 
-  async getFeatures(properties: string[] = []) {
-    if (this.deckLayer instanceof GeoJsonLayer || this.deckLayer instanceof IconLayer) {
+  /**
+   * Set proper deck instance
+   *
+   * @param {Deck} deckInstance
+   * @memberof ViewportFeaturesGenerator
+   */
+  public setDeckInstance(deckInstance: Deck) {
+    this._deckInstance = deckInstance;
+  }
+
+  /**
+   * Set layer to get features from
+   *
+   * @param {MVTLayer<string>} deckLayer
+   * @memberof ViewportFeaturesGenerator
+   */
+  public setDeckLayer(deckLayer: MVTLayer<string>) {
+    this._deckLayer = deckLayer;
+  }
+
+  /**
+   * Set viewport
+   *
+   * @param {WebMercatorViewport} viewport
+   * @memberof ViewportFeaturesGenerator
+   */
+  public setViewport(viewport: WebMercatorViewport) {
+    this._viewport = viewport;
+  }
+
+  /**
+   * Get the features on the viewport
+   *
+   * @param {string[]} [properties=[]] name of the columns to keep on features
+   * @returns {Promise<Record<string, unknown>[]>}
+   * @memberof ViewportFeaturesGenerator
+   */
+  async getFeatures(properties: string[] = []): Promise<Record<string, unknown>[]> {
+    if (this._deckLayer instanceof GeoJsonLayer || this._deckLayer instanceof IconLayer) {
       return this.getGeoJSONLayerFeatures(properties);
     }
 
     return this.getMVTLayerFeatures(properties);
   }
 
+  // #endregion
+
+  // #region Private methods
+
+  /**
+   * Get the WebMercatorViewport for spatial filtering
+   */
+  private getViewport() {
+    if (this._viewport) {
+      return this._viewport;
+    }
+
+    // WebMercatorViewport is there by default
+    const viewports: Viewport[] = this._deckInstance?.getViewports(undefined);
+    return viewports[0];
+  }
+
+  /**
+   * Get features (from a MVTLayer)
+   */
   private async getMVTLayerFeatures(properties: string[] = []) {
     const selectedTiles = await this.getSelectedTiles();
     const allTilesLoaded = selectedTiles.every(tile => tile.isLoaded);
@@ -61,38 +137,13 @@ export class ViewportFeaturesGenerator {
     return this.getMVTViewportFilteredFeatures(selectedTiles, properties);
   }
 
-  private async getGeoJSONLayerFeatures(properties: string[] = []) {
-    const features = this.getGeoJSONFeatures();
-    let viewport: Viewport;
-
-    try {
-      viewport = this.getViewport();
-    } catch (err) {
-      // eslint-disable-next-line no-console
-      console.warn('Viewport not ready');
+  // #region MVTLayer
+  private getSelectedTiles(): ViewportTile[] {
+    if (!this._deckLayer || !this._deckLayer.state) {
       return [];
     }
 
-    const currentFrustumPlanes = viewport.getFrustumPlanes();
-
-    return features
-      .filter(feature => {
-        if (!feature.properties) {
-          return false;
-        }
-
-        return checkIfGeometryIsInsideFrustum(
-          transformGeometryCoordinatesToCommonSpaceByViewport(
-            feature.geometry as GeometryData,
-            viewport
-          ),
-          currentFrustumPlanes
-        );
-      })
-      .map(feature => {
-        return selectPropertiesFrom(feature.properties as Record<string, unknown>, properties);
-      })
-      .flat();
+    return this._deckLayer.state.tileset.selectedTiles;
   }
 
   private getMVTViewportFilteredFeatures(selectedTiles: ViewportTile[], properties: string[]) {
@@ -154,7 +205,7 @@ export class ViewportFeaturesGenerator {
       throw new SourceError(`The feature has no properties: ${feature}`);
     }
 
-    let id = feature.properties[this.uniqueIdProperty] || feature[FALLBACK_ID_PROPERTY];
+    let id = feature.properties[this._uniqueIdProperty] || feature[FALLBACK_ID_PROPERTY];
 
     if (typeof id === 'number') {
       id = id.toString(); // it should be safe to assume an integer here as key...
@@ -169,45 +220,60 @@ export class ViewportFeaturesGenerator {
     return id;
   }
 
-  private getSelectedTiles(): ViewportTile[] {
-    if (!this.deckLayer || !this.deckLayer.state) {
+  // #endregion
+
+  /**
+   * Get features (from a GeoJson layer)
+   */
+  private async getGeoJSONLayerFeatures(properties: string[] = []) {
+    const features = this.getGeoJSONFeatures();
+    let viewport: Viewport;
+
+    try {
+      viewport = this.getViewport();
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.warn('Viewport not ready');
       return [];
     }
 
-    return this.deckLayer.state.tileset.selectedTiles;
+    const currentFrustumPlanes = viewport.getFrustumPlanes();
+
+    return features
+      .filter(feature => {
+        if (!feature.properties) {
+          return false;
+        }
+
+        return checkIfGeometryIsInsideFrustum(
+          transformGeometryCoordinatesToCommonSpaceByViewport(
+            feature.geometry as GeometryData,
+            viewport
+          ),
+          currentFrustumPlanes
+        );
+      })
+      .map(feature => {
+        return selectPropertiesFrom(feature.properties as Record<string, unknown>, properties);
+      })
+      .flat();
   }
 
+  // #region GeoJson Layer
   private getGeoJSONFeatures(): Feature[] {
-    if (!this.deckLayer || !this.deckLayer.props || !this.deckLayer.props.data) {
+    if (!this._deckLayer || !this._deckLayer.props || !this._deckLayer.props.data) {
       return [];
     }
 
-    return (this.deckLayer.props.data as unknown) as Feature[];
+    return (this._deckLayer.props.data as unknown) as Feature[];
   }
 
-  private getViewport() {
-    if (this.viewport) {
-      return this.viewport;
-    }
+  // #endregion
 
-    // WebMercatorViewport is there by default
-    const viewports: Viewport[] = this.deckInstance?.getViewports(undefined);
-    return viewports[0];
-  }
-
-  public setDeckInstance(deckInstance: Deck) {
-    this.deckInstance = deckInstance;
-  }
-
-  public setDeckLayer(deckLayer: MVTLayer<string>) {
-    this.deckLayer = deckLayer;
-  }
-
-  public setViewport(viewport: WebMercatorViewport) {
-    this.viewport = viewport;
-  }
+  // #endregion
 }
 
+// #region Private complements
 interface ViewportFeaturesGeneratorOptions {
   uniqueIdProperty?: string;
 }
@@ -217,3 +283,5 @@ interface InsideViewportCheckOptions {
   transformationMatrix: Matrix4;
   currentFrustumPlanes: ViewportFrustumPlanes;
 }
+
+// #endregion
