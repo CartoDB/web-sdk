@@ -8,6 +8,7 @@ export class TileJsonClient {
     // const r = await fetch(url);
     // return parseFetchJSON(r);
     //
+    console.log(url);
     return {
       tiles: [
         'https://bq1.cartocdn.com/bqtiler?y={y}&x={x}&z={z}&p=0_16_19257_19396_24574_24697_4000_1&t=cartobq.maps.nyc_taxi_demo2',
@@ -24,13 +25,13 @@ export class TileJsonClient {
   }
 }
 
-function parseFetchJSON(r: Response) {
-  switch (r.status) {
-    case 200:
-      return r.json();
-    case 404:
-      throw new Error('Not found tilejson for that url');
-    default:
-      throw new Error('Unexpected error fetching the tileset info');
-  }
-}
+// function parseFetchJSON(r: Response) {
+//   switch (r.status) {
+//     case 200:
+//       return r.json();
+//     case 404:
+//       throw new Error('Not found tilejson for that url');
+//     default:
+//       throw new Error('Unexpected error fetching the tileset info');
+//   }
+// }
