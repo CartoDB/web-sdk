@@ -82,6 +82,21 @@ export class ViewportFeaturesGenerator {
   }
 
   /**
+   * Set options (uniqueIdProperty).
+   *
+   * uniqueIdProperty determines what 'pieces' in tiles are treated as 'the same' or
+   * as different fefatures
+   *
+   * @param {ViewportFeaturesGeneratorOptions} [options=DEFAULT_OPTIONS]
+   * @memberof ViewportFeaturesGenerator
+   */
+  public setOptions(options: ViewportFeaturesGeneratorOptions = DEFAULT_OPTIONS) {
+    const { uniqueIdProperty = DEFAULT_OPTIONS.uniqueIdProperty } = options;
+
+    this._uniqueIdProperty = uniqueIdProperty;
+  }
+
+  /**
    * Set viewport
    *
    * @param {WebMercatorViewport} viewport
