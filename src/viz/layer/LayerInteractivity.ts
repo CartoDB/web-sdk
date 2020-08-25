@@ -195,6 +195,22 @@ export class LayerInteractivity {
       hoverStyleProps = await this._hoverStyle.getLayerProps(this._layer);
     }
 
+    const source = this._layer.getSource();
+    const { uniqueIdProperty } = source.getMetadata();
+
+    type simpleFeature = Record<string, any>;
+    let sameFeatureFn: any;
+
+    if (uniqueIdProperty) {
+      sameFeatureFn = (f1: simpleFeature, f2: simpleFeature): boolean => {
+        return f1.properties[uniqueIdProperty] === f2.properties[uniqueIdProperty];
+      };
+    } else {
+      sameFeatureFn = (f1: simpleFeature, f2: simpleFeature): boolean => {
+        return f1 === f2;
+      };
+    }
+
     Object.keys({
       ...clickStyleProps,
       ...hoverStyleProps
@@ -219,15 +235,9 @@ export class LayerInteractivity {
         let styleValue;
 
         if (feature) {
-          if (
-            this._clickFeature &&
-            feature.properties.cartodb_id === this._clickFeature.properties.cartodb_id
-          ) {
+          if (this._clickFeature && sameFeatureFn(feature, this._clickFeature)) {
             styleValue = clickStyleValue;
-          } else if (
-            this._hoverFeature &&
-            feature.properties.cartodb_id === this._hoverFeature.properties.cartodb_id
-          ) {
+          } else if (this._hoverFeature && sameFeatureFn(feature, this._hoverFeature)) {
             styleValue = hoverStyleValue;
           }
         }
