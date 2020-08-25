@@ -2,13 +2,21 @@ import { Vector3 } from '@math.gl/core';
 import { ViewportFrustumPlanes } from '../../../../interactivity/viewport-features/geometry/types';
 import tiles from './tiles.json';
 
-export { name, tiles, viewportFeaturesColumns, viewportFeaturesResult, frustumPlanes };
+export {
+  name,
+  tiles,
+  viewportFeaturesColumns,
+  viewportFeaturesResult,
+  viewportFeaturesCount,
+  frustumPlanes
+};
 
 const name = 'Lines';
 
 const viewportFeaturesColumns = ['street'];
 
 const viewportFeaturesResult = [{ street: 'FITZGERALD' }];
+const viewportFeaturesCount = 1;
 
 const frustumPlanes: ViewportFrustumPlanes = {
   near: {

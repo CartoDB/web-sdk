@@ -19,6 +19,7 @@
         },
         "properties": {
           "cartodb_id": 10684,
+          "custom_id": "1",
           "street": "FITZGERALD",
           "st_type": "AVE",
           "lf_fadd": 1201,
@@ -66,6 +67,7 @@
         },
         "properties": {
           "cartodb_id": 10684,
+          "custom_id": "2",
           "street": "FITZGERALD",
           "st_type": "AVE",
           "lf_fadd": 1201,

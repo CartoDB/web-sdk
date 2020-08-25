@@ -13,6 +13,7 @@
         },
         "properties": {
           "cartodb_id": 5642,
+          "custom_id": "1",
           "natscale": 30,
           "labelrank": 3,
           "featurecla": "Admin-1 capital",
@@ -58,6 +59,7 @@
         },
         "properties": {
           "cartodb_id": 2122,
+          "custom_id": "2",
           "natscale": 20,
           "labelrank": 3,
           "featurecla": "Populated place",
@@ -110,6 +112,7 @@
         },
         "properties": {
           "cartodb_id": 2122,
+          "custom_id": "3",
           "natscale": 20,
           "labelrank": 3,
           "featurecla": "Populated place",
@@ -162,6 +165,7 @@
         },
         "properties": {
           "cartodb_id": 2120,
+          "custom_id": "4",
           "natscale": 20,
           "labelrank": 3,
           "featurecla": "Populated place",
@@ -206,6 +210,7 @@
         },
         "properties": {
           "cartodb_id": 7265,
+          "custom_id": "5",
           "natscale": 300,
           "labelrank": 3,
           "featurecla": "Admin-0 capital",
@@ -259,6 +264,7 @@
         },
         "properties": {
           "cartodb_id": 2119,
+          "custom_id": "6",
           "natscale": 20,
           "labelrank": 3,
           "featurecla": "Admin-1 capital",
@@ -311,6 +317,7 @@
         },
         "properties": {
           "cartodb_id": 2118,
+          "custom_id": "7",
           "natscale": 20,
           "labelrank": 3,
           "featurecla": "Populated place",

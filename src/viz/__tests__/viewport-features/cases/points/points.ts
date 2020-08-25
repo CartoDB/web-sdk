@@ -2,7 +2,14 @@ import { Vector3 } from '@math.gl/core';
 import { ViewportFrustumPlanes } from '../../../../interactivity/viewport-features/geometry/types';
 import tiles from './tiles.json';
 
-export { name, tiles, viewportFeaturesColumns, viewportFeaturesResult, frustumPlanes };
+export {
+  name,
+  tiles,
+  viewportFeaturesColumns,
+  viewportFeaturesResult,
+  viewportFeaturesCount,
+  frustumPlanes
+};
 
 const name = 'Points';
 
@@ -31,6 +38,7 @@ const viewportFeaturesResult = [
     pop_min: 33125
   }
 ];
+const viewportFeaturesCount = 3;
 
 const frustumPlanes: ViewportFrustumPlanes = {
   near: {

@@ -651,6 +651,7 @@
         },
         "properties": {
           "cartodb_id": 16,
+          "custom_id": "1",
           "fid": 6,
           "scalerank": 1,
           "featurecla": "Admin-0 country",
@@ -1453,6 +1454,7 @@
         },
         "properties": {
           "cartodb_id": 16,
+          "custom_id": "2",
           "fid": 6,
           "scalerank": 1,
           "featurecla": "Admin-0 country",
@@ -2167,6 +2169,7 @@
         },
         "properties": {
           "cartodb_id": 16,
+          "custom_id": "3",
           "fid": 6,
           "scalerank": 1,
           "featurecla": "Admin-0 country",
@@ -2319,6 +2322,7 @@
         },
         "properties": {
           "cartodb_id": 158,
+          "custom_id": "4",
           "fid": 174,
           "scalerank": 5,
           "featurecla": "Admin-0 country",
@@ -2586,6 +2590,7 @@
         },
         "properties": {
           "cartodb_id": 156,
+          "custom_id": "5",
           "fid": 172,
           "scalerank": 1,
           "featurecla": "Admin-0 country",
@@ -3285,6 +3290,7 @@
         },
         "properties": {
           "cartodb_id": 166,
+          "custom_id": "6",
           "fid": 183,
           "scalerank": 1,
           "featurecla": "Admin-0 country",
@@ -3393,6 +3399,7 @@
         },
         "properties": {
           "cartodb_id": 71,
+          "custom_id": "7",
           "fid": 103,
           "scalerank": 1,
           "featurecla": "Admin-0 country",
@@ -4951,6 +4958,7 @@
         },
         "properties": {
           "cartodb_id": 166,
+          "custom_id": "8",
           "fid": 183,
           "scalerank": 1,
           "featurecla": "Admin-0 country",
@@ -6197,6 +6205,7 @@
         },
         "properties": {
           "cartodb_id": 166,
+          "custom_id": "9",
           "fid": 183,
           "scalerank": 1,
           "featurecla": "Admin-0 country",
@@ -6449,6 +6458,7 @@
         },
         "properties": {
           "cartodb_id": 166,
+          "custom_id": "10",
           "fid": 183,
           "scalerank": 1,
           "featurecla": "Admin-0 country",

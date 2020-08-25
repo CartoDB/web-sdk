@@ -2,7 +2,14 @@ import { Vector3 } from '@math.gl/core';
 import { ViewportFrustumPlanes } from '../../../../interactivity/viewport-features/geometry/types';
 import tiles from './tiles.json';
 
-export { name, tiles, viewportFeaturesColumns, viewportFeaturesResult, frustumPlanes };
+export {
+  name,
+  tiles,
+  viewportFeaturesColumns,
+  viewportFeaturesResult,
+  viewportFeaturesCount,
+  frustumPlanes
+};
 
 const name = 'Polygons';
 
@@ -14,6 +21,7 @@ const viewportFeaturesResult = [
     pop_est: 4213418
   }
 ];
+const viewportFeaturesCount = 1;
 
 const frustumPlanes: ViewportFrustumPlanes = {
   near: {
