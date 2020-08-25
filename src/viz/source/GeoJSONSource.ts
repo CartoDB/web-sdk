@@ -18,6 +18,10 @@ import {
 import { sourceErrorTypes, SourceError } from '../errors/source-error';
 import { selectPropertiesFrom } from '../utils/object';
 
+interface GeoJSONSourceOptions {
+  uniqueIdProperty?: string;
+}
+
 interface GeoJSONSourceProps extends SourceProps {
   data: Feature[];
 }
@@ -26,7 +30,9 @@ export const DEFAULT_GEOM = 'Point';
 const MAX_SAMPLE_SIZE = 1000;
 
 export class GeoJSONSource extends Source {
+  // #region private props
   private _geojson: GeoJSON;
+  private _uniqueIdProperty: string | undefined;
   private _metadata?: SourceMetadata;
   private _props?: GeoJSONSourceProps;
   private _numericFieldValues: Record<string, number[]>;
@@ -35,12 +41,16 @@ export class GeoJSONSource extends Source {
   private filtersCollection = new FiltersCollection<ColumnFilters, FunctionFilterApplicator>(
     FunctionFilterApplicator
   );
+  // #endregion
 
-  constructor(geojson: GeoJSON) {
+  constructor(geojson: GeoJSON, options: GeoJSONSourceOptions = {}) {
     super(`geojson-${uuidv4()}`);
     this.sourceType = 'GeoJSONSource';
 
     this._geojson = geojson;
+    const { uniqueIdProperty } = options;
+    this._uniqueIdProperty = uniqueIdProperty;
+
     this._numericFieldValues = {};
     this._categoryFieldValues = {};
   }
@@ -101,7 +111,7 @@ export class GeoJSONSource extends Source {
     const geometryType = getGeomType(this._geojson);
     const stats = this._getStats();
 
-    return { geometryType, stats };
+    return { geometryType, uniqueIdProperty: this._uniqueIdProperty, stats };
   }
 
   private _getStats(): (NumericFieldStats | CategoryFieldStats)[] {

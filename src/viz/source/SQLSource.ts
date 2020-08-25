@@ -250,7 +250,7 @@ export class SQLSource extends Source {
     }
 
     const fieldStats = this.getCompleteFieldStats(stats);
-    const metadata = { geometryType, stats: fieldStats };
+    const metadata = { geometryType, uniqueIdProperty: DEFAULT_ID_PROPERTY, stats: fieldStats };
     return metadata;
   }
 
