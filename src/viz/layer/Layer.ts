@@ -204,12 +204,12 @@ export class Layer extends WithEvents implements StyledLayer {
    * @memberof Layer
    */
   public async addTo(deckInstance: Deck, opts: LayerPosition = {}) {
-    const createdDeckGLLayer = await this._createDeckLayer();
+    const deckLayer = await this._createDeckLayer();
 
     // collection may have changed during instantiation...
     const layers = [...deckInstance.props.layers];
 
-    addInTheRightPosition(createdDeckGLLayer, layers, opts);
+    addInTheRightPosition(deckLayer, layers, opts);
 
     const { onViewStateChange } = deckInstance.props;
     deckInstance.setProps({
@@ -231,10 +231,13 @@ export class Layer extends WithEvents implements StyledLayer {
 
     this._deckInstance = deckInstance;
 
+    const { uniqueIdProperty } = this.getSource().getMetadata();
+
     this._interactivity.setDeckInstance(deckInstance);
 
     this._viewportFeaturesGenerator.setDeckInstance(deckInstance);
-    this._viewportFeaturesGenerator.setDeckLayer(createdDeckGLLayer);
+    this._viewportFeaturesGenerator.setDeckLayer(deckLayer);
+    this._viewportFeaturesGenerator.setOptions({ uniqueIdProperty });
   }
 
   /**
