@@ -21,6 +21,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 - Fix error on viewport mode in classifiers, with first render without proper styles ([#124](https://github.com/CartoDB/web-sdk/pull/124/))
 - Fix `remove` error in `carto.viz.Layer`, keeping the reference to the old map ([#124](https://github.com/CartoDB/web-sdk/pull/124/))
 - Fix esm bundle, where typescript interfaces were not correctly ignored by babel ([#126](https://github.com/CartoDB/web-sdk/pull/126/))
+- Fix interactivity styles for common geojson files, expecting cartodb_id to be always present on `carto.viz.source.GeoJSON` ([#125](https://github.com/CartoDB/web-sdk/pull/125/))
 
 ## [1.0.0-alpha.2] 2020-07-31
 
