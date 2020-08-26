@@ -141,6 +141,20 @@ describe('getFeatures', () => {
 });
 
 describe('SourceMetadata', () => {
+  it('should return no uniqueId by default in metadata', async () => {
+    const source = new GeoJSONSource(geojson);
+    source.init();
+    const metadata = source.getMetadata();
+    expect(metadata.uniqueIdProperty).toEqual(undefined);
+  });
+
+  it('should return custom id in metadata if specified', async () => {
+    const source = new GeoJSONSource(geojson, { uniqueIdProperty: 'my_custom_id' });
+    source.init();
+    const metadata = source.getMetadata();
+    expect(metadata.uniqueIdProperty).toEqual('my_custom_id');
+  });
+
   it('should build props and metadata properly with basic example', async () => {
     const source = new GeoJSONSource(geojson);
     await source.addField('number');

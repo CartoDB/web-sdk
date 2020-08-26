@@ -259,4 +259,13 @@ describe('SQLSource', () => {
       expect(instantiateMapFromMock.mock.calls[0][0]).toStrictEqual(expectedmapConfig);
     });
   });
+
+  describe('SourceMetadata', () => {
+    it('should return cartodb_id as uniqueId by default in metadata', async () => {
+      const source = new SQLSource(DEFAULT_SQL);
+      await source.init();
+      const metadata = source.getMetadata();
+      expect(metadata.uniqueIdProperty).toEqual('cartodb_id');
+    });
+  });
 });

@@ -13,6 +13,7 @@
         },
         "properties": {
           "cartodb_id": 5642,
+          "custom_id": "1",
           "natscale": 30,
           "labelrank": 3,
           "featurecla": "Admin-1 capital",
@@ -58,6 +59,7 @@
         },
         "properties": {
           "cartodb_id": 2122,
+          "custom_id": "2",
           "natscale": 20,
           "labelrank": 3,
           "featurecla": "Populated place",
@@ -110,6 +112,7 @@
         },
         "properties": {
           "cartodb_id": 2122,
+          "custom_id": "3",
           "natscale": 20,
           "labelrank": 3,
           "featurecla": "Populated place",
@@ -162,6 +165,7 @@
         },
         "properties": {
           "cartodb_id": 2120,
+          "custom_id": "4",
           "natscale": 20,
           "labelrank": 3,
           "featurecla": "Populated place",
@@ -206,6 +210,53 @@
         },
         "properties": {
           "cartodb_id": 7265,
+          "custom_id": "5",
+          "natscale": 300,
+          "labelrank": 3,
+          "featurecla": "Admin-0 capital",
+          "name": "Madrid",
+          "diffascii": 0,
+          "nameascii": "Madrid",
+          "adm0cap": 1,
+          "capalt": 0,
+          "worldcity": 1,
+          "megacity": 1,
+          "sov0name": "Kingdom of Spain",
+          "sov_a3": "ESP",
+          "adm0name": "Spain",
+          "adm0_a3": "ESP",
+          "adm1name": "Comunidad de Madrid",
+          "scalerank": 1,
+          "latitude": 40.4000262645,
+          "longitude": -3.683351686,
+          "changed": 0,
+          "namediff": 0,
+          "pop_max": 5567000,
+          "pop_min": 50437,
+          "pop_other": 3673427,
+          "rank_max": 13,
+          "rank_min": 8,
+          "geonameid": 3675707,
+          "meganame": "Madrid",
+          "ls_name": "Madrid",
+          "ls_match": 1,
+          "checkme": 0,
+          "iso_a2": "ES",
+          "layerName": "layer0"
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            0.37939453125,
+            0.5419921875
+          ]
+        },
+        "properties": {
+          "cartodb_id": 7265,
+          "custom_id": "5-duplicated-record-for-tests",
           "natscale": 300,
           "labelrank": 3,
           "featurecla": "Admin-0 capital",
@@ -259,6 +310,7 @@
         },
         "properties": {
           "cartodb_id": 2119,
+          "custom_id": "6",
           "natscale": 20,
           "labelrank": 3,
           "featurecla": "Admin-1 capital",
@@ -311,6 +363,7 @@
         },
         "properties": {
           "cartodb_id": 2118,
+          "custom_id": "7",
           "natscale": 20,
           "labelrank": 3,
           "featurecla": "Populated place",

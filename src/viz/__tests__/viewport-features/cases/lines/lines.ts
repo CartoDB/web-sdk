@@ -2,13 +2,24 @@ import { Vector3 } from '@math.gl/core';
 import { ViewportFrustumPlanes } from '../../../../interactivity/viewport-features/geometry/types';
 import tiles from './tiles.json';
 
-export { name, tiles, viewportFeaturesColumns, viewportFeaturesResult, frustumPlanes };
+export {
+  name,
+  tiles,
+  viewportFeaturesColumns,
+  viewportFeaturesResult,
+  viewportFeaturesCount,
+  viewportFeaturesCountWithCustomId,
+  frustumPlanes
+};
 
 const name = 'Lines';
 
 const viewportFeaturesColumns = ['street'];
 
 const viewportFeaturesResult = [{ street: 'FITZGERALD' }];
+const viewportFeaturesCount = 1;
+const viewportFeaturesCountWithCustomId = 2;
+// :top fake 2 different features (same cartodb_id 10684 for 2 segments but different custom_id)
 
 const frustumPlanes: ViewportFrustumPlanes = {
   near: {
