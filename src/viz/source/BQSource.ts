@@ -23,7 +23,7 @@ export class BQSource extends Source {
   // constructor(dataset: string, options: SourceOptions = {}) {
   constructor(dataset: string) {
     super(`CARTOBQ-${uuidv4()}`);
-    this.sourceType = 'BQSource';
+    this.sourceType = 'BQ';
 
     this._dataset = dataset;
   }
