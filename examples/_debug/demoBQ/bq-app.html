@@ -7,7 +7,7 @@
       content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0"
     />
 
-    <title>NY City & taxi trips</title>
+    <title>NY City - Taxi trips, with CARTO & Google BQ</title>
 
     <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.css" rel="stylesheet" />
 
@@ -21,7 +21,9 @@
         <div class="as-toolbar__item">
           <img src="../mini-app/pride-logo.png" width="75px;" alt="Logo" />
         </div>
-        <p class="as-toolbar__item" style="font-size: 16px;">NY City & taxi trips</p>
+        <p class="as-toolbar__item" style="font-size: 16px;">
+          NY City - Taxi trips, with CARTO & Google BQ
+        </p>
       </div>
     </header>
 
@@ -31,7 +33,7 @@
       <aside class="as-sidebar as-sidebar--left" data-name="Legend">
         <div class="as-container">
           <section class="as-box">
-            <as-legend heading="Aggregated total" description="Write a description here">
+            <as-legend heading="Number of trips" description="Legend">
               <as-legend-color-bins id="legend" slot="legends"></as-legend-color-bins>
             </as-legend>
           </section>
@@ -52,13 +54,13 @@
             <as-formula-widget
               id="widgetAggregatedTotal"
               class="as-p--16"
-              heading="Aggregated total"
-              description="Write a description here"
+              heading="Number of trips"
+              description="(just on viewport)"
             >
             </as-formula-widget>
           </section>
           <section class="as-box">
-            <button class="as-btn as-btn--primary" onclick="updateStyle()">Update Style</button>
+            <button class="as-btn as-btn--primary" onclick="updateStyle()">See fare ammount</button>
           </section>
         </div>
       </aside>
@@ -88,6 +90,11 @@
 
     <script>
       let layer;
+
+      const FIELD_1_TRIPS = 'aggregated_total';
+      const FIELD_2_FARE = 'avg_fare_amount';
+      const FIELD_3_TIP_PCT = 'avg_tip_percentage';
+
       const breaks = [10, 100, 1000, 10000, 100000, 1000000];
       const palette = ['#009392', '#39b185', '#9ccb86', '#e9e29c', '#eeb479', '#e88571', '#cf597e'];
 
@@ -109,7 +116,7 @@
         // const bq = new carto.viz.source.BQ('bqtiler-staging.maps.nyc_taxi_demo_id') // for PROD
 
         // manual style
-        const style = carto.viz.style.colorBins('aggregated_total', {
+        const style = carto.viz.style.colorBins(FIELD_1_TRIPS, {
           breaks: breaks,
           palette: palette,
           opacity: 1
@@ -117,7 +124,7 @@
         layer = new carto.viz.Layer(bq, style);
         await layer.addTo(deckMap);
 
-        // manual legend
+        // manual (custom) legend
         const legendBreaks = [0, ...breaks, '> 1000000'];
         const legend = document.querySelector('#legend');
         legend.data = palette.map((p, i) => ({
@@ -131,37 +138,37 @@
         }));
 
         // formula dataview
-        const dataviewAggregatedTotal = new carto.viz.dataview.Formula(layer, 'aggregated_total', {
-          operation: 'count',
+        const dataviewAggregatedTotal = new carto.viz.dataview.Formula(layer, FIELD_1_TRIPS, {
+          operation: 'sum',
           spatialFilter: 'viewport'
         });
         new carto.viz.widget.Formula('#widgetAggregatedTotal', dataviewAggregatedTotal);
 
         // basic popup
-        layer.setPopupHover([
+        layer.setPopupClick([
           {
-            attr: 'aggregated_total',
-            title: 'Aggregated total'
+            attr: FIELD_1_TRIPS,
+            title: 'Aggregated total',
+            format: value => `${value} trips`
           },
           {
-            attr: 'avg_fare_amount',
+            attr: FIELD_2_FARE,
             title: 'Avg fare amount total',
             format: value => `${value.toFixed(1)} USD`
           },
           {
-            attr: 'avg_tip_percentage',
+            attr: FIELD_3_TIP_PCT,
             title: 'Avg tip percentage',
-            format: value => `${value.toFixed(0)} %`
+            format: value => `${value.toFixed(3)} %`
           }
         ]);
       }
 
       function updateStyle() {
         if (layer) {
-          const style = carto.viz.style.colorBins('aggregated_total', {
-            opacity: 1,
-            breaks: [...breaks].reverse(),
-            palette: [...palette].reverse()
+          const style = carto.viz.style.colorBins(FIELD_2_FARE, {
+            breaks: [2, 5, 10, 15, 20],
+            palette: 'purpor'
           });
           layer.setStyle(style);
         }
