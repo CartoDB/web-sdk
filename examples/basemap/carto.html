@@ -50,7 +50,6 @@
       </main>
     </div>
 
-    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.js"></script>
     <script src="https://unpkg.com/deck.gl@8.2.0/dist.min.js"></script>
     <script src="/dist/umd/index.min.js"></script>
 
@@ -61,7 +60,7 @@
         // by default you get a full world positron basemap, centered at (0, 0) coordinates
         const deckMap = carto.viz.createMap();
         // ... but all these variations are also allowed
-        //   const deckMap = carto.viz.createMap({ basemap: 'voyager'});
+        // const deckMap = carto.viz.createMap({ basemap: 'voyager'});
         //   const deckMap = carto.viz.createMap({ basemap: 'darkmatter', view: { zoom: 4 } });
         //   const deckMap = carto.viz.createMap({ basemap: 'positron', view: { zoom: 4, longitude: 3, latitude: 40, pitch: 45, bearing: 30 }, container: 'map' });
 

@@ -1,17 +1,25 @@
 import { createGoogleMap, createMap } from '../basemap';
 
+jest.mock('mapbox-gl', () => ({ Map: jest.fn() }));
+
 describe('createMap (mapbox)', () => {
+  beforeAll(() => {
+    const container = document.createElement('div');
+    container.setAttribute('id', 'map');
+    document.body.appendChild(container);
+  });
+
   it('should create a carto voyager world basemap when no params', () => {
-    expect(() => createMap().not.toThrow());
+    expect(() => createMap()).not.toThrow();
   });
 
   it('should allow using carto basemaps', () => {
     const cartoMapStyles = ['positron', 'voyager', 'darkmatter'];
     cartoMapStyles.forEach(mapStyle => {
-      expect(() => createMap({ basemap: mapStyle }).not.toThrow());
+      expect(() => createMap({ basemap: mapStyle })).not.toThrow();
     });
 
-    expect(() => createMap({ basemap: 'whatever' }).toThrow());
+    expect(() => createMap({ basemap: 'whatever' })).toThrow();
   });
 
   it('should allow specifying view params', () => {
@@ -24,8 +32,8 @@ describe('createMap (mapbox)', () => {
           pitch: 45,
           bearing: 30
         }
-      }).not.toThrow()
-    );
+      })
+    ).not.toThrow();
   });
 });
 

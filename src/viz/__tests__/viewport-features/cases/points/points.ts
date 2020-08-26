@@ -35,26 +35,26 @@ const viewportFeaturesResult = [
 const frustumPlanes: ViewportFrustumPlanes = {
   near: {
     distance: 4.09229740924007,
-    normal: new Vector3([0, 0, 1])
+    normal: new Vector3(0, 0, 1)
   },
   far: {
     distance: 0.043846043670429324,
-    normal: new Vector3([0, 0, -1])
+    normal: new Vector3(0, 0, -1)
   },
   right: {
     distance: 238.87795770091236,
-    normal: new Vector3([0.9473747608415422, 0, 0.32012663513121004])
+    normal: new Vector3(0.9473747608415422, 0, 0.32012663513121004)
   },
   left: {
     distance: -236.07070041610626,
-    normal: new Vector3([-0.9473747608415422, 0, 0.32012663513121004])
+    normal: new Vector3(-0.9473747608415422, 0, 0.32012663513121004)
   },
   top: {
     distance: 304.0887896731457,
-    normal: new Vector3([0, 0.9486832980505175, 0.3162277660168267])
+    normal: new Vector3(0, 0.9486832980505175, 0.3162277660168267)
   },
   bottom: {
     distance: -301.3157223854305,
-    normal: new Vector3([0, -0.9486832980505175, 0.3162277660168267])
+    normal: new Vector3(0, -0.9486832980505175, 0.3162277660168267)
   }
 };
