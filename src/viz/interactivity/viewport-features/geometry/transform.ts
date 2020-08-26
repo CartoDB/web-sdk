@@ -44,7 +44,7 @@ export function getTransformationMatrixFromTile(tile: { x: number; y: number; z:
   const xOffset = (WORLD_SIZE * tile.x) / worldScale;
   const yOffset = WORLD_SIZE * (1 - tile.y / worldScale);
 
-  return new Matrix4().translate([xOffset, yOffset, 0]).scale([xScale, yScale, 1]);
+  return new Matrix4(null).translate([xOffset, yOffset, 0]).scale([xScale, yScale, 1]);
 }
 
 export function transformGeometryCoordinatesToCommonSpaceByMatrix(
