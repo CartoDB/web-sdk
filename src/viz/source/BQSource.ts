@@ -12,23 +12,35 @@ interface BQSourceProps extends SourceProps {
 }
 
 // https://bq1.cartocdn.com/tilesjson?t={project}.{dataset}.{tileset_table_name}
-const baseURL = 'https://bq1.cartocdn.com/tilesjson';
+const DEFAULT_TILEJSON_ENDPOINT = 'https://bq1.cartocdn.com/tilesjson';
+
+interface BQSourceOptions {
+  tileJsonEndpoint: string;
+}
 
 export class BQSource extends Source {
-  // _dataset it should be a valid dataset name for a BQ tileset
-  protected _dataset: string;
-  protected _props?: BQSourceProps;
-  protected _metadata?: SourceMetadata;
+  // #region Private props
+  private _dataset: string;
+  private _tileJsonEndpoint: string;
+  private _props?: BQSourceProps;
+  private _metadata?: SourceMetadata;
 
-  // constructor(dataset: string, options: SourceOptions = {}) {
-  constructor(dataset: string) {
+  // #endregion
+
+  // #region Public methods
+  constructor(
+    dataset: string,
+    options: BQSourceOptions = { tileJsonEndpoint: DEFAULT_TILEJSON_ENDPOINT }
+  ) {
     super(`CARTOBQ-${uuidv4()}`);
     this.sourceType = 'BQ';
 
     this._dataset = dataset;
+
+    const { tileJsonEndpoint } = options;
+    this._tileJsonEndpoint = tileJsonEndpoint;
   }
 
-  // #region Public
   /**
    * Instantiate the map, getting proper stats for input fields
    */
@@ -39,7 +51,8 @@ export class BQSource extends Source {
 
     this.needsInitialization = false;
     // https://bq1.cartocdn.com/tilesjson?t={project}.{dataset}.{tileset_table_name}
-    const url = `${baseURL}?t=${this._dataset}`;
+    // right now dataset = '{project}.{dataset}.{tileset_table_name}'
+    const url = `${this._tileJsonEndpoint}?t=${this._dataset}`;
     const tilejsonClient = new TileJsonClient();
     const tilejsonInstance: TileJsonInstance = await tilejsonClient.getTilesetInfoFrom(url);
 
@@ -103,9 +116,9 @@ export class BQSource extends Source {
     return this._props;
   }
 
-  // #endregion Public
+  // #endregion
 
-  // #region Private
+  // #region Private methods
   private _extractMetadataFrom(tilejson: TileJsonInstance) {
     console.error(`METADATA FOR BQSOURCE NOT IMPLEMENTED YET`);
 
@@ -118,5 +131,5 @@ export class BQSource extends Source {
     const metadata = { geometryType, stats: [] };
     return metadata;
   }
-  // #endregion Private
+  // #endregion
 }
