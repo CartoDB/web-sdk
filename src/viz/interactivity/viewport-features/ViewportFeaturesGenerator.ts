@@ -4,6 +4,7 @@ import { Matrix4 } from '@math.gl/core';
 import { GeoJSON, Feature } from 'geojson';
 import { GeoJsonLayer, IconLayer } from '@deck.gl/layers';
 import { SourceError } from '@/viz/errors/source-error';
+import { isVariableDefined } from '@/core/utils/variables';
 import { selectPropertiesFrom } from '../../utils/object';
 import { ViewportTile } from '../../declarations/deckgl';
 import { GeometryData, ViewportFrustumPlanes } from './geometry/types';
@@ -18,7 +19,7 @@ const DEFAULT_OPTIONS = {
   uniqueIdProperty: 'cartodb_id'
 };
 
-const FALLBACK_ID_PROPERTY = 'id';
+const ID_PROPERTY = 'id';
 
 /**
  * Class to obtain features from the current viewport.
@@ -163,7 +164,7 @@ export class ViewportFeaturesGenerator {
 
   private getMVTViewportFilteredFeatures(selectedTiles: ViewportTile[], properties: string[]) {
     const currentFrustumPlanes = this.getViewport().getFrustumPlanes();
-    const featureCache = new Set<string>(); // don't assume just number (the most common use case, eg cartodb_id)
+    const featureCache = new Set<number | string>(); // don't assume just number (the most common use case, eg cartodb_id)
 
     return selectedTiles
       .map(tile => {
@@ -192,7 +193,7 @@ export class ViewportFeaturesGenerator {
       return false;
     }
 
-    const featureId: string = this.getFeatureId(feature);
+    const featureId = this.getFeatureId(feature);
 
     if (featureCache.has(featureId)) {
       // Prevent checking feature across tiles
@@ -215,20 +216,27 @@ export class ViewportFeaturesGenerator {
     return isInside;
   }
 
-  private getFeatureId(feature: GeoJSON.Feature): string {
+  private getFeatureId(feature: GeoJSON.Feature): number | string {
+    if (!feature.properties && feature[ID_PROPERTY]) {
+      // According to the GeoJSON Format Specification:
+      //    "If a feature has a commonly used identifier, that identifier should be included as
+      //    a member of the feature object with the name "id"."
+      return feature[ID_PROPERTY] as number | string;
+    }
+
     if (!feature.properties) {
-      throw new SourceError(`The feature has no properties: ${feature}`);
-    }
-
-    let id = feature.properties[this._uniqueIdProperty] || feature[FALLBACK_ID_PROPERTY];
-
-    if (typeof id === 'number') {
-      id = id.toString(); // it should be safe to assume an integer here as key...
-    }
-
-    if (typeof id !== 'string') {
       throw new SourceError(
-        `Just an Integer or a String value is allowed for the id field in the feature (found: ${id})`
+        `No feature.id nor properties in the feature to get a required unique id`
+      );
+    }
+
+    const customUniqueId = feature.properties[this._uniqueIdProperty];
+    const hasCustomUniqueId = isVariableDefined(customUniqueId);
+    const id = hasCustomUniqueId ? customUniqueId : feature[ID_PROPERTY];
+
+    if (typeof id !== 'number' && typeof id !== 'string') {
+      throw new SourceError(
+        `An Integer or a String value is required for the id field in the feature (found: ${id})`
       );
     }
 
@@ -294,7 +302,7 @@ interface ViewportFeaturesGeneratorOptions {
 }
 
 interface InsideViewportCheckOptions {
-  featureCache: Set<string>;
+  featureCache: Set<number | string>;
   transformationMatrix: Matrix4;
   currentFrustumPlanes: ViewportFrustumPlanes;
 }
