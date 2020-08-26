@@ -7,7 +7,7 @@
       content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0"
     />
 
-    <title>Web SDK Mini-App Example</title>
+    <title>NY City & taxi trips</title>
 
     <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.css" rel="stylesheet" />
 
@@ -21,14 +21,14 @@
         <div class="as-toolbar__item">
           <img src="../mini-app/pride-logo.png" width="75px;" alt="Logo" />
         </div>
-        <p class="as-toolbar__item" style="font-size: 16px;">Web SDK Mini-App Example</p>
+        <p class="as-toolbar__item" style="font-size: 16px;">NY City & taxi trips</p>
       </div>
     </header>
 
     <!-- Responsive content -->
     <as-responsive-content>
       <!-- Left sidebar -->
-      <aside class="as-sidebar as-sidebar--left" data-name="Ports">
+      <aside class="as-sidebar as-sidebar--left" data-name="Legend">
         <div class="as-container">
           <section class="as-box">
             <as-legend heading="Aggregated total" description="Write a description here">
@@ -46,7 +46,7 @@
       </main>
 
       <!-- Right sidebar -->
-      <aside class="as-sidebar as-sidebar--right" data-name="Commerce">
+      <aside class="as-sidebar as-sidebar--right" data-name="Taxi data">
         <div class="as-container">
           <section class="as-box">
             <as-formula-widget
@@ -92,26 +92,32 @@
       const palette = ['#009392', '#39b185', '#9ccb86', '#e9e29c', '#eeb479', '#e88571', '#cf597e'];
 
       async function initialize() {
-        carto.auth.setDefaultCredentials({ username: 'public' });
-
+        // basemap
         const deckMap = carto.viz.createMap({
           view: {
             zoom: 8,
-            longitude: -73.99360656738281,
-            latitude: 40.73685214795608
+            longitude: -73.9936065,
+            latitude: 40.7368521
           }
         });
-        const bq = new carto.viz.source.BQ(
-          'cartodb-gcp-backend-data-team.carto_tilesets.nyc_taxi_2015_2016'
-        );
+
+        // bq source
+        const tileJsonEndpoint = 'https://us-central1-bqtiler-staging.cloudfunctions.net/tilejson'; // for staging
+        const bq = new carto.viz.source.BQ('bqtiler-staging.maps.nyc_taxi_demo_id', {
+          tileJsonEndpoint
+        });
+        // const bq = new carto.viz.source.BQ('bqtiler-staging.maps.nyc_taxi_demo_id') // for PROD
+
+        // manual style
         const style = carto.viz.style.colorBins('aggregated_total', {
-          opacity: 1,
           breaks: breaks,
-          palette: palette
+          palette: palette,
+          opacity: 1
         });
         layer = new carto.viz.Layer(bq, style);
         await layer.addTo(deckMap);
 
+        // manual legend
         const legendBreaks = [0, ...breaks, '> 1000000'];
         const legend = document.querySelector('#legend');
         legend.data = palette.map((p, i) => ({
@@ -124,12 +130,14 @@
           width: 5
         }));
 
+        // formula dataview
         const dataviewAggregatedTotal = new carto.viz.dataview.Formula(layer, 'aggregated_total', {
           operation: 'count',
           spatialFilter: 'viewport'
         });
         new carto.viz.widget.Formula('#widgetAggregatedTotal', dataviewAggregatedTotal);
 
+        // basic popup
         layer.setPopupHover([
           {
             attr: 'aggregated_total',
@@ -137,11 +145,13 @@
           },
           {
             attr: 'avg_fare_amount',
-            title: 'Avg fare amount total'
+            title: 'Avg fare amount total',
+            format: value => `${value.toFixed(1)} USD`
           },
           {
             attr: 'avg_tip_percentage',
-            title: 'Avg tip percentage'
+            title: 'Avg tip percentage',
+            format: value => `${value.toFixed(0)} %`
           }
         ]);
       }
