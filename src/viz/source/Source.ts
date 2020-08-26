@@ -8,7 +8,7 @@ import { ColumnFilters } from '../filters/types';
 
 export type GeometryType = 'Point' | 'Line' | 'Polygon';
 
-export type SourceType = 'SQLSource' | 'DatasetSource' | 'DOSource' | 'GeoJSONSource';
+export type SourceType = 'SQLSource' | 'DatasetSource' | 'DOSource' | 'GeoJSONSource' | 'BQSource';
 
 export interface Stats {
   min: number;
