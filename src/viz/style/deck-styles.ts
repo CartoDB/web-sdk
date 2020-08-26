@@ -67,7 +67,7 @@ export function getStyleValue(
   return opts[variable];
 }
 
-export interface BasicOptionsStyle {
+interface BasicOptionsStyle {
   // Color: hex, rgb or named color value.
   // Defaults is '#EE4D5A' points, '#4CC8A3'lines and '#826DBA' polygons
   color: string;
@@ -83,6 +83,8 @@ export interface BasicOptionsStyle {
   // Default is false.
   viewport: boolean;
 }
+
+export type { BasicOptionsStyle };
 
 export function getStyles(geometryType?: GeometryType, options: Partial<BasicOptionsStyle> = {}) {
   if (!geometryType) {
