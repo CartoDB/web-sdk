@@ -36,6 +36,7 @@ export interface CategoryFieldStats {
 
 export interface SourceMetadata {
   geometryType?: GeometryType;
+  uniqueIdProperty?: string;
   stats: (NumericFieldStats | CategoryFieldStats)[];
 }
 

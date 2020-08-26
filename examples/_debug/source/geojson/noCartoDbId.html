@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>colorBins with common GeoJSON</title>
+
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.css"
+    />
+
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://libs.cartocdn.com/airship-style/v2.4/airship.min.css"
+    />
+
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+      }
+
+      #map {
+        width: 100vw;
+        height: 100vh;
+      }
+    </style>
+  </head>
+
+  <body>
+    <section id="map"></section>
+
+    <!-- Map libraries-->
+    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.js"></script>
+    <script src="https://unpkg.com/deck.gl@8.2.0/dist.min.js"></script>
+    <script src="https://libs.cartocdn.com/airship-components/v2.4/airship.js"></script>
+
+    <script src="/dist/umd/index.min.js"></script>
+
+    <script>
+      async function initializePolygons() {
+        carto.auth.setDefaultCredentials({ username: 'public' });
+        const data = await fetch('./data.json').then(response => response.json());
+
+        const deckMap = carto.viz.createMap({
+          basemap: 'voyager',
+          view: {
+            longitude: 0,
+            latitude: 0,
+            zoom: 1
+          }
+        });
+
+        // style
+        const style = carto.viz.style.colorBins('value', {
+          size: 30,
+          palette: 'ORYEL',
+          viewport: true
+        });
+
+        // geojson source (external, to allow custom options)
+        const geojsonSource = new carto.viz.source.GeoJSON(data);
+        // const geojsonSource = new carto.viz.source.GeoJSON(data, { uniqueIdProperty: 'name' });
+
+        // basic layer, with interactivity styles
+        const layer = new carto.viz.Layer(geojsonSource, style, {
+          hoverStyle: 'default',
+          clickStyle: 'default'
+        });
+
+        // popup
+        layer.setPopupClick(['name', 'value']);
+
+        // dataview
+        const dataview = new carto.viz.dataview.Formula(layer, 'value', {
+          operation: 'sum',
+          spatialFilter: 'viewport' // data will be updated on every viewport change (remove for 'global')
+        });
+        dataview.on('dataUpdate', async () => {
+          const data = await dataview.getData();
+          console.log('sum: ', data);
+        });
+
+        layer.addTo(deckMap);
+        window.layer = layer;
+      }
+
+      initializePolygons();
+    </script>
+  </body>
+</html>

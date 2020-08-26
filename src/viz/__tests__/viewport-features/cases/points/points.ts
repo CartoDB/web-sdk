@@ -2,7 +2,15 @@ import { Vector3 } from '@math.gl/core';
 import { ViewportFrustumPlanes } from '../../../../interactivity/viewport-features/geometry/types';
 import tiles from './tiles.json';
 
-export { name, tiles, viewportFeaturesColumns, viewportFeaturesResult, frustumPlanes };
+export {
+  name,
+  tiles,
+  viewportFeaturesColumns,
+  viewportFeaturesResult,
+  viewportFeaturesCount,
+  viewportFeaturesCountWithCustomId,
+  frustumPlanes
+};
 
 const name = 'Points';
 
@@ -31,6 +39,9 @@ const viewportFeaturesResult = [
     pop_min: 33125
   }
 ];
+const viewportFeaturesCount = 3;
+const viewportFeaturesCountWithCustomId = 4;
+// :top there is a "fake duplicated record" (Madrid), to test custom_id
 
 const frustumPlanes: ViewportFrustumPlanes = {
   near: {

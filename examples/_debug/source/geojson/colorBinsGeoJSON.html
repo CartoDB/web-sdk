@@ -3,13 +3,18 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>GeoJSON Layer with CARTO Tiles Example</title>
+    <title>colorBins with common GeoJSON</title>
 
-    <!-- Custom CSS -->
     <link
       rel="stylesheet"
       type="text/css"
       href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.css"
+    />
+
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://libs.cartocdn.com/airship-style/v2.4/airship.min.css"
     />
 
     <style>
@@ -31,6 +36,7 @@
     <!-- Map libraries-->
     <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.js"></script>
     <script src="https://unpkg.com/deck.gl@8.2.0/dist.min.js"></script>
+    <script src="https://libs.cartocdn.com/airship-components/v2.4/airship.js"></script>
 
     <script src="/dist/umd/index.min.js"></script>
 
@@ -38,7 +44,8 @@
       async function initializePolygons() {
         carto.auth.setDefaultCredentials({ username: 'public' });
         const data = await fetch(
-          'https://public.carto.com/api/v2/sql?api_key=default_public&q=select* from ne_50m_admin_0_countries&format=geojson'
+          './data.json'
+          // 'https://public.carto.com/api/v2/sql?api_key=default_public&q=select* from ne_50m_admin_0_countries&format=geojson'
         ).then(response => response.json());
 
         const deckMap = carto.viz.createMap({
@@ -46,13 +53,26 @@
           view: {
             longitude: 0,
             latitude: 0,
-            zoom: 0
+            zoom: 1
           }
         });
 
-        const style = carto.viz.style.colorBins('gdp_md_est');
-        const layer = new carto.viz.Layer(data, style);
+        const style = carto.viz.style.colorBins('value', {
+          size: 30,
+          palette: 'bold', // 'ORYEL',
+          viewport: true
+        });
+        // const style = carto.viz.style.colorBins('gdp_md_est');
+        const geojsonSource = new carto.viz.source.GeoJSON(data);
+        const layer = new carto.viz.Layer(geojsonSource, style, {
+          hoverStyle: 'default',
+          clickStyle: 'default'
+        });
+        layer.setPopupClick(['name', 'value']);
+
         layer.addTo(deckMap);
+
+        window.layer = layer;
       }
 
       initializePolygons();

@@ -2,7 +2,15 @@ import { Vector3 } from '@math.gl/core';
 import { ViewportFrustumPlanes } from '../../../../interactivity/viewport-features/geometry/types';
 import tiles from './tiles.json';
 
-export { name, tiles, viewportFeaturesColumns, viewportFeaturesResult, frustumPlanes };
+export {
+  name,
+  tiles,
+  viewportFeaturesColumns,
+  viewportFeaturesResult,
+  viewportFeaturesCount,
+  viewportFeaturesCountWithCustomId,
+  frustumPlanes
+};
 
 const name = 'Polygons';
 
@@ -14,6 +22,9 @@ const viewportFeaturesResult = [
     pop_est: 4213418
   }
 ];
+const viewportFeaturesCount = 1;
+const viewportFeaturesCountWithCustomId = 3;
+// :top fake 3 different features (same cartodb_id 166 for different portions but different custom_id)
 
 const frustumPlanes: ViewportFrustumPlanes = {
   near: {

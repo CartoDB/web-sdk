@@ -16,12 +16,12 @@ import { sourceErrorTypes, SourceError } from '../errors/source-error';
 import { FiltersCollection } from '../filters/FiltersCollection';
 import { ColumnFilters } from '../filters/types';
 
-export interface SourceOptions {
+export interface SQLSourceOptions {
   credentials?: Credentials;
   mapOptions?: MapOptions;
 }
 
-const DEFAULT_ID_PROPERTY = 'cartodb_id';
+export const DEFAULT_ID_PROPERTY = 'cartodb_id';
 
 export const defaultMapOptions: MapOptions = {
   vectorExtent: 2048,
@@ -71,7 +71,7 @@ export class SQLSource extends Source {
     SQLFilterApplicator
   );
 
-  constructor(sql: string, options: SourceOptions = {}) {
+  constructor(sql: string, options: SQLSourceOptions = {}) {
     super(`CARTO-SQL-${uuidv4()}`);
     this.sourceType = 'SQLSource';
 
@@ -250,7 +250,7 @@ export class SQLSource extends Source {
     }
 
     const fieldStats = this.getCompleteFieldStats(stats);
-    const metadata = { geometryType, stats: fieldStats };
+    const metadata = { geometryType, uniqueIdProperty: DEFAULT_ID_PROPERTY, stats: fieldStats };
     return metadata;
   }
 
