@@ -232,11 +232,7 @@ export class Layer extends WithEvents implements StyledLayer {
         }
       },
       onAfterRender: () => {
-        debounce(
-          () => this._sendDataEvent('onAfterRender'),
-          OPTION_DEBOUNCE_DELAY,
-          this.setOptionScope
-        )();
+        this._sendDataEvent('onAfterRender');
       }
     });
 
@@ -598,11 +594,7 @@ export class Layer extends WithEvents implements StyledLayer {
           styleProperties.onViewportLoad(...args);
         }
 
-        debounce(
-          () => this._sendDataEvent('onViewportLoad'),
-          OPTION_DEBOUNCE_DELAY,
-          this.setOptionScope
-        )();
+        this._sendDataEvent('onViewportLoad');
       },
       onClick: this._interactivity.onClick.bind(this._interactivity),
       onHover: this._interactivity.onHover.bind(this._interactivity)
@@ -708,27 +700,38 @@ export class Layer extends WithEvents implements StyledLayer {
    * Manage data state and asociated events
    */
   private _sendDataEvent(referer: 'onViewportLoad' | 'onAfterRender') {
-    const isGeoJsonLayer = this._source.sourceType === 'GeoJSON';
+    const isGeoJsonLayer = this._source.sourceType === 'GeoJSONSource';
 
     if (
       this.dataState === DATA_STATES.STARTING &&
       (isGeoJsonLayer || referer === 'onViewportLoad')
     ) {
       this.emit(LayerEvent.DATA_READY);
-      // this.emit(LayerEvent.DATA_CHANGED);
+      this._emitDataChanged();
       this.dataState = DATA_STATES.READY;
     }
 
     if (this.dataState === DATA_STATES.UPDATING || referer === 'onViewportLoad') {
-      // this.emit(LayerEvent.DATA_CHANGED);
+      this._emitDataChanged();
       this.dataState = DATA_STATES.READY;
     }
 
     if (referer === 'onViewportLoad') {
       this.emit(LayerEvent.TILES_LOADED);
     }
+  }
 
-    this.emit(LayerEvent.DATA_CHANGED);
+  /**
+   * We emit DATA_CHANGED event using a debounce function
+   * because _sendDataEvent is called a lot of time by
+   * onAfterRender and onViewportLoad events
+   */
+  private _emitDataChanged() {
+    debounce(
+      () => this.emit(LayerEvent.DATA_CHANGED),
+      OPTION_DEBOUNCE_DELAY,
+      this.setOptionScope
+    )();
   }
 
   /**
