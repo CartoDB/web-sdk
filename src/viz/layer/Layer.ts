@@ -695,7 +695,7 @@ export class Layer extends WithEvents implements StyledLayer {
     if (isChanging) {
       this.dataState = DATA_STATES.UPDATING;
 
-      const isGeoJsonLayer = this._source.sourceType === 'GeoJSONSource';
+      const isGeoJsonLayer = this._source.sourceType === 'GeoJSON';
 
       if (isGeoJsonLayer) {
         const viewport = new WebMercatorViewport(viewState);
@@ -708,7 +708,7 @@ export class Layer extends WithEvents implements StyledLayer {
    * Manage data state and asociated events
    */
   private _sendDataEvent(referer: 'onViewportLoad' | 'onAfterRender') {
-    const isGeoJsonLayer = this._source.sourceType === 'GeoJSONSource';
+    const isGeoJsonLayer = this._source.sourceType === 'GeoJSON';
 
     if (
       this.dataState === DATA_STATES.STARTING &&
