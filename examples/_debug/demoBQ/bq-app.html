@@ -29,17 +29,6 @@
 
     <!-- Responsive content -->
     <as-responsive-content>
-      <!-- Left sidebar -->
-      <aside class="as-sidebar as-sidebar--left" data-name="Legend">
-        <div class="as-container">
-          <section class="as-box">
-            <as-legend heading="Number of trips" description="Legend">
-              <as-legend-color-bins id="legend" slot="legends"></as-legend-color-bins>
-            </as-legend>
-          </section>
-        </div>
-      </aside>
-
       <!-- Map area -->
       <main class="as-main">
         <div class="as-map-area">
@@ -55,9 +44,14 @@
               id="widgetAggregatedTotal"
               class="as-p--16"
               heading="Number of trips"
-              description="(just on viewport)"
+              description="currently on screen"
             >
             </as-formula-widget>
+          </section>
+          <section class="as-box">
+            <as-legend heading="Legend" description="Number of trips">
+              <as-legend-color-bins id="legend" slot="legends"></as-legend-color-bins>
+            </as-legend>
           </section>
           <section class="as-box">
             <button class="as-btn as-btn--primary" onclick="updateStyle()">See fare ammount</button>
