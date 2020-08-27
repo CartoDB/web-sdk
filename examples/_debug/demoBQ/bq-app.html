@@ -40,10 +40,20 @@
       <aside class="as-sidebar as-sidebar--right" data-name="Taxi data">
         <div class="as-container">
           <section class="as-box">
+            <!-- aggregated_total (sum) -->
             <as-formula-widget
               id="widgetAggregatedTotal"
               class="as-p--16"
               heading="Number of trips"
+              description="currently on screen"
+            >
+            </as-formula-widget>
+
+            <!-- avg_fare_amount -->
+            <as-formula-widget
+              id="widgetAverageFare"
+              class="as-p--16"
+              heading="Average fare (USD)"
               description="currently on screen"
             >
             </as-formula-widget>
@@ -131,12 +141,18 @@
           width: 5
         }));
 
-        // formula dataview
+        // formula dataview (viewport)
         const dataviewAggregatedTotal = new carto.viz.dataview.Formula(layer, FIELD_1_TRIPS, {
           operation: 'sum',
           spatialFilter: 'viewport'
         });
         new carto.viz.widget.Formula('#widgetAggregatedTotal', dataviewAggregatedTotal);
+
+        const dataviewAverageFare = new carto.viz.dataview.Formula(layer, FIELD_2_FARE, {
+          operation: 'avg',
+          spatialFilter: 'viewport'
+        });
+        new carto.viz.widget.Formula('#widgetAverageFare', dataviewAverageFare);
 
         // basic popup
         layer.setPopupClick([
@@ -161,7 +177,7 @@
       function updateStyle() {
         if (layer) {
           const style = carto.viz.style.colorBins(FIELD_2_FARE, {
-            breaks: [2, 5, 10, 15, 20],
+            // breaks: [2, 5, 10, 15, 20],
             palette: 'purpor'
           });
           layer.setStyle(style);
