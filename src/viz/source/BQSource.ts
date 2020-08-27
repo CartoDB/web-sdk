@@ -3,7 +3,14 @@
 import { uuidv4 } from '@/core/utils/uuid';
 import { TileJsonInstance, TileJsonClient } from '@/tilejson';
 import { sourceErrorTypes, SourceError } from '@/viz/errors/source-error';
-import { Source, SourceProps, SourceMetadata, GeometryType } from './Source';
+import { TileStatsLayerAttribute } from '@/tilejson/TileJsonInstance';
+import {
+  Source,
+  SourceProps,
+  SourceMetadata,
+  NumericFieldStats,
+  CategoryFieldStats
+} from './Source';
 import { parseGeometryType } from '../style/helpers/utils';
 
 interface BQSourceProps extends SourceProps {
@@ -119,17 +126,60 @@ export class BQSource extends Source {
   // #endregion
 
   // #region Private methods
+
+  /**
+   * General metadata parsing from tilejson endpoint response
+   */
   private _extractMetadataFrom(tilejson: TileJsonInstance) {
     console.error(`METADATA FOR BQSOURCE NOT IMPLEMENTED YET`);
 
-    let geometryType: GeometryType | undefined;
-
-    if (tilejson.vector_layers) {
-      geometryType = parseGeometryType(tilejson.vector_layers[0].geometry_type);
+    if (!tilejson.vector_layers || !tilejson.tilestats) {
+      throw new SourceError('BQ Source does not provide required "vector_layers" or "tilestats"');
     }
 
-    const metadata = { geometryType, stats: [] };
+    // assuming just 1 layer
+    const layer = tilejson.vector_layers[0];
+    const geometryType = parseGeometryType(layer.geometry_type);
+    Object.keys(layer.fields).forEach(field => this.fields.add(field)); // all metadata available upfront
+
+    const fieldStats = this._getCompleteFieldStats(tilejson.tilestats.layers[0].attributes);
+
+    const metadata = { geometryType, stats: fieldStats };
     return metadata;
+  }
+
+  private _getCompleteFieldStats(attributes: TileStatsLayerAttribute[]) {
+    if (!this.fields.size) {
+      return [];
+    }
+
+    const fieldStats: (NumericFieldStats | CategoryFieldStats)[] = [];
+
+    this.fields.forEach(column => {
+      const columnStats = attributes.filter(attr => {
+        return attr.attribute === column;
+      })[0];
+
+      switch (columnStats.type) {
+        case 'Number':
+          fieldStats.push({
+            name: column,
+            min: columnStats.min,
+            max: columnStats.max,
+            avg: columnStats.avg,
+            sum: columnStats.sum,
+            sample: columnStats.sample
+          });
+          break;
+        default:
+          throw new SourceError(
+            'Unsupported type for stats',
+            sourceErrorTypes.UNSUPPORTED_STATS_TYPE
+          );
+      }
+    });
+
+    return fieldStats;
   }
   // #endregion
 }
