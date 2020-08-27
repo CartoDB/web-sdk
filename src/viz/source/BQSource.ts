@@ -131,8 +131,6 @@ export class BQSource extends Source {
    * General metadata parsing from tilejson endpoint response
    */
   private _extractMetadataFrom(tilejson: TileJsonInstance) {
-    console.error(`METADATA FOR BQSOURCE NOT IMPLEMENTED YET`);
-
     if (!tilejson.vector_layers || !tilejson.tilestats) {
       throw new SourceError('BQ Source does not provide required "vector_layers" or "tilestats"');
     }
