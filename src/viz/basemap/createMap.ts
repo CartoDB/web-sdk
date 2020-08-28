@@ -68,16 +68,21 @@ export function createMap(options: DeckGLMapOptions = DEFAULT_OPTIONS) {
     container: options.container || DEFAULT_OPTIONS.container
   };
 
-  const deckMap = new (window.deck.DeckGL as any)({
+  let props = {
     mapStyle: CartoMapStyle[chosenOptions.basemap.toUpperCase() as keyof typeof CartoMapStyle],
     container: chosenOptions.container,
     controller: true,
-    onLoad: options.onLoad,
     viewState: chosenOptions.view,
     onViewStateChange: ({ viewState }: IWithViewState) => {
       deckMap.setProps({ viewState });
     }
-  });
+  } as any;
+
+  if (options.onLoad) {
+    props = { ...props, onLoad: options.onLoad };
+  }
+
+  const deckMap = new (window.deck.DeckGL as any)(props);
 
   // add the overflow:hidden rule in order to prevent scroll-bar appearing
   // when popups reach the viewport boundary
