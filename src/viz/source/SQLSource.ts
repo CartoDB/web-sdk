@@ -73,7 +73,7 @@ export class SQLSource extends Source {
 
   constructor(sql: string, options: SQLSourceOptions = {}) {
     super(`CARTO-SQL-${uuidv4()}`);
-    this.sourceType = 'SQLSource';
+    this.sourceType = 'SQL';
 
     // Set object properties
     const { mapOptions = defaultMapOptions, credentials = defaultCredentials } = options;

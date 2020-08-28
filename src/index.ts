@@ -4,6 +4,7 @@ import { Credentials, setDefaultCredentials } from './auth';
 // Sources
 import {
   // DOSource,
+  BQSource,
   GeoJSONSource,
   SQLSource,
   DatasetSource
@@ -59,7 +60,8 @@ const source = {
   // DO: DOSource,
   GeoJSON: GeoJSONSource,
   SQL: SQLSource,
-  Dataset: DatasetSource
+  Dataset: DatasetSource,
+  BQ: BQSource
 };
 
 const basemaps = { createMap, createGoogleMap };

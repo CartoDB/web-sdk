@@ -542,15 +542,19 @@ export class Layer extends WithEvents implements StyledLayer {
     const layerProperties = await this._getLayerProps();
 
     // Create the Deck.gl instance
-    if (this._source.sourceType === 'SQLSource' || this._source.sourceType === 'DatasetSource') {
+    if (
+      this._source.sourceType === 'SQL' ||
+      this._source.sourceType === 'Dataset' ||
+      this._source.sourceType === 'BQ'
+    ) {
       this._deckLayer = new MVTLayer(layerProperties);
-    } else if (this._source.sourceType === 'GeoJSONSource') {
+    } else if (this._source.sourceType === 'GeoJSON') {
       if (layerProperties._isIconLayer) {
         this._deckLayer = new IconLayer(layerProperties);
       } else {
         this._deckLayer = new GeoJsonLayer(layerProperties);
       }
-    } else if (this._source.sourceType === 'DOSource') {
+    } else if (this._source.sourceType === 'DO') {
       this._deckLayer = new DOLayer(layerProperties);
     } else {
       throw new CartoLayerError('Unsupported source instance', layerErrorTypes.UNKNOWN_SOURCE);
@@ -671,7 +675,7 @@ export class Layer extends WithEvents implements StyledLayer {
     if (isChanging) {
       this.dataState = DATA_STATES.UPDATING;
 
-      const isGeoJsonLayer = this._source.sourceType === 'GeoJSONSource';
+      const isGeoJsonLayer = this._source.sourceType === 'GeoJSON';
 
       if (isGeoJsonLayer) {
         const viewport = new WebMercatorViewport(viewState);
@@ -684,7 +688,7 @@ export class Layer extends WithEvents implements StyledLayer {
    * Manage data state and asociated events
    */
   private _sendDataEvent(referer: 'onViewportLoad' | 'onAfterRender') {
-    const isGeoJsonLayer = this._source.sourceType === 'GeoJSONSource';
+    const isGeoJsonLayer = this._source.sourceType === 'GeoJSON';
 
     if (
       this.dataState === DATA_STATES.STARTING &&

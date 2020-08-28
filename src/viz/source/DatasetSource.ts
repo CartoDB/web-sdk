@@ -8,6 +8,6 @@ export class DatasetSource extends SQLSource {
     super(`SELECT * FROM ${dataset}`, options);
 
     this.id = `CARTO-${dataset}`;
-    this.sourceType = 'DatasetSource';
+    this.sourceType = 'Dataset';
   }
 }
