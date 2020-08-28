@@ -18,6 +18,7 @@ interface DeckGLMapOptions {
   basemap?: string;
   view?: DeckViewState;
   container?: HTMLElement | string;
+  onLoad?: () => void;
 }
 
 const DEFAULT_OPTIONS: DeckGLMapOptions = {
@@ -71,6 +72,7 @@ export function createMap(options: DeckGLMapOptions = DEFAULT_OPTIONS) {
     mapStyle: CartoMapStyle[chosenOptions.basemap.toUpperCase() as keyof typeof CartoMapStyle],
     container: chosenOptions.container,
     controller: true,
+    onLoad: options.onLoad,
     viewState: chosenOptions.view,
     onViewStateChange: ({ viewState }: IWithViewState) => {
       deckMap.setProps({ viewState });
