@@ -15,6 +15,7 @@ import { AggregatedColumn } from '../source/Source';
 import { DOLayer } from '../deck/DOLayer';
 import { getStyles, StyleProperties, Style } from '../style';
 import { ViewportFeaturesGenerator } from '../interactivity/viewport-features/ViewportFeaturesGenerator';
+import { ViewportFeaturesQueue } from '../interactivity/viewport-features/ViewportFeaturesQueue';
 import { PopupElement } from '../popups/Popup';
 import { StyledLayer } from '../style/layer-style';
 import { CartoLayerError, layerErrorTypes } from '../errors/layer-error';
@@ -52,6 +53,9 @@ export class Layer extends WithEvents implements StyledLayer {
 
   // Viewport Features Generator instance to get current features within viewport
   private _viewportFeaturesGenerator = new ViewportFeaturesGenerator();
+
+  // Viewport Features Queue instance to enqueue calls to ViewportFeaturesGenerator
+  private _viewportFeaturesQueue = new ViewportFeaturesQueue();
 
   // pickable events count
   private _pickableEventsCount = 0;
@@ -510,14 +514,23 @@ export class Layer extends WithEvents implements StyledLayer {
       });
     }
 
-    let features = await this._viewportFeaturesGenerator.getFeatures();
-    const filters = this.filtersCollection.getApplicatorInstance(excludedFilters);
+    const isQueueEmpty = this._viewportFeaturesQueue.isQueueEmpty();
+    const pendingPromise = this._viewportFeaturesQueue.enqueue();
 
-    if (this.filtersCollection.hasFilters()) {
-      features = features.filter(feature => filters.applicator(feature));
+    if (isQueueEmpty) {
+      this._viewportFeaturesGenerator.getFeatures().then(f => {
+        let features = f;
+        const filters = this.filtersCollection.getApplicatorInstance(excludedFilters);
+
+        if (this.filtersCollection.hasFilters()) {
+          features = features.filter(feature => filters.applicator(feature));
+        }
+
+        this._viewportFeaturesQueue.resolveQueue(features);
+      });
     }
 
-    return features;
+    return (await pendingPromise.catch(error => console.debug(error))) || [];
   }
 
   /**
@@ -727,6 +740,7 @@ export class Layer extends WithEvents implements StyledLayer {
    * onAfterRender and onViewportLoad events
    */
   private _emitDataChanged() {
+    this._viewportFeaturesQueue.clearQueue();
     debounce(
       () => this.emit(LayerEvent.DATA_CHANGED),
       OPTION_DEBOUNCE_DELAY,
@@ -835,6 +849,6 @@ interface LayerPosition {
   underLayerId?: string;
 }
 
-const OPTION_DEBOUNCE_DELAY = 100;
+const OPTION_DEBOUNCE_DELAY = 500;
 
 // #endregion Complement
