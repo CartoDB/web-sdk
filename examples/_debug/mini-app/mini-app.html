@@ -272,7 +272,7 @@
         
             // Remote dataview + widget
             const dataviewPortsRemote = new carto.viz.dataview.Category(
-                portsLayer.source,   
+                portsLayer.getSource(),   
                 'harborsize', 
                 {
                     operation: 'count'
