@@ -11,6 +11,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 - New `viewport` mode for style classifiers: quantiles, equal and stdev ([#119](https://github.com/CartoDB/web-sdk/pull/119/))
 - New `getId` method in `carto.viz.Layer` ([#113](https://github.com/CartoDB/web-sdk/pull/113/))
 - New `BQSource` for public datasets ([#122](https://github.com/CartoDB/web-sdk/pull/122/))
+- New `onLoad` option to `carto.viz.createMap` ([#121](https://github.com/CartoDB/web-sdk/pull/121/))
 
 ### Changed
 
