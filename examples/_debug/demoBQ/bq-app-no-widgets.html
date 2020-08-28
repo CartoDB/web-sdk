@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html dir="ltr" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0"
+    />
+
+    <title>NY City - Taxi trips, with CARTO & Google BQ</title>
+
+    <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.css" rel="stylesheet" />
+
+    <link rel="stylesheet" href="https://libs.cartocdn.com/airship-style/v2.4.0/airship.css" />
+  </head>
+
+  <body class="as-app-body as-app">
+    <!-- Header -->
+    <header class="as-toolbar" style="background-color: #d83426;">
+      <div class="as-toolbar__group">
+        <div class="as-toolbar__item">
+          <img src="../mini-app/pride-logo.png" width="75px;" alt="Logo" />
+        </div>
+        <p class="as-toolbar__item" style="font-size: 16px;">
+          NY City - Taxi trips, with CARTO & Google BQ
+        </p>
+      </div>
+    </header>
+
+    <!-- Responsive content -->
+    <as-responsive-content>
+      <!-- Map area -->
+      <main class="as-main">
+        <div class="as-map-area">
+          <div id="map"></div>
+        </div>
+      </main>
+
+      <!-- Right sidebar -->
+      <aside class="as-sidebar as-sidebar--right" data-name="Taxi data">
+        <div class="as-container">
+          <section class="as-box">
+            <as-legend heading="Legend" description="Number of trips">
+              <as-legend-color-bins id="legend" slot="legends"></as-legend-color-bins>
+            </as-legend>
+          </section>
+          <section class="as-box">
+            <button class="as-btn as-btn--primary" onclick="updateStyle()">See fare ammount</button>
+          </section>
+        </div>
+      </aside>
+    </as-responsive-content>
+
+    <!-- deck.gl -->
+    <script src="https://unpkg.com/deck.gl@8.2.0/dist.min.js"></script>
+
+    <!-- Mapbox -->
+    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.js"></script>
+
+    <!-- Web SDK -->
+    <script src="/dist/umd/index.min.js"></script>
+
+    <!-- Airship -->
+    <script
+      type="module"
+      src="https://libs.cartocdn.com/airship-components/v2.4.0/airship/airship.esm.js"
+    ></script>
+    <script
+      nomodule=""
+      src="https://libs.cartocdn.com/airship-components/v2.4.0/airship/airship.js"
+    ></script>
+
+    <!-- D3 format -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-format/1.3.0/d3-format.min.js"></script>
+
+    <script>
+      let layer;
+
+      const FIELD_1_TRIPS = 'aggregated_total';
+      const FIELD_2_FARE = 'avg_fare_amount';
+      const FIELD_3_TIP_PCT = 'avg_tip_percentage';
+
+      const breaks = [10, 100, 1000, 10000, 100000, 1000000];
+      const palette = ['#009392', '#39b185', '#9ccb86', '#e9e29c', '#eeb479', '#e88571', '#cf597e'];
+
+      async function initialize() {
+        // basemap
+        const deckMap = carto.viz.createMap({
+          view: {
+            zoom: 8,
+            longitude: -73.9936065,
+            latitude: 40.7368521
+          }
+        });
+
+        // bq source
+        const tileJsonEndpoint = 'https://us-central1-bqtiler-staging.cloudfunctions.net/tilejson'; // for staging
+        const bq = new carto.viz.source.BQ('bqtiler-staging.maps.nyc_taxi_points_demo_id', {
+          tileJsonEndpoint
+        });
+        // const bq = new carto.viz.source.BQ('bqtiler-staging.maps.nyc_taxi_demo_id') // for PROD
+
+        // manual style
+        const style = carto.viz.style.colorBins(FIELD_1_TRIPS, {
+          breaks: breaks,
+          palette: palette,
+          opacity: 1,
+          strokeWidth: 0,
+          size: 2
+        });
+        layer = new carto.viz.Layer(bq, style);
+        await layer.addTo(deckMap);
+
+        // manual (custom) legend
+        const legendBreaks = [0, ...breaks, '> 1000000'];
+        const legend = document.querySelector('#legend');
+        legend.data = palette.map((p, i) => ({
+          type: 'point',
+          color: p,
+          label:
+            i !== palette.length - 1
+              ? `${legendBreaks[i]} - ${legendBreaks[i + 1]}`
+              : legendBreaks[i + 1],
+          width: 5
+        }));
+
+        // basic popup
+        layer.setPopupClick([
+          {
+            attr: FIELD_1_TRIPS,
+            title: 'Aggregated total',
+            format: value => `${value} trips`
+          },
+          {
+            attr: FIELD_2_FARE,
+            title: 'Avg fare amount total',
+            format: value => `${value.toFixed(1)} USD`
+          },
+          {
+            attr: FIELD_3_TIP_PCT,
+            title: 'Avg tip percentage',
+            format: value => `${value.toFixed(3)} %`
+          }
+        ]);
+      }
+
+      function updateStyle() {
+        if (layer) {
+          const style = carto.viz.style.colorBins(FIELD_2_FARE, {
+            // breaks: [2, 5, 10, 15, 20],
+            palette: 'purpor',
+            strokeWidth: 0,
+            size: 2
+          });
+          layer.setStyle(style);
+        }
+      }
+
+      initialize();
+    </script>
+  </body>
+</html>
