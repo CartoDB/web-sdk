@@ -40,35 +40,6 @@
       <aside class="as-sidebar as-sidebar--right" data-name="Taxi data">
         <div class="as-container">
           <section class="as-box">
-            <!-- FORMULA: aggregated_total (sum) -->
-            <as-formula-widget
-              id="widgetAggregatedTotal"
-              class="as-p--16"
-              heading="Number of trips"
-              description="currently on screen"
-            >
-            </as-formula-widget>
-
-            <!-- FORMULA: avg_fare_amount -->
-            <as-formula-widget
-              id="widgetAverageFare"
-              class="as-p--16"
-              heading="Average fare (USD)"
-              description="currently on screen"
-            >
-            </as-formula-widget>
-
-            <!-- HISTOGRAM: avg_tip_percentage -->
-            <!-- <as-histogram-widget
-              id="histogramTipPercent"
-              class="as-p--16"
-              heading="Average tip percent %"
-              description="currently onn screen"
-              show-clear
-            >
-            </as-histogram-widget> -->
-          </section>
-          <section class="as-box">
             <as-legend heading="Legend" description="Number of trips">
               <as-legend-color-bins id="legend" slot="legends"></as-legend-color-bins>
             </as-legend>
@@ -153,29 +124,6 @@
               : legendBreaks[i + 1],
           width: 5
         }));
-
-        // formula dataview
-        const dataviewAggregatedTotal = new carto.viz.dataview.Formula(layer, FIELD_1_TRIPS, {
-          operation: 'sum',
-          spatialFilter: 'viewport'
-        });
-        new carto.viz.widget.Formula('#widgetAggregatedTotal', dataviewAggregatedTotal);
-
-        // formula dataview
-        const dataviewAverageFare = new carto.viz.dataview.Formula(layer, FIELD_2_FARE, {
-          operation: 'avg',
-          spatialFilter: 'viewport'
-        });
-        new carto.viz.widget.Formula('#widgetAverageFare', dataviewAverageFare);
-
-        // histogram dataview
-        // const dataviewHistogram = new carto.viz.dataview.Histogram(layer, FIELD_3_TIP_PCT, {
-        //   bins: 20,
-        //   start: 0,
-        //   end: 1,
-        //   spatialFilter: 'viewport'
-        // });
-        // new carto.viz.widget.Histogram('#histogramTipPercent', dataviewHistogram);
 
         // basic popup
         layer.setPopupClick([

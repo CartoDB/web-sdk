@@ -14,6 +14,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 - New `BQSource` for public datasets ([#122](https://github.com/CartoDB/web-sdk/pull/122/))
 - New `onLoad` option to `carto.viz.createMap` ([#121](https://github.com/CartoDB/web-sdk/pull/121/))
 - Better performance in Layer, with a debounced approach to DATA_CHANGED event ([#130](https://github.com/CartoDB/web-sdk/pull/130))
+- Better performance in ViewportFeaturesGenerator, with a queue system ([#131](https://github.com/CartoDB/web-sdk/pull/131))
 
 ### Changed
 
