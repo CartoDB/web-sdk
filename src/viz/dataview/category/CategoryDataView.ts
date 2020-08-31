@@ -1,4 +1,4 @@
-import { debounce } from '@/viz/utils';
+import { debounce } from '@/viz/core/utils';
 import { DataView, OPTION_CHANGED_DELAY } from '../DataView';
 import {
   CategoryOptions,
