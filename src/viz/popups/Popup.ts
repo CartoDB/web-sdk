@@ -7,8 +7,9 @@ const CLOSE_BUTTON_WIDTH = '17px';
 /**
  * Default options for the Popup
  */
-const defaultOptions: PopupOptions = {
+export const POPUP_DEFAULT_OPTIONS: PopupOptions = {
   closeButton: true,
+  autoWidth: false,
   containerClassName: 'carto-popup',
   contentClassName: 'as-body',
   closeButtonClassName: 'as-btn',
@@ -28,9 +29,9 @@ export class Popup {
   private _parentElement: HTMLElement | undefined;
   private _isOpen: boolean;
 
-  constructor(options: Partial<PopupOptions> = defaultOptions) {
+  constructor(options: Partial<PopupOptions> = POPUP_DEFAULT_OPTIONS) {
     this._options = {
-      ...defaultOptions,
+      ...POPUP_DEFAULT_OPTIONS,
       ...options
     };
     this._isOpen = false;
@@ -199,8 +200,13 @@ export class Popup {
     const containerElem = document.createElement('as-infowindow');
     containerElem.style.cssText = 'position: absolute; z-index: 1; pointer-events: none';
 
+    if (this._options.autoWidth) {
+      const extraForCloseBtn = this._options.closeButton ? ` + ${CLOSE_BUTTON_WIDTH}` : '';
+      const width = `calc(100%${extraForCloseBtn})`;
+      containerElem.setAttribute('width', width);
+    }
+
     if (this._options.closeButton) {
-      containerElem.setAttribute('width', `calc(100% + ${CLOSE_BUTTON_WIDTH})`);
       // enable pointer events
       containerElem.style.pointerEvents = 'inherit';
       // create the close button
@@ -319,7 +325,7 @@ export interface PopupElement {
 /**
  * Popup options
  */
-interface PopupOptions {
+export interface PopupOptions {
   /**
    * Flag to indicate whether a close
    * button is shown in the popup.
@@ -327,6 +333,12 @@ interface PopupOptions {
    * @defaultValue false
    */
   closeButton: boolean;
+
+  /**
+   * Flag to indicate whether width is automatically adjusted to content
+   * (until reaching the maximum width set on airship for the component)
+   */
+  autoWidth: boolean;
 
   /**
    * Class name for the popup container.

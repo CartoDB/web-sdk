@@ -1,5 +1,5 @@
 import { Deck, RGBAColor } from '@deck.gl/core';
-import { Popup, PopupElement } from '../popups/Popup';
+import { Popup, PopupElement, PopupOptions } from '../popups/Popup';
 import { Style, StyleProperties } from '../style/Style';
 import { StyledLayer } from '../style/layer-style';
 
@@ -107,10 +107,13 @@ export class LayerInteractivity {
    * This method creates popups every time the
    * user clicks on one or more features of the layer.
    */
-  public async setPopupClick(elements: PopupElement[] | string[] | null = []) {
+  public async setPopupClick(
+    elements: PopupElement[] | string[] | null = [],
+    options: Partial<PopupOptions> = {}
+  ) {
     // if the popup was not created yet then we create it and add it to the map
     if (!this._clickPopup) {
-      this._clickPopup = new Popup();
+      this._clickPopup = new Popup(options);
 
       if (this._deckInstance) {
         this._clickPopup.addTo(this._deckInstance);
@@ -120,10 +123,13 @@ export class LayerInteractivity {
     await this._popupHandler(InteractivityEvent.CLICK, this._clickPopup, elements);
   }
 
-  public async setPopupHover(elements: PopupElement[] | string[] | null = []) {
+  public async setPopupHover(
+    elements: PopupElement[] | string[] | null = [],
+    options: Partial<PopupOptions> = { closeButton: false }
+  ) {
     // if the popup was not created yet then we create it and add it to the map
     if (!this._hoverPopup) {
-      this._hoverPopup = new Popup({ closeButton: false });
+      this._hoverPopup = new Popup(options);
 
       if (this._deckInstance) {
         this._hoverPopup.addTo(this._deckInstance);
