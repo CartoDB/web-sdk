@@ -56,6 +56,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 - A better documentation, with a new set of guides & examples
 - New `isReady` method in `carto.viz.Layer` ([#101](https://github.com/CartoDB/web-sdk/pull/101))
 - New option to specify the visual property to use in color (`color` | `strokeColor`) and size (`size` | `strokeWidth`) style helpers ([#98](https://github.com/CartoDB/web-sdk/pull/98))
+- Better performance in Layer, with a debounced approach to DATA_CHANGED event ([#130](https://github.com/CartoDB/web-sdk/pull/130))
 
 ### Changed
 
