@@ -61,8 +61,19 @@
       let layer;
 
       function initialize() {
-        const deckMap = carto.viz.createMap({ basemap: 'darkmatter' });
-        const bq = new carto.viz.source.BQ('cartobq.maps.ais_tileset');
+          const deckMap = carto.viz.createMap({
+          view: {
+            zoom: 8,
+            longitude: -73.9936065,
+            latitude: 40.7368521
+          },
+          basemap: 'darkmatter'
+        });
+        
+        const tileJsonEndpoint = 'https://us-central1-bqtiler-staging.cloudfunctions.net/tilejson'; // staging
+        const bq = new carto.viz.source.BQ('bqtiler-staging.maps.nyc_taxi_demo_id', {
+          tileJsonEndpoint
+        });
         layer = new carto.viz.Layer(bq);
         layer.addTo(deckMap);
       }

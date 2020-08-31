@@ -7,10 +7,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 
 ### Added
 
-- Add new `Legend` widget for layers, working for these styles: basic, colorBins, colorCategories, colorContinuous, sizeBins, sizeCategories and sizeContinuous (#100, #102, #104, #105, #106, #107, #109 and #113)
+- Add new `carto.viz.Legend` widget for layers, working for these styles: basic, colorBins, colorCategories, colorContinuous, sizeBins, sizeCategories and sizeContinuous (#100, #102, #104, #105, #106, #107, #109 and #113)
 - New `viewport` mode for style classifiers: quantiles, equal and stdev ([#119](https://github.com/CartoDB/web-sdk/pull/119/))
+- Dynamic legends when using viewport styles ([#120](https://github.com/CartoDB/web-sdk/pull/120/))
 - New `getId` method in `carto.viz.Layer` ([#113](https://github.com/CartoDB/web-sdk/pull/113/))
 - New `BQSource` for public datasets ([#122](https://github.com/CartoDB/web-sdk/pull/122/))
+- New `onLoad` option to `carto.viz.createMap` ([#121](https://github.com/CartoDB/web-sdk/pull/121/))
 
 ### Changed
 
