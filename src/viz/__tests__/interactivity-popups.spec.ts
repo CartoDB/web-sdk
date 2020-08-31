@@ -3,7 +3,11 @@ import { InteractivityEvent, LayerInteractivity } from '../layer/LayerInteractiv
 import { Popup } from '../popups/Popup';
 
 const FAKE_COORDS = [0, 0];
-const FEATURE = { type: 'feature', properties: { cartodb_id: '15', pop: 10435000 } };
+const FEATURE = {
+  type: 'feature',
+  properties: { cartodb_id: '15', pop: 10435000 },
+  geometry: { type: 'Point', coordinates: [0, 0] }
+};
 
 let layer: Layer;
 let setContentMockClick: jasmine.Spy;
@@ -14,12 +18,36 @@ beforeEach(() => {
 
   const sourceData = [
     FEATURE,
-    { type: 'feature', properties: { cartodb_id: '3', pop: 30 } },
-    { type: 'feature', properties: { cartodb_id: '4', pop: 40 } },
-    { type: 'feature', properties: { cartodb_id: '5', pop: null } },
-    { type: 'feature', properties: { cartodb_id: '6', pop: undefined } },
-    { type: 'feature', properties: { cartodb_id: '7', pop: 50 } },
-    { type: 'feature', properties: { cartodb_id: '8', pop: 90 } }
+    {
+      type: 'feature',
+      properties: { cartodb_id: '3', pop: 30 },
+      geometry: { type: 'Point', coordinates: [0, 0] }
+    },
+    {
+      type: 'feature',
+      properties: { cartodb_id: '4', pop: 40 },
+      geometry: { type: 'Point', coordinates: [0, 0] }
+    },
+    {
+      type: 'feature',
+      properties: { cartodb_id: '5', pop: null },
+      geometry: { type: 'Point', coordinates: [0, 0] }
+    },
+    {
+      type: 'feature',
+      properties: { cartodb_id: '6', pop: undefined },
+      geometry: { type: 'Point', coordinates: [0, 0] }
+    },
+    {
+      type: 'feature',
+      properties: { cartodb_id: '7', pop: 50 },
+      geometry: { type: 'Point', coordinates: [0, 0] }
+    },
+    {
+      type: 'feature',
+      properties: { cartodb_id: '8', pop: 90 },
+      geometry: { type: 'Point', coordinates: [0, 0] }
+    }
   ];
 
   spyOn(layer, 'getViewportFeatures').and.returnValue(Promise.resolve(sourceData));

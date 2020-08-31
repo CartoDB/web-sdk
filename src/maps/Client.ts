@@ -2,7 +2,7 @@ import { AggregationType } from '@/data/operations/aggregation';
 import { uuidv4 } from '@/core/utils/uuid';
 import { Credentials } from '../auth';
 import errorHandlers from './errors';
-import { encodeParameter, getRequest, postRequest } from './utils';
+import { encodeParameter, getRequest, postRequest } from '../core/utils/request-utils';
 
 const REQUEST_GET_MAX_URL_LENGTH = 2048;
 const VECTOR_EXTENT = 2048;

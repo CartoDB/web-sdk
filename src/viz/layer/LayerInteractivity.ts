@@ -1,7 +1,8 @@
 import { Deck, RGBAColor } from '@deck.gl/core';
-import { Popup, PopupElement } from '../popups/Popup';
+import { Popup, PopupElement, REMOTE_COORD_FLAG } from '../popups/Popup';
 import { Style, StyleProperties } from '../style/Style';
 import { StyledLayer } from '../style/layer-style';
+import { DEFAULT_ID_PROPERTY } from '../source/SQLSource';
 
 export class LayerInteractivity {
   private _deckInstance?: Deck;
@@ -27,6 +28,12 @@ export class LayerInteractivity {
 
   private _clickPopupHandler?: InteractionHandler;
   private _hoverPopupHandler?: InteractionHandler;
+
+  /**
+   * Remote coordinates cache in order to prevent
+   * requesting a feature multiple times
+   */
+  private _remoteCoordinates: Record<string, number[]>;
 
   constructor(options: LayerInteractivityOptions) {
     this._layer = options.layer;
@@ -57,6 +64,8 @@ export class LayerInteractivity {
     }
 
     this._layerEmitFn = options.layerEmitFn;
+
+    this._remoteCoordinates = {};
   }
 
   public onClick(info: any, event: HammerInput) {
@@ -77,6 +86,12 @@ export class LayerInteractivity {
 
     if (eventType === InteractivityEvent.CLICK) {
       this._clickFeature = object;
+
+      // to be more accurate on points we use the real feature
+      // coordinates instead of the coordinates where the user clicked
+      if (this._clickFeature && this._clickFeature.geometry.type === 'Point') {
+        this.calculateRemoteCoordinates(this._clickFeature);
+      }
     } else if (eventType === InteractivityEvent.HOVER) {
       this._hoverFeature = object;
       this._setStyleCursor(info);
@@ -303,6 +318,26 @@ export class LayerInteractivity {
     }
 
     return new Style(defaultHighlightProps);
+  }
+
+  private calculateRemoteCoordinates(feature: Record<string, any>) {
+    const remoteCoords = this._remoteCoordinates[feature.properties[DEFAULT_ID_PROPERTY]];
+
+    if (remoteCoords) {
+      // eslint-disable-next-line no-param-reassign
+      feature.geometry.coordinates = remoteCoords;
+      // eslint-disable-next-line no-param-reassign
+      feature.properties[REMOTE_COORD_FLAG] = true;
+    } else {
+      this._layer.source.getRemoteFeatureCoordinates(feature).then(coords => {
+        this._remoteCoordinates[feature.properties[DEFAULT_ID_PROPERTY]] = coords;
+
+        if (this._clickPopup) {
+          // prevent rendering to avoid "jumping" effect
+          this._clickPopup.setCoordinates(coords, false);
+        }
+      });
+    }
   }
 }
 

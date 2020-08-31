@@ -14,6 +14,13 @@ const defaultOptions: PopupOptions = {
 };
 
 /**
+ * Attribute name for the flag used to check if
+ * the feature coordinates were already calculated
+ * from the SQL API
+ */
+export const REMOTE_COORD_FLAG = '__cdb_remote_coords';
+
+/**
  * @class
  * This class wraps the popup based on the
  * implementation.
@@ -65,14 +72,14 @@ export class Popup {
    *
    * @param coordinates with long lat.
    */
-  public setCoordinates(coordinates: number[]) {
+  public setCoordinates(coordinates: number[], render = true) {
     if (!coordinates || coordinates.length !== 2) {
       throw new CartoPopupError('Popup coordinates invalid', popupErrorTypes.COORDINATE_INVALID);
     }
 
     this._coordinates = coordinates;
 
-    if (this._deckInstance) {
+    if (render && this._deckInstance) {
       this._render();
     }
   }
@@ -154,23 +161,16 @@ export class Popup {
    * content.
    */
   public createHandler(elements: PopupElement[] | string[] | null = []) {
-    return ([features, coordinates]: [Record<string, any>[], number[], HammerInput]) => {
+    return async ([features, coordinates]: [Record<string, any>[], number[], HammerInput]) => {
       if (features.length > 0) {
         const popupContent: string = generatePopupContent(elements, features);
         this.open();
         this.setContent(popupContent);
 
-        // to be more accurate on points we use the feature
-        // coordinates instead of the coordinates where the user clicked
-        // if (features[0].geometry.type === 'Point') {
-        //   const featureCoordinates = pixels2coordinates(
-        //     features[0].geometry.coordinates,
-        //     this._deckInstance
-        //   );
-        //   this.setCoordinates(featureCoordinates);
-        // } else {
-        this.setCoordinates(coordinates);
-        // }
+        const popupCoordinates = features[0].properties[REMOTE_COORD_FLAG]
+          ? features[0].geometry.coordinates
+          : coordinates;
+        this.setCoordinates(popupCoordinates);
       } else {
         this.close();
       }
