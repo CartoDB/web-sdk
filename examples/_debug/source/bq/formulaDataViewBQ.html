@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Dataview Formula all modes</title>
+    <title>BQ - Dataview Formula all modes</title>
 
     <link
       rel="stylesheet"
@@ -48,7 +48,7 @@
               <p id="errorContainer" class="as-color--error"></p>
               <p>
                 <span class="as-caption">Column</span>
-                <input id="column" class="as-input" type="text" value="gdp" />
+                <input id="column" class="as-input" type="text" value="avg_fare_amount" />
               </p>
               <p>
                 <span class="as-caption">Operation</span>
@@ -80,8 +80,7 @@
     >
       <section class="as-body">
         <div>
-          <as-widget-header header="World commerce (remote)" subheader="Sum of GDP">
-          </as-widget-header>
+          <as-widget-header header="Global remote"> </as-widget-header>
           <p
             id="formula-remote"
             class="as-title as-m--4 as-p--0 as-font--medium"
@@ -104,8 +103,7 @@
     >
       <section class="as-body">
         <div>
-          <as-widget-header header="World commerce (remote-filtered)" subheader="Sum of GDP">
-          </as-widget-header>
+          <as-widget-header header="Viewport (remote-filtered)"> </as-widget-header>
           <p
             id="formula-remote-filtered"
             class="as-title as-m--4 as-p--0 as-font--medium"
@@ -128,8 +126,7 @@
     >
       <section class="as-body">
         <div>
-          <as-widget-header header="World commerce (local)" subheader="Sum of GDP">
-          </as-widget-header>
+          <as-widget-header header="Viewport local"> </as-widget-header>
           <p
             id="formula-local"
             class="as-title as-m--4 as-p--0 as-font--medium"
@@ -165,54 +162,69 @@
       let formulaViewportFast;
 
       async function initialize() {
-        carto.auth.setDefaultCredentials({ username: 'public' });
-        const deckMap = carto.viz.createMap();
-
-        const countriesLayer = new carto.viz.Layer('world_commerce');
-        await countriesLayer.addTo(deckMap);
-
-        formulaGlobal = new carto.viz.dataview.Formula(countriesLayer.getSource(), 'gdp', {
-          operation: 'sum'
+        const deckMap = carto.viz.createMap({
+          view: {
+            zoom: 8,
+            longitude: -73.9936065,
+            latitude: 40.7368521
+          }
         });
-        formulaViewportPrecise = new carto.viz.dataview.Formula(countriesLayer, 'gdp', {
-          operation: 'sum',
-          spatialFilter: 'viewport',
-          mode: 'precise'
+
+        const tileJsonEndpoint = 'https://us-central1-bqtiler-staging.cloudfunctions.net/tilejson'; // staging
+        const bq = new carto.viz.source.BQ('bqtiler-staging.maps.nyc_taxi_demo_id', {
+          tileJsonEndpoint
         });
-        formulaViewportFast = new carto.viz.dataview.Formula(countriesLayer, 'gdp', {
+        layer = new carto.viz.Layer(bq);
+
+        await layer.addTo(deckMap);
+
+        // -- DATAVIEW GLOBAL (FAST)
+        //
+        // formulaGlobal = new carto.viz.dataview.Formula(layer.getSource(), 'avg_fare_amount', {
+        //   operation: 'sum'
+        // });
+        // const remoteData = await formulaGlobal.getData();
+        //
+        // formulaRemoteElement.innerHTML = d3.format('.4s')(remoteData.result);
+        // formulaGlobal.on('dataUpdate', async () => {
+        //   const data = await formulaGlobal.getData();
+        //   formulaRemoteElement.innerHTML = d3.format('.4s')(data.result);
+        // });
+        //
+        // formulaGlobal.on('error', ([error]) => {
+        //   errorContainer.innerHTML = error.message;
+        // });
+
+        // -- DATAVIEW VIEWPORT (PRECISE)
+        //
+        // formulaViewportPrecise = new carto.viz.dataview.Formula(layer, 'avg_fare_amount', {
+        //   operation: 'sum',
+        //   spatialFilter: 'viewport',
+        //   mode: 'precise'
+        // });
+        // const remoteFilteredData = await formulaViewportPrecise.getData();
+        // formulaRemoteFilteredElement.innerHTML = d3.format('.4s')(remoteFilteredData.result);
+        // formulaViewportPrecise.on('dataUpdate', async () => {
+        //   const data = await formulaViewportPrecise.getData();
+        //   formulaRemoteFilteredElement.innerHTML = d3.format('.4s')(data.result);
+        // });
+
+        // formulaViewportPrecise.on('error', ([error]) => {
+        //   errorContainer.innerHTML = error.message;
+        // });
+
+        // -- DATAVIEW VIEWPORT (FAST)
+        //
+        formulaViewportFast = new carto.viz.dataview.Formula(layer, 'avg_fare_amount', {
           operation: 'sum',
           spatialFilter: 'viewport'
         });
-
-        // intializes the widgets
-        const remoteData = await formulaGlobal.getData();
-        formulaRemoteElement.innerHTML = d3.format('.4s')(remoteData.result);
-        const remoteFilteredData = await formulaViewportPrecise.getData();
-        formulaRemoteFilteredElement.innerHTML = d3.format('.4s')(remoteFilteredData.result);
         const localData = await formulaViewportFast.getData();
         formulaLocalElement.innerHTML = d3.format('.4s')(localData.result);
 
-        // bind events
         formulaViewportFast.on('dataUpdate', async () => {
           const data = await formulaViewportFast.getData();
           formulaLocalElement.innerHTML = d3.format('.4s')(data.result);
-        });
-
-        formulaGlobal.on('dataUpdate', async () => {
-          const data = await formulaGlobal.getData();
-          formulaRemoteElement.innerHTML = d3.format('.4s')(data.result);
-        });
-        formulaGlobal.on('error', ([error]) => {
-          errorContainer.innerHTML = error.message;
-        });
-
-        formulaViewportPrecise.on('dataUpdate', async () => {
-          const data = await formulaViewportPrecise.getData();
-          formulaRemoteFilteredElement.innerHTML = d3.format('.4s')(data.result);
-        });
-
-        formulaViewportPrecise.on('error', ([error]) => {
-          errorContainer.innerHTML = error.message;
         });
       }
 
@@ -222,11 +234,11 @@
 
         errorContainer.innerHTML = '';
 
-        formulaGlobal.column = column;
-        formulaGlobal.operation = operation;
+        // formulaGlobal.column = column;
+        // formulaGlobal.operation = operation;
 
-        formulaViewportPrecise.column = column;
-        formulaViewportPrecise.operation = operation;
+        // formulaViewportPrecise.column = column;
+        // formulaViewportPrecise.operation = operation;
 
         formulaViewportFast.column = column;
         formulaViewportFast.operation = operation;

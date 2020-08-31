@@ -10,7 +10,7 @@ import { uuidv4 } from '@/core/utils/uuid';
 import { WithEvents } from '@/core/mixins/WithEvents';
 import { DatasetSource, SQLSource, GeoJSONSource, Source } from '@/viz';
 import { LegendWidgetOptions, LegendProperties } from '@/viz/legend';
-import { debounce } from '@/viz/utils';
+import { debounce } from '@/viz/core/utils';
 import { AggregatedColumn } from '../source/Source';
 import { DOLayer } from '../deck/DOLayer';
 import { getStyles, StyleProperties, Style } from '../style';
@@ -713,7 +713,7 @@ export class Layer extends WithEvents implements StyledLayer {
    * Manage data state and asociated events
    */
   private _sendDataEvent(referer: 'onViewportLoad' | 'onAfterRender') {
-    const isGeoJsonLayer = this._source.sourceType === 'GeoJSONSource';
+    const isGeoJsonLayer = this._source.sourceType === 'GeoJSON';
 
     if (
       this.dataState === DATA_STATES.STARTING &&

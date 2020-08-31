@@ -3,7 +3,7 @@ import { Layer, Source } from '@/viz';
 import { Credentials } from '@/auth';
 import { Filter, ColumnFilters, SpatialFilters } from '@/viz/filters/types';
 import { AggregationType } from '@/data/operations/aggregation/';
-import { debounce } from '@/viz/utils';
+import { debounce } from '@/viz/core/utils';
 import { DataViewImpl, GetDataOptions } from './DataViewImpl';
 import { DataViewCalculation, DataViewMode } from './mode/DataViewMode';
 import { isGeoJSONSource, DataViewEvent } from './utils';

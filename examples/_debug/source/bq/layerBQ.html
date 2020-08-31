@@ -70,6 +70,11 @@
       function initialize() {
         const map = carto.viz.createMap();
         const bqSource = new carto.viz.source.BQ('cartobq.maps.ais_tileset');
+
+        //         const tileJsonEndpoint = 'https://us-central1-bqtiler-staging.cloudfunctions.net/tilejson'; // staging
+        // const bq = new carto.viz.source.BQ('bqtiler-staging.maps.nyc_taxi_demo_id', {
+        //   tileJsonEndpoint
+        // });
         // const bq = new carto.viz.source.BQ('cartobq.maps.osm_buildings');
         
         const layer = new carto.viz.Layer(bqSource);
