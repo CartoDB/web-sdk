@@ -36,18 +36,38 @@
 
     <script>
       async function initialize() {
-        const deckMap = carto.viz.createMap();
-        const field = 'aggregated_total';
+        const deckMap = carto.viz.createMap({
+          view: {
+            zoom: 8,
+            longitude: -73.9936065,
+            latitude: 40.7368521
+          }
+        });
+
+        const field = 'avg_fare_amount';
 
         // completely automatic, based on metadata
-        const style = carto.viz.style.colorBins(field);
+        // const style = carto.viz.style.colorBins(field);
 
-        // xxx
+        // custom method, global classifier
+        // const style = carto.viz.style.colorBins(field, {
+        //   method: 'equal' // 'quantiles', 'equal', 'stdev'
+        // });
 
-        // yyy
+        // viewport mode
+        const style = carto.viz.style.colorBins(field, {
+          method: 'stdev',
+          palette: 'earth',
+          strokeWidth: 0,
+          viewport: true
+        });
 
         // layer + style
-        const bq = new carto.viz.source.BQ('cartobq.maps.ais_tileset');
+        const tileJsonEndpoint = 'https://us-central1-bqtiler-staging.cloudfunctions.net/tilejson'; // staging
+        const bq = new carto.viz.source.BQ('bqtiler-staging.maps.nyc_taxi_demo_id', {
+          tileJsonEndpoint
+        });
+
         const layer = new carto.viz.Layer(bq, style);
         layer.addTo(deckMap);
       }
