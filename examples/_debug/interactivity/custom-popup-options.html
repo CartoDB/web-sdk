@@ -3,23 +3,22 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Add popup on click example</title>
+    <title>Custom popup options</title>
 
     <link
       rel="stylesheet"
       type="text/css"
       href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.css"
     />
+
     <link
       rel="stylesheet"
       type="text/css"
       href="https://libs.cartocdn.com/airship-style/v2.4/airship.min.css"
     />
-    <link
-      rel="stylesheet"
-      type="text/css"
-      href="https://libs.cartocdn.com/airship-icons/v2.4/icons.css"
-    />
+
+    <link rel="stylesheet" type="text/css" href="https://libs.cartocdn.com/airship-icons/v2.4/icons.css"/>
+
 
     <style>
       body {
@@ -44,8 +43,10 @@
               <div class="as-panel as-panel--top as-panel--right as-bg--ui-01">
                 <div class="as-container">
                   <section class="as-box">
-                    <h1 class="as-title">Pop-ups on click</h1>
-                    <p class="as-body">Configure pop-up windows on click</p>
+                    <h1 class="as-title">
+                      Pop-ups on hover with invalid format
+                    </h1>
+                    <p class="as-body">Configure pop-up windows on hover</p>
                   </section>
                 </div>
               </div>
@@ -77,10 +78,21 @@
           }
         });
 
-        const style = carto.viz.style.icon('./carto.jpg');
+        const sizeBinStyle = new carto.viz.style.sizeBins('pop_2015', {
+          sizeRange: [1, 50]
+        });
+        const populationLayer = new carto.viz.Layer('world_population_2015', sizeBinStyle);
 
-        const populationLayer = new carto.viz.Layer('world_population_2015', style);
-        populationLayer.setPopupClick(['cartodb_id', { attr: 'pop_2015', title: 'Population' }]);
+        const popupOptions = { autoWidth: true, closeButton: false };
+
+        await populationLayer.setPopupHover([
+        { attr: 'cartodb_id', title: null }
+        ], popupOptions);
+
+        await populationLayer.setPopupClick([
+          'cartodb_id',
+          { attr: 'pop_2015', title: 'Population' }
+        ]);
         await populationLayer.addTo(deckMap);
       }
       initialize();

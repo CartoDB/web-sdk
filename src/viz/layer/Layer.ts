@@ -16,7 +16,7 @@ import { DOLayer } from '../deck/DOLayer';
 import { getStyles, StyleProperties, Style } from '../style';
 import { ViewportFeaturesGenerator } from '../interactivity/viewport-features/ViewportFeaturesGenerator';
 import { ViewportFeaturesQueue } from '../interactivity/viewport-features/ViewportFeaturesQueue';
-import { PopupElement } from '../popups/Popup';
+import { PopupElement, PopupOptions } from '../popups/Popup';
 import { StyledLayer } from '../style/layer-style';
 import { CartoLayerError, layerErrorTypes } from '../errors/layer-error';
 import { LayerInteractivity, InteractivityEvent } from './LayerInteractivity';
@@ -386,22 +386,30 @@ export class Layer extends WithEvents implements StyledLayer {
    * Display a popup every time the user clicks on a feature
    *
    * @param {(PopupElement[] | string[] | null)} [elements=[]]
+   * @param {Partial<PopupOptions>} [options={}]
    * @memberof Layer
    */
-  public async setPopupClick(elements: PopupElement[] | string[] | null = []) {
+  public async setPopupClick(
+    elements: PopupElement[] | string[] | null = [],
+    options: Partial<PopupOptions> = {}
+  ) {
     this._addPopupFields(elements);
-    await this._interactivity.setPopupClick(elements);
+    await this._interactivity.setPopupClick(elements, options);
   }
 
   /**
    * Display a popup every time the user hovers over a feature
    *
    * @param {(PopupElement[] | string[] | null)} [elements=[]]
+   * @param {Partial<PopupOptions>} [options={ closeButton: false }]
    * @memberof Layer
    */
-  public async setPopupHover(elements: PopupElement[] | string[] | null = []) {
+  public async setPopupHover(
+    elements: PopupElement[] | string[] | null = [],
+    options: Partial<PopupOptions> = { closeButton: false, autoWidth: true }
+  ) {
     this._addPopupFields(elements);
-    await this._interactivity.setPopupHover(elements);
+    await this._interactivity.setPopupHover(elements, options);
   }
 
   /**
