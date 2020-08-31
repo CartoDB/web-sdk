@@ -10,6 +10,7 @@ import { uuidv4 } from '@/core/utils/uuid';
 import { WithEvents } from '@/core/mixins/WithEvents';
 import { DatasetSource, SQLSource, GeoJSONSource, Source } from '@/viz';
 import { LegendWidgetOptions, LegendProperties } from '@/viz/legend';
+import { debounce } from '@/viz/core/utils';
 import { AggregatedColumn } from '../source/Source';
 import { DOLayer } from '../deck/DOLayer';
 import { getStyles, StyleProperties, Style } from '../style';
@@ -61,6 +62,12 @@ export class Layer extends WithEvents implements StyledLayer {
   );
 
   private dataState: DATA_STATES = DATA_STATES.STARTING;
+
+  /**
+   * Debounce scope to prevent multiple calls
+   * to this._sendDataEvent('onAfterRender') and this._sendDataEvent('onViewportLoad')
+   */
+  private setOptionScope: { timeoutId?: number } = {};
 
   // #endregion
 
@@ -457,13 +464,18 @@ export class Layer extends WithEvents implements StyledLayer {
     dimensions.forEach(dimension => this._source.addField(dimension));
     columns.forEach(aggregatedColumn => this._source.addAggregatedColumn(aggregatedColumn));
 
-    return this.replaceDeckLayer();
+    if (this._source.needsInitialization) {
+      this.replaceDeckLayer();
+    }
   }
 
   // TODO not public ?
   addSourceField(field: string) {
     this._source.addField(field);
-    return this.replaceDeckLayer();
+
+    if (this._source.needsInitialization) {
+      this.replaceDeckLayer();
+    }
   }
 
   /**
@@ -695,18 +707,31 @@ export class Layer extends WithEvents implements StyledLayer {
       (isGeoJsonLayer || referer === 'onViewportLoad')
     ) {
       this.emit(LayerEvent.DATA_READY);
-      this.emit(LayerEvent.DATA_CHANGED);
+      this._emitDataChanged();
       this.dataState = DATA_STATES.READY;
     }
 
     if (this.dataState === DATA_STATES.UPDATING || referer === 'onViewportLoad') {
-      this.emit(LayerEvent.DATA_CHANGED);
+      this._emitDataChanged();
       this.dataState = DATA_STATES.READY;
     }
 
     if (referer === 'onViewportLoad') {
       this.emit(LayerEvent.TILES_LOADED);
     }
+  }
+
+  /**
+   * We emit DATA_CHANGED event using a debounce function
+   * because _sendDataEvent is called a lot of time by
+   * onAfterRender and onViewportLoad events
+   */
+  private _emitDataChanged() {
+    debounce(
+      () => this.emit(LayerEvent.DATA_CHANGED),
+      OPTION_DEBOUNCE_DELAY,
+      this.setOptionScope
+    )();
   }
 
   /**
@@ -809,5 +834,7 @@ interface LayerPosition {
   overLayerId?: string;
   underLayerId?: string;
 }
+
+const OPTION_DEBOUNCE_DELAY = 100;
 
 // #endregion Complement
