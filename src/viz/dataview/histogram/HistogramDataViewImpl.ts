@@ -30,12 +30,16 @@ export class HistogramDataViewImpl extends DataViewImpl<HistogramDataViewData> {
 
     try {
       const features = (await dataviewLocal.getSourceData(options)) as Record<string, number>[];
-      const sortedFeatures = features
-        .map(feature => feature[aggregatedColumnName] || feature[columnName])
-        .sort((a, b) => a - b);
+      let sortedFeatures: number[] = [];
 
-      const startValue = start ?? Math.min(...sortedFeatures);
-      const endValue = end ?? Math.max(...sortedFeatures);
+      if (start === null || start === undefined || end === null || end === undefined) {
+        sortedFeatures = features
+          .map(feature => feature[aggregatedColumnName] || feature[columnName])
+          .sort((a, b) => a - b);
+      }
+
+      const startValue = start ?? sortedFeatures[0];
+      const endValue = end ?? sortedFeatures[sortedFeatures.length - 1];
       let nulls = 0;
 
       const binsDistance = (endValue - startValue) / bins;

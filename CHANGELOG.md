@@ -15,6 +15,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 - New `onLoad` option to `carto.viz.createMap` ([#121](https://github.com/CartoDB/web-sdk/pull/121/))
 - Better performance in Layer, with a debounced approach to DATA_CHANGED event ([#130](https://github.com/CartoDB/web-sdk/pull/130))
 - Better performance in `carto.viz.layer.getViewportFeatures`, with a ViewportFeaturesGenerator using with a queue system ([#131](https://github.com/CartoDB/web-sdk/pull/131))
+- Better performance in `carto.viz.dataview.Histogram` with optimized calculations ([#133](https://github.com/CartoDB/web-sdk/pull/133))
 - Add new optional `autoWidth` option to `Popup`, to adjust to its content ([#80](https://github.com/CartoDB/web-sdk/pull/80/))
 
 ### Changed

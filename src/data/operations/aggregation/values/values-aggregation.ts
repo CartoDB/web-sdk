@@ -41,11 +41,11 @@ const aggregationFunctions: Record<AggregationType, Function> = {
   },
 
   [AggregationType.MIN](values: number[]) {
-    return Math.min(...values);
+    return values.reduce((a, b) => Math.min(a, b), Infinity);
   },
 
   [AggregationType.MAX](values: number[]) {
-    return Math.max(...values);
+    return values.reduce((a, b) => Math.max(a, b), -Infinity);
   },
 
   [AggregationType.SUM](values: number[]) {
