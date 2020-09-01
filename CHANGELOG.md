@@ -17,6 +17,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 - Better performance in `carto.viz.layer.getViewportFeatures`, with a ViewportFeaturesGenerator using with a queue system ([#131](https://github.com/CartoDB/web-sdk/pull/131))
 - Better performance in `carto.viz.dataview.Histogram` with optimized calculations ([#133](https://github.com/CartoDB/web-sdk/pull/133))
 - Add new optional `autoWidth` option to `Popup`, to adjust to its content ([#80](https://github.com/CartoDB/web-sdk/pull/80/))
+- Add new methods to `carto.viz.Layer` to control its visibility: show / hide / isVisible ([#134](https://github.com/CartoDB/web-sdk/pull/134/))
+
 
 ### Changed
 
