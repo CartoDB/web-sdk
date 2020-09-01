@@ -44,6 +44,10 @@
               <h4 class="as-subheader as-mb--12">
                 Add several CARTO layers to your map, using just multiple <em>carto.viz.Layer.addTo</em> calls
               </h4>
+              <div>
+                <!-- Clicking the button will toggle the ports layer visibility -->
+                <button class="as-btn as-btn--primary" onclick="toggleVisibility()">Show/Hide layer</button>
+              </div>
           </div>
         </div>
       </main>
@@ -54,6 +58,8 @@
     <script src="/dist/umd/index.min.js"></script>
 
     <script>
+      let ports;
+
       async function initialize() {
         carto.auth.setDefaultCredentials({ username: 'public' });
 
@@ -79,7 +85,7 @@
         const boundaries = new carto.viz.Layer('ne_50m_admin_0_boundary_lines_land');
         boundaries.addTo(deckMap);
 
-        const ports = new carto.viz.Layer('world_ports');
+        ports = new carto.viz.Layer('world_ports');
         ports.addTo(deckMap);
 
         /*
@@ -92,6 +98,14 @@
           and in general asynchronous code (vs the 'callback hell'). If you are not used to id, have
           a look at https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Asynchronous/Async_await
         */
+      }
+
+      function toggleVisibility(){
+        if(ports.isVisible()){
+          ports.hide();
+        } else {
+          ports.show();
+        }
       }
 
       initialize();
