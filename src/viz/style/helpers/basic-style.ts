@@ -32,7 +32,7 @@ export function basicStyle(options: Partial<BasicOptionsStyle> = {}) {
     let { label } = legendWidgetOptions;
 
     if (isEmpty(label)) {
-      label = layer.getId();
+      label = '';
     }
 
     return [
