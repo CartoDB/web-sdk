@@ -113,7 +113,8 @@
 
         const dataviewViewport = new carto.viz.dataview.Category(countriesLayer, 'continent', {
           operation: 'count',
-          spatialFilter: 'viewport' // data will be updated on every viewport change
+          spatialFilter: 'viewport', // data will be updated on every viewport change
+          mode: 'precise'
         });
 
         /*
@@ -124,7 +125,7 @@
           Widgets include a filtering feature out of the box, so you can display / hide the categories
           on the map
         */
-        new carto.viz.widget.Category('#category-global', dataviewGlobal);
+        // new carto.viz.widget.Category('#category-global', dataviewGlobal);
         new carto.viz.widget.Category('#category-viewport', dataviewViewport);
       }
 

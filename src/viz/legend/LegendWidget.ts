@@ -34,7 +34,7 @@ export class LegendWidget {
     if (layer.isReady()) {
       layer.getStyle().then(style => {
         if (style.viewport) {
-          layer.on(LayerEvent.TILES_LOADED, () => applyLegendData(legendWidget, layer, options));
+          layer.on(LayerEvent.DATA_CHANGED, () => applyLegendData(legendWidget, layer, options));
         }
       });
       applyLegendData(legendWidget, layer, options);
@@ -42,7 +42,7 @@ export class LegendWidget {
       layer.on(LayerEvent.DATA_READY, () => {
         layer.getStyle().then(style => {
           if (style.viewport) {
-            layer.on(LayerEvent.TILES_LOADED, () => applyLegendData(legendWidget, layer, options));
+            layer.on(LayerEvent.DATA_CHANGED, () => applyLegendData(legendWidget, layer, options));
           }
 
           applyLegendData(legendWidget, layer, options);

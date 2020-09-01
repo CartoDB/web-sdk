@@ -74,7 +74,7 @@ export class DataViewRemote extends DataViewMode {
       );
     }
 
-    this.dataOrigin.on(LayerEvent.TILES_LOADED, () => {
+    this.dataOrigin.on(LayerEvent.DATA_CHANGED, () => {
       const deckInstance = (this.dataOrigin as Layer).getMap();
 
       if (deckInstance === undefined) {
