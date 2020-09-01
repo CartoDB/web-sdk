@@ -8,7 +8,7 @@ const REQUEST_GET_MAX_URL_LENGTH = 2048;
 const VECTOR_EXTENT = 2048;
 const VECTOR_SIMPLIFY_EXTENT = 2048;
 
-export class Client {
+export class MapsApiClient {
   private _credentials: Credentials;
 
   constructor(credentials: Credentials) {

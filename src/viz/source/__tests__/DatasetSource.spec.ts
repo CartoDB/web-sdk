@@ -1,5 +1,5 @@
 import { Credentials, defaultCredentials, setDefaultCredentials } from '@/auth';
-import { Client } from '@/maps/Client';
+import { MapsApiClient } from '@/maps/MapsApiClient';
 import { DatasetSource } from '@/viz/source/DatasetSource';
 
 const TEST_CREDENTIALS = {
@@ -43,7 +43,7 @@ describe('DatasetSource', () => {
     beforeEach(() => {
       setDefaultCredentials({ ...TEST_CREDENTIALS });
 
-      Client.prototype.instantiateMapFrom = jest.fn().mockImplementation(() => {
+      MapsApiClient.prototype.instantiateMapFrom = jest.fn().mockImplementation(() => {
         throw new Error('Error fake');
       });
     });
@@ -94,7 +94,7 @@ describe('DatasetSource', () => {
           }
         };
       });
-      Client.prototype.instantiateMapFrom = instantiateMapFromMock;
+      MapsApiClient.prototype.instantiateMapFrom = instantiateMapFromMock;
     });
 
     it('should have default mapConfig', async () => {
