@@ -1,5 +1,5 @@
+import { MapsApiClient, MapOptions } from '@/maps';
 import { Credentials } from '../../auth';
-import { MapOptions, MapsApiClient } from '../MapsApiClient';
 
 describe('maps', () => {
   it('can be easily created', () => {

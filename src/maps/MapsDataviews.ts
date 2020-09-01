@@ -1,7 +1,8 @@
 import { AggregationType } from '@/data/operations/aggregation';
 import { uuidv4 } from '@/core/utils/uuid';
 import { Credentials } from '../auth';
-import { MapsApiClient, MapDataviewsOptions } from './MapsApiClient';
+import { MapsApiClient } from './MapsApiClient';
+import { MapDataviewsOptions } from './MapDataviewsOptions';
 
 export class MapsDataviews {
   private _source: string;
