@@ -1,15 +1,15 @@
 import { AggregationType } from '@/data/operations/aggregation';
 import { uuidv4 } from '@/core/utils/uuid';
 import { Credentials } from '../auth';
-import { Client, MapDataviewsOptions } from './Client';
+import { MapsApiClient, MapDataviewsOptions } from './MapsApiClient';
 
 export class MapsDataviews {
   private _source: string;
-  private _mapClient: Client;
+  private _mapClient: MapsApiClient;
 
   constructor(source: string, credentials: Credentials) {
     this._source = source;
-    this._mapClient = new Client(credentials);
+    this._mapClient = new MapsApiClient(credentials);
   }
 
   public async aggregation(params: Partial<MapDataviewsOptions>): Promise<AggregationResponse> {
@@ -67,7 +67,7 @@ export class MapsDataviews {
     type: string,
     options: Partial<MapDataviewsOptions>
   ) {
-    const sourceMapConfig = Client.generateMapConfigFromSource(this._source);
+    const sourceMapConfig = MapsApiClient.generateMapConfigFromSource(this._source);
     const sourceId = sourceMapConfig.analyses[0].id;
     const mapConfig = {
       ...sourceMapConfig,
