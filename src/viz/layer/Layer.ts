@@ -610,9 +610,7 @@ export class Layer extends WithEvents implements StyledLayer {
     // The first step is to initialize the source to get the geometryType and the stats
     await this._source.init();
 
-    let layerProperties = await this._getLayerProps();
-
-    layerProperties = { ...layerProperties, visible: this._visible };
+    const layerProperties = await this._getLayerProps();
 
     // Create the Deck.gl instance
     if (
@@ -661,11 +659,14 @@ export class Layer extends WithEvents implements StyledLayer {
       onHover: this._interactivity.onHover.bind(this._interactivity)
     };
 
+    const visibility = { visible: this._visible };
+
     const layerProps = {
       ...this._options,
       ...props,
       ...styleProps,
       ...events,
+      ...visibility,
       ...filters.getOptions()
     };
 
