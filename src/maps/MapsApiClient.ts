@@ -127,7 +127,10 @@ export class MapsApiClient {
 
   private makeMapsApiRequest(config: string) {
     const encodedApiKey = encodeParameter('api_key', this._credentials.apiKey);
-    const parameters = [encodedApiKey];
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    const encodedClient = encodeParameter('client', `websdk-${WEBSDK_VERSION}`);
+    const parameters = [encodedApiKey, encodedClient];
     const url = this.generateMapsApiUrl(parameters);
 
     const getUrl = `${url}&${encodeParameter('config', config)}`;
