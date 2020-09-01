@@ -1,5 +1,5 @@
 import { Credentials, defaultCredentials } from '@/auth';
-import { MapInstance, MapOptions, MapsApiClient } from '@/maps/MapsApiClient';
+import { MapsApiClient, MapOptions, MapInstance } from '@/maps';
 import { uuidv4 } from '@/core/utils/uuid';
 import { SQLFilterApplicator } from '@/viz/filters/SQLFilterApplicator';
 import {
