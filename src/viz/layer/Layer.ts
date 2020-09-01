@@ -47,6 +47,7 @@ export class Layer extends WithEvents implements StyledLayer {
   // the typing of getPickinfo method is different from TileLayer and Layer are
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private _deckLayer?: any;
+  private _visible = true;
 
   // Helper class to manage interactivity
   private _interactivity: LayerInteractivity;
@@ -249,6 +250,43 @@ export class Layer extends WithEvents implements StyledLayer {
     this._viewportFeaturesGenerator.setDeckInstance(deckInstance);
     this._viewportFeaturesGenerator.setDeckLayer(deckLayer);
     this._viewportFeaturesGenerator.setOptions({ uniqueIdProperty });
+  }
+
+  /**
+   * Return if layer is visible
+   */
+  public isVisible(): boolean {
+    return this._deckLayer && this._visible;
+  }
+
+  /**
+   * Hide layer
+   */
+  public hide() {
+    if (this._deckLayer === undefined) {
+      throw new CartoLayerError(
+        'This layer cannot be hidden because it is not added to a map',
+        layerErrorTypes.DEFAULT
+      );
+    }
+
+    this._visible = false;
+    this.replaceDeckLayer();
+  }
+
+  /**
+   * Show layer
+   */
+  public show() {
+    if (this._deckLayer === undefined) {
+      throw new CartoLayerError(
+        'This layer cannot be displayed because it is not added to a map',
+        layerErrorTypes.DEFAULT
+      );
+    }
+
+    this._visible = true;
+    this.replaceDeckLayer();
   }
 
   /**
@@ -572,7 +610,9 @@ export class Layer extends WithEvents implements StyledLayer {
     // The first step is to initialize the source to get the geometryType and the stats
     await this._source.init();
 
-    const layerProperties = await this._getLayerProps();
+    let layerProperties = await this._getLayerProps();
+
+    layerProperties = { ...layerProperties, visible: this._visible };
 
     // Create the Deck.gl instance
     if (
