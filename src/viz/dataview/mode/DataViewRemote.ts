@@ -58,6 +58,7 @@ export class DataViewRemote extends DataViewMode {
 
   public setFilters(filters: ColumnFilters) {
     this.dataOrigin.setFilters(filters);
+    this._remoteSource.setFilters(filters);
   }
 
   public setSpatialFilter(spatialFilter: SpatialFilters) {

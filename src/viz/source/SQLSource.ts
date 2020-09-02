@@ -241,6 +241,11 @@ export class SQLSource extends Source {
     this.emit(SourceEvent.FILTER_CHANGE);
   }
 
+  async setFilters(filter: ColumnFilters) {
+    this.columnFiltersCollection.clear();
+    this.addFilter(uuidv4(), filter);
+  }
+
   private extractMetadataFrom(mapInstance: MapInstance) {
     const { stats } = mapInstance.metadata.layers[0].meta;
     let geometryType: GeometryType | undefined;
