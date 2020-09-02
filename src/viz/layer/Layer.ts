@@ -29,7 +29,6 @@ import { basicStyle } from '../style/helpers/basic-style';
 export enum LayerEvent {
   DATA_READY = 'dataReady',
   DATA_CHANGED = 'dataChanged',
-  TILES_LOADED = 'tilesLoaded',
   FILTER_CHANGE = 'filterChange' // must be the same value as GenericDataSourceEvent.FILTER_CHANGE
 }
 
@@ -87,7 +86,6 @@ export class Layer extends WithEvents implements StyledLayer {
     this.registerAvailableEvents([
       LayerEvent.DATA_READY,
       LayerEvent.DATA_CHANGED,
-      LayerEvent.TILES_LOADED,
       LayerEvent.FILTER_CHANGE,
       InteractivityEvent.CLICK,
       InteractivityEvent.HOVER
@@ -777,10 +775,6 @@ export class Layer extends WithEvents implements StyledLayer {
       this._emitDataChanged();
       this.dataState = DATA_STATES.READY;
     }
-
-    if (referer === 'onViewportLoad') {
-      this.emit(LayerEvent.TILES_LOADED);
-    }
   }
 
   /**
@@ -804,7 +798,7 @@ export class Layer extends WithEvents implements StyledLayer {
     const builtStyle = style instanceof Style ? style : new Style(style);
 
     if (builtStyle.viewport) {
-      this.on(LayerEvent.TILES_LOADED, async () => this.replaceDeckLayer());
+      this.on(LayerEvent.DATA_CHANGED, async () => this.replaceDeckLayer());
     }
 
     return builtStyle;

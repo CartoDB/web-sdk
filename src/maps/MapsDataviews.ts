@@ -7,10 +7,12 @@ import { MapDataviewsOptions } from './MapDataviewsOptions';
 export class MapsDataviews {
   private _source: string;
   private _mapClient: MapsApiClient;
+  private _layergroupCache: Record<string, any>;
 
   constructor(source: string, credentials: Credentials) {
     this._source = source;
     this._mapClient = new MapsApiClient(credentials);
+    this._layergroupCache = {};
   }
 
   public async aggregation(params: Partial<MapDataviewsOptions>): Promise<AggregationResponse> {
@@ -23,7 +25,7 @@ export class MapsDataviews {
       aggregationColumn
     });
 
-    const aggregationResponse = this._mapClient.dataview(layergroup, dataviewName, {
+    const aggregationResponse = this._mapClient.dataview(layergroup, {
       categories,
       bbox
     });
@@ -40,7 +42,7 @@ export class MapsDataviews {
       column
     });
 
-    const formulaResponse = this._mapClient.dataview(layergroup, dataviewName, { bbox });
+    const formulaResponse = this._mapClient.dataview(layergroup, { bbox });
 
     return (formulaResponse as unknown) as FormulaResponse;
   }
@@ -56,18 +58,27 @@ export class MapsDataviews {
       column
     });
 
-    return this._mapClient.dataview(layergroup, dataviewName, { column, bins, start, end, bbox });
+    return this._mapClient.dataview(layergroup, { column, bins, start, end, bbox });
   }
 
   public setSource(source: string) {
-    this._source = source;
+    if (this._source !== source) {
+      this._source = source;
+      this._layergroupCache = {};
+    }
   }
 
-  private _createMapWithDataviews(
+  private async _createMapWithDataviews(
     dataviewName: string,
     type: string,
     options: Partial<MapDataviewsOptions>
   ) {
+    const layergroupCacheKey = `type_${JSON.stringify(options)}`;
+
+    if (this._layergroupCache[layergroupCacheKey]) {
+      return this._layergroupCache[layergroupCacheKey];
+    }
+
     const sourceMapConfig = MapsApiClient.generateMapConfigFromSource(this._source);
     const sourceId = sourceMapConfig.analyses[0].id;
     const mapConfig = {
@@ -81,7 +92,8 @@ export class MapsDataviews {
       }
     };
 
-    const response = this._mapClient.instantiateMap(mapConfig);
+    const response = await this._mapClient.instantiateMap(mapConfig);
+    this._layergroupCache[layergroupCacheKey] = response;
     return response;
   }
 

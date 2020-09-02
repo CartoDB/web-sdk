@@ -32,6 +32,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 - Fix esm bundle, where typescript interfaces were not correctly ignored by babel ([#126](https://github.com/CartoDB/web-sdk/pull/126/))
 - Fix interactivity styles for common geojson files, expecting cartodb_id to be always present on `carto.viz.source.GeoJSON` ([#125](https://github.com/CartoDB/web-sdk/pull/125/))
 - Fix some `carto.viz.dataview` errors (with remote mode), due to map instance not ready yet ([#136](https://github.com/CartoDB/web-sdk/pull/136/))
+- Fix multiple calls to remote dataviews API (precise mode) every time the map is dragged ([#138](https://github.com/CartoDB/web-sdk/pull/138/))
 
 
 ## [1.0.0-alpha.2] 2020-07-31
