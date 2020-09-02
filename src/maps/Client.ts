@@ -81,18 +81,10 @@ export class Client {
    * @param layergroup
    * @param options
    */
-  public async dataview(
-    layergroup: MapInstance,
-    dataview: string,
-    dataViewOptions?: Partial<MapDataviewsOptions>
-  ) {
+  public async dataview(layergroup: MapInstance, dataViewOptions?: Partial<MapDataviewsOptions>) {
     const {
-      metadata: {
-        dataviews: {
-          [dataview]: { url }
-        }
-      }
-    } = layergroup;
+      0: { url }
+    } = Object.values(layergroup.metadata.dataviews);
 
     const params = {
       api_key: this._credentials.apiKey,
