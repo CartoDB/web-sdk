@@ -46,7 +46,7 @@
     "@babel/plugin-transform-runtime": "^7.11.0",
     "@babel/preset-env": "^7.11.0",
     "@babel/preset-typescript": "^7.10.4",
-    "@danmarshall/deckgl-typings": "github:alasarr/deckgl-typings",
+    "@danmarshall/deckgl-typings": "^4.3.3",
     "@salte-auth/popup": "1.0.0-rc.2",
     "@salte-auth/salte-auth": "3.0.0-rc.8",
     "@types/chroma-js": "^2.0.0",
