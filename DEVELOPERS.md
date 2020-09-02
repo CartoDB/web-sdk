@@ -113,7 +113,7 @@ If a release is, for example `v2.1.0`, it will be deployed to:
 
 > Note, this triple deployment does not apply if using a pre-release (eg `4.2.0-alpha.0`). In that case it gets deployed to:
 
-- `https://libs.cartocdn.com/web-sdk/4.2.0-alpha/index.min.js`
-- `https://libs.cartocdn.com/web-sdk/4.2.0-alpha.0/index.min.js`
+- `https://libs.cartocdn.com/web-sdk/v4.2.0-alpha/index.min.js`
+- `https://libs.cartocdn.com/web-sdk/v4.2.0-alpha.0/index.min.js`
 
 > After the publication, remember to manually merged the `release|fix` branch to `master`, and then `master` back to `develop`.
