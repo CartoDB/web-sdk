@@ -1,4 +1,4 @@
-import { Client } from '@/maps/Client';
+import { MapsApiClient } from '@/maps/MapsApiClient';
 import { Deck } from '@deck.gl/core';
 import { Layer } from '../../layer/Layer';
 import { CategoryDataView } from './CategoryDataView';
@@ -98,7 +98,7 @@ describe('DataView', () => {
           }
         };
       });
-      Client.prototype.instantiateMapFrom = instantiateMapFromMock;
+      MapsApiClient.prototype.instantiateMapFrom = instantiateMapFromMock;
 
       const deck = {
         props: {

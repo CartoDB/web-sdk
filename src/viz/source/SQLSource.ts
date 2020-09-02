@@ -1,5 +1,5 @@
 import { Credentials, defaultCredentials } from '@/auth';
-import { MapInstance, MapOptions, Client } from '@/maps/Client';
+import { MapsApiClient, MapOptions, MapInstance } from '@/maps';
 import { uuidv4 } from '@/core/utils/uuid';
 import { SQLFilterApplicator } from '@/viz/filters/SQLFilterApplicator';
 import {
@@ -142,7 +142,7 @@ export class SQLSource extends Source {
 
     this.needsInitialization = false;
 
-    const mapsClient = new Client(this._credentials);
+    const mapsClient = new MapsApiClient(this._credentials);
     const mapInstance: MapInstance = await mapsClient.instantiateMapFrom(this.getMapConfig());
 
     const urlTemplate = getUrlsFrom(mapInstance);

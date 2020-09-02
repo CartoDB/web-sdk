@@ -1,17 +1,17 @@
+import { MapsApiClient, MapOptions } from '@/maps';
 import { Credentials } from '../../auth';
-import { MapOptions, Client } from '../Client';
 
 describe('maps', () => {
   it('can be easily created', () => {
     const credentials = new Credentials('aUser', 'anApiKey');
-    const m = new Client(credentials);
+    const m = new MapsApiClient(credentials);
     expect(m).toBeTruthy();
   });
 
   describe('create a simple map', () => {
     it('fails without dataset or sql query', async () => {
       const credentials = new Credentials('aUser', 'anApiKey');
-      const m = new Client(credentials);
+      const m = new MapsApiClient(credentials);
 
       const mapOptions: MapOptions = {
         vectorExtent: 2048,
