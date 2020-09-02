@@ -53,12 +53,13 @@ Steps for a release:
 
 1. create a new branch, either from `develop` (if it's a common release, eg. `release/v1.0.0`) or from `master` (if it is a hotfix, like `hotfix/legend-1`).
 2. pass all the checks on it (build, test, lint, doc...).
-3. update the `CHANGELOG`, adding the current date, expected version and its notes, and then a new _Unreleased_ section. Commit it to the branch.
-4. set up the upstream branch (eg. `git push --set-upstream origin release/v1.0.0`).
-5. create a PR, in draft mode, for some previous revision from your mates. Name the PR after the release, eg `release/v1.0.0`. Don't start the release process without that feedback.
-6. launch the release process (which includes the version bump aand the npm & cdn publication) and specify the desired version, eg. `v1.0.0`. See section 2.3 to know more details about this step.
-7. after a succesful release, merge the `release` to `develop` or the `hotfix` branch to `master`
-8. merge `master` back to `develop` (or the other way around), because it always have to be updated with `master`.
+3. apply small fixes if not blocking
+4. update the `CHANGELOG`, adding the current date, expected version and its notes, and then a new _Unreleased_ section. Commit it to the branch.
+5. set up the upstream branch (eg. `git push --set-upstream origin release/v1.0.0`).
+6. create a PR, in draft mode, for some previous revision from your mates. Name the PR after the release, eg `release/v1.0.0`. Don't start the release process without that feedback.
+7. launch the release process (which includes the version bump and the npm & cdn publication) and specify the desired version, eg. `v1.0.0`. See section 2.3 to know more details about this step.
+8. after a succesful release, merge the `release` to `develop` or the `hotfix` branch to `master`
+9. merge `master` back to `develop` (or the other way around), because it always have to be updated with `master`.
 
 > Note: The next sections, about releases, are just for internal use at CARTO and they require the proper permissions (with a `secrets.json`).
 
@@ -112,7 +113,7 @@ If a release is, for example `v2.1.0`, it will be deployed to:
 
 > Note, this triple deployment does not apply if using a pre-release (eg `4.2.0-alpha.0`). In that case it gets deployed to:
 
-- `https://libs.cartocdn.com/web-sdk/4.2.0-alpha/index.min.js`
-- `https://libs.cartocdn.com/web-sdk/4.2.0-alpha.0/index.min.js`
+- `https://libs.cartocdn.com/web-sdk/v4.2.0-alpha/index.min.js`
+- `https://libs.cartocdn.com/web-sdk/v4.2.0-alpha.0/index.min.js`
 
 > After the publication, remember to manually merged the `release|fix` branch to `master`, and then `master` back to `develop`.
