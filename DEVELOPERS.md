@@ -57,7 +57,7 @@ Steps for a release:
 4. update the `CHANGELOG`, adding the current date, expected version and its notes, and then a new _Unreleased_ section. Commit it to the branch.
 5. set up the upstream branch (eg. `git push --set-upstream origin release/v1.0.0`).
 6. create a PR, in draft mode, for some previous revision from your mates. Name the PR after the release, eg `release/v1.0.0`. Don't start the release process without that feedback.
-7. launch the release process (which includes the version bump aand the npm & cdn publication) and specify the desired version, eg. `v1.0.0`. See section 2.3 to know more details about this step.
+7. launch the release process (which includes the version bump and the npm & cdn publication) and specify the desired version, eg. `v1.0.0`. See section 2.3 to know more details about this step.
 8. after a succesful release, merge the `release` to `develop` or the `hotfix` branch to `master`
 9. merge `master` back to `develop` (or the other way around), because it always have to be updated with `master`.
 
