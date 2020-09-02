@@ -2,37 +2,48 @@ import { Vector3 } from '@math.gl/core';
 import { ViewportFrustumPlanes } from '../../../../interactivity/viewport-features/geometry/types';
 import tiles from './tiles.json';
 
-export { name, tiles, viewportFeaturesColumns, viewportFeaturesResult, frustumPlanes };
+export {
+  name,
+  tiles,
+  viewportFeaturesColumns,
+  viewportFeaturesResult,
+  viewportFeaturesCount,
+  viewportFeaturesCountWithCustomId,
+  frustumPlanes
+};
 
 const name = 'Lines';
 
 const viewportFeaturesColumns = ['street'];
 
 const viewportFeaturesResult = [{ street: 'FITZGERALD' }];
+const viewportFeaturesCount = 1;
+const viewportFeaturesCountWithCustomId = 2;
+// :top fake 2 different features (same cartodb_id 10684 for 2 segments but different custom_id)
 
 const frustumPlanes: ViewportFrustumPlanes = {
   near: {
     distance: 0.0023256811732884296,
-    normal: new Vector3([0, 0, 1])
+    normal: new Vector3(0, 0, 1)
   },
   far: {
     distance: 0.000024918012570947397,
-    normal: new Vector3([0, 0, -1])
+    normal: new Vector3(0, 0, -1)
   },
   right: {
     distance: 67.88942172945644,
-    normal: new Vector3([0.828534118678061, 0, 0.5599385807268227])
+    normal: new Vector3(0.828534118678061, 0, 0.5599385807268227)
   },
   left: {
     distance: -67.88663121813775,
-    normal: new Vector3([-0.828534118678061, 0, 0.5599385807268227])
+    normal: new Vector3(-0.828534118678061, 0, 0.5599385807268227)
   },
   top: {
     distance: 297.8897836232825,
-    normal: new Vector3([0, 0.9486832980841026, 0.3162277659160719])
+    normal: new Vector3(0, 0.9486832980841026, 0.3162277659160719)
   },
   bottom: {
     distance: -297.88820766979325,
-    normal: new Vector3([0, -0.9486832980841026, 0.3162277659160719])
+    normal: new Vector3(0, -0.9486832980841026, 0.3162277659160719)
   }
 };

@@ -59,13 +59,14 @@ export class FormulaDataViewImpl extends DataViewImpl<FormulaDataViewData> {
     try {
       const filterApplicator = dataviewRemote.getFilterApplicator();
       const bbox = filterApplicator.getBbox();
+
+      dataviewRemote.updateDataViewSource(options);
+
       const dataviewsApiResponse = await dataviewRemote.dataviewsApi.formula({
         column: this.column,
         operation: this.operation,
         bbox
       });
-
-      dataviewRemote.updateDataViewSource(options);
 
       if (
         dataviewsApiResponse.errors_with_context &&

@@ -54,10 +54,10 @@ function defaultOptions(options: Partial<IconOptionsStyle>) {
 }
 
 export function iconStyle(icon: string, options: Partial<IconOptionsStyle> = {}) {
-  const evalFN = (layer: StyledLayer) => {
-    const meta = layer.source.getMetadata();
+  const evalFN = async (layer: StyledLayer) => {
+    const meta = layer.getSource().getMetadata();
 
-    if (layer.source.isEmpty()) {
+    if (layer.getSource().isEmpty()) {
       return {};
     }
 

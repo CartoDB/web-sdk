@@ -1,5 +1,6 @@
 import { Deck } from '@deck.gl/core';
 import { DatasetSource } from '@/viz';
+import { uuidv4 } from '@/core/utils/uuid';
 import * as mapsResponse from '../data-mocks/maps.category.json';
 import { sizeCategoriesStyle } from '../../style';
 import { defaultStyles } from '../../style/default-styles';
@@ -27,8 +28,9 @@ jest.mock('../../source/DatasetSource', () => ({
 }));
 
 const styledLayer = {
-  getMapInstance: () => ({} as Deck),
-  source: new DatasetSource('table')
+  getId: () => uuidv4(),
+  getMap: () => ({} as Deck),
+  getSource: () => new DatasetSource('table')
 };
 
 describe('SizeCategoriesStyle', () => {
@@ -37,9 +39,9 @@ describe('SizeCategoriesStyle', () => {
       expect(() => sizeCategoriesStyle(FIELD_NAME)).not.toThrow();
     });
 
-    it('should always return the right propertie for points', () => {
+    it('should always return the right propertie for points', async () => {
       const style = sizeCategoriesStyle(FIELD_NAME);
-      const response = style.getLayerProps(styledLayer);
+      const response = await style.getLayerProps(styledLayer);
       expect(response).toHaveProperty('getRadius');
       expect(response.getRadius).toBeInstanceOf(Function);
       expect(response).toHaveProperty('radiusUnits', 'pixels');
@@ -124,17 +126,17 @@ describe('SizeCategoriesStyle', () => {
       }
     });
 
-    it('If geometryType is Point and property is strokeWidth getLineWidth should be a function', () => {
+    it('If geometryType is Point and property is strokeWidth getLineWidth should be a function', async () => {
       const style = sizeCategoriesStyle(FIELD_NAME, {
         property: 'strokeWidth'
       });
-      const response = style.getLayerProps(styledLayer);
+      const response = await style.getLayerProps(styledLayer);
       expect(response).toHaveProperty('getLineWidth');
       expect(response.getLineWidth).toBeInstanceOf(Function);
     });
   });
 
-  describe('Data validation', () => {
+  describe('Data validation', async () => {
     const opts = {
       categories: ['Moda y calzado', 'Bares y restaurantes', 'Salud'],
       sizeRange: [2, 10]
@@ -142,7 +144,7 @@ describe('SizeCategoriesStyle', () => {
 
     const style = sizeCategoriesStyle(FIELD_NAME, opts);
 
-    let getRadius = style.getLayerProps(styledLayer).getRadius as (d: any) => any;
+    let getRadius = (await style.getLayerProps(styledLayer)).getRadius as (d: any) => any;
 
     it('should assign the right size to each category', () => {
       let r = getRadius({
@@ -169,8 +171,8 @@ describe('SizeCategoriesStyle', () => {
       expect(r).toEqual(2);
     });
 
-    it('should assign the right color to feature using dynamic categories', () => {
-      const response = sizeCategoriesStyle(FIELD_NAME).getLayerProps(styledLayer);
+    it('should assign the right color to feature using dynamic categories', async () => {
+      const response = await (await sizeCategoriesStyle(FIELD_NAME)).getLayerProps(styledLayer);
       getRadius = response.getRadius as (d: any) => any;
       let r = getRadius({
         properties: { [FIELD_NAME]: opts.categories[0] }

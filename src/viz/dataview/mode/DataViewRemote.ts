@@ -74,8 +74,13 @@ export class DataViewRemote extends DataViewMode {
       );
     }
 
-    this.dataOrigin.on(LayerEvent.TILES_LOADED, () => {
-      const deckInstance = (this.dataOrigin as Layer).getMapInstance();
+    this.dataOrigin.on(LayerEvent.DATA_CHANGED, () => {
+      const deckInstance = (this.dataOrigin as Layer).getMap();
+
+      if (deckInstance === undefined) {
+        throw new CartoDataViewError("Layer doesn't have a map innstance");
+      }
+
       const viewport = deckInstance.getViewports(undefined)[0];
 
       if (viewport) {
@@ -98,10 +103,22 @@ export class DataViewRemote extends DataViewMode {
 
 function getRemoteSource(dataOrigin: Layer | Source) {
   if (dataOrigin instanceof Source) {
-    // TODO what about the other sources? Check DOSource and its instantiation process
+    checkAllowedSourceOrThrow(dataOrigin);
     return dataOrigin as SQLSource | DatasetSource;
   }
 
   const layer = dataOrigin as Layer;
-  return layer.source as SQLSource | DatasetSource;
+  const source = layer.getSource();
+  checkAllowedSourceOrThrow(source);
+
+  return source as SQLSource | DatasetSource;
+}
+
+function checkAllowedSourceOrThrow(source: Source) {
+  if (source.sourceType !== 'SQL' && source.sourceType !== 'Dataset') {
+    throw new CartoDataViewError(
+      `Just SQL or Dataset source type is allowed for DataViewRemote, based on dataviews endpoint`,
+      dataViewErrorTypes.DEFAULT
+    );
+  }
 }

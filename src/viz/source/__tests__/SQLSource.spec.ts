@@ -1,6 +1,6 @@
 import { Credentials, defaultCredentials, setDefaultCredentials } from '@/auth';
-import { Client } from '@/maps/Client';
-import { SQLSource } from '../SQLSource';
+import { MapsApiClient } from '@/maps/MapsApiClient';
+import { SQLSource } from '..';
 
 const TEST_CREDENTIALS = {
   username: 'test_username',
@@ -43,7 +43,7 @@ describe('SQLSource', () => {
     beforeEach(() => {
       setDefaultCredentials({ ...TEST_CREDENTIALS });
 
-      Client.prototype.instantiateMapFrom = jest.fn().mockImplementation(() => {
+      MapsApiClient.prototype.instantiateMapFrom = jest.fn().mockImplementation(() => {
         throw new Error('Error fake');
       });
     });
@@ -94,7 +94,7 @@ describe('SQLSource', () => {
           }
         };
       });
-      Client.prototype.instantiateMapFrom = instantiateMapFromMock;
+      MapsApiClient.prototype.instantiateMapFrom = instantiateMapFromMock;
     });
 
     it('should have default mapConfig', async () => {
@@ -257,6 +257,15 @@ describe('SQLSource', () => {
       };
 
       expect(instantiateMapFromMock.mock.calls[0][0]).toStrictEqual(expectedmapConfig);
+    });
+  });
+
+  describe('SourceMetadata', () => {
+    it('should return cartodb_id as uniqueId by default in metadata', async () => {
+      const source = new SQLSource(DEFAULT_SQL);
+      await source.init();
+      const metadata = source.getMetadata();
+      expect(metadata.uniqueIdProperty).toEqual('cartodb_id');
     });
   });
 });

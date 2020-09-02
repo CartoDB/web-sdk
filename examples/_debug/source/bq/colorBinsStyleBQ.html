@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BQ - colorBins style</title>
+
+    <!-- Custom CSS -->
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.css"
+    />
+
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+      }
+
+      #map {
+        width: 100vw;
+        height: 100vh;
+      }
+    </style>
+  </head>
+
+  <body>
+    <section id="map"></section>
+
+    <!-- Map libraries-->
+    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.js"></script>
+    <script src="https://unpkg.com/deck.gl@8.2.0/dist.min.js"></script>
+
+    <script src="/dist/umd/index.min.js"></script>
+
+    <script>
+      async function initialize() {
+        const deckMap = carto.viz.createMap({
+          view: {
+            zoom: 8,
+            longitude: -73.9936065,
+            latitude: 40.7368521
+          }
+        });
+
+        const field = 'avg_fare_amount';
+
+        // completely automatic, based on metadata
+        // const style = carto.viz.style.colorBins(field);
+
+        // custom method, global classifier
+        // const style = carto.viz.style.colorBins(field, {
+        //   method: 'equal' // 'quantiles', 'equal', 'stdev'
+        // });
+
+        // viewport mode
+        const style = carto.viz.style.colorBins(field, {
+          method: 'stdev',
+          palette: 'earth',
+          strokeWidth: 0,
+          viewport: true
+        });
+
+        // layer + style
+        const tileJsonEndpoint = 'https://us-central1-bqtiler-staging.cloudfunctions.net/tilejson'; // staging
+        const bq = new carto.viz.source.BQ('bqtiler-staging.maps.nyc_taxi_demo_id', {
+          tileJsonEndpoint
+        });
+
+        const layer = new carto.viz.Layer(bq, style);
+        layer.addTo(deckMap);
+      }
+
+      initialize();
+    </script>
+  </body>
+</html>

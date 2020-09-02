@@ -5,19 +5,22 @@ export { Source, GeoJSONSource, SQLSource, DatasetSource } from './source';
 // Style helpers
 export {
   basicStyle,
-  BasicOptionsStyle,
   colorBinsStyle,
-  ColorBinsOptionsStyle,
   colorCategoriesStyle,
-  ColorCategoriesOptionsStyle,
   colorContinuousStyle,
-  ColorContinuousOptionsStyle,
-  sizeBinsStyle,
-  SizeBinsOptionsStyle,
-  sizeCategoriesStyle,
-  SizeCategoriesOptionsStyle,
   sizeContinuousStyle,
-  iconStyle,
+  sizeBinsStyle,
+  sizeCategoriesStyle,
+  iconStyle
+} from './style';
+
+export type {
+  BasicOptionsStyle,
+  ColorBinsOptionsStyle,
+  ColorCategoriesOptionsStyle,
+  ColorContinuousOptionsStyle,
+  SizeCategoriesOptionsStyle,
+  SizeBinsOptionsStyle,
   IconOptionsStyle
 } from './style';
 

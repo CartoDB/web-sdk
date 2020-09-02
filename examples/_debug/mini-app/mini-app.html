@@ -87,7 +87,7 @@
                         id="widgetCommerceHistogram"
                         heading="GDP"
                         description="Distribution of GDP for countries"
-                        show-clear>
+                        show-clear-button>
                     </as-histogram-widget>
                 </section>    
             </div>
@@ -272,7 +272,7 @@
         
             // Remote dataview + widget
             const dataviewPortsRemote = new carto.viz.dataview.Category(
-                portsLayer.source,   
+                portsLayer.getSource(),   
                 'harborsize', 
                 {
                     operation: 'count'

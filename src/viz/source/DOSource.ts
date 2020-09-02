@@ -120,7 +120,7 @@ export class DOSource extends Source {
   constructor(variable: string, credentials?: Credentials) {
     const id = `DO-${variable}`;
     super(id);
-    this.sourceType = 'DOSource';
+    this.sourceType = 'DO';
 
     this._credentials = credentials || defaultCredentials;
 

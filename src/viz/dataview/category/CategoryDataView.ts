@@ -1,11 +1,11 @@
+import { debounce } from '@/viz/core/utils';
 import { DataView, OPTION_CHANGED_DELAY } from '../DataView';
-
 import {
   CategoryOptions,
   CategoryDataViewImpl,
   CategoryDataViewData
 } from './CategoryDataViewImpl';
-import { debounce, DataViewEvent } from '../utils';
+import { DataViewEvent } from '../utils';
 
 export class CategoryDataView extends DataView<CategoryDataViewData> {
   protected buildImpl(column: string, options: CategoryOptions) {

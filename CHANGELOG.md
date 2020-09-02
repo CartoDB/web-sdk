@@ -5,6 +5,39 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [1.0.0-alpha.3] 2020-09-02
+
+### Added
+
+- Add new `carto.viz.Legend` widget for layers, working for these styles: basic, colorBins, colorCategories, colorContinuous, sizeBins, sizeCategories and sizeContinuous (#100, #102, #104, #105, #106, #107, #109 and #113)
+- New `viewport` mode for style classifiers: quantiles, equal and stdev ([#119](https://github.com/CartoDB/web-sdk/pull/119/))
+- Dynamic legends when using viewport styles ([#120](https://github.com/CartoDB/web-sdk/pull/120/))
+- New `getId` method in `carto.viz.Layer` ([#113](https://github.com/CartoDB/web-sdk/pull/113/))
+- New `BQSource` for public datasets ([#122](https://github.com/CartoDB/web-sdk/pull/122/))
+- New `onLoad` option to `carto.viz.createMap` ([#121](https://github.com/CartoDB/web-sdk/pull/121/))
+- Better performance in Layer, with a debounced approach to DATA_CHANGED event ([#130](https://github.com/CartoDB/web-sdk/pull/130))
+- Better performance in `carto.viz.layer.getViewportFeatures`, with a ViewportFeaturesGenerator using with a queue system ([#131](https://github.com/CartoDB/web-sdk/pull/131))
+- Better performance in `carto.viz.dataview.Histogram` with optimized calculations ([#133](https://github.com/CartoDB/web-sdk/pull/133))
+- Add new optional `autoWidth` option to `Popup`, to adjust to its content ([#80](https://github.com/CartoDB/web-sdk/pull/80/))
+- Add new methods to `carto.viz.Layer` to control its visibility: show / hide / isVisible ([#134](https://github.com/CartoDB/web-sdk/pull/134/))
+
+
+### Changed
+
+- Rename several public members in `carto.viz.Layer`: methods `replaceDeckGLLayer`, `getDeckGLLayer`, `getMapInstance` and property `source` to `replaceDeckLayer`, `getDeckLayer`, `getMap` and `getSource` ([#124](https://github.com/CartoDB/web-sdk/pull/124/))
+
+### Fixed
+
+- Fix WEBSDK VERSION for .cjs & .esm module distributions ([#115](https://github.com/CartoDB/web-sdk/pull/115/))
+- Fix error on viewport mode in classifiers, with first render without proper styles ([#124](https://github.com/CartoDB/web-sdk/pull/124/))
+- Fix `remove` error in `carto.viz.Layer`, keeping the reference to the old map ([#124](https://github.com/CartoDB/web-sdk/pull/124/))
+- Fix esm bundle, where typescript interfaces were not correctly ignored by babel ([#126](https://github.com/CartoDB/web-sdk/pull/126/))
+- Fix interactivity styles for common geojson files, expecting cartodb_id to be always present on `carto.viz.source.GeoJSON` ([#125](https://github.com/CartoDB/web-sdk/pull/125/))
+- Fix some `carto.viz.dataview` errors (with remote mode), due to map instance not ready yet ([#136](https://github.com/CartoDB/web-sdk/pull/136/))
+- Fix multiple calls to remote dataviews API (precise mode) every time the map is dragged ([#138](https://github.com/CartoDB/web-sdk/pull/138/))
+- Fix `carto.viz.dataview.Formula` not getting an updated source ([#139](https://github.com/CartoDB/web-sdk/pull/139/))
+
+
 ## [1.0.0-alpha.2] 2020-07-31
 
 ### Added

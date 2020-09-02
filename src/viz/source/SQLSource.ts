@@ -1,5 +1,5 @@
 import { Credentials, defaultCredentials } from '@/auth';
-import { MapInstance, MapOptions, Client } from '@/maps/Client';
+import { MapsApiClient, MapOptions, MapInstance } from '@/maps';
 import { uuidv4 } from '@/core/utils/uuid';
 import { SQLFilterApplicator } from '@/viz/filters/SQLFilterApplicator';
 import {
@@ -16,12 +16,12 @@ import { sourceErrorTypes, SourceError } from '../errors/source-error';
 import { FiltersCollection } from '../filters/FiltersCollection';
 import { ColumnFilters } from '../filters/types';
 
-export interface SourceOptions {
+export interface SQLSourceOptions {
   credentials?: Credentials;
   mapOptions?: MapOptions;
 }
 
-const DEFAULT_ID_PROPERTY = 'cartodb_id';
+export const DEFAULT_ID_PROPERTY = 'cartodb_id';
 
 export const defaultMapOptions: MapOptions = {
   vectorExtent: 2048,
@@ -71,9 +71,9 @@ export class SQLSource extends Source {
     SQLFilterApplicator
   );
 
-  constructor(sql: string, options: SourceOptions = {}) {
+  constructor(sql: string, options: SQLSourceOptions = {}) {
     super(`CARTO-SQL-${uuidv4()}`);
-    this.sourceType = 'SQLSource';
+    this.sourceType = 'SQL';
 
     // Set object properties
     const { mapOptions = defaultMapOptions, credentials = defaultCredentials } = options;
@@ -142,7 +142,7 @@ export class SQLSource extends Source {
 
     this.needsInitialization = false;
 
-    const mapsClient = new Client(this._credentials);
+    const mapsClient = new MapsApiClient(this._credentials);
     const mapInstance: MapInstance = await mapsClient.instantiateMapFrom(this.getMapConfig());
 
     const urlTemplate = getUrlsFrom(mapInstance);
@@ -153,21 +153,23 @@ export class SQLSource extends Source {
   }
 
   private buildMapConfig(mapOptions: MapOptions) {
-    const defaultMapOptionsCopy = JSON.parse(JSON.stringify(defaultMapOptions));
-
-    return {
-      ...defaultMapOptionsCopy,
+    const mapConfig = {
+      ...defaultMapOptions,
       ...mapOptions,
       metadata: {
-        ...defaultMapOptionsCopy.metadata,
+        ...defaultMapOptions.metadata,
         ...mapOptions.metadata
       },
       aggregation: {
-        ...defaultMapOptionsCopy.aggregation,
+        ...defaultMapOptions.aggregation,
         ...mapOptions.aggregation
       },
       sql: this._value
     };
+
+    // returns a clone in order to prevent modify
+    // default values by reference
+    return JSON.parse(JSON.stringify(mapConfig));
   }
 
   private getMapConfig() {
@@ -248,7 +250,7 @@ export class SQLSource extends Source {
     }
 
     const fieldStats = this.getCompleteFieldStats(stats);
-    const metadata = { geometryType, stats: fieldStats };
+    const metadata = { geometryType, uniqueIdProperty: DEFAULT_ID_PROPERTY, stats: fieldStats };
     return metadata;
   }
 

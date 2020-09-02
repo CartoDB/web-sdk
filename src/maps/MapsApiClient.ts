@@ -1,14 +1,16 @@
-import { AggregationType } from '@/data/operations/aggregation';
 import { uuidv4 } from '@/core/utils/uuid';
 import { Credentials } from '../auth';
 import errorHandlers from './errors';
 import { encodeParameter, getRequest, postRequest } from './utils';
+import { MapInstance } from './MapInstance';
+import { MapOptions } from './MapOptions';
+import { MapDataviewsOptions } from './MapDataviewsOptions';
 
 const REQUEST_GET_MAX_URL_LENGTH = 2048;
 const VECTOR_EXTENT = 2048;
 const VECTOR_SIMPLIFY_EXTENT = 2048;
 
-export class Client {
+export class MapsApiClient {
   private _credentials: Credentials;
 
   constructor(credentials: Credentials) {
@@ -81,18 +83,10 @@ export class Client {
    * @param layergroup
    * @param options
    */
-  public async dataview(
-    layergroup: MapInstance,
-    dataview: string,
-    dataViewOptions?: Partial<MapDataviewsOptions>
-  ) {
+  public async dataview(layergroup: MapInstance, dataViewOptions?: Partial<MapDataviewsOptions>) {
     const {
-      metadata: {
-        dataviews: {
-          [dataview]: { url }
-        }
-      }
-    } = layergroup;
+      0: { url }
+    } = Object.values(layergroup.metadata.dataviews);
 
     const params = {
       api_key: this._credentials.apiKey,
@@ -133,7 +127,10 @@ export class Client {
 
   private makeMapsApiRequest(config: string) {
     const encodedApiKey = encodeParameter('api_key', this._credentials.apiKey);
-    const parameters = [encodedApiKey];
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    const encodedClient = encodeParameter('client', `websdk-${WEBSDK_VERSION}`);
+    const parameters = [encodedApiKey, encodedClient];
     const url = this.generateMapsApiUrl(parameters);
 
     const getUrl = `${url}&${encodeParameter('config', config)}`;
@@ -164,175 +161,4 @@ export class Client {
     const base = `${this._credentials.serverURL}api/v1/map`;
     return `${base}?${parameters.join('&')}`;
   }
-}
-
-export interface AggregationColumn {
-  // eslint-disable-next-line camelcase
-  aggregate_function: string;
-  // eslint-disable-next-line camelcase
-  aggregated_column: string;
-}
-
-export interface StatsColumn {
-  topCategories: number;
-  includeNulls: boolean;
-}
-
-export interface Sample {
-  // eslint-disable-next-line camelcase
-  num_rows: number;
-  // eslint-disable-next-line camelcase
-  include_columns: string[];
-}
-
-export interface MapOptions {
-  bufferSize?: BufferSizeOptions;
-  sql?: string;
-  dataset?: string;
-  vectorExtent: number;
-  vectorSimplifyExtent: number;
-  metadata?: {
-    geometryType: boolean;
-    columnStats?: StatsColumn;
-    dimensions?: boolean;
-    sample?: Sample;
-  };
-  aggregation?: {
-    placement: string;
-    resolution: number;
-    threshold?: number;
-    columns?: Record<string, AggregationColumn>;
-    dimensions?: Record<string, { column: string }>;
-  };
-}
-
-interface BufferSizeOptions {
-  png?: number;
-  'grid.json'?: number;
-  mvt?: number;
-}
-
-export interface MapInstance {
-  layergroupid: string;
-  // eslint-disable-next-line camelcase
-  last_updated: string;
-  metadata: {
-    layers: [
-      {
-        type: string;
-        id: string;
-        meta: {
-          stats: {
-            estimatedFeatureCount: number;
-            geometryType: string;
-            // TODO: create a proper type for columns
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            columns: any;
-            sample: number[];
-          };
-          aggregation: {
-            png: boolean;
-            mvt: boolean;
-          };
-        };
-        tilejson: {
-          vector: {
-            tilejson: string;
-            tiles: string[];
-          };
-        };
-      }
-    ];
-    dataviews: {
-      [dataview: string]: {
-        url: {
-          http: string;
-          https: string;
-        };
-      };
-    };
-    tilejson: {
-      vector: {
-        tilejson: string;
-        tiles: string[];
-      };
-    };
-    url: {
-      vector: {
-        urlTemplate: string;
-        subdomains: string[];
-      };
-    };
-  };
-  // eslint-disable-next-line camelcase
-  cdn_url: {
-    http: string;
-    https: string;
-    templates: {
-      http: {
-        subdomains: string[];
-        url: string;
-      };
-      https: {
-        subdomains: string[];
-        url: string;
-      };
-    };
-  };
-}
-
-export interface MapDataviewsOptions {
-  /**
-   * column name to aggregate by
-   */
-  column: string;
-
-  /**
-   * operation to perform
-   */
-  aggregation: AggregationType;
-
-  /**
-   * operation to perform
-   */
-  operation: AggregationType;
-
-  /**
-   * The num of categories
-   */
-  categories?: number;
-
-  /**
-   * Column value to aggregate.
-   * This param is required when
-   * `aggregation` is different than "count"
-   */
-  operationColumn?: string;
-
-  /**
-   * [Maps API parameter name]
-   * Same as operationColumn but this is the
-   * name which is used by Maps API as parameter
-   */
-  aggregationColumn?: string;
-
-  /**
-   * Bounding box to filter data
-   */
-  bbox?: number[];
-
-  /**
-   * Number of bins to aggregate the data range into
-   */
-  bins?: number;
-
-  /**
-   * Lower limit of the data range, if not present, the lower limit of the actual data will be used.
-   */
-  start?: number;
-
-  /**
-   * Upper limit of the data range, if not present, the upper limit of the actual data will be used.
-   */
-  end?: number;
 }

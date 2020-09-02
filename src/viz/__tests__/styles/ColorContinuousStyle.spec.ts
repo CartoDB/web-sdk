@@ -1,6 +1,7 @@
 import { Deck } from '@deck.gl/core';
 import { scale as chromaScale } from 'chroma-js';
 import { DatasetSource } from '@/viz';
+import { uuidv4 } from '@/core/utils/uuid';
 import { colorContinuousStyle } from '../../style';
 import * as mapsResponse from '../data-mocks/maps.number.json';
 import { hexToRgb } from '../../style/helpers/utils';
@@ -27,8 +28,9 @@ jest.mock('../../source/DatasetSource', () => ({
 }));
 
 const styledLayer = {
-  getMapInstance: () => ({} as Deck),
-  source: new DatasetSource('table')
+  getId: () => uuidv4(),
+  getMap: () => ({} as Deck),
+  getSource: () => new DatasetSource('table')
 };
 
 describe('ColorContinuousStyle', () => {
@@ -37,9 +39,9 @@ describe('ColorContinuousStyle', () => {
       expect(() => colorContinuousStyle('attributeName')).not.toThrow();
     });
 
-    it('should always return a getFillColor function', () => {
+    it('should always return a getFillColor function', async () => {
       const style = colorContinuousStyle(FIELD_NAME);
-      const response = style.getLayerProps(styledLayer);
+      const response = await style.getLayerProps(styledLayer);
       expect(response).toHaveProperty('getFillColor');
       expect(response.getFillColor).toBeInstanceOf(Function);
     });
@@ -83,39 +85,39 @@ describe('ColorContinuousStyle', () => {
       }
     });
 
-    it('If geometryType is Polygon and property is strokeColor getLineColor should be a function', () => {
+    it('If geometryType is Polygon and property is strokeColor getLineColor should be a function', async () => {
       const style = colorContinuousStyle(FIELD_NAME, {
         property: 'strokeColor'
       });
-      const response = style.getLayerProps(styledLayer);
+      const response = await style.getLayerProps(styledLayer);
       expect(response).toHaveProperty('getLineColor');
       expect(response.getLineColor).toBeInstanceOf(Function);
     });
 
-    it('If geometryType is Point and property is strokeColor getLineColor should be a function', () => {
+    it('If geometryType is Point and property is strokeColor getLineColor should be a function', async () => {
       const style = colorContinuousStyle(FIELD_NAME, {
         property: 'strokeColor'
       });
       const styleLayerPoint = { ...styledLayer };
-      styleLayerPoint.source.getMetadata = jest.fn().mockImplementation(() => {
+      styleLayerPoint.getSource().getMetadata = jest.fn().mockImplementation(() => {
         return {
           geometryType: 'Point',
           stats: [stats]
         };
       });
-      const response = style.getLayerProps(styledLayer);
+      const response = await style.getLayerProps(styledLayer);
       expect(response).toHaveProperty('getLineColor');
       expect(response.getLineColor).toBeInstanceOf(Function);
     });
   });
 
-  describe('Data validation', () => {
+  describe('Data validation', async () => {
     const opts = {
       palette: ['#f00', '#00f', '#aff'],
       nullColor: '#0f0'
     };
     const style = colorContinuousStyle(FIELD_NAME, opts);
-    let getFillColor = style.getLayerProps(styledLayer).getFillColor as (d: any) => any;
+    let getFillColor = (await style.getLayerProps(styledLayer)).getFillColor as (d: any) => any;
 
     it('should assign the right color to a feature', () => {
       const featureValue = 30;
@@ -134,7 +136,7 @@ describe('ColorContinuousStyle', () => {
       expect(r).toEqual(hexToRgb(opts.nullColor));
     });
 
-    it('should assign the right color to a feature using ranges', () => {
+    it('should assign the right color to a feature using ranges', async () => {
       const rangeMin = 0;
       const rangeMax = 100;
       const featureValue = 30;
@@ -143,7 +145,7 @@ describe('ColorContinuousStyle', () => {
         rangeMin,
         rangeMax
       });
-      getFillColor = s.getLayerProps(styledLayer).getFillColor as (d: any) => any;
+      getFillColor = (await s.getLayerProps(styledLayer)).getFillColor as (d: any) => any;
 
       const expectedColor = chromaScale(opts.palette)
         .domain([rangeMin, rangeMax])

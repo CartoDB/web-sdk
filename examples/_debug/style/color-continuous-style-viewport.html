@@ -12,10 +12,10 @@
       href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.css"
     />
     <link
-     rel="stylesheet"
-     type="text/css"
-     href="https://libs.cartocdn.com/airship-style/v2.4/airship.min.css"
-   />
+      rel="stylesheet"
+      type="text/css"
+      href="https://libs.cartocdn.com/airship-style/v2.4/airship.min.css"
+    />
 
     <style>
       body {
@@ -35,7 +35,7 @@
     <div class="as-map-panels">
       <div class="as-panel as-panel--top as-panel--left">
         <as-legend>
-          <as-legend-size-continuous id="legend" slot="legends"></as-legend-size-continuous>
+          <as-legend-color-continuous id="legend" slot="legends"></as-legend-color-continuous>
         </as-legend>
       </div>
     </div>
@@ -60,43 +60,31 @@
           }
         });
 
-        const style = carto.viz.style.sizeContinuous('total_pop', {
-          rangeMin: 100000,
-          rangeMax: 5000000,
-          sizeRange: [5, 50],
-          color: '#0000FF',
-          strokeColor: '#40E0D0',
-          strokeWidth: 1
-        });
-
-        const tempLayer = new carto.viz.Layer('ca_measures', style);
+        const style = carto.viz.style.colorContinuous('value', { viewport: true });
+        const tempLayer = new carto.viz.Layer('temps', style);
         tempLayer.addTo(deckMap);
         new carto.viz.Legend('#legend', tempLayer);
       }
 
-      function initializeLines() {
-        carto.auth.setDefaultCredentials({ username: 'cartoframes' });
+      async function initializePolygons() {
+        carto.auth.setDefaultCredentials({ username: 'josemacarto' });
 
         const deckMap = carto.viz.createMap({
           basemap: 'voyager',
           view: {
-            longitude: 135.7,
-            latitude: -25.48,
-            zoom: 3
+            longitude: -122.45292663574217,
+            latitude: 37.760944207425965,
+            zoom: 11
           }
         });
 
-        const style = carto.viz.style.sizeContinuous('length_km', {
-          // bins: 3,
-          // sizeRange: [1, 5]
-        });
-        const layer = new carto.viz.Layer('roads', style);
-        layer.addTo(deckMap);
-        new carto.viz.Legend('#legend', layer);
+        const style = carto.viz.style.colorContinuous('businesses', { viewport: true });
+        const tempLayer = new carto.viz.Layer('sf_businesses_neighborhoods', style);
+        tempLayer.addTo(deckMap);
       }
 
       initialize();
-      // initializeLines();
+      // initializePolygons();
     </script>
   </body>
 </html>

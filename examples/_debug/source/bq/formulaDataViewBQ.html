@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BQ - Dataview Formula all modes</title>
+
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.css"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://libs.cartocdn.com/airship-style/v2.4/airship.min.css"
+    />
+
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+      }
+
+      #map {
+        width: 100vw;
+        height: 100vh;
+      }
+    </style>
+  </head>
+
+  <body class="as-app-body as-app">
+    <div class="as-content">
+      <main class="as-main">
+        <div class="as-map-area">
+          <!-- map -->
+          <div id="map"></div>
+
+          <!-- panel -->
+          <div
+            class="as-panel as-panel--vertical as-panel--top as-panel--right as-bg--ui-01"
+            style="overflow: visible;"
+          >
+            <div
+              class="as-panel__element as-p--16 as-body"
+              style="max-width: fit-content; padding-bottom: 0px;"
+            >
+              <p id="errorContainer" class="as-color--error"></p>
+              <p>
+                <span class="as-caption">Column</span>
+                <input id="column" class="as-input" type="text" value="avg_fare_amount" />
+              </p>
+              <p>
+                <span class="as-caption">Operation</span>
+                <as-dropdown
+                  default-text="Operation"
+                  can-clear="false"
+                  selected-option="sum"
+                ></as-dropdown>
+              </p>
+              <button class="as-btn as-btn--secondary" onclick="applyChanges();">
+                APPLY
+              </button>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+    <div
+      class="as-box"
+      style="
+        position: absolute;
+        left: 10px;
+        top: 10px;
+        height: 110px;
+        width: 250px;
+        padding: 16px;
+        background-color: #fff;
+      "
+    >
+      <section class="as-body">
+        <div>
+          <as-widget-header header="Global remote"> </as-widget-header>
+          <p
+            id="formula-remote"
+            class="as-title as-m--4 as-p--0 as-font--medium"
+            id="layer0_widget0-value"
+          ></p>
+        </div>
+      </section>
+    </div>
+    <div
+      class="as-box"
+      style="
+        position: absolute;
+        left: 10px;
+        top: 130px;
+        height: 110px;
+        width: 250px;
+        padding: 16px;
+        background-color: #fff;
+      "
+    >
+      <section class="as-body">
+        <div>
+          <as-widget-header header="Viewport (remote-filtered)"> </as-widget-header>
+          <p
+            id="formula-remote-filtered"
+            class="as-title as-m--4 as-p--0 as-font--medium"
+            id="layer0_widget0-value"
+          ></p>
+        </div>
+      </section>
+    </div>
+    <div
+      class="as-box"
+      style="
+        position: absolute;
+        left: 10px;
+        top: 250px;
+        height: 110px;
+        width: 250px;
+        padding: 16px;
+        background-color: #fff;
+      "
+    >
+      <section class="as-body">
+        <div>
+          <as-widget-header header="Viewport local"> </as-widget-header>
+          <p
+            id="formula-local"
+            class="as-title as-m--4 as-p--0 as-font--medium"
+            id="layer0_widget0-value"
+          ></p>
+        </div>
+      </section>
+    </div>
+
+    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.js"></script>
+    <script src="https://unpkg.com/deck.gl@8.2.0/dist.min.js"></script>
+    <script src="https://libs.cartocdn.com/airship-components/v2.4/airship.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-format/1.3.0/d3-format.min.js"></script>
+
+    <script src="/dist/umd/index.min.js"></script>
+
+    <script>
+      const operationElem = document.querySelector('as-dropdown');
+      operationElem.options = [
+        { text: 'SUM', value: 'sum' },
+        { text: 'COUNT', value: 'count' },
+        { text: 'AVG', value: 'avg' },
+        { text: 'MAX', value: 'max' },
+        { text: 'MIN', value: 'min' }
+      ];
+      const formulaRemoteElement = document.getElementById('formula-remote');
+      const formulaRemoteFilteredElement = document.getElementById('formula-remote-filtered');
+      const formulaLocalElement = document.getElementById('formula-local');
+      const errorContainer = document.getElementById('errorContainer');
+
+      let formulaGlobal;
+      let formulaViewportPrecise;
+      let formulaViewportFast;
+
+      async function initialize() {
+        const deckMap = carto.viz.createMap({
+          view: {
+            zoom: 8,
+            longitude: -73.9936065,
+            latitude: 40.7368521
+          }
+        });
+
+        const tileJsonEndpoint = 'https://us-central1-bqtiler-staging.cloudfunctions.net/tilejson'; // staging
+        const bq = new carto.viz.source.BQ('bqtiler-staging.maps.nyc_taxi_demo_id', {
+          tileJsonEndpoint
+        });
+        layer = new carto.viz.Layer(bq);
+
+        await layer.addTo(deckMap);
+
+        // -- DATAVIEW GLOBAL (FAST)
+        //
+        // formulaGlobal = new carto.viz.dataview.Formula(layer.getSource(), 'avg_fare_amount', {
+        //   operation: 'sum'
+        // });
+        // const remoteData = await formulaGlobal.getData();
+        //
+        // formulaRemoteElement.innerHTML = d3.format('.4s')(remoteData.result);
+        // formulaGlobal.on('dataUpdate', async () => {
+        //   const data = await formulaGlobal.getData();
+        //   formulaRemoteElement.innerHTML = d3.format('.4s')(data.result);
+        // });
+        //
+        // formulaGlobal.on('error', ([error]) => {
+        //   errorContainer.innerHTML = error.message;
+        // });
+
+        // -- DATAVIEW VIEWPORT (PRECISE)
+        //
+        // formulaViewportPrecise = new carto.viz.dataview.Formula(layer, 'avg_fare_amount', {
+        //   operation: 'sum',
+        //   spatialFilter: 'viewport',
+        //   mode: 'precise'
+        // });
+        // const remoteFilteredData = await formulaViewportPrecise.getData();
+        // formulaRemoteFilteredElement.innerHTML = d3.format('.4s')(remoteFilteredData.result);
+        // formulaViewportPrecise.on('dataUpdate', async () => {
+        //   const data = await formulaViewportPrecise.getData();
+        //   formulaRemoteFilteredElement.innerHTML = d3.format('.4s')(data.result);
+        // });
+
+        // formulaViewportPrecise.on('error', ([error]) => {
+        //   errorContainer.innerHTML = error.message;
+        // });
+
+        // -- DATAVIEW VIEWPORT (FAST)
+        //
+        formulaViewportFast = new carto.viz.dataview.Formula(layer, 'avg_fare_amount', {
+          operation: 'sum',
+          spatialFilter: 'viewport'
+        });
+        const localData = await formulaViewportFast.getData();
+        formulaLocalElement.innerHTML = d3.format('.4s')(localData.result);
+
+        formulaViewportFast.on('dataUpdate', async () => {
+          const data = await formulaViewportFast.getData();
+          formulaLocalElement.innerHTML = d3.format('.4s')(data.result);
+        });
+      }
+
+      function applyChanges() {
+        const operation = operationElem.selectedOption;
+        const column = document.getElementById('column').value;
+
+        errorContainer.innerHTML = '';
+
+        // formulaGlobal.column = column;
+        // formulaGlobal.operation = operation;
+
+        // formulaViewportPrecise.column = column;
+        // formulaViewportPrecise.operation = operation;
+
+        formulaViewportFast.column = column;
+        formulaViewportFast.operation = operation;
+      }
+
+      initialize();
+    </script>
+  </body>
+</html>

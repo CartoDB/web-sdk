@@ -1,5 +1,5 @@
 import { Deck, RGBAColor } from '@deck.gl/core';
-import { Popup, PopupElement } from '../popups/Popup';
+import { Popup, PopupElement, PopupOptions } from '../popups/Popup';
 import { Style, StyleProperties } from '../style/Style';
 import { StyledLayer } from '../style/layer-style';
 
@@ -15,7 +15,7 @@ export class LayerInteractivity {
   private _hoverStyle?: Style | string;
   private _clickStyle?: Style | string;
 
-  private _layerGetStyleFn: () => Style;
+  private _layerGetStyleFn: () => Promise<Style>;
   private _layerSetStyleFn: (style: Style) => Promise<void>;
 
   private _layerOnFn: EventHandler;
@@ -42,15 +42,17 @@ export class LayerInteractivity {
 
     if (this._clickStyle) {
       this._layerOnFn(InteractivityEvent.CLICK, () => {
-        const interactiveStyle = this._wrapInteractiveStyle();
-        this._layerSetStyleFn(interactiveStyle);
+        this._wrapInteractiveStyle().then(interactiveStyle =>
+          this._layerSetStyleFn(interactiveStyle)
+        );
       });
     }
 
     if (this._hoverStyle) {
       this._layerOnFn(InteractivityEvent.HOVER, () => {
-        const interactiveStyle = this._wrapInteractiveStyle();
-        this._layerSetStyleFn(interactiveStyle);
+        this._wrapInteractiveStyle().then(interactiveStyle =>
+          this._layerSetStyleFn(interactiveStyle)
+        );
       });
     }
 
@@ -65,7 +67,7 @@ export class LayerInteractivity {
     this.fireOnEvent(InteractivityEvent.HOVER, info, event);
   }
 
-  public fireOnEvent(eventType: InteractivityEvent, info: any, event: HammerInput) {
+  public async fireOnEvent(eventType: InteractivityEvent, info: any, event: HammerInput) {
     const features = [];
     const { coordinate, object } = info;
 
@@ -81,7 +83,7 @@ export class LayerInteractivity {
     }
 
     if (this._clickStyle || this._hoverStyle) {
-      const interactiveStyle = this._wrapInteractiveStyle();
+      const interactiveStyle = await this._wrapInteractiveStyle();
       this._layerSetStyleFn(interactiveStyle);
     }
 
@@ -105,10 +107,13 @@ export class LayerInteractivity {
    * This method creates popups every time the
    * user clicks on one or more features of the layer.
    */
-  public async setPopupClick(elements: PopupElement[] | string[] | null = []) {
+  public async setPopupClick(
+    elements: PopupElement[] | string[] | null = [],
+    options: Partial<PopupOptions> = {}
+  ) {
     // if the popup was not created yet then we create it and add it to the map
     if (!this._clickPopup) {
-      this._clickPopup = new Popup();
+      this._clickPopup = new Popup(options);
 
       if (this._deckInstance) {
         this._clickPopup.addTo(this._deckInstance);
@@ -118,10 +123,13 @@ export class LayerInteractivity {
     await this._popupHandler(InteractivityEvent.CLICK, this._clickPopup, elements);
   }
 
-  public async setPopupHover(elements: PopupElement[] | string[] | null = []) {
+  public async setPopupHover(
+    elements: PopupElement[] | string[] | null = [],
+    options: Partial<PopupOptions> = { closeButton: false }
+  ) {
     // if the popup was not created yet then we create it and add it to the map
     if (!this._hoverPopup) {
-      this._hoverPopup = new Popup({ closeButton: false });
+      this._hoverPopup = new Popup(options);
 
       if (this._deckInstance) {
         this._hoverPopup.addTo(this._deckInstance);
@@ -169,28 +177,44 @@ export class LayerInteractivity {
    * to check if the feature received by paramter has been clicked
    * or hovered by the user in order to apply the interaction style
    */
-  private _wrapInteractiveStyle() {
+  private async _wrapInteractiveStyle() {
     const wrapInteractiveStyle = { updateTriggers: {} };
 
-    const currentStyle = this._layerGetStyleFn();
-    const styleProps = currentStyle.getLayerProps(this._layer);
+    const currentStyle = await this._layerGetStyleFn();
+    const styleProps = await currentStyle.getLayerProps(this._layer);
 
     let clickStyleProps = {};
 
     if (this._clickStyle === 'default') {
-      const defaultHighlightStyle = this._getDefaultHighlightStyle();
-      clickStyleProps = defaultHighlightStyle.getLayerProps(this._layer);
+      const defaultHighlightStyle = await this._getDefaultHighlightStyle();
+      clickStyleProps = await defaultHighlightStyle.getLayerProps(this._layer);
     } else if (this._clickStyle instanceof Style) {
-      clickStyleProps = this._clickStyle.getLayerProps(this._layer);
+      clickStyleProps = await this._clickStyle.getLayerProps(this._layer);
     }
 
     let hoverStyleProps = {};
 
     if (this._hoverStyle === 'default') {
-      const defaultHighlightStyle = this._getDefaultHighlightStyle();
-      hoverStyleProps = defaultHighlightStyle.getLayerProps(this._layer);
+      const defaultHighlightStyle = await this._getDefaultHighlightStyle();
+      hoverStyleProps = await defaultHighlightStyle.getLayerProps(this._layer);
     } else if (this._hoverStyle instanceof Style) {
-      hoverStyleProps = this._hoverStyle.getLayerProps(this._layer);
+      hoverStyleProps = await this._hoverStyle.getLayerProps(this._layer);
+    }
+
+    const source = this._layer.getSource();
+    const { uniqueIdProperty } = source.getMetadata();
+
+    type simpleFeature = Record<string, any>;
+    let sameFeatureFn: any;
+
+    if (uniqueIdProperty) {
+      sameFeatureFn = (f1: simpleFeature, f2: simpleFeature): boolean => {
+        return f1.properties[uniqueIdProperty] === f2.properties[uniqueIdProperty];
+      };
+    } else {
+      sameFeatureFn = (f1: simpleFeature, f2: simpleFeature): boolean => {
+        return f1 === f2;
+      };
     }
 
     Object.keys({
@@ -217,15 +241,9 @@ export class LayerInteractivity {
         let styleValue;
 
         if (feature) {
-          if (
-            this._clickFeature &&
-            feature.properties.cartodb_id === this._clickFeature.properties.cartodb_id
-          ) {
+          if (this._clickFeature && sameFeatureFn(feature, this._clickFeature)) {
             styleValue = clickStyleValue;
-          } else if (
-            this._hoverFeature &&
-            feature.properties.cartodb_id === this._hoverFeature.properties.cartodb_id
-          ) {
+          } else if (this._hoverFeature && sameFeatureFn(feature, this._hoverFeature)) {
             styleValue = hoverStyleValue;
           }
         }
@@ -265,9 +283,9 @@ export class LayerInteractivity {
     }
   }
 
-  private _getDefaultHighlightStyle() {
+  private async _getDefaultHighlightStyle() {
     const defaultHighlightProps: StyleProperties = {};
-    const styleProps = this._layerGetStyleFn().getLayerProps(this._layer);
+    const styleProps = await (await this._layerGetStyleFn()).getLayerProps(this._layer);
 
     if (styleProps.getIcon) {
       // icons
@@ -307,7 +325,7 @@ export interface LayerInteractivityOptions {
   /**
    * getStyle method of the layer
    */
-  layerGetStyleFn: () => Style;
+  layerGetStyleFn: () => Promise<Style>;
 
   /**
    * setStyle method of the layer
