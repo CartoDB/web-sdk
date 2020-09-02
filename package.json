@@ -18,7 +18,7 @@
     "lib": "src",
     "example": "examples"
   },
-  "types": "dist/types/index.d.ts",
+  "types": "dist/web-sdk.d.ts",
   "scripts": {
     "prettify": "prettier --write 'src/**/*.ts'",
     "lint": "eslint 'src/**/*{.ts,.tsx}' --no-error-on-unmatched-pattern",
@@ -29,6 +29,7 @@
     "build:cjs": "BABEL_ENV=COMMONJS npx babel --source-maps --config-file ./babel.config.js --out-dir dist/cjs --extensions '.ts' ./src",
     "build:umd": "webpack --config webpack.config.js",
     "build:watch": "webpack --config webpack.config.js --watch ",
+    "build:reference": "npm run build && npx api-extractor run --local --verbose",
     "prewatch": "rimraf dist/",
     "prerelease": "npm run build && npm run test",
     "release": "npx release-it && ./scripts/publish-release.sh",
@@ -47,6 +48,7 @@
     "@babel/preset-env": "^7.11.0",
     "@babel/preset-typescript": "^7.10.4",
     "@danmarshall/deckgl-typings": "^4.3.2",
+    "@microsoft/api-documenter": "^7.8.37",
     "@microsoft/api-extractor": "^7.9.11",
     "@salte-auth/popup": "1.0.0-rc.2",
     "@salte-auth/salte-auth": "3.0.0-rc.8",
