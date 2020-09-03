@@ -215,7 +215,7 @@ Finally, we are going to add an Histogram widget:
   id="widgetHistogram"
   heading="Countries by population"
   description="Distribution of countries by population"
-  show-clear>
+  show-clear-button>
 </as-histogram-widget>
 ```
 

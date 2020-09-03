@@ -64,7 +64,7 @@
               class="as-p--16"
               heading="Average tip percent %"
               description="currently onn screen"
-              show-clear
+              show-clear-button
             >
             </as-histogram-widget>
           </section>
@@ -125,8 +125,9 @@
         // bq source
         // const tileJsonEndpoint = 'https://us-central1-bqtiler-staging.cloudfunctions.net/tilejson'; // for staging
         const tileJsonEndpoint = 'https://bq1.cartocdn.com/tilejson'; // for PROD
-        const bq = new carto.viz.source.BQ('cartobq.maps.nyc_taxi_points_demo_id', { // for PROD
-        // const bq = new carto.viz.source.BQ('bqtiler-staging.maps.nyc_taxi_points_demo_id', { // for staging
+        const bq = new carto.viz.source.BQ('cartobq.maps.nyc_taxi_points_demo_id', {
+          // for PROD
+          // const bq = new carto.viz.source.BQ('bqtiler-staging.maps.nyc_taxi_points_demo_id', { // for staging
           tileJsonEndpoint
         });
 

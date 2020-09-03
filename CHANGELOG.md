@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [1.0.0-alpha.3] 2020-09-02
+
 ### Added
 
 - Add new `carto.viz.Legend` widget for layers, working for these styles: basic, colorBins, colorCategories, colorContinuous, sizeBins, sizeCategories and sizeContinuous (#100, #102, #104, #105, #106, #107, #109 and #113)
@@ -33,6 +35,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 - Fix interactivity styles for common geojson files, expecting cartodb_id to be always present on `carto.viz.source.GeoJSON` ([#125](https://github.com/CartoDB/web-sdk/pull/125/))
 - Fix some `carto.viz.dataview` errors (with remote mode), due to map instance not ready yet ([#136](https://github.com/CartoDB/web-sdk/pull/136/))
 - Fix multiple calls to remote dataviews API (precise mode) every time the map is dragged ([#138](https://github.com/CartoDB/web-sdk/pull/138/))
+- Fix `carto.viz.dataview.Formula` not getting an updated source ([#139](https://github.com/CartoDB/web-sdk/pull/139/))
 
 
 ## [1.0.0-alpha.2] 2020-07-31
