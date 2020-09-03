@@ -29,7 +29,7 @@
     "build:cjs": "BABEL_ENV=COMMONJS npx babel --source-maps --config-file ./babel.config.js --out-dir dist/cjs --extensions '.ts' ./src",
     "build:umd": "webpack --config webpack.config.js",
     "build:watch": "webpack --config webpack.config.js --watch ",
-    "build:reference": "npm run build && npx api-extractor run --local --verbose",
+    "build:extract-api": "npm run build && npx api-extractor run --local --verbose",
     "prewatch": "rimraf dist/",
     "prerelease": "npm run build && npm run test",
     "release": "npx release-it && ./scripts/publish-release.sh",
