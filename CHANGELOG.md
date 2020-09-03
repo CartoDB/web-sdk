@@ -5,6 +5,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+### Fixed
+
+- Added setFilter remoteSource call to DataViewRemote setFilters method ([#142](https://github.com/CartoDB/web-sdk/pull/142/))
+
 ## [1.0.0-alpha.3] 2020-09-02
 
 ### Added
