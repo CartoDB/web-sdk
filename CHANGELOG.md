@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 
+**DEPRECATION WARNING**
+This project won't be continued. Due to feedback received from the users and to bring a better integration with deck.gl, we're moving to a native deck.gl module (see https://deck.gl/docs)
+gi
+
 ## [Unreleased]
 
 ### Fixed
@@ -25,7 +29,6 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 - Add new optional `autoWidth` option to `Popup`, to adjust to its content ([#80](https://github.com/CartoDB/web-sdk/pull/80/))
 - Add new methods to `carto.viz.Layer` to control its visibility: show / hide / isVisible ([#134](https://github.com/CartoDB/web-sdk/pull/134/))
 
-
 ### Changed
 
 - Rename several public members in `carto.viz.Layer`: methods `replaceDeckGLLayer`, `getDeckGLLayer`, `getMapInstance` and property `source` to `replaceDeckLayer`, `getDeckLayer`, `getMap` and `getSource` ([#124](https://github.com/CartoDB/web-sdk/pull/124/))
@@ -40,7 +43,6 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 - Fix some `carto.viz.dataview` errors (with remote mode), due to map instance not ready yet ([#136](https://github.com/CartoDB/web-sdk/pull/136/))
 - Fix multiple calls to remote dataviews API (precise mode) every time the map is dragged ([#138](https://github.com/CartoDB/web-sdk/pull/138/))
 - Fix `carto.viz.dataview.Formula` not getting an updated source ([#139](https://github.com/CartoDB/web-sdk/pull/139/))
-
 
 ## [1.0.0-alpha.2] 2020-07-31
 
