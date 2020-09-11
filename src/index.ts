@@ -1,3 +1,14 @@
+// Copyright (c) CARTO 2020. All rights reserved. Licensed under the BSD-3 license.
+
+/**
+ * Web SDK
+ *
+ * @remarks
+ * A JavaScript library to create custom applications on top of CARTO, using deck.gl
+ *
+ * @packageDocumentation
+ */
+
 // Auth
 import { Credentials, setDefaultCredentials } from './auth';
 

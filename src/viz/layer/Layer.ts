@@ -32,6 +32,16 @@ export enum LayerEvent {
   FILTER_CHANGE = 'filterChange' // must be the same value as GenericDataSourceEvent.FILTER_CHANGE
 }
 
+/**
+ * Main class of the library, representing a layer connected to a CARTO datasource
+ *
+ * @export
+ * @class Layer
+ * @extends {WithEvents}
+ * @implements {StyledLayer}
+ *
+ * @public
+ */
 export class Layer extends WithEvents implements StyledLayer {
   // #region Private props
   private _source: Source;
